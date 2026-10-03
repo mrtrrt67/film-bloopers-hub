@@ -73,8 +73,8 @@ if not st.session_state.get("sessione_tracciata", False):
 inject_global_styles()
 
 # --- CONFIGURAZIONI & SERVIZI ---
-AMAZON_AFFILIATE_TAG = st.secrets.get("AMAZON_AFFILIATE_TAG") or "tuotag-21"
-AMAZON_DASHBOARD_URL = st.secrets.get("AMAZON_DASHBOARD_URL") or "https://affiliati.amazon.it/"
+AMAZON_AFFILIATE_TAG = st.secrets.get("AMAZON_AFFILIATE_TAG")
+AMAZON_DASHBOARD_URL = st.secrets.get("AMAZON_DASHBOARD_URL")
 STRIPE_MONTHLY_URL = st.secrets.get("STRIPE_MONTHLY_URL") or "https://buy.stripe.com/tuolinkmensile"
 STRIPE_LIFETIME_URL = st.secrets.get("STRIPE_LIFETIME_URL") or "https://buy.stripe.com/tuolinklifetime"
 ADMIN_EMAIL = st.secrets.get("ADMIN_EMAIL", "").lower()
