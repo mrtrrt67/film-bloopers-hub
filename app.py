@@ -1,5 +1,6 @@
 from datetime import date, datetime
 import streamlit as st
+import streamlit.components.v1 as components
 from supabase import create_client
 
 # --- IMPORT MODULI CUSTOM ---
@@ -51,9 +52,27 @@ if "access_token" in st.session_state and st.session_state.access_token:
     try: supabase.auth.set_session(st.session_state.access_token, st.session_state.get("refresh_token", ""))
     except: pass
 
+# --- SCRIPT JS PER INTERETTARE IL HASH (#) E CONVERTIRLO IN QUERY (?) ---
+components.html("""
+    <script>
+        if (window.location.hash) {
+            const hash = window.location.hash.substring(1);
+            if (hash.includes("type=recovery") || hash.includes("access_token")) {
+                window.location.replace(window.location.pathname + "?" + hash);
+            }
+        }
+    </script>
+""", height=0)
+
 # --- GESTIONE SCHERMATA RECUPERO PASSWORD (LINK DA EMAIL) ---
 query_params = st.query_params
-if "token_hash" in query_params or "code" in query_params or query_params.get("type") == "recovery":
+if query_params.get("type") == "recovery" or "access_token" in query_params:
+    if "access_token" in query_params and "refresh_token" in query_params:
+        try:
+            supabase.auth.set_session(query_params["access_token"], query_params["refresh_token"])
+        except:
+            pass
+
     st.markdown("""
         <div style="max-width: 500px; margin: 50px auto; background: #111827; border: 1px solid #1f2937; border-radius: 14px; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
             <h2 style="color: #f9fafc; text-align: center; margin-bottom: 20px;">🔒 Imposta Nuova Password</h2>
@@ -70,16 +89,6 @@ if "token_hash" in query_params or "code" in query_params or query_params.get("t
             if btn_salva_pw:
                 if nuova_pw and nuova_pw == conferma_pw:
                     try:
-                        # Gestione del token hash moderno di Supabase
-                        if "token_hash" in query_params:
-                            supabase.auth.verify_otp({
-                                "token_hash": query_params["token_hash"],
-                                "type": "recovery"
-                            })
-                        elif "code" in query_params:
-                            supabase.auth.exchange_code_for_session(query_params["code"])
-                            
-                        # Aggiornamento effettivo della password
                         supabase.auth.update_user({"password": nuova_pw})
                         st.success("Password aggiornata con successo! Ora puoi effettuare il login.")
                         st.query_params.clear()
@@ -200,7 +209,7 @@ elif sezione == "🔍 Esplora e Cerca":
             dati_log = {"termine": testo_titolo.strip()}
             supabase.table("log_ricerche").insert(dati_log).execute()
         except Exception as e:
-            st.toast(f"❌ Errore log_ricerche: {e}", icon="⚠️️")
+            st.toast(f"❌ Errore log_ricerche: {e}", icon="⚠️")
             
         film_gia_esistente = False
         for f in tutti_i_film:
