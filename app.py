@@ -67,10 +67,17 @@ components.html("""
 # --- GESTIONE SCHERMATA RECUPERO PASSWORD (LINK DA EMAIL) ---
 query_params = st.query_params
 if query_params.get("type") == "recovery" or "access_token" in query_params:
-    if "access_token" in query_params and "refresh_token" in query_params:
+    acc_token = query_params.get("access_token")
+    ref_token = query_params.get("refresh_token")
+    
+    if acc_token and ref_token:
         try:
-            supabase.auth.set_session(query_params["access_token"], query_params["refresh_token"])
-        except:
+            res = supabase.auth.set_session(acc_token, ref_token)
+            if res and res.user:
+                st.session_state.user = res.user
+                st.session_state.access_token = acc_token
+                st.session_state.refresh_token = ref_token
+        except Exception:
             pass
 
     st.markdown("""
@@ -89,9 +96,14 @@ if query_params.get("type") == "recovery" or "access_token" in query_params:
             if btn_salva_pw:
                 if nuova_pw and nuova_pw == conferma_pw:
                     try:
+                        if st.session_state.get("access_token"):
+                            supabase.auth.set_session(st.session_state.access_token, st.session_state.get("refresh_token", ""))
+                            
                         supabase.auth.update_user({"password": nuova_pw})
                         st.success("Password aggiornata con successo! Ora puoi effettuare il login.")
                         st.query_params.clear()
+                        st.session_state.user = None
+                        st.session_state.access_token = None
                         st.rerun()
                     except Exception as e:
                         st.error(f"Errore durante l'aggiornamento: {e}")
@@ -256,7 +268,7 @@ elif sezione == "🔍 Esplora e Cerca":
             st.session_state.film_selezionato_id = fil_aggiornati[0]['id']
         else:
             st.session_state.film_selezionato_id = None
-            st.warning(f"⚠️ Nessun film trovato corrispondente esattamente a '{testo_titolo}' con i filtri indicati.")
+            st.warning(f"⚠️️ Nessun film trovato corrispondente esattamente a '{testo_titolo}' con i filtri indicati.")
             
         st.rerun()
         
