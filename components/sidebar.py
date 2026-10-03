@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import date
+import time
 from components.modals import ModalsComponent
 
 def render_sidebar(supabase, is_promo_active, utente_corrente_e_admin, cb_naviga, cb_apri_modal, cb_logout, AMAZON_AFFILIATE_TAG, STRIPE_MONTHLY_URL, STRIPE_LIFETIME_URL):
@@ -116,6 +117,20 @@ def render_sidebar(supabase, is_promo_active, utente_corrente_e_admin, cb_naviga
                             except Exception:
                                 st.error("Credenziali non valide.")
                             if login_ok: st.rerun()
+                    
+                    # --- RECUPERO PASSWORD INTEGRATO ---
+                    with st.expander("🔑 Password dimenticata?"):
+                        with st.form("form_recupero_pw"):
+                            email_recupero = st.text_input("Inserisci la tua email", key="input_recupero_pw")
+                            if st.form_submit_button("Invia email di ripristino", width='stretch'):
+                                if email_recupero:
+                                    try:
+                                        supabase.auth.reset_password_for_email(email_recupero)
+                                        st.success("Controlla la tua casella di posta per le istruzioni di reset.")
+                                    except Exception as e:
+                                        st.error(f"Errore durante l'invio: {e}")
+                                else:
+                                    st.warning("Inserisci prima un indirizzo email valido.")
                 else:
                     with st.form("form_signup"):
                         em = st.text_input("Email")
