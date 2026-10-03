@@ -51,6 +51,37 @@ if "access_token" in st.session_state and st.session_state.access_token:
     try: supabase.auth.set_session(st.session_state.access_token, st.session_state.get("refresh_token", ""))
     except: pass
 
+# --- GESTIONE SCHERMATA RECUPERO PASSWORD (LINK DA EMAIL) ---
+query_params = st.query_params
+if "code" in query_params or query_params.get("type") == "recovery":
+    st.markdown("""
+        <div style="max-width: 500px; margin: 50px auto; background: #111827; border: 1px solid #1f2937; border-radius: 14px; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+            <h2 style="color: #f9fafc; text-align: center; margin-bottom: 20px;">🔒 Imposta Nuova Password</h2>
+        </div>
+    """, unsafe_allow_html=True)
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        with st.form("form_aggiorna_password"):
+            nuova_pw = st.text_input("Nuova Password", type="password")
+            conferma_pw = st.text_input("Conferma Nuova Password", type="password")
+            btn_salva_pw = st.form_submit_button("Aggiorna Password", use_container_width=True)
+            
+            if btn_salva_pw:
+                if nuova_pw and nuova_pw == conferma_pw:
+                    try:
+                        if "code" in query_params:
+                            supabase.auth.exchange_code_for_session(query_params["code"])
+                        supabase.auth.update_user({"password": nuova_pw})
+                        st.success("Password aggiornata con successo! Reindirizzamento in corso...")
+                        st.query_params.clear()
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Errore durante l'aggiornamento: {e}")
+                else:
+                    st.error("Le password non coincidono o sono vuote.")
+    st.stop()
+
 # --- CONTROLLO CAMBIO STATO UTENTE ---
 utente_corrente_id = st.session_state.user.id if st.session_state.user else None
 if st.session_state.get("ultimo_utente_id") != utente_corrente_id:
@@ -209,7 +240,7 @@ elif sezione == "🔍 Esplora e Cerca":
             st.session_state.film_selezionato_id = fil_aggiornati[0]['id']
         else:
             st.session_state.film_selezionato_id = None
-            st.warning(f"⚠️ Nessun film trovato corrispondente esattamente a '{testo_titolo}' con i filtri indicati.")
+            st.warning(f"⚠️️ Nessun film trovato corrispondente esattamente a '{testo_titolo}' con i filtri indicati.")
             
         st.rerun()
         
