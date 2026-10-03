@@ -1,6 +1,5 @@
 from datetime import date, datetime
 import streamlit as st
-import streamlit.components.v1 as components
 from supabase import create_client
 
 # --- IMPORT MODULI CUSTOM ---
@@ -52,71 +51,45 @@ if "access_token" in st.session_state and st.session_state.access_token:
     try: supabase.auth.set_session(st.session_state.access_token, st.session_state.get("refresh_token", ""))
     except: pass
 
-# --- SCRIPT JS PER INTERETTARE IL HASH (#) E CONVERTIRLO IN QUERY (?) ---
-components.html("""
-    <script>
-        if (window.location.hash) {
-            const hash = window.location.hash.substring(1);
-            if (hash.includes("type=recovery") || hash.includes("access_token") || hash.includes("token_hash")) {
-                window.top.location.replace(window.top.location.pathname + "?" + hash);
-            }
-        }
-    </script>
-""", height=0)
-
-# --- GESTIONE SCHERMATA RECUPERO PASSWORD (LINK DA EMAIL) ---
+# --- GESTIONE SCHERMATA RECUPERO PASSWORD (VIA CODICE PKCE PULITO) ---
 query_params = st.query_params
+code_param = query_params.get("code")
 
-# Controllo sicuro a prova di errore per i tipi di parametri (stringa o lista)
-p_type = query_params.get("type")
-is_recovery = p_type == "recovery" or (isinstance(p_type, list) and "recovery" in p_type)
-has_token = "access_token" in query_params or "token_hash" in query_params
-
-if is_recovery or has_token:
-    acc_token = query_params.get("access_token")
-    if isinstance(acc_token, list): acc_token = acc_token[0]
-    
-    ref_token = query_params.get("refresh_token")
-    if isinstance(ref_token, list): ref_token = ref_token[0]
-    
-    if acc_token and ref_token:
-        try:
-            res = supabase.auth.set_session(acc_token, ref_token)
-            if res and res.user:
-                st.session_state.user = res.user
-                st.session_state.access_token = acc_token
-                st.session_state.refresh_token = ref_token
-        except Exception:
-            pass
+if code_param:
+    if isinstance(code_param, list): 
+        code_param = code_param[0]
 
     st.markdown("""
-        <div style="max-width: 500px; margin: 50px auto; background: #111827; border: 1px solid #1f2937; border-radius: 14px; padding: 30px; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
-            <h2 style="color: #f9fafc; text-align: center; margin-bottom: 20px;">🔒 Imposta Nuova Password</h2>
+        <div style="max-width: 500px; margin: 80px auto; background: #111827; border: 1px solid #1f2937; border-radius: 16px; padding: 35px; box-shadow: 0 10px 25px rgba(0,0,0,0.6);">
+            <h2 style="color: #f9fafc; text-align: center; margin-bottom: 10px;">🔒 Reimposta Password</h2>
+            <p style="color: #9ca3af; text-align: center; font-size: 14px; margin-bottom: 25px;">Inserisci la tua nuova password per completare il recupero.</p>
         </div>
     """, unsafe_allow_html=True)
     
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
-        with st.form("form_aggiorna_password"):
+        with st.form("form_reset_definitivo"):
             nuova_pw = st.text_input("Nuova Password", type="password")
             conferma_pw = st.text_input("Conferma Nuova Password", type="password")
-            btn_salva_pw = st.form_submit_button("Aggiorna Password", use_container_width=True)
+            btn_aggiorna = st.form_submit_button("Aggiorna Password", use_container_width=True)
             
-            if btn_salva_pw:
+            if btn_aggiorna:
                 if nuova_pw and nuova_pw == conferma_pw:
-                    try:
-                        if st.session_state.get("access_token"):
-                            supabase.auth.set_session(st.session_state.get("access_token"), st.session_state.get("refresh_token"))
+                    if len(nuova_pw) >= 6:
+                        try:
+                            # Scambiamo il codice di recupero per una sessione valida
+                            supabase.auth.exchange_code_for_session(code_param)
+                            # Aggiorniamo la password dell'utente
+                            supabase.auth.update_user({"password": nuova_pw})
                             
-                        supabase.auth.update_user({"password": nuova_pw})
-                        st.success("Password aggiornata con successo! Ora puoi effettuare il login.")
-                        st.query_params.clear()
-                        st.session_state.user = None
-                        st.session_state.access_token = None
-                        st.session_state.refresh_token = None
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"Errore durante l'aggiornamento: {e}")
+                            st.success("Password aggiornata con successo! Reindirizzamento al sito...")
+                            # Puliamo i parametri dall'URL e ricarichiamo la home
+                            st.query_params.clear()
+                            st.rerun()
+                        except Exception as e:
+                            st.error(f"Errore durante l'aggiornamento: {e}")
+                    else:
+                        st.warning("La password deve essere di almeno 6 caratteri.")
                 else:
                     st.error("Le password non coincidono o sono vuote.")
     st.stop()
@@ -300,7 +273,7 @@ elif sezione == "🔍 Esplora e Cerca":
 elif sezione == "🏆 Classifica":
     render_classifica(supabase)
 
-elif sezione == "✍️ Segnala un Errore":
+elif sezione == "✍️️ Segnala un Errore":
     render_segnala_errore(supabase, tutti_i_film)
 
 elif sezione == "💬 Invia Suggerimento":
