@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Reset Password - FilmBloopers Hub</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background: #0b0f19; color: #fff; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .card { background: #111827; padding: 35px; border-radius: 16px; border: 1px solid #1f2937; width: 100%; max-width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.6); }
+        h2 { text-align: center; margin-bottom: 8px; font-size: 22px; }
+        p.subtitle { text-align: center; color: #9ca3af; font-size: 13px; margin-bottom: 25px; }
+        label { font-size: 11px; color: #9ca3af; display: block; margin-bottom: 4px; }
+        input { width: 100%; padding: 11px; margin-bottom: 16px; background: #1f2937; border: 1px solid #374151; color: #fff; border-radius: 8px; box-sizing: border-box; outline: none; }
+        button { width: 100%; padding: 12px; background: #2563eb; color: #fff; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; font-size: 14px; }
+        button:hover { background: #1d4ed8; }
+        #message { font-size: 13px; text-align: center; margin-top: 15px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>🔒 Nuova Password</h2>
+        <p class="subtitle">Inserisci la tua nuova password per completare il recupero.</p>
+        
+        <div id="form-container">
+            <label>Nuova Password</label>
+            <input type="password" id="new_password" placeholder="••••••••">
+            
+            <label>Conferma Password</label>
+            <input type="password" id="confirm_password" placeholder="••••••••">
+            
+            <button onclick="handlePasswordReset()">Aggiorna Password</button>
+        </div>
+        <p id="message"></p>
+    </div>
+
+    <script>
+        // Inserisci qui le tue chiavi di Supabase
+        const SUPABASE_URL = "https://gmiwhscbqvadnlqruhjs.supabase.co";
+        const SUPABASE_KEY = "sb_secret_ApMO_nHM0RHaAZAAuAfTVw_fGHAgAn2";
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        async function handlePasswordReset() {
+            const p1 = document.getElementById('new_password').value;
+            const p2 = document.getElementById('confirm_password').value;
+            const msg = document.getElementById('message');
+
+            if (!p1 || p1 !== p2) {
+                msg.style.color = '#ef4444';
+                msg.innerText = "Le password non coincidono o sono vuote.";
+                return;
+            }
+            if (p1.length < 6) {
+                msg.style.color = '#ef4444';
+                msg.innerText = "La password deve essere di almeno 6 caratteri.";
+                return;
+            }
+
+            msg.style.color = '#9ca3af';
+            msg.innerText = "Aggiornamento in corso...";
+
+            try {
+                // Supabase JS legge in automatico il token dal cancelletto (#) dell'URL
+                const { error } = await supabaseClient.auth.updateUser({ password: p1 });
+
+                if (error) {
+                    msg.style.color = '#ef4444';
+                    msg.innerText = "Errore: " + error.message;
+                } else {
+                    msg.style.color = '#22c55e';
+                    msg.innerText = "Password aggiornata! Reindirizzamento all'app...";
+                    setTimeout(() => {
+                        window.location.href = "https://cinemabloopers.streamlit.app/";
+                    }, 2500);
+                }
+            } catch (e) {
+                msg.style.color = '#ef4444';
+                msg.innerText = "Errore di connessione imprevisto.";
+            }
+        }
+    </script>
+</body>
+</html>
