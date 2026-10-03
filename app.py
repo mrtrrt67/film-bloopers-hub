@@ -57,8 +57,8 @@ components.html("""
     <script>
         if (window.location.hash) {
             const hash = window.location.hash.substring(1);
-            if (hash.includes("type=recovery") || hash.includes("access_token")) {
-                window.location.replace(window.location.pathname + "?" + hash);
+            if (hash.includes("type=recovery") || hash.includes("access_token") || hash.includes("token_hash")) {
+                window.top.location.replace(window.top.location.pathname + "?" + hash);
             }
         }
     </script>
@@ -66,7 +66,7 @@ components.html("""
 
 # --- GESTIONE SCHERMATA RECUPERO PASSWORD (LINK DA EMAIL) ---
 query_params = st.query_params
-if query_params.get("type") == "recovery" or "access_token" in query_params:
+if query_params.get("type") == "recovery" or "access_token" in query_params or "token_hash" in query_params:
     acc_token = query_params.get("access_token")
     ref_token = query_params.get("refresh_token")
     
@@ -268,7 +268,7 @@ elif sezione == "🔍 Esplora e Cerca":
             st.session_state.film_selezionato_id = fil_aggiornati[0]['id']
         else:
             st.session_state.film_selezionato_id = None
-            st.warning(f"⚠️️ Nessun film trovato corrispondente esattamente a '{testo_titolo}' con i filtri indicati.")
+            st.warning(f"⚠️ Nessun film trovato corrispondente esattamente a '{testo_titolo}' con i filtri indicati.")
             
         st.rerun()
         
