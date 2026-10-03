@@ -66,9 +66,18 @@ components.html("""
 
 # --- GESTIONE SCHERMATA RECUPERO PASSWORD (LINK DA EMAIL) ---
 query_params = st.query_params
-if query_params.get("type") == "recovery" or "access_token" in query_params or "token_hash" in query_params:
+
+# Controllo sicuro a prova di errore per i tipi di parametri (stringa o lista)
+p_type = query_params.get("type")
+is_recovery = p_type == "recovery" or (isinstance(p_type, list) and "recovery" in p_type)
+has_token = "access_token" in query_params or "token_hash" in query_params
+
+if is_recovery or has_token:
     acc_token = query_params.get("access_token")
+    if isinstance(acc_token, list): acc_token = acc_token[0]
+    
     ref_token = query_params.get("refresh_token")
+    if isinstance(ref_token, list): ref_token = ref_token[0]
     
     if acc_token and ref_token:
         try:
@@ -97,13 +106,14 @@ if query_params.get("type") == "recovery" or "access_token" in query_params or "
                 if nuova_pw and nuova_pw == conferma_pw:
                     try:
                         if st.session_state.get("access_token"):
-                            supabase.auth.set_session(st.session_state.access_token, st.session_state.get("refresh_token", ""))
+                            supabase.auth.set_session(st.session_state.get("access_token"), st.session_state.get("refresh_token"))
                             
                         supabase.auth.update_user({"password": nuova_pw})
                         st.success("Password aggiornata con successo! Ora puoi effettuare il login.")
                         st.query_params.clear()
                         st.session_state.user = None
                         st.session_state.access_token = None
+                        st.session_state.refresh_token = None
                         st.rerun()
                     except Exception as e:
                         st.error(f"Errore durante l'aggiornamento: {e}")
