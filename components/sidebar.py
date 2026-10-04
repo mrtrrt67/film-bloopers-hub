@@ -121,10 +121,10 @@ def render_sidebar(supabase, is_promo_active, utente_corrente_e_admin, cb_naviga
                         if btn_invia:
                             if email_recupero:
                                 try:
-                                   supabase.auth.reset_password_for_email(
+                                    supabase.auth.reset_password_for_email(
                                         email_recupero,
                                         options={"email_redirect_to": "https://mrtrrt67.github.io/film-bloopers-hub/reset.html"}
-                                    )                                    
+                                    )
                                     st.success("Email inviata! Controlla la tua casella di posta.")
                                 except Exception as e:
                                     st.error(f"Errore: {e}")
