@@ -4,10 +4,6 @@ import time
 from components.modals import ModalsComponent
 
 def render_sidebar(supabase, is_promo_active, utente_corrente_e_admin, cb_naviga, cb_apri_modal, cb_logout, AMAZON_AFFILIATE_TAG, STRIPE_MONTHLY_URL, STRIPE_LIFETIME_URL):
-    """
-    Gestisce interamente il rendering, la navigazione, la ricerca e il blocco utente della barra laterale.
-    Restituisce un dizionario o una tupla con i parametri di ricerca se l'utente ha avviato una ricerca.
-    """
     btn_cerca = False
     btn_reset = False
     testo_titolo = ""
@@ -15,7 +11,6 @@ def render_sidebar(supabase, is_promo_active, utente_corrente_e_admin, cb_naviga
     testo_cast = ""
 
     with st.sidebar:
-        # Logo con cornice 3D elegante
         st.image("images/Logo.png", use_container_width=True)
         st.markdown("---")
 
@@ -29,7 +24,6 @@ def render_sidebar(supabase, is_promo_active, utente_corrente_e_admin, cb_naviga
                 args=(nome_sezione,)
             )
 
-        # Sezione Ricerca o Menu di Navigazione
         if st.session_state.get("sezione_corrente") == "🔍 Esplora e Cerca":
             st.markdown("<div style='margin-top: 10px; margin-bottom: 6px; padding-left: 8px;'><span style='color: #64748b; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px;'>🔍 Ricerca</span></div>", unsafe_allow_html=True)
             st.button("🔙 Torna al Menu", key="btn_torna_menu", width='stretch', type="secondary", on_click=cb_naviga, args=("🏠 Home",))
@@ -57,7 +51,7 @@ def render_sidebar(supabase, is_promo_active, utente_corrente_e_admin, cb_naviga
             if st.session_state.get("user"):
                 st.markdown("""<div style="background: #111827; border: 1px solid #1f2937; border-radius: 10px; padding: 10px; margin-bottom: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.2);"><div style="color: #64748b; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 6px; padding-left: 4px;">✍️ Community</div>""", unsafe_allow_html=True)
                 render_nav_btn("🏆 Classifica", "🏆 Classifica")
-                render_nav_btn("✍️ Segnala un Errore", "✍️ Segnala un Errore")
+                render_nav_btn("✍ Segnala un Errore", "✍️ Segnala un Errore")
                 render_nav_btn("💬 Invia Suggerimento", "💬 Invia Suggerimento")
                 st.markdown("</div>", unsafe_allow_html=True)
                 
@@ -82,7 +76,7 @@ def render_sidebar(supabase, is_promo_active, utente_corrente_e_admin, cb_naviga
                 render_nav_btn("🛡️ Pannello Admin", "🛡️ Pannello Admin")
                 st.markdown("</div>", unsafe_allow_html=True)
                 
-            with st.expander("⚖️ Note Legali", expanded=False):
+            with st.expander("⚖ Note Legali", expanded=False):
                 if st.button("🔒 Privacy Policy", width='stretch'): cb_apri_modal("privacy"); st.rerun()
                 if st.button("📄 Termini di Servizio", width='stretch'): cb_apri_modal("tos"); st.rerun()
                 if st.button("🍪 Cookie Policy", width='stretch'): cb_apri_modal("cookie"); st.rerun()
@@ -90,7 +84,6 @@ def render_sidebar(supabase, is_promo_active, utente_corrente_e_admin, cb_naviga
 
         st.markdown("---")
         
-        # Blocco Utente / Autenticazione in basso nella sidebar
         if "login_err" not in st.session_state: 
             st.session_state.login_err = ""
             
@@ -99,8 +92,10 @@ def render_sidebar(supabase, is_promo_active, utente_corrente_e_admin, cb_naviga
             st.markdown(f"""<div style="background: #111827; border: 1px solid #1f2937; border-radius: 8px; padding: 8px 10px; margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; font-size: 11px;"><span style="color: #9ca3af; font-weight: 500;">Ospite</span><span style="color: #fb923c; font-weight: 600;">👤 {rimanenti_guest}/6 gratis</span></div>""", unsafe_allow_html=True)
             if st.button("💎 Listino Piani", key="btn_popup_ospite"): 
                 ModalsComponent.mostra_popup_premium(is_promo_active(), STRIPE_MONTHLY_URL, STRIPE_LIFETIME_URL, None)
+            
             with st.expander("🔑 Accedi o Registrati", expanded=False):
-                scelta_auth = st.radio("Azione", ["Accedi", "Registrati"], label_visibility="collapsed")
+                scelta_auth = st.radio("Azione", ["Accedi", "Registrati", "Recupera Password"], label_visibility="collapsed")
+                
                 if scelta_auth == "Accedi":
                     with st.form("form_login"):
                         em = st.text_input("Email")
@@ -117,20 +112,24 @@ def render_sidebar(supabase, is_promo_active, utente_corrente_e_admin, cb_naviga
                             except Exception:
                                 st.error("Credenziali non valide.")
                             if login_ok: st.rerun()
-                    
-                    # --- RECUPERO PASSWORD INTEGRATO ---
-                    with st.expander("🔑 Password dimenticata?"):
-                        with st.form("form_recupero_pw"):
-                            email_recupero = st.text_input("Inserisci la tua email", key="input_recupero_pw")
-                            if st.form_submit_button("Invia email di ripristino", width='stretch'):
-                                if email_recupero:
-                                    try:
-                                        supabase.auth.reset_password_for_email(email_recupero)
-                                        st.success("Controlla la tua casella di posta per le istruzioni di reset.")
-                                    except Exception as e:
-                                        st.error(f"Errore durante l'invio: {e}")
-                                else:
-                                    st.warning("Inserisci prima un indirizzo email valido.")
+                            
+                elif scelta_auth == "Recupera Password":
+                    st.markdown("<span style='font-size: 11px; color: #9ca3af;'>Inserisci la tua email per ricevere il link sicuro di recupero.</span>", unsafe_allow_html=True)
+                    with st.form("form_richiesta_reset"):
+                        email_recupero = st.text_input("Tua Email")
+                        btn_invia = st.form_submit_button("Invia Email di Recupero", width='stretch')
+                        if btn_invia:
+                            if email_recupero:
+                                try:
+                                   supabase.auth.reset_password_for_email(
+                                        email_recupero,
+                                        options={"email_redirect_to": "https://mrtrrt67.github.io/film-bloopers-hub/reset.html"}
+                                    )                                    
+                                    st.success("Email inviata! Controlla la tua casella di posta.")
+                                except Exception as e:
+                                    st.error(f"Errore: {e}")
+                            else:
+                                st.warning("Inserisci l'email.")
                 else:
                     with st.form("form_signup"):
                         em = st.text_input("Email")
