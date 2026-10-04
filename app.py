@@ -273,7 +273,7 @@ elif sezione == "🔍 Esplora e Cerca":
 elif sezione == "🏆 Classifica":
     render_classifica(supabase)
 
-elif sezione == "✍️️ Segnala un Errore":
+elif "Segnala un Errore" in sezione:
     render_segnala_errore(supabase, tutti_i_film)
 
 elif sezione == "💬 Invia Suggerimento":
