@@ -7,7 +7,7 @@ import streamlit as st
 from google import genai
 from google.genai import types
 
-MODELLI_GEMINI = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-1.5-flash-8b', 'gemini-flash-latest']
+MODELLI_GEMINI = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-flash-latest']
 
 def normalizza_ai(testo):
     if not testo: return ""
