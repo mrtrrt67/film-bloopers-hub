@@ -204,16 +204,24 @@ class AIService:
             response = self.chiama_ia_con_retry(prompt, supabase_client, user_obj, is_admin, temperatura=0.0, operazione="Creazione Film DB", film=titolo)
             if not response or not response.text: return 0
 
-            testo_risposta = response.text.replace("```json", "").replace("```", "").strip()
+            # DEBUG: Mostriamo a video cosa sta dicendo l'IA prima che si rompa
+            st.info(f"🕵️ DEBUG - L'IA ha risposto per il film '{titolo}'. Estrazione dati in corso...")
+
+            testo_risposta = response.text.strip()
             
-            start_idx = testo_risposta.find("{")
-            end_idx = testo_risposta.rfind("}")
-            if start_idx != -1 and end_idx != -1:
-                testo_risposta = testo_risposta[start_idx:end_idx+1]
+            # Utilizziamo le regex per isolare il dizionario JSON, saltando le chiacchiere iniziali o finali
+            match = re.search(r'\{.*\}', testo_risposta, re.DOTALL)
+            if match: 
+                testo_risposta = match.group(0)
+            else:
+                st.error("🕵️ DEBUG - L'IA non ha restituito un formato JSON valido. Testo grezzo restituito:")
+                st.text(response.text)
+                return 0
 
             try:
                 dati = json.loads(testo_risposta)
             except Exception as e_json:
+                st.error(f"🕵️ DEBUG - Errore di decodifica JSON: {e_json}")
                 self._registra_errore_ia(supabase_client, user_obj, "JSON Parsing", titolo, "Parsing Json Creazione Film", str(e_json))
                 return 0
 
@@ -237,11 +245,16 @@ class AIService:
                         "genere": f.get("genere", "N/D"),
                         "trama": f.get("trama", "Trama non disponibile.")
                     }
-                    supabase_client.table("films").insert(nuovo_record).execute()
-                    inseriti += 1
+                    try:
+                        supabase_client.table("films").insert(nuovo_record).execute()
+                        st.success(f"🕵️ DEBUG - Film '{t_titolo}' salvato correttamente nel database!")
+                        inseriti += 1
+                    except Exception as ins_err:
+                        st.error(f"🕵️ DEBUG - Errore di salvataggio su Supabase per '{t_titolo}': {ins_err}")
 
             return inseriti
         except Exception as e_gen:
+            st.error(f"🕵️ DEBUG - Eccezione generale durante il processo per '{titolo}': {e_gen}")
             self._registra_errore_ia(supabase_client, user_obj, "Eccezione Generale", titolo, "Creazione Film DB", str(e_gen))
             return 0
  
