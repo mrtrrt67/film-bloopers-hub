@@ -180,41 +180,41 @@ class AIService:
             prompt = f"""
             Sei un database cinematografico ufficiale. L'utente ha cercato: "{titolo}" (Anno indicato: {anno}, Regista/Attore: {cast}).
             REGOLE TASSATIVE:
-            1. MULTI-RISULTATO: Se la ricerca corrisponde a più film (es. remake o saghe), restituisci TUTTE le versioni esistenti. Non fermarti al primo.
-            2. Se l'utente cerca invece un sequel specifico, restituisci solo quello.
-            3. Il campo 'titolo' DEVE contenere il titolo in italiano seguito dal titolo originale tra parentesi.
+            1. MULTI-RISULTATO: Se la ricerca corrisponde a più film (es. remake o saghe), restituisci TUTTE le versioni in un array.
+            2. Se l'utente cerca un sequel specifico, restituisci solo quello.
+            3. Il campo 'titolo' DEVE contenere il titolo in italiano seguito dal titolo originale tra parentesi (es. "King Kong (King Kong)").
             
-            ESEMPIO DI STRUTTURA JSON:
+            ESEMPIO DI STRUTTURA JSON TASSATIVA:
             {{
                 "films": [
                     {{
-                        "titolo": "Titolo in italiano (Titolo Originale)",
+                        "titolo": "King Kong (King Kong)",
                         "anno": 1933,
-                        "regista": "Nome",
-                        "attori": "Attori",
-                        "genere": "Genere",
+                        "regista": "Merian C. Cooper",
+                        "attori": "Fay Wray",
+                        "genere": "Avventura",
                         "trama": "Trama"
                     }},
                     {{
-                        "titolo": "Titolo in italiano (Titolo Originale)",
+                        "titolo": "King Kong (King Kong)",
                         "anno": 2005,
-                        "regista": "Nome",
-                        "attori": "Attori",
-                        "genere": "Genere",
+                        "regista": "Peter Jackson",
+                        "attori": "Naomi Watts",
+                        "genere": "Avventura",
                         "trama": "Trama"
                     }}
                 ]
             }}
-            Restituisci ESCLUSIVAMENTE il JSON puro, senza blocchi markdown.
+            Restituisci ESCLUSIVAMENTE il JSON puro.
             """
 
             response = self.chiama_ia_con_retry(prompt, supabase_client, user_obj, is_admin, temperatura=0.0, operazione="Creazione Film DB", film=titolo)
-            if not response or not response.text: return None
+            if not response or not response.text: 
+                st.error("🕵️ Errore IA: Nessuna risposta dai server di Google.")
+                return None
 
             testo_risposta = response.text.replace("```json", "").replace("```", "").strip()
             
-            # --- ESTRAZIONE FLESSIBILE A PROVA DI BOMBA ---
-            # Trova la prima apertura e l'ultima chiusura, che sia un oggetto o un array diretto
             start_dict = testo_risposta.find("{")
             start_list = testo_risposta.find("[")
             
@@ -228,45 +228,57 @@ class AIService:
             try:
                 dati = json.loads(testo_risposta)
             except Exception as e_json:
-                self._registra_errore_ia(supabase_client, user_obj, "JSON Parsing", titolo, "Parsing Json Creazione Film", f"{e_json} - TESTO STRAPPATO: {testo_risposta}")
+                st.error(f"🕵️ L'IA ha sbagliato a formattare il JSON: {e_json}")
+                st.code(testo_risposta)
                 return None
 
-            # --- GESTIONE DATI ADATTIVA ---
-            # Se Gemini ha restituito l'oggetto corretto {"films": [...]}, estraiamo l'array
+            # --- PROTEZIONE TOTALE STRUTTURA DATI ---
             if isinstance(dati, dict):
-                film_trovati = dati.get("films", [])
-            # Se Gemini ha disubbidito e restituito un array diretto [...], lo gestiamo comunque!
+                f_data = dati.get("films", [])
+                if isinstance(f_data, dict):
+                    film_trovati = [f_data] # Se l'IA ha fatto un oggetto invece di una lista, lo forziamo a lista!
+                elif isinstance(f_data, list):
+                    film_trovati = f_data
+                else:
+                    film_trovati = []
             elif isinstance(dati, list):
                 film_trovati = dati
             else:
                 film_trovati = []
             
+            if not film_trovati:
+                st.error("🕵️ L'IA non ha trovato o inserito film nel file.")
+                return None
+
+            titolo_principale = str(film_trovati[0].get("titolo", ""))
+
             for f in film_trovati:
-                t_titolo = f.get("titolo")
-                t_anno = str(f.get("anno", ""))
+                t_titolo = str(f.get("titolo", "")).strip()
+                t_anno = str(f.get("anno", "")).strip()
                 
                 if not t_titolo: continue
 
-                esistente = next((db for db in tutti_i_film if db.get("titolo", "").strip().lower() == t_titolo.strip().lower() and str(db.get("anno", "")) == t_anno), None)
+                esistente = next((db for db in tutti_i_film if db.get("titolo", "").strip().lower() == t_titolo.lower() and str(db.get("anno", "")) == t_anno), None)
                 
                 if not esistente:
                     nuovo_record = {
                         "titolo": t_titolo,
                         "anno": t_anno,
-                        "regista": f.get("regista", "N/D"),
-                        "attori": f.get("attori", "N/D"),
-                        "genere": f.get("genere", "N/D"),
-                        "trama": f.get("trama", "Trama non disponibile.")
+                        "regista": str(f.get("regista", "N/D")),
+                        "attori": str(f.get("attori", "N/D")),
+                        "genere": str(f.get("genere", "N/D")),
+                        "trama": str(f.get("trama", "Trama non disponibile."))
                     }
                     try:
                         supabase_client.table("films").insert(nuovo_record).execute()
+                        st.success(f"🕵️ Salvato su Supabase: {t_titolo}")
                     except Exception as db_err:
-                        self._registra_errore_ia(supabase_client, user_obj, "DB Insert Error", titolo, "Creazione Film DB", str(db_err))
+                        st.error(f"🕵️ ERRORE SUPABASE per '{t_titolo}': {db_err}")
 
-            return True
+            return titolo_principale 
             
         except Exception as e_gen:
-            self._registra_errore_ia(supabase_client, user_obj, "Eccezione Generale", titolo, "Creazione Film DB", str(e_gen))
+            st.error(f"🕵️ ERRORE PYTHON: {e_gen}")
             return None
             
     def completa_cast_e_dettagli(self, film_id, titolo, anno, supabase_client, user_obj, is_admin):
