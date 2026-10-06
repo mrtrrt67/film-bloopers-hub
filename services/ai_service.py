@@ -104,7 +104,6 @@ class AIService:
                 
                 self._registra_errore_ia(supabase_client, user_obj, modello, film, operazione, err_msg)
                 
-                # Se l'errore è 503, prova un breve retry sullo stesso modello
                 if "503" in err_str or "service unavailable" in err_str or "overloaded" in err_str:
                     time.sleep(1.5)
                     try:
@@ -121,7 +120,6 @@ class AIService:
                         )
                         t1 = time.time()
                         
-                        # --- AGGIUNTO: Registra il successo anche nel retry 503 ---
                         try: 
                             supabase_client.table("statistiche_ia").insert({"modello": modello, "tempo_esecuzione": round(t1-t0, 2)}).execute()
                         except Exception: 
@@ -183,13 +181,13 @@ class AIService:
             Sei un database cinematografico ufficiale. L'utente sta cercando esattamente questo film: "{titolo}" (Anno indicato: {anno}, Regista/Attore: {cast}).
             REGOLE TASSATIVE:
             1. Se l'utente cerca un sequel numerato (es. "Lo squalo 2", "Lo squalo 3", "Alien 3"), DEVI restituire i dati specifici di quel capitolo esatto.
-            2. ATTENZIONE AI TITOLI STORICI ITALIANI: Se l'utente cerca "Lo squalo 3" (uscito anche come "Jaws 3-D" o "Il cavaliere del mare" nel 1983), restituisci correttamente il film "Lo squalo 3" (1983) con il suo regista e la sua trama vera.
+            2. Il campo 'titolo' DEVE contenere il titolo in italiano seguito dal titolo originale tra parentesi (es. "Gli intoccabili (The Untouchables)"). Se i titoli coincidono, scrivilo una volta sola.
             3. Fornisci un oggetto JSON con una chiave "films" contenente una lista con il film trovato.
             4. La struttura JSON DEVE essere esattamente questa:
             {{
                 "films": [
                     {{
-                        "titolo": "Titolo ufficiale completo in italiano (es. Lo squalo 3)",
+                        "titolo": "Titolo in italiano (Titolo Originale)",
                         "anno": 1983,
                         "regista": "Nome del regista",
                         "attori": "Attori principali",
@@ -202,32 +200,23 @@ class AIService:
             """
 
             response = self.chiama_ia_con_retry(prompt, supabase_client, user_obj, is_admin, temperatura=0.0, operazione="Creazione Film DB", film=titolo)
-            if not response or not response.text: return 0
-
-            # DEBUG: Mostriamo a video cosa sta dicendo l'IA prima che si rompa
-            st.info(f"🕵️ DEBUG - L'IA ha risposto per il film '{titolo}'. Estrazione dati in corso...")
+            if not response or not response.text: return None
 
             testo_risposta = response.text.strip()
             
-            # Utilizziamo le regex per isolare il dizionario JSON, saltando le chiacchiere iniziali o finali
+            # Filtro robusto per il JSON
             match = re.search(r'\{.*\}', testo_risposta, re.DOTALL)
             if match: 
                 testo_risposta = match.group(0)
-            else:
-                st.error("🕵️ DEBUG - L'IA non ha restituito un formato JSON valido. Testo grezzo restituito:")
-                st.text(response.text)
-                return 0
 
             try:
                 dati = json.loads(testo_risposta)
             except Exception as e_json:
-                st.error(f"🕵️ DEBUG - Errore di decodifica JSON: {e_json}")
                 self._registra_errore_ia(supabase_client, user_obj, "JSON Parsing", titolo, "Parsing Json Creazione Film", str(e_json))
-                return 0
+                return None
 
             film_trovati = dati.get("films", [])
-
-            inseriti = 0
+            
             for f in film_trovati:
                 t_titolo = f.get("titolo")
                 t_anno = str(f.get("anno", ""))
@@ -247,17 +236,15 @@ class AIService:
                     }
                     try:
                         supabase_client.table("films").insert(nuovo_record).execute()
-                        st.success(f"🕵️ DEBUG - Film '{t_titolo}' salvato correttamente nel database!")
-                        inseriti += 1
-                    except Exception as ins_err:
-                        st.error(f"🕵️ DEBUG - Errore di salvataggio su Supabase per '{t_titolo}': {ins_err}")
+                    except:
+                        pass 
 
-            return inseriti
+            return True
+            
         except Exception as e_gen:
-            st.error(f"🕵️ DEBUG - Eccezione generale durante il processo per '{titolo}': {e_gen}")
             self._registra_errore_ia(supabase_client, user_obj, "Eccezione Generale", titolo, "Creazione Film DB", str(e_gen))
-            return 0
- 
+            return None
+
     def completa_cast_e_dettagli(self, film_id, titolo, anno, supabase_client, user_obj, is_admin):
         with st.spinner(f"🤖 L'IA sta completando i dettagli per '{titolo}'..."):
             prompt = f"""Fornisci i dati aggiornati per il film: {titolo} ({anno}). Restituisci ESCLUSIVAMENTE JSON:
