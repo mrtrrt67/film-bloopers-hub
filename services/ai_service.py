@@ -180,8 +180,8 @@ class AIService:
             prompt = f"""
             Sei un database cinematografico ufficiale. L'utente ha cercato: "{titolo}" (Anno indicato: {anno}, Regista/Attore: {cast}).
             REGOLE TASSATIVE:
-            1. MULTI-RISULTATO: Se la ricerca ("{titolo}") corrisponde a più film storici (es. remake come "King Kong", "Spider-Man" o saghe come "Harry Potter"), DEVI restituire un array contenente TUTTE le versioni cinematografiche esistenti. Non fermarti al primo!
-            2. Se l'utente cerca invece un sequel specifico (es. "Lo squalo 3"), restituisci solo quello.
+            1. MULTI-RISULTATO: Se la ricerca corrisponde a più film (es. remake o saghe), restituisci TUTTE le versioni esistenti. Non fermarti al primo.
+            2. Se l'utente cerca invece un sequel specifico, restituisci solo quello.
             3. Il campo 'titolo' DEVE contenere il titolo in italiano seguito dal titolo originale tra parentesi.
             
             ESEMPIO DI STRUTTURA JSON:
@@ -205,28 +205,41 @@ class AIService:
                     }}
                 ]
             }}
-            Restituisci ESCLUSIVAMENTE il JSON puro, senza testo aggiuntivo o blocchi markdown superflui.
+            Restituisci ESCLUSIVAMENTE il JSON puro, senza blocchi markdown.
             """
 
             response = self.chiama_ia_con_retry(prompt, supabase_client, user_obj, is_admin, temperatura=0.0, operazione="Creazione Film DB", film=titolo)
             if not response or not response.text: return None
 
-            testo_risposta = response.text.strip()
+            testo_risposta = response.text.replace("```json", "").replace("```", "").strip()
             
-            match = re.search(r'\{.*\}', testo_risposta, re.DOTALL)
-            if match: 
-                testo_risposta = match.group(0)
+            # --- ESTRAZIONE FLESSIBILE A PROVA DI BOMBA ---
+            # Trova la prima apertura e l'ultima chiusura, che sia un oggetto o un array diretto
+            start_dict = testo_risposta.find("{")
+            start_list = testo_risposta.find("[")
+            
+            if start_dict != -1 and (start_list == -1 or start_dict < start_list):
+                end_dict = testo_risposta.rfind("}")
+                testo_risposta = testo_risposta[start_dict:end_dict+1]
+            elif start_list != -1:
+                end_list = testo_risposta.rfind("]")
+                testo_risposta = testo_risposta[start_list:end_list+1]
 
             try:
                 dati = json.loads(testo_risposta)
             except Exception as e_json:
-                st.error(f"❌ DEBUG IA - JSON NON VALIDO: {e_json}")
-                st.code(testo_risposta)  # Mostra a schermo cosa diavolo ha scritto l'IA
+                self._registra_errore_ia(supabase_client, user_obj, "JSON Parsing", titolo, "Parsing Json Creazione Film", f"{e_json} - TESTO STRAPPATO: {testo_risposta}")
                 return None
 
-            film_trovati = dati.get("films", [])
-            if not film_trovati:
-                st.warning("❌ DEBUG IA - L'IA non ha inserito nessun film nell'array.")
+            # --- GESTIONE DATI ADATTIVA ---
+            # Se Gemini ha restituito l'oggetto corretto {"films": [...]}, estraiamo l'array
+            if isinstance(dati, dict):
+                film_trovati = dati.get("films", [])
+            # Se Gemini ha disubbidito e restituito un array diretto [...], lo gestiamo comunque!
+            elif isinstance(dati, list):
+                film_trovati = dati
+            else:
+                film_trovati = []
             
             for f in film_trovati:
                 t_titolo = f.get("titolo")
@@ -247,14 +260,12 @@ class AIService:
                     }
                     try:
                         supabase_client.table("films").insert(nuovo_record).execute()
-                        st.success(f"✅ DEBUG DB - Salvato con successo: {t_titolo}")
                     except Exception as db_err:
-                        st.error(f"❌ DEBUG DB - Errore salvataggio {t_titolo}: {db_err}") 
+                        self._registra_errore_ia(supabase_client, user_obj, "DB Insert Error", titolo, "Creazione Film DB", str(db_err))
 
             return True
             
         except Exception as e_gen:
-            st.error(f"❌ DEBUG GENERALE: {e_gen}")
             self._registra_errore_ia(supabase_client, user_obj, "Eccezione Generale", titolo, "Creazione Film DB", str(e_gen))
             return None
             
