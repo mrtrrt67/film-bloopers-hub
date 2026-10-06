@@ -253,7 +253,7 @@ elif sezione == "🔍 Esplora e Cerca":
             st.session_state.film_selezionato_id = None
             st.warning(f"⚠️ Nessun film trovato corrispondente esattamente a '{testo_titolo}' con i filtri indicati.")
             
-        #st.rerun()
+        st.rerun()
         
     sq = st.session_state.termine_cercato
     c_s, c_d = st.columns([1, 2])
