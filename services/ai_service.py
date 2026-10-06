@@ -7,8 +7,7 @@ import streamlit as st
 from google import genai
 from google.genai import types
 
-# La tua scaletta originale intatta
-MODELLI_GEMINI = ['gemini-3.6-flash', 'gemini-3.5-flash', 'gemini-3.8-flash', 'gemini-3.7-flash', 'gemini-flash-latest']
+MODELLI_GEMINI = ['gemini-1.5-flash', 'gemini-1.5-pro', 'gemini-1.5-flash-8b', 'gemini-flash-latest']
 
 def normalizza_ai(testo):
     if not testo: return ""
@@ -21,7 +20,6 @@ class AIService:
         self.client = genai.Client(api_key=api_key)
 
     def _registra_errore_ia(self, supabase_client, user_obj, modello, film, operazione, errore_dettaglio):
-        """Salva silenziosamente gli errori nel database senza bloccare l'app."""
         try:
             valore_utente = user_obj.email if user_obj and hasattr(user_obj, 'email') else "ospite"
             supabase_client.table("log_errori_ia").insert({
@@ -66,15 +64,28 @@ class AIService:
                 return True
             except: return True
 
-    def chiama_ia_con_retry(self, prompt, supabase_client, user_obj, is_admin, temperatura=0.0, operazione="Generale", film="N/D"):
+    def chiama_ia_con_retry(self, prompt, supabase_client, user_obj, is_admin, temperatura=0.0, operazione="Generale", film="N/D", response_schema=None):
         if not self.verifica_e_incrementa_limite(supabase_client, user_obj, is_admin): return None
         
+        # 1. FIX SICUREZZA: Usiamo BLOCK_ONLY_HIGH. BLOCK_NONE causa ban istantaneo (Errore 400) sul piano Free.
         safety_settings = [
-            types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold=types.HarmBlockThreshold.BLOCK_NONE),
-            types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HARASSMENT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
-            types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold=types.HarmBlockThreshold.BLOCK_NONE),
-            types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold=types.HarmBlockThreshold.BLOCK_NONE)
+            types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold=types.HarmBlockThreshold.BLOCK_ONLY_HIGH),
+            types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_HARASSMENT, threshold=types.HarmBlockThreshold.BLOCK_ONLY_HIGH),
+            types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold=types.HarmBlockThreshold.BLOCK_ONLY_HIGH),
+            types.SafetySetting(category=types.HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold=types.HarmBlockThreshold.BLOCK_ONLY_HIGH)
         ]
+
+        config_args = {
+            "response_mime_type": "application/json", 
+            "max_output_tokens": 8192, 
+            "temperature": temperatura,
+            "safety_settings": safety_settings
+        }
+        
+        if response_schema:
+            config_args["response_schema"] = response_schema
+
+        config = types.GenerateContentConfig(**config_args)
 
         for modello in MODELLI_GEMINI:
             try:
@@ -82,56 +93,38 @@ class AIService:
                 resp = self.client.models.generate_content(
                     model=modello, 
                     contents=prompt, 
-                    config=types.GenerateContentConfig(
-                        response_mime_type="application/json", 
-                        max_output_tokens=8192, 
-                        temperature=temperatura,
-                        safety_settings=safety_settings
-                    )
+                    config=config
                 )
                 t1 = time.time()
-                
-                try: 
-                    supabase_client.table("statistiche_ia").insert({"modello": modello, "tempo_esecuzione": round(t1-t0, 2)}).execute()
-                except Exception: 
-                    pass 
-                    
+                try: supabase_client.table("statistiche_ia").insert({"modello": modello, "tempo_esecuzione": round(t1-t0, 2)}).execute()
+                except Exception: pass 
                 return resp
             
             except Exception as e:
                 err_msg = str(e)
                 err_str = err_msg.lower()
-                
                 self._registra_errore_ia(supabase_client, user_obj, modello, film, operazione, err_msg)
                 
-                if "503" in err_str or "service unavailable" in err_str or "overloaded" in err_str:
-                    time.sleep(1.5)
+                # 2. FIX RATE LIMITING: Intercettiamo i blocchi istantanei per quota superata (429) e diamo respiro all'API
+                if any(codice in err_str for codice in ["503", "429", "service unavailable", "overloaded", "quota", "too many"]):
+                    st.toast(f"⏳ API Google intasate ({modello}). Pausa di 3 secondi...", icon="🔄")
+                    time.sleep(3)
                     try:
                         t0 = time.time()
-                        resp = self.client.models.generate_content(
-                            model=modello, 
-                            contents=prompt, 
-                            config=types.GenerateContentConfig(
-                                response_mime_type="application/json", 
-                                max_output_tokens=8192, 
-                                temperature=temperatura,
-                                safety_settings=safety_settings
-                            )
-                        )
+                        resp = self.client.models.generate_content(model=modello, contents=prompt, config=config)
                         t1 = time.time()
-                        
-                        try: 
-                            supabase_client.table("statistiche_ia").insert({"modello": modello, "tempo_esecuzione": round(t1-t0, 2)}).execute()
-                        except Exception: 
-                            pass 
-                            
+                        try: supabase_client.table("statistiche_ia").insert({"modello": modello, "tempo_esecuzione": round(t1-t0, 2)}).execute()
+                        except Exception: pass 
                         return resp
                     except Exception:
                         pass
+                else:
+                    # 3. FIX DEBUG: Se è un errore 400 per malformazione o altro, stampiamolo a schermo
+                    st.error(f"❌ Errore interno Google API ({modello}): {err_msg}")
 
                 continue
                 
-        st.warning("⚠️ I server IA sono momentaneamente sovraccarichi. Riprova tra qualche istante.")
+        st.warning("⚠️ Tutti i server IA hanno rifiutato la connessione. Probabile limite di richieste superato, riprova tra un minuto.")
         return None
         
     def genera_errori_per_film(self, film_id, titolo, anno, regista, attori, supabase_client, user_obj, is_admin):
@@ -144,21 +137,17 @@ class AIService:
             resp = self.chiama_ia_con_retry(prompt, supabase_client, user_obj, is_admin, temperatura=0.0, operazione="Ricerca Bloopers", film=titolo)
             if not resp: return
             
-            try:
-                testo = resp.text.strip()
+            try: testo = resp.text.strip()
             except ValueError as ve:
-                self._registra_errore_ia(supabase_client, user_obj, "Safety Block", titolo, "Ricerca Bloopers (Filtri)", str(ve))
-                if is_admin: st.toast("⚠️ Debug Admin: Blocco Safety Ratings da Gemini.", icon="⚠️")
+                self._registra_errore_ia(supabase_client, user_obj, "Safety Block", titolo, "Ricerca Bloopers", str(ve))
                 return
 
             match = re.search(r'\[.*\]', testo, re.DOTALL)
             if match: testo = match.group(0)
             
-            try:
-                errori_list = json.loads(testo)
+            try: errori_list = json.loads(testo)
             except Exception as e_json:
                 self._registra_errore_ia(supabase_client, user_obj, "JSON Parsing", titolo, "Parsing Json Bloopers", str(e_json))
-                if is_admin: st.toast(f"⚠️ Debug Admin: JSON malformato.", icon="⚠️")
                 return
 
             email = user_obj.email if user_obj else "IA (Sistema)"
@@ -179,77 +168,55 @@ class AIService:
         try:
             prompt = f"""
             Sei un database cinematografico ufficiale. L'utente ha cercato: "{titolo}" (Anno indicato: {anno}, Regista/Attore: {cast}).
-            REGOLE TASSATIVE:
-            1. MULTI-RISULTATO: Se la ricerca corrisponde a più film (es. remake o saghe), restituisci TUTTE le versioni in un array.
-            2. Se l'utente cerca un sequel specifico, restituisci solo quello.
-            3. Il campo 'titolo' DEVE contenere il titolo in italiano seguito dal titolo originale tra parentesi (es. "King Kong (King Kong)").
             
-            ESEMPIO DI STRUTTURA JSON TASSATIVA:
-            {{
-                "films": [
-                    {{
-                        "titolo": "King Kong (King Kong)",
-                        "anno": 1933,
-                        "regista": "Merian C. Cooper",
-                        "attori": "Fay Wray",
-                        "genere": "Avventura",
-                        "trama": "Trama"
-                    }},
-                    {{
-                        "titolo": "King Kong (King Kong)",
-                        "anno": 2005,
-                        "regista": "Peter Jackson",
-                        "attori": "Naomi Watts",
-                        "genere": "Avventura",
-                        "trama": "Trama"
-                    }}
-                ]
-            }}
-            Restituisci ESCLUSIVAMENTE il JSON puro.
+            REGOLE TASSATIVE:
+            1. ESAUSTIVITÀ ASSOLUTA: Se la ricerca è generica per un franchise o un personaggio (es. "King Kong", "Dracula", "Batman"), non fermarti ai film più famosi o recenti. DEVI esplorare tutti i decenni ed estrarre TUTTI i capitoli, remake e sequel ufficiali esistenti (es. 1933, 1976, 2005, 2017...).
+            2. FORMATO TITOLO PULITO: Usa il titolo in italiano. SOLO SE il titolo originale differisce da quello italiano, aggiungilo tra parentesi (es. "Gli intoccabili (The Untouchables)"). SE SONO IDENTICI, scrivilo una volta sola (es. "King Kong" e NON "King Kong (King Kong)").
+            3. RICERCA SPECIFICA: Se l'utente cerca un sequel esatto e numerato (es. "Lo squalo 3"), ignora la regola 1 e restituisci SOLO quel film specifico.
             """
 
-            response = self.chiama_ia_con_retry(prompt, supabase_client, user_obj, is_admin, temperatura=0.0, operazione="Creazione Film DB", film=titolo)
-            if not response or not response.text: 
-                st.error("🕵️ Errore IA: Nessuna risposta dai server di Google.")
-                return None
+            # Implementazione nativa degli Structured Outputs (JSON Schema)
+            schema_risposta = types.Schema(
+                type=types.Type.OBJECT,
+                properties={
+                    "films": types.Schema(
+                        type=types.Type.ARRAY,
+                        description="Array di film. Deve essere esaustivo per franchise e remake storici.",
+                        items=types.Schema(
+                            type=types.Type.OBJECT,
+                            properties={
+                                "titolo": types.Schema(type=types.Type.STRING, description="Titolo in italiano. Se l'originale è diverso, aggiungilo tra parentesi. Se identico, non duplicare."),
+                                "anno": types.Schema(type=types.Type.STRING),
+                                "regista": types.Schema(type=types.Type.STRING),
+                                "attori": types.Schema(type=types.Type.STRING),
+                                "genere": types.Schema(type=types.Type.STRING),
+                                "trama": types.Schema(type=types.Type.STRING)
+                            },
+                            required=["titolo", "anno", "regista", "attori", "genere", "trama"]
+                        )
+                    )
+                },
+                required=["films"]
+            )
 
-            testo_risposta = response.text.replace("```json", "").replace("```", "").strip()
+            # Temperatura a 0.2 per dare più libertà di "memoria" al modello senza perdere precisione
+            response = self.chiama_ia_con_retry(
+                prompt, supabase_client, user_obj, is_admin, 
+                temperatura=0.2, operazione="Creazione Film DB", film=titolo, response_schema=schema_risposta
+            )
             
-            start_dict = testo_risposta.find("{")
-            start_list = testo_risposta.find("[")
-            
-            if start_dict != -1 and (start_list == -1 or start_dict < start_list):
-                end_dict = testo_risposta.rfind("}")
-                testo_risposta = testo_risposta[start_dict:end_dict+1]
-            elif start_list != -1:
-                end_list = testo_risposta.rfind("]")
-                testo_risposta = testo_risposta[start_list:end_list+1]
+            if not response or not response.text: return None
 
+            # Con lo schema nativo, la risposta di Gemini è garantita essere un JSON valido. Niente più regex.
             try:
-                dati = json.loads(testo_risposta)
+                dati = json.loads(response.text)
+                film_trovati = dati.get("films", [])
             except Exception as e_json:
-                st.error(f"🕵️ L'IA ha sbagliato a formattare il JSON: {e_json}")
-                st.code(testo_risposta)
+                self._registra_errore_ia(supabase_client, user_obj, "JSON Parsing", titolo, "Parsing Json", str(e_json))
                 return None
 
-            # --- PROTEZIONE TOTALE STRUTTURA DATI ---
-            if isinstance(dati, dict):
-                f_data = dati.get("films", [])
-                if isinstance(f_data, dict):
-                    film_trovati = [f_data] # Se l'IA ha fatto un oggetto invece di una lista, lo forziamo a lista!
-                elif isinstance(f_data, list):
-                    film_trovati = f_data
-                else:
-                    film_trovati = []
-            elif isinstance(dati, list):
-                film_trovati = dati
-            else:
-                film_trovati = []
+            if not film_trovati: return None
             
-            if not film_trovati:
-                st.error("🕵️ L'IA non ha trovato o inserito film nel file.")
-                return None
-
             titolo_principale = str(film_trovati[0].get("titolo", ""))
 
             for f in film_trovati:
@@ -271,16 +238,15 @@ class AIService:
                     }
                     try:
                         supabase_client.table("films").insert(nuovo_record).execute()
-                        st.success(f"🕵️ Salvato su Supabase: {t_titolo}")
                     except Exception as db_err:
-                        st.error(f"🕵️ ERRORE SUPABASE per '{t_titolo}': {db_err}")
+                        self._registra_errore_ia(supabase_client, user_obj, "DB Insert Error", t_titolo, "Creazione Film DB", str(db_err))
 
             return titolo_principale 
             
         except Exception as e_gen:
-            st.error(f"🕵️ ERRORE PYTHON: {e_gen}")
+            self._registra_errore_ia(supabase_client, user_obj, "Eccezione Generale", titolo, "Creazione Film DB", str(e_gen))
             return None
-            
+
     def completa_cast_e_dettagli(self, film_id, titolo, anno, supabase_client, user_obj, is_admin):
         with st.spinner(f"🤖 L'IA sta completando i dettagli per '{titolo}'..."):
             prompt = f"""Fornisci i dati aggiornati per il film: {titolo} ({anno}). Restituisci ESCLUSIVAMENTE JSON:
@@ -288,11 +254,8 @@ class AIService:
             try:
                 resp = self.chiama_ia_con_retry(prompt, supabase_client, user_obj, is_admin, temperatura=0.0, operazione="Aggiornamento Dettagli", film=titolo)
                 if resp and resp.text:
-                    try:
-                        d = json.loads(resp.text.replace("```json", "").replace("```", "").strip())
-                    except Exception as e_json:
-                        self._registra_errore_ia(supabase_client, user_obj, "JSON Parsing", titolo, "Parsing Json Dettagli", str(e_json))
-                        return
+                    try: d = json.loads(resp.text.replace("```json", "").replace("```", "").strip())
+                    except Exception: return
                     supabase_client.table("films").update({"regista": d.get("regista"), "attori": d.get("attori"), "trama": d.get("trama"), "genere": d.get("genere")}).eq("id", film_id).execute()
                     st.success("Dettagli aggiornati!")
                     time.sleep(1)
@@ -313,11 +276,8 @@ class AIService:
                 testo = resp.text.strip()
                 match = re.search(r'\[.*\]', testo, re.DOTALL)
                 if match: testo = match.group(0)
-                try:
-                    nuovi = json.loads(testo)
-                except Exception as e_json:
-                    self._registra_errore_ia(supabase_client, user_obj, "JSON Parsing", titolo, "Parsing Json Errori Inediti", str(e_json))
-                    return 0
+                try: nuovi = json.loads(testo)
+                except Exception: return 0
                 
                 set_es = {normalizza_ai(e["descrizione"]) for e in esistenti}
                 da_inserire = []
