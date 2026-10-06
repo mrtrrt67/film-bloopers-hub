@@ -180,31 +180,33 @@ class AIService:
             prompt = f"""
             Sei un database cinematografico ufficiale. L'utente ha cercato: "{titolo}" (Anno indicato: {anno}, Regista/Attore: {cast}).
             REGOLE TASSATIVE:
-            1. MULTI-RISULTATO: Se l'utente cerca una saga (es. "Harry Potter") o un film con più remake storici (es. "King Kong", "Spider-Man"), la chiave "films" DEVE contenere un array con TUTTI i capitoli o TUTTI i remake esistenti.
-            2. Se l'utente cerca invece un sequel numerato specifico (es. "Lo squalo 3"), restituisci solo quel capitolo esatto.
-            3. Il campo 'titolo' DEVE contenere il titolo in italiano seguito dal titolo originale tra parentesi (es. "King Kong (King Kong)" o "Gli intoccabili (The Untouchables)"). 
-            4. Fornisci ESCLUSIVAMENTE un oggetto JSON puro con la chiave "films".
-            La struttura DEVE essere questa:
+            1. MULTI-RISULTATO: Se la ricerca ("{titolo}") corrisponde a più film storici (es. remake come "King Kong", "Spider-Man" o saghe come "Harry Potter"), DEVI restituire un array contenente TUTTE le versioni cinematografiche esistenti. Non fermarti al primo!
+            2. Se l'utente cerca invece un sequel specifico (es. "Lo squalo 3"), restituisci solo quello.
+            3. Il campo 'titolo' DEVE contenere il titolo in italiano seguito dal titolo originale tra parentesi.
+            
+            ESEMPIO DI STRUTTURA JSON:
             {{
                 "films": [
                     {{
                         "titolo": "Titolo in italiano (Titolo Originale)",
                         "anno": 1933,
-                        "regista": "Nome del regista",
-                        "attori": "Attori principali",
+                        "regista": "Nome",
+                        "attori": "Attori",
                         "genere": "Genere",
-                        "trama": "Trama in italiano"
+                        "trama": "Trama"
                     }},
                     {{
                         "titolo": "Titolo in italiano (Titolo Originale)",
                         "anno": 2005,
-                        ...
+                        "regista": "Nome",
+                        "attori": "Attori",
+                        "genere": "Genere",
+                        "trama": "Trama"
                     }}
                 ]
             }}
             Restituisci ESCLUSIVAMENTE il JSON puro, senza testo aggiuntivo o blocchi markdown superflui.
             """
-
             response = self.chiama_ia_con_retry(prompt, supabase_client, user_obj, is_admin, temperatura=0.0, operazione="Creazione Film DB", film=titolo)
             if not response or not response.text: return None
 
