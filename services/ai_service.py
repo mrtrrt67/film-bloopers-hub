@@ -178,21 +178,27 @@ class AIService:
     def cerca_e_salva_saga_su_db(self, titolo, anno, cast, tutti_i_film, supabase_client, user_obj, is_admin):
         try:
             prompt = f"""
-            Sei un database cinematografico ufficiale. L'utente sta cercando esattamente questo film: "{titolo}" (Anno indicato: {anno}, Regista/Attore: {cast}).
+            Sei un database cinematografico ufficiale. L'utente ha cercato: "{titolo}" (Anno indicato: {anno}, Regista/Attore: {cast}).
             REGOLE TASSATIVE:
-            1. Se l'utente cerca un sequel numerato (es. "Lo squalo 2", "Lo squalo 3", "Alien 3"), DEVI restituire i dati specifici di quel capitolo esatto.
-            2. Il campo 'titolo' DEVE contenere il titolo in italiano seguito dal titolo originale tra parentesi (es. "Gli intoccabili (The Untouchables)"). Se i titoli coincidono, scrivilo una volta sola.
-            3. Fornisci un oggetto JSON con una chiave "films" contenente una lista con il film trovato.
-            4. La struttura JSON DEVE essere esattamente questa:
+            1. MULTI-RISULTATO: Se l'utente cerca una saga (es. "Harry Potter") o un film con più remake storici (es. "King Kong", "Spider-Man"), la chiave "films" DEVE contenere un array con TUTTI i capitoli o TUTTI i remake esistenti.
+            2. Se l'utente cerca invece un sequel numerato specifico (es. "Lo squalo 3"), restituisci solo quel capitolo esatto.
+            3. Il campo 'titolo' DEVE contenere il titolo in italiano seguito dal titolo originale tra parentesi (es. "King Kong (King Kong)" o "Gli intoccabili (The Untouchables)"). 
+            4. Fornisci ESCLUSIVAMENTE un oggetto JSON puro con la chiave "films".
+            La struttura DEVE essere questa:
             {{
                 "films": [
                     {{
                         "titolo": "Titolo in italiano (Titolo Originale)",
-                        "anno": 1983,
+                        "anno": 1933,
                         "regista": "Nome del regista",
                         "attori": "Attori principali",
                         "genere": "Genere",
                         "trama": "Trama in italiano"
+                    }},
+                    {{
+                        "titolo": "Titolo in italiano (Titolo Originale)",
+                        "anno": 2005,
+                        ...
                     }}
                 ]
             }}
