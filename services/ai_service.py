@@ -207,12 +207,12 @@ class AIService:
             }}
             Restituisci ESCLUSIVAMENTE il JSON puro, senza testo aggiuntivo o blocchi markdown superflui.
             """
+
             response = self.chiama_ia_con_retry(prompt, supabase_client, user_obj, is_admin, temperatura=0.0, operazione="Creazione Film DB", film=titolo)
             if not response or not response.text: return None
 
             testo_risposta = response.text.strip()
             
-            # Filtro robusto per il JSON
             match = re.search(r'\{.*\}', testo_risposta, re.DOTALL)
             if match: 
                 testo_risposta = match.group(0)
@@ -220,10 +220,13 @@ class AIService:
             try:
                 dati = json.loads(testo_risposta)
             except Exception as e_json:
-                self._registra_errore_ia(supabase_client, user_obj, "JSON Parsing", titolo, "Parsing Json Creazione Film", str(e_json))
+                st.error(f"❌ DEBUG IA - JSON NON VALIDO: {e_json}")
+                st.code(testo_risposta)  # Mostra a schermo cosa diavolo ha scritto l'IA
                 return None
 
             film_trovati = dati.get("films", [])
+            if not film_trovati:
+                st.warning("❌ DEBUG IA - L'IA non ha inserito nessun film nell'array.")
             
             for f in film_trovati:
                 t_titolo = f.get("titolo")
@@ -244,15 +247,17 @@ class AIService:
                     }
                     try:
                         supabase_client.table("films").insert(nuovo_record).execute()
-                    except:
-                        pass 
+                        st.success(f"✅ DEBUG DB - Salvato con successo: {t_titolo}")
+                    except Exception as db_err:
+                        st.error(f"❌ DEBUG DB - Errore salvataggio {t_titolo}: {db_err}") 
 
             return True
             
         except Exception as e_gen:
+            st.error(f"❌ DEBUG GENERALE: {e_gen}")
             self._registra_errore_ia(supabase_client, user_obj, "Eccezione Generale", titolo, "Creazione Film DB", str(e_gen))
             return None
-
+            
     def completa_cast_e_dettagli(self, film_id, titolo, anno, supabase_client, user_obj, is_admin):
         with st.spinner(f"🤖 L'IA sta completando i dettagli per '{titolo}'..."):
             prompt = f"""Fornisci i dati aggiornati per il film: {titolo} ({anno}). Restituisci ESCLUSIVAMENTE JSON:
