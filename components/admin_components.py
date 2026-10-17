@@ -80,7 +80,6 @@ class AdminComponent:
             st.markdown("<h3 style='text-align: center; color: #facc15;'>🛒 Dashboard Affiliazioni Amazon</h3>", unsafe_allow_html=True)
             st.markdown("<p style='text-align: center; color: #9ca3af; font-size: 14px;'>Accedi alla console ufficiale di Amazon per monitorare ordini, conversioni e commissioni in tempo reale.</p>", unsafe_allow_html=True)
             
-            # Creiamo 3 colonne e mettiamo il bottone al centro per farlo risaltare
             col_b1, col_b2, col_b3 = st.columns([1, 2, 1])
             with col_b2:
                 st.link_button("📊 Apri Dashboard Amazon Affiliati", amazon_dashboard_url, use_container_width=True)
@@ -200,15 +199,13 @@ class AdminComponent:
             st.markdown(f"#### ⚠️ Log Errori IA (Ultimi {len(err_ia)})")
             if err_ia:
                 df_err = pd.DataFrame(err_ia)
-                df_err['created_at'] = pd.to_datetime(df_err['created_at'], utc=True).dt.tz_convert('Europe/Rome').dt.strftime('%d/%m %H:%M')
+                df_err['created_at'] = pd.to_datetime(df_err['created_at'], utc=True).dt.tz_convert('Europe/Rome').strftime('%d/%m %H:%M')
                 df_err = df_err[['created_at', 'utente', 'film', 'modello', 'errore_dettaglio']]
                 df_err.columns = ['Data', 'Utente', 'Film', 'Tipo Errore / Modello', 'Dettaglio Tecnico']
                 st.dataframe(df_err, width='stretch', hide_index=True)
             else:
                 st.success("Nessun errore IA registrato! 🎉")
 
-
-            
             col_st1, col_st2 = st.columns(2)
             
             with col_st1:
@@ -319,6 +316,40 @@ class AdminComponent:
 
         with tab_film:
             st.markdown("### 📋 Elenco completo film in archivio")
+            
+            # --- SEZIONE MANUTENZIONE LOCANDINE TMDB ---
+            with st.expander("🖼️ Manutenzione e Ricerca Locandine TMDB Manancanti", expanded=False):
+                film_senza_poster = [f for f in tutti_i_film if not f.get("poster_url") or not str(f.get("poster_url")).startswith("http")]
+                if not film_senza_poster:
+                    st.success("Ottimo! Tutti i film in archivio hanno una locandina valida.")
+                else:
+                    st.info(f"Trovati {len(film_senza_poster)} film senza locandina o con poster non valido.")
+                    for film in film_senza_poster:
+                        col_m1, col_m2 = st.columns([4, 1])
+                        with col_m1:
+                            st.write(f"🎬 **{film.get('titolo')}** ({film.get('anno', 'N/D')})")
+                        with col_m2:
+                            if st.button("Rilancia TMDB", key=f"btn_poster_{film.get('id')}"):
+                                try:
+                                    from services.tmdb_service import TMDBService
+                                    tmdb_serv = TMDBService()
+                                    # Svuotiamo preventivamente e ricarichiamo
+                                    supabase.table("films").update({"poster_url": None}).eq("id", film.get("id")).execute()
+                                    nuovo_url = tmdb_serv.get_or_fetch_poster(
+                                        film.get("id"), 
+                                        film.get("titolo"), 
+                                        film.get("anno"), 
+                                        supabase
+                                    )
+                                    if nuovo_url:
+                                        st.success("Locandina recuperata con successo!")
+                                        st.rerun()
+                                    else:
+                                        st.error("Impossibile trovare una locandina su TMDB.")
+                                except Exception as e:
+                                    st.error(f"Errore durante la ricerca: {e}")
+            
+            st.markdown("---")
             if tutti_i_film:
                 co1, co2 = st.columns(2)
                 co = co1.selectbox("Ordina per:", ["Titolo", "Anno", "Regista", "Genere"], key="criterio")
@@ -418,7 +449,6 @@ class AdminComponent:
                                     "visibile": dati["visibile"]
                                 }).eq("chiave", chiave).execute()
                                 
-                            # Feedback visivo di successo potenziato con toast e messaggio esplicito
                             st.toast("✅ Modifiche salvate con successo!", icon="🎉")
                             st.success("✅ Configurazioni, testi e scadenze aggiornati con successo sul database!")
                             st.rerun()

@@ -9,6 +9,15 @@ class TMDBService:
         import streamlit as st
         self.api_key = api_key or os.getenv("TMDB_API_KEY") or st.secrets.get("TMDB_API_KEY", "")
 
+    def force_refresh_poster(self, film_id, titolo, anno, supabase_client):
+        # Svuotiamo prima il poster nel DB per forzare il ricalcolo fresco
+        try:
+            supabase_client.table("films").update({"poster_url": None}).eq("id", film_id).execute()
+        except Exception:
+            pass
+        # Richiamiamo il metodo standard che lo ricercherà e salverà di nuovo
+        return self.get_or_fetch_poster(film_id, titolo, anno, supabase_client)
+
     def get_or_fetch_poster(self, film_id, titolo, anno, supabase_client):
         try:
             # 1. Controllo se nel DB esiste già un poster_url valido
