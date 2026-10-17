@@ -5,7 +5,7 @@ import unicodedata
 class TMDBService:
     def __init__(self, api_key=None):
         import streamlit as st
-        self.api_key = api_key or st.secrets.get("TMDB_API_KEY", "")
+        self.api_key = api_key or os.getenv("TMDB_API_KEY") or st.secrets.get("TMDB_API_KEY", "")
 
     def get_or_fetch_poster(self, film_id, titolo, anno, supabase_client):
         try:
