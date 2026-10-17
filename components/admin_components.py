@@ -31,7 +31,6 @@ class AdminComponent:
                 utenti_free = sum(1 for p in tutti_profili if p.get("tier") == "free")
                 utenti_premium = sum(1 for p in tutti_profili if p.get("tier") == "premium")
                 
-                # NUOVO: Calcolo visitatori totali e ospiti
                 log_res = supabase.table("log_accessi").select("tipo").execute()
                 tutti_accessi = log_res.data if log_res.data else []
                 totale_visite = len(tutti_accessi)
@@ -199,7 +198,7 @@ class AdminComponent:
             st.markdown(f"#### ⚠️ Log Errori IA (Ultimi {len(err_ia)})")
             if err_ia:
                 df_err = pd.DataFrame(err_ia)
-                df_err['created_at'] = pd.to_datetime(df_err['created_at'], utc=True).dt.tz_convert('Europe/Rome').strftime('%d/%m %H:%M')
+                df_err['created_at'] = pd.to_datetime(df_err['created_at'], utc=True).dt.tz_convert('Europe/Rome').dt.strftime('%d/%m %H:%M')
                 df_err = df_err[['created_at', 'utente', 'film', 'modello', 'errore_dettaglio']]
                 df_err.columns = ['Data', 'Utente', 'Film', 'Tipo Errore / Modello', 'Dettaglio Tecnico']
                 st.dataframe(df_err, width='stretch', hide_index=True)
@@ -318,7 +317,7 @@ class AdminComponent:
             st.markdown("### 📋 Elenco completo film in archivio")
             
             # --- SEZIONE MANUTENZIONE LOCANDINE TMDB ---
-            with st.expander("🖼️ Manutenzione e Ricerca Locandine TMDB Manancanti", expanded=False):
+            with st.expander("🖼️ Manutenzione e Ricerca Locandine TMDB Mancanti", expanded=False):
                 film_senza_poster = [f for f in tutti_i_film if not f.get("poster_url") or not str(f.get("poster_url")).startswith("http")]
                 if not film_senza_poster:
                     st.success("Ottimo! Tutti i film in archivio hanno una locandina valida.")
@@ -333,7 +332,6 @@ class AdminComponent:
                                 try:
                                     from services.tmdb_service import TMDBService
                                     tmdb_serv = TMDBService()
-                                    # Svuotiamo preventivamente e ricarichiamo
                                     supabase.table("films").update({"poster_url": None}).eq("id", film.get("id")).execute()
                                     nuovo_url = tmdb_serv.get_or_fetch_poster(
                                         film.get("id"), 
