@@ -1,0 +1,7 @@
+streamlit
+supabase
+google-genai
+pandas
+requests
+beautifulsoup4
+google-generativeai

@@ -1,0 +1,164 @@
+/* --- HEADER TRASPARENTE (Mantiene le freccette) E RIMOZIONE RIGA VIOLA --- */
+[data-testid="stHeader"] {
+    background-color: transparent !important;
+}
+[data-testid="stDecoration"] {
+    display: none !important; /* Questo uccide solo la riga viola */
+}
+
+/* --- SFONDO APP CON IMMAGINE E VELO --- */
+.stApp, [data-testid="stAppViewContainer"] {
+    background-image: linear-gradient(rgba(17, 24, 39, 0.75), rgba(17, 24, 39, 0.75)), url("https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?q=80&w=2070&auto=format&fit=crop") !important;
+    background-size: cover !important;
+    background-position: center !important;
+    background-attachment: fixed !important;
+    background-color: transparent !important;
+}
+
+/* --- SIDEBAR GLASSMORPHISM --- */
+[data-testid="stSidebar"] {
+    background-color: rgba(17, 24, 39, 0.3) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Sfondo trasparente per i contenitori interni della sidebar */
+[data-testid="stSidebar"] > div:first-child {
+    background-color: transparent !important;
+}
+
+/* --- EFFETTO GLASSMORPHISM PANNELLI --- */
+.glass-container {
+    background: rgba(30, 41, 59, 0.4) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border-radius: 15px !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    padding: 24px !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5) !important;
+    margin-bottom: 20px !important;
+}
+
+/* --- OTTIMIZZAZIONE SCROLLBAR --- */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
+/* --- TWEAK PER I BOTTONI --- */
+div.stButton > button {
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+div.stButton > button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+}
+
+/* --- STILE PER I LINK DEL FOOTER --- */
+.footer-link {
+    color: #9ca3af !important;
+    text-decoration: none !important;
+    transition: color 0.3s ease;
+}
+.footer-link:hover {
+    color: #fb923c !important; /* Arancione brillante al passaggio del mouse */
+}
+
+/* --- FOOTER ULTRA-COMPATTO E MINIMALE --- */
+div.stButton > button.footer-btn,
+div.stButton > button[kind="secondary"] {
+    background-color: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    color: #9ca3af !important;
+    font-family: inherit !important;
+    font-size: 9px !important;
+    font-weight: 400 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: auto !important;
+    height: auto !important;
+    line-height: 1 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+}
+
+div.stButton > button.footer-btn:hover,
+div.stButton > button[kind="secondary"]:hover {
+    color: #fb923c !important;
+    background-color: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+}
+
+/* Compatta i blocchi colonna di Streamlit nel footer */
+div[data-testid="column"] {
+    padding: 0 !important;
+}
+
+/* --- STILE DEFINITIVO MODALI (GLASSMORPHISM REALE) --- */
+div[data-baseweb="modal"] {
+    background: rgba(0, 0, 0, 0.6) !important;
+}
+
+div[data-baseweb="modal"] > div {
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 24px 48px rgba(0, 0, 0, 0.8) !important;
+    color: #f9fafc !important;
+}
+
+div[data-baseweb="modal"] h3,
+div[data-baseweb="modal"] p, 
+div[data-baseweb="modal"] li, 
+div[data-baseweb="modal"] span,
+div[data-baseweb="modal"] label {
+    color: #cbd5e1 !important;
+}
+
+div[data-baseweb="modal"] h3 {
+    color: #f9fafc !important;
+}
+
+/* Nasconde la scritta di servizio di invio nei form di Streamlit */
+div[data-testid="stForm"] small {
+    display: none !important;
+}
+
+/* --- FOOTER NATURALE E FLUIDO --- */
+html, body, [data-testid="stAppViewContainer"] {
+    overflow-x: hidden !important;
+}
+
+/* Ripristina il posizionamento normale del footer in fondo alla pagina */
+div:has(> hr[style*="border-color"]) {
+    position: relative !important;
+    bottom: auto !important;
+    left: auto !important;
+    right: auto !important;
+    background-color: transparent !important;
+    box-shadow: none !important;
+    margin-top: 40px !important;
+    border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Margine pulito in fondo alla pagina */
+.main .block-container {
+    padding-bottom: 2rem !important;
+}
