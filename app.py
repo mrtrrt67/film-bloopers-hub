@@ -360,7 +360,9 @@ with cols[3]:
 with cols[4]:
     if st.button("Affiliazione", key="foot_amazon"): cb_apri_modal("amazon"); st.rerun()
 
-st.markdown("<div style='margin-bottom: 20px;'></div>", unsafe_allow_html=True)from datetime import date, datetime
+st.markdown("<div style='margin-bottom: 20px;'></div>", unsafe_allow_html=True)
+from datetime import date, datetime
+
 import os
 import streamlit as st
 from supabase import create_client
