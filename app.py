@@ -8,6 +8,7 @@ from views.home_view import render_home
 from views.community_view import render_classifica, render_segnala_errore, render_suggerimenti
 from views.strumenti_view import render_sync_letterboxd, render_esporta_archivio
 from views.esplora_view import normalizza, render_colonna_sinistra, render_scheda_film, render_elenco_bloopers
+from views.pricing_view import render_pricing
 from components.sidebar import render_sidebar
 from services.ai_service import AIService
 from services.tmdb_service import TMDBService
@@ -317,6 +318,10 @@ elif sezione == "Sync Letterboxd":
 elif sezione == "Esporta Archivio":
     render_esporta_archivio(supabase, tutti_i_film)
 
+elif sezione == "Premium":
+    user_email = st.session_state.user.email if st.session_state.user else None
+    render_pricing(PRICE_IDS, user_email)
+    
 elif sezione == "Pannello Admin" and utente_corrente_e_admin(supabase, ADMIN_EMAIL):
     AdminComponent.render_admin_panel(
         supabase, tutti_i_film, AMAZON_DASHBOARD_URL, 

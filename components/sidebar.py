@@ -48,6 +48,7 @@ def render_sidebar(supabase, is_promo_active, utente_corrente_e_admin, cb_naviga
             with st.expander("Navigazione Principale", expanded=True):
                 render_nav_btn("Home", "Home")
                 render_nav_btn("Esplora e Cerca", "Esplora e Cerca")
+                render_nav_btn("Premium", "Premium")
             
             if st.session_state.get("user"):
                 with st.expander("Community", expanded=True):
