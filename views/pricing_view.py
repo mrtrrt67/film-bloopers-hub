@@ -2,9 +2,8 @@ import streamlit as st
 import stripe
 
 def render_pricing(price_ids, user_email):
-    """Renderizza la pagina dei piani con card a blocchi uniformi, tooltip e pulsanti perfettamente allineati"""
+    """Renderizza la pagina dei piani con card unificate in un unico blocco HTML per evitare problemi di rendering"""
     
-    # CSS avanzato per allineare le card, uniformare le altezze e dare massimo contrasto ai bottoni
     st.markdown("""
         <style>
         .pricing-card-wrapper {
@@ -16,20 +15,21 @@ def render_pricing(price_ids, user_email):
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            height: 480px; /* Altezza fissa comune per tutte le card per garantire l'allineamento perfetto */
+            height: 490px;
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
-            margin-bottom: 15px;
+            margin-bottom: 12px;
         }
-        .pricing-content-top {
-            display: flex;
-            flex-direction: column;
+        .pricing-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+            margin-bottom: 10px;
         }
         .pricing-features-list {
             display: flex;
             flex-direction: column;
             gap: 6px;
-            margin-top: 10px;
             text-align: left;
+            flex-grow: 1;
         }
         .feature-item {
             background: rgba(31, 41, 55, 0.8);
@@ -42,7 +42,7 @@ def render_pricing(price_ids, user_email):
             font-size: 11px;
             color: #e5e7eb;
         }
-        /* Stile tooltip informativi */
+        /* Tooltip CSS */
         .tooltip-container {
             position: relative;
             display: inline-flex;
@@ -68,7 +68,7 @@ def render_pricing(price_ids, user_email):
         }
         .tooltip-text {
             visibility: hidden;
-            width: 190px;
+            width: 180px;
             background-color: #1f2937;
             color: #f9fafc;
             text-align: left;
@@ -82,7 +82,7 @@ def render_pricing(price_ids, user_email):
             opacity: 0;
             transition: opacity 0.2s;
             font-size: 11px;
-            line-height: 1.4;
+            line-height: 1.3;
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
@@ -178,7 +178,7 @@ def render_pricing(price_ids, user_email):
 
     for i, piano in enumerate(piani):
         with cols[i]:
-            # Generazione HTML interna per le voci
+            # Costruiamo TUTTA la card (header + lista caratteristiche) in un'unica stringa HTML
             html_voci = ""
             for titolo_voce, desc_voce in piano["voci"]:
                 html_voci += f"""
@@ -191,29 +191,27 @@ def render_pricing(price_ids, user_email):
                     </div>
                 """
 
-            # Card principale con altezza fissa flexbox
-            st.markdown(f"""
+            card_html = f"""
                 <div class="pricing-card-wrapper">
-                    <div class="pricing-content-top">
+                    <div class="pricing-header">
                         <h3 style="color: #f9fafc; font-size: 15px; margin-bottom: 4px;">{piano['titolo']}</h3>
                         <h2 style="color: #fb923c; font-size: 20px; font-weight: 800; margin: 6px 0;">{piano['prezzo']}</h2>
-                        <p style="color: #9ca3af; font-size: 11px; margin: 0 0 8px 0;">{piano['sottotitolo']}</p>
-                        <hr style="border-color: rgba(255,255,255,0.1); margin: 4px 0 8px 0;">
-                        <div class="pricing-features-list">
-                            {html_voci}
-                        </div>
+                        <p style="color: #9ca3af; font-size: 11px; margin: 0;">{piano['sottotitolo']}</p>
                     </div>
-                    <div style="font-size: 11px; color: #9ca3af; padding-top: 5px;">
-                        <!-- Spaziatore interno per garantire l'ancoraggio del bottone -->
+                    <div class="pricing-features-list">
+                        {html_voci}
                     </div>
                 </div>
-            """, unsafe_allow_html=True)
+            """
             
-            # Pulsante posizionato esattamente alla stessa altezza per ogni colonna
+            # Renderizziamo l'intera card con un UNICO st.markdown
+            st.markdown(card_html, unsafe_allow_html=True)
+            
+            # Pulsante di acquisto allineato perfettamente in basso
             if piano.get("is_free"):
                 st.markdown("<div style='text-align: center; color: #9ca3af; font-size: 12px; padding: 10px; background: rgba(31, 41, 55, 0.5); border-radius: 6px; border: 1px solid rgba(255,255,255,0.08);'>Piano Attuale</div>", unsafe_allow_html=True)
             else:
-                is_primary = (i == 3) # Evidenzia Lifetime Promo come piano consigliato
+                is_primary = (i == 3)
                 if st.button(piano['btn_label'], use_container_width=True, key=piano['btn_key'], type="primary" if is_primary else "secondary"):
                     if piano['price_id']:
                         url = create_checkout_session(piano['price_id'], piano['is_subscription'], user_email)
