@@ -316,13 +316,21 @@ class AdminComponent:
         with tab_film:
             st.markdown("### 📋 Elenco completo film in archivio")
             
-            # --- SEZIONE MANUTENZIONE LOCANDINE TMDB ---
+            # --- SEZIONE MANUTENZIONE LOCANDINE TMDB (ORDINATA ALFABETICAMENTE) ---
             with st.expander("🖼️ Manutenzione e Ricerca Locandine TMDB Mancanti", expanded=False):
-                film_senza_poster = [f for f in tutti_i_film if not f.get("poster_url") or not str(f.get("poster_url")).startswith("http")]
+                try:
+                    res_mancanti = supabase.table("films").select("id, titolo, anno, poster_url").or_("poster_url.is.null,poster_url.eq.").execute()
+                    film_senza_poster = res_mancanti.data if res_mancanti.data else []
+                except Exception:
+                    film_senza_poster = [f for f in tutti_i_film if not f.get("poster_url") or str(f.get("poster_url")).strip() == ""]
+
+                # Ordinamento alfabetico per titolo del film
+                film_senza_poster = sorted(film_senza_poster, key=lambda x: (x.get("titolo") or "").lower())
+
                 if not film_senza_poster:
-                    st.success("Ottimo! Tutti i film in archivio hanno una locandina valida.")
+                    st.success("Ottimo! Tutti i film in archivio hanno una locandina valida sul database.")
                 else:
-                    st.info(f"Trovati {len(film_senza_poster)} film senza locandina o con poster non valido.")
+                    st.info(f"Trovati {len(film_senza_poster)} film con poster_url NULL o vuoto.")
                     for film in film_senza_poster:
                         col_m1, col_m2 = st.columns([4, 1])
                         with col_m1:
