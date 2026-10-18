@@ -95,8 +95,7 @@ class TMDBService:
             
         return None
 
- def get_or_fetch_cast(self, film_id, titolo, anno, supabase_client):
-        """Cerca il film su TMDB usando la stessa logica robusta delle locandine e recupera il cast."""
+    def get_or_fetch_cast(self, film_id, titolo, anno, supabase_client):
         try:
             res = supabase_client.table("films").select("attori").eq("id", film_id).execute()
             if res.data and res.data[0].get("attori"):
@@ -110,7 +109,6 @@ class TMDBService:
             movie_id = None
             anno_str = str(anno).strip() if anno else ""
 
-            # Sfruttiamo esattamente la stessa preparazione dei titoli robusta dei poster
             titoli_da_testare = []
             if titolo:
                 titoli_da_testare.append(titolo)
@@ -160,7 +158,6 @@ class TMDBService:
                         if movie_id:
                             break
 
-            # Se troviamo l'ID, peschiamo il cast dai credits di TMDB
             if movie_id:
                 url_credits = f"https://api.themoviedb.org/3/movie/{movie_id}/credits?api_key={self.api_key}"
                 resp_cred = requests.get(url_credits, timeout=5)
