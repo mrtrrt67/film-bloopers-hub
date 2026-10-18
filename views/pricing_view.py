@@ -2,61 +2,105 @@ import streamlit as st
 import stripe
 
 def render_pricing(price_ids, user_email):
-    """Renderizza la pagina dedicata ai piani e agli abbonamenti Stripe"""
-    st.markdown("<h1 style='text-align: center;'>Scegli il tuo piano</h1>", unsafe_allow_html=True)
-    st.markdown("<p style='text-align: center; color: gray;'>Sblocca ricerche IA illimitate, sincronizzazione automatica Letterboxd e download completo dell'archivio.</p>", unsafe_allow_html=True)
-    st.write("")
+    """Renderizza la pagina dedicata ai piani e agli abbonamenti Stripe con card in stile glassmorphic allineate"""
+    
+    # --- STILE CSS PER COLORARE DI VERDE IL PULSANTE PREMIUM NELLA SIDEBAR ---
+    st.markdown("""
+        <style>
+        /* Seleziona il bottone della sidebar che corrisponde alla sezione Premium */
+        div[data-testid="stSidebar"] button[kind="secondary"]:has(div:text("Premium")),
+        div[data-testid="stSidebar"] button[kind="primary"]:has(div:text("Premium")),
+        div[data-testid="stSidebar"] button:has(p:text("Premium")) {
+            border: 1px solid #10b981 !important;
+            color: #10b981 !important;
+        }
+        /* Colore del testo quando il mouse passa sopra o viene selezionato */
+        div[data-testid="stSidebar"] button:has(p:text("Premium")):hover {
+            background-color: rgba(16, 185, 129, 0.1) !important;
+            color: #34d399 !important;
+        }
+        </style>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("<h1 style='text-align: center; color: #f9fafc; font-weight: 800; margin-bottom: 5px;'>Scegli il tuo piano</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; color: #9ca3af; margin-bottom: 30px;'>Sblocca ricerche IA illimitate, sincronizzazione automatica Letterboxd e download completo dell'archivio.</p>", unsafe_allow_html=True)
 
     col1, col2, col3, col4 = st.columns(4)
 
-    with col1:
-        st.markdown("### Mensile")
-        st.markdown("### **0,99 €**")
-        st.markdown("Al mese")
-        st.write("---")
-        st.markdown("- Ricerche IA illimitate\n- Sync Letterboxd\n- Download archivio")
-        if st.button("Scegli Mensile", use_container_width=True, key="btn_mensile"):
-            url = create_checkout_session(price_ids["Mensile"], user_email)
-            if url:
-                st.markdown(f'<meta http-equiv="refresh" content="0;url={url}">', unsafe_allow_html=True)
+    # Dati dei piani con i rispettivi Price ID passati dal dizionario PRICE_IDS di app.py
+    piani = [
+        {
+            "titolo": "Mensile",
+            "prezzo": "0,99 €",
+            "sottotitolo": "Al mese",
+            "caratteristiche": "• Ricerche IA illimitate<br>• Sync Letterboxd<br>• Download archivio",
+            "price_id": price_ids.get("Mensile"),
+            "is_subscription": True,
+            "btn_label": "Scegli Mensile",
+            "btn_key": "btn_mensile"
+        },
+        {
+            "titolo": "Annuale",
+            "prezzo": "9,99 €",
+            "sottotitolo": "All'anno",
+            "caratteristiche": "• Ricerche IA illimitate<br>• Sync Letterboxd<br>• Download archivio",
+            "price_id": price_ids.get("Annuale"),
+            "is_subscription": True,
+            "btn_label": "Scegli Annuale",
+            "btn_key": "btn_annuale"
+        },
+        {
+            "titolo": "Lifetime Promo",
+            "prezzo": "9,99 €",
+            "sottotitolo": "Offerta Lancio",
+            "caratteristiche": "• Per sempre senza rinnovi<br>• Vantaggi Premium inclusi",
+            "price_id": price_ids.get("Lifetime Promo"),
+            "is_subscription": False,
+            "btn_label": "Acquista Promo",
+            "btn_key": "btn_promo"
+        },
+        {
+            "titolo": "Lifetime Standard",
+            "prezzo": "19,99 €",
+            "sottotitolo": "Accesso a vita",
+            "caratteristiche": "• Per sempre senza rinnovi<br>• Tutte le funzioni sbloccate",
+            "price_id": price_ids.get("Lifetime Standard"),
+            "is_subscription": False,
+            "btn_label": "Acquista Standard",
+            "btn_key": "btn_standard"
+        }
+    ]
 
-    with col2:
-        st.markdown("### Annuale")
-        st.markdown("### **9,99 €**")
-        st.markdown("All'anno")
-        st.write("---")
-        st.markdown("- Ricerche IA illimitate\n- Sync Letterboxd\n- Download archivio")
-        if st.button("Scegli Annuale", use_container_width=True, key="btn_annuale"):
-            url = create_checkout_session(price_ids["Annuale"], user_email)
-            if url:
-                st.markdown(f'<meta http-equiv="refresh" content="0;url={url}">', unsafe_allow_html=True)
+    cols = [col1, col2, col3, col4]
 
-    with col3:
-        st.markdown("### Lifetime Promo")
-        st.markdown("### **9,99 €**")
-        st.markdown("Offerta Lancio")
-        st.write("---")
-        st.markdown("- Per sempre senza rinnovi\n- Vantaggi Premium inclusi")
-        if st.button("Acquista Promo", use_container_width=True, key="btn_promo"):
-            url = create_checkout_session(price_ids["Lifetime Promo"], user_email)
-            if url:
-                st.markdown(f'<meta http-equiv="refresh" content="0;url={url}">', unsafe_allow_html=True)
+    for i, piano in enumerate(piani):
+        with cols[i]:
+            st.markdown(f"""
+                <div style="background: rgba(17, 24, 39, 0.90); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 22px; text-align: center; margin-bottom: 12px; min-height: 280px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);">
+                    <div>
+                        <h3 style="color: #f9fafc; font-size: 18px; margin-bottom: 5px;">{piano['titolo']}</h3>
+                        <h2 style="color: #fb923c; font-size: 26px; font-weight: 800; margin: 10px 0;">{piano['prezzo']}</h2>
+                        <p style="color: #9ca3af; font-size: 12px; margin-bottom: 15px;">{piano['sottotitolo']}</p>
+                        <hr style="border-color: rgba(255,255,255,0.08); margin: 10px 0;">
+                        <div style="color: #d1d5db; font-size: 13px; text-align: left; line-height: 1.6; margin-bottom: 15px;">
+                            {piano['caratteristiche']}
+                        </div>
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            if st.button(piano['btn_label'], use_container_width=True, key=piano['btn_key'], type="primary" if i == 2 else "secondary"):
+                if piano['price_id']:
+                    url = create_checkout_session(piano['price_id'], piano['is_subscription'], user_email)
+                    if url:
+                        st.markdown(f'<meta http-equiv="refresh" content="0;url={url}">', unsafe_allow_html=True)
+                else:
+                    st.error("ID Prezzo Stripe non configurato.")
 
-    with col4:
-        st.markdown("### Lifetime Standard")
-        st.markdown("### **19,99 €**")
-        st.markdown("Accesso a vita")
-        st.write("---")
-        st.markdown("- Per sempre senza rinnovi\n- Tutte le funzioni sbloccate")
-        if st.button("Acquista Standard", use_container_width=True, key="btn_standard"):
-            url = create_checkout_session(price_ids["Lifetime Standard"], user_email)
-            if url:
-                st.markdown(f'<meta http-equiv="refresh" content="0;url={url}">', unsafe_allow_html=True)
-
-def create_checkout_session(price_id, user_email):
-    """Funzione di supporto per creare la sessione Stripe"""
+def create_checkout_session(price_id, is_subscription, user_email):
+    """Funzione di supporto per creare la sessione Stripe in modo sicuro"""
     try:
-        mode = "subscription" if price_id in [st.secrets.get("STRIPE_PRICE_MONTHLY"), st.secrets.get("STRIPE_PRICE_YEARLY")] else "payment"
+        mode = "subscription" if is_subscription else "payment"
         checkout_session = stripe.checkout.Session.create(
             payment_method_types=["card"],
             line_items=[{"price": price_id, "quantity": 1}],
