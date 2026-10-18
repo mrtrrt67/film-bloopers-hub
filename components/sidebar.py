@@ -109,16 +109,12 @@ def render_sidebar(
         st.markdown(
             """
             <style>
-            div.stButton > button[kind="secondary"]:has(span:text("Premium")),
-            div.stButton > button[kind="primary"]:has(span:text("Premium")),
-            div[data-testid="stSidebar"] button:has(div:text("Premium")) {
-                border: 1px solid #10b981 !important;
+            div[data-testid="stSidebar"] button:has(div:text("Premium")),
+            div[data-testid="stSidebar"] button:has(p:text("Premium")),
+            div.stButton > button[kind="secondary"]:has(p:text("Premium")),
+            div.stButton > button[kind="primary"]:has(p:text("Premium")) {
                 color: #10b981 !important;
-            }
-            div.stButton > button[kind="secondary"]:has(span:text("Premium")):hover,
-            div.stButton > button[kind="primary"]:has(span:text("Premium")):hover {
-                background-color: rgba(16, 185, 129, 0.1) !important;
-                color: #34d399 !important;
+                border-color: #10b981 !important;
             }
             </style>
         """,
