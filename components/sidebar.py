@@ -105,23 +105,31 @@ def render_sidebar(
         render_nav_btn("Home", "Home")
         render_nav_btn("Esplora e Cerca", "Esplora e Cerca")
 
-        # Stile CSS mirato per colorare di verde smeraldo il pulsante Premium nella sidebar
-        st.markdown(
-            """
+        # Stile CSS aggressivo e mirato per forzare il colore verde smeraldo sul pulsante Premium
+        st.markdown("""
             <style>
             div[data-testid="stSidebar"] button:has(div:text("Premium")),
             div[data-testid="stSidebar"] button:has(p:text("Premium")),
-            div.stButton > button[kind="secondary"]:has(p:text("Premium")),
-            div.stButton > button[kind="primary"]:has(p:text("Premium")) {
+            div[data-testid="stSidebar"] button[kind="secondary"]:has(div),
+            div[data-testid="stSidebar"] button {
+                /* Seleziona il bottone specifico della sezione Premium */
+            }
+            /* Selettore mirato basato sull'etichetta del testo all'interno dei bottoni della sidebar */
+            div[data-testid="stSidebar"] button p, div[data-testid="stSidebar"] button div {
+                color: inherit;
+            }
+            /* Forza il colore verde per il bottone Premium ovunque si trovi nella sidebar */
+            div[data-testid="stSidebar"] button[key="nav_Premium"] {
+                border: 1px solid #10b981 !important;
                 color: #10b981 !important;
-                border-color: #10b981 !important;
+            }
+            div[data-testid="stSidebar"] button[key="nav_Premium"] p {
+                color: #10b981 !important;
             }
             </style>
-        """,
-            unsafe_allow_html=True,
-        )
+        """, unsafe_allow_html=True)
         render_nav_btn("Premium", "Premium")
-
+        
       if st.session_state.get("user"):
         with st.expander("Community", expanded=True):
           render_nav_btn("Classifica", "Classifica")

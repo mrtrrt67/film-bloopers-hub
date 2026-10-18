@@ -2,9 +2,9 @@ import streamlit as st
 import stripe
 
 def render_pricing(price_ids, user_email):
-    """Renderizza la pagina dedicata ai piani (Free e Premium) con card in stile glassmorphic allineate e tooltip informativi"""
+    """Renderizza la pagina dedicata ai piani con card e tooltip informativi corretti"""
     
-    # CSS personalizzato per i tooltip informativi (icona "i") al passaggio del mouse
+    # CSS per i tooltip informativi
     st.markdown("""
         <style>
         .tooltip-container {
@@ -33,7 +33,7 @@ def render_pricing(price_ids, user_email):
         }
         .tooltip-text {
             visibility: hidden;
-            width: 200px;
+            width: 190px;
             background-color: #1f2937;
             color: #f9fafc;
             text-align: left;
@@ -63,16 +63,15 @@ def render_pricing(price_ids, user_email):
 
     col0, col1, col2, col3, col4 = st.columns(5)
 
-    # Definizione delle voci con le relative descrizioni dettagliate per i tooltip
     piani = [
         {
             "titolo": "Free",
             "prezzo": "0,00 €",
             "sottotitolo": "Gratuito",
             "voci": [
-                ("Ricerche limitate", "Puoi effettuare fino a un massimo di 15 ricerche intelligenti con IA al giorno."),
-                ("Invio suggerimenti", "Proponi miglioramenti o nuove idee direttamente alla piattaforma."),
-                ("Accesso community", "Esplora l'archivio esistente e visualizza le classifiche pubbliche.")
+                ("Ricerche limitate", "Fino a 15 ricerche IA al giorno."),
+                ("Invio suggerimenti", "Proponi miglioramenti alla piattaforma."),
+                ("Accesso community", "Esplora l'archivio e le classifiche pubbliche.")
             ],
             "is_free": True
         },
@@ -81,12 +80,12 @@ def render_pricing(price_ids, user_email):
             "prezzo": "0,99 €",
             "sottotitolo": "Al mese",
             "voci": [
-                ("Ricerche IA illimitate", "Interroga l'intelligenza artificiale per cercare film e saghe senza alcun limite giornaliero."),
-                ("Inserimento bloopers", "Contribuisci aggiungendo nuovi errori e incongruenze cinematografiche scoperte da te."),
-                ("Segnalazione errori", "Segnala correzioni o imprecisioni sui bloopers presenti nel database."),
-                ("Conferma/Contestazione", "Vota, conferma o contesta i bloopers inseriti dagli altri utenti della community."),
-                ("Sync Letterboxd & Download", "Sincronizza automaticamente la tua watchlist e scarica l'archivio completo in formato tabellare."),
-                ("Classifica e premi", "Partecipa attivamente alla classifica della community e competi per vincere premi esclusivi.")
+                ("Ricerche IA illimitate", "Nessun limite giornaliero nelle ricerche."),
+                ("Inserimento bloopers", "Aggiungi nuovi errori cinematografici."),
+                ("Segnalazione errori", "Segnala imprecisioni sui bloopers."),
+                ("Conferma/Contestazione", "Vota e contesta i bloopers della community."),
+                ("Sync Letterboxd & Download", "Sincronizza watchlist e scarica l'archivio."),
+                ("Classifica e premi", "Partecipa alla classifica con premi esclusivi.")
             ],
             "price_id": price_ids.get("Mensile"),
             "is_subscription": True,
@@ -98,12 +97,12 @@ def render_pricing(price_ids, user_email):
             "prezzo": "9,99 €",
             "sottotitolo": "All'anno",
             "voci": [
-                ("Ricerche IA illimitate", "Interroga l'intelligenza artificiale per cercare film e saghe senza alcun limite giornaliero."),
-                ("Inserimento bloopers", "Contribuisci aggiungendo nuovi errori e incongruenze cinematografiche scoperte da te."),
-                ("Segnalazione errori", "Segnala correzioni o imprecisioni sui bloopers presenti nel database."),
-                ("Conferma/Contestazione", "Vota, conferma o contesta i bloopers inseriti dagli altri utenti della community."),
-                ("Sync Letterboxd & Download", "Sincronizza automaticamente la tua watchlist e scarica l'archivio completo in formato tabellare."),
-                ("Classifica e premi", "Partecipa attivamente alla classifica della community e competi per vincere premi esclusivi.")
+                ("Ricerche IA illimitate", "Nessun limite giornaliero nelle ricerche."),
+                ("Inserimento bloopers", "Aggiungi nuovi errori cinematografici."),
+                ("Segnalazione errori", "Segnala imprecisioni sui bloopers."),
+                ("Conferma/Contestazione", "Vota e contesta i bloopers della community."),
+                ("Sync Letterboxd & Download", "Sincronizza watchlist e scarica l'archivio."),
+                ("Classifica e premi", "Partecipa alla classifica con premi esclusivi.")
             ],
             "price_id": price_ids.get("Annuale"),
             "is_subscription": True,
@@ -115,9 +114,9 @@ def render_pricing(price_ids, user_email):
             "prezzo": "9,99 €",
             "sottotitolo": "Offerta Lancio",
             "voci": [
-                ("Accesso a vita", "Paghi una sola volta e mantieni tutti i vantaggi Premium per sempre, senza alcun rinnovo automatico."),
-                ("Funzioni Premium incluse", "Ricerche illimitate, inserimento bloopers, segnalazioni e sincronizzazione Letterboxd sempre sbloccate."),
-                ("Classifica e premi dedicati", "Partecipazione prioritaria alla classifica con vantaggi esclusivi riservati ai primi iscritti.")
+                ("Accesso a vita", "Paghi una sola volta, per sempre senza rinnovi."),
+                ("Funzioni Premium", "Tutti i vantaggi Premium inclusi permanentemente."),
+                ("Classifica e premi", "Partecipazione prioritaria con vantaggi dedicati.")
             ],
             "price_id": price_ids.get("Lifetime Promo"),
             "is_subscription": False,
@@ -129,9 +128,9 @@ def render_pricing(price_ids, user_email):
             "prezzo": "19,99 €",
             "sottotitolo": "Accesso a vita",
             "voci": [
-                ("Accesso a vita", "Paghi una sola volta e mantieni tutti i vantaggi Premium per sempre, senza alcun rinnovo automatico."),
-                ("Tutte le funzioni sbloccate", "Sblocco completo e permanente di qualsiasi strumento avanzato presente e futuro della piattaforma."),
-                ("Vantaggi illimitati", "Supporto prioritario e accesso illimitato a tutte le funzionalità della community.")
+                ("Accesso a vita", "Paghi una sola volta, per sempre senza rinnovi."),
+                ("Funzioni sbloccate", "Accesso completo a tutti gli strumenti avanzati."),
+                ("Vantaggi illimitati", "Supporto e funzioni prioritarie nel tempo.")
             ],
             "price_id": price_ids.get("Lifetime Standard"),
             "is_subscription": False,
@@ -144,33 +143,29 @@ def render_pricing(price_ids, user_email):
 
     for i, piano in enumerate(piani):
         with cols[i]:
-            # Generazione dinamica della lista con le icone "i" e i tooltip
-            html_voci = ""
+            # Renderizziamo l'intestazione della card con HTML pulito
+            st.markdown(f"""
+                <div style="background: rgba(17, 24, 39, 0.90); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 10px; min-height: 140px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);">
+                    <h3 style="color: #f9fafc; font-size: 15px; margin-bottom: 4px;">{piano['titolo']}</h3>
+                    <h2 style="color: #fb923c; font-size: 20px; font-weight: 800; margin: 6px 0;">{piano['prezzo']}</h2>
+                    <p style="color: #9ca3af; font-size: 11px; margin: 0;">{piano['sottotitolo']}</p>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            # Renderizziamo ogni singola voce con il suo tooltip HTML interpretato correttamente
             for titolo_voce, desc_voce in piano["voci"]:
-                html_voci += f"""
-                    <div style="margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;">
+                st.markdown(f"""
+                    <div style="background: rgba(17, 24, 39, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 6px 10px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #d1d5db;">
                         <span>• {titolo_voce}</span>
                         <span class="tooltip-container">
                             <span class="info-icon">i</span>
                             <span class="tooltip-text">{desc_voce}</span>
                         </span>
                     </div>
-                """
+                """, unsafe_allow_html=True)
 
-            st.markdown(f"""
-                <div style="background: rgba(17, 24, 39, 0.90); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 18px; text-align: center; margin-bottom: 12px; min-height: 330px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);">
-                    <div>
-                        <h3 style="color: #f9fafc; font-size: 16px; margin-bottom: 5px;">{piano['titolo']}</h3>
-                        <h2 style="color: #fb923c; font-size: 22px; font-weight: 800; margin: 8px 0;">{piano['prezzo']}</h2>
-                        <p style="color: #9ca3af; font-size: 11px; margin-bottom: 12px;">{piano['sottotitolo']}</p>
-                        <hr style="border-color: rgba(255,255,255,0.08); margin: 8px 0;">
-                        <div style="color: #d1d5db; font-size: 12px; text-align: left; line-height: 1.4; margin-bottom: 10px;">
-                            {html_voci}
-                        </div>
-                    </div>
-                </div>
-            """, unsafe_allow_html=True)
-            
+            # Spaziatura e pulsante di azione allineato in basso
+            st.markdown("<div style='margin-bottom: 10px;'></div>", unsafe_allow_html=True)
             if piano.get("is_free"):
                 st.markdown("<div style='text-align: center; color: #9ca3af; font-size: 12px; padding: 10px;'>Piano Attuale</div>", unsafe_allow_html=True)
             else:
@@ -183,7 +178,7 @@ def render_pricing(price_ids, user_email):
                         st.error("ID Prezzo Stripe non configurato.")
 
 def create_checkout_session(price_id, is_subscription, user_email):
-    """Crea la sessione di checkout Stripe reindirizzando correttamente in caso di annullamento"""
+    """Crea la sessione di checkout Stripe"""
     try:
         mode = "subscription" if is_subscription else "payment"
         checkout_session = stripe.checkout.Session.create(
