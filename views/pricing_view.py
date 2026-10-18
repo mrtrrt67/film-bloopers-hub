@@ -4,30 +4,11 @@ import stripe
 def render_pricing(price_ids, user_email):
     """Renderizza la pagina dedicata ai piani e agli abbonamenti Stripe con card in stile glassmorphic allineate"""
     
-    # --- STILE CSS PER COLORARE DI VERDE IL PULSANTE PREMIUM NELLA SIDEBAR ---
-    st.markdown("""
-        <style>
-        /* Seleziona il bottone della sidebar che corrisponde alla sezione Premium */
-        div[data-testid="stSidebar"] button[kind="secondary"]:has(div:text("Premium")),
-        div[data-testid="stSidebar"] button[kind="primary"]:has(div:text("Premium")),
-        div[data-testid="stSidebar"] button:has(p:text("Premium")) {
-            border: 1px solid #10b981 !important;
-            color: #10b981 !important;
-        }
-        /* Colore del testo quando il mouse passa sopra o viene selezionato */
-        div[data-testid="stSidebar"] button:has(p:text("Premium")):hover {
-            background-color: rgba(16, 185, 129, 0.1) !important;
-            color: #34d399 !important;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-    
     st.markdown("<h1 style='text-align: center; color: #f9fafc; font-weight: 800; margin-bottom: 5px;'>Scegli il tuo piano</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; color: #9ca3af; margin-bottom: 30px;'>Sblocca ricerche IA illimitate, sincronizzazione automatica Letterboxd e download completo dell'archivio.</p>", unsafe_allow_html=True)
 
     col1, col2, col3, col4 = st.columns(4)
 
-    # Dati dei piani con i rispettivi Price ID passati dal dizionario PRICE_IDS di app.py
     piani = [
         {
             "titolo": "Mensile",
@@ -98,11 +79,10 @@ def render_pricing(price_ids, user_email):
                     st.error("ID Prezzo Stripe non configurato.")
 
 def create_checkout_session(price_id, is_subscription, user_email):
-    """Funzione di supporto per creare la sessione Stripe in modo sicuro"""
+    """Crea la sessione di checkout Stripe senza parametri deprecati"""
     try:
         mode = "subscription" if is_subscription else "payment"
         checkout_session = stripe.checkout.Session.create(
-            payment_method_types=["card"],
             line_items=[{"price": price_id, "quantity": 1}],
             mode=mode,
             success_url="https://filmbloopers.online/?success=true",
