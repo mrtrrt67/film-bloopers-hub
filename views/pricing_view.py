@@ -2,11 +2,47 @@ import streamlit as st
 import stripe
 
 def render_pricing(price_ids, user_email):
-    """Renderizza la pagina dedicata ai piani con card e tooltip informativi corretti"""
+    """Renderizza la pagina dei piani con card a blocchi uniformi, tooltip e pulsanti perfettamente allineati"""
     
-    # CSS per i tooltip informativi
+    # CSS avanzato per allineare le card, uniformare le altezze e dare massimo contrasto ai bottoni
     st.markdown("""
         <style>
+        .pricing-card-wrapper {
+            background: rgba(17, 24, 39, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 16px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 480px; /* Altezza fissa comune per tutte le card per garantire l'allineamento perfetto */
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+            margin-bottom: 15px;
+        }
+        .pricing-content-top {
+            display: flex;
+            flex-direction: column;
+        }
+        .pricing-features-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 10px;
+            text-align: left;
+        }
+        .feature-item {
+            background: rgba(31, 41, 55, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 6px;
+            padding: 6px 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #e5e7eb;
+        }
+        /* Stile tooltip informativi */
         .tooltip-container {
             position: relative;
             display: inline-flex;
@@ -18,14 +54,13 @@ def render_pricing(price_ids, user_email):
             display: inline-flex;
             justify-content: center;
             align-items: center;
-            width: 15px;
-            height: 15px;
-            background-color: rgba(156, 163, 175, 0.2);
-            color: #9ca3af;
+            width: 14px;
+            height: 14px;
+            background-color: rgba(251, 146, 60, 0.2);
+            color: #fb923c;
             border-radius: 50%;
-            font-size: 10px;
+            font-size: 9px;
             font-weight: bold;
-            font-family: sans-serif;
         }
         .tooltip-container:hover .info-icon {
             background-color: #fb923c;
@@ -48,8 +83,8 @@ def render_pricing(price_ids, user_email):
             transition: opacity 0.2s;
             font-size: 11px;
             line-height: 1.4;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
         .tooltip-container:hover .tooltip-text {
             visibility: visible;
@@ -143,33 +178,43 @@ def render_pricing(price_ids, user_email):
 
     for i, piano in enumerate(piani):
         with cols[i]:
-            # Renderizziamo l'intestazione della card con HTML pulito
-            st.markdown(f"""
-                <div style="background: rgba(17, 24, 39, 0.90); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; padding: 16px; text-align: center; margin-bottom: 10px; min-height: 140px; box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);">
-                    <h3 style="color: #f9fafc; font-size: 15px; margin-bottom: 4px;">{piano['titolo']}</h3>
-                    <h2 style="color: #fb923c; font-size: 20px; font-weight: 800; margin: 6px 0;">{piano['prezzo']}</h2>
-                    <p style="color: #9ca3af; font-size: 11px; margin: 0;">{piano['sottotitolo']}</p>
-                </div>
-            """, unsafe_allow_html=True)
-            
-            # Renderizziamo ogni singola voce con il suo tooltip HTML interpretato correttamente
+            # Generazione HTML interna per le voci
+            html_voci = ""
             for titolo_voce, desc_voce in piano["voci"]:
-                st.markdown(f"""
-                    <div style="background: rgba(17, 24, 39, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 6px; padding: 6px 10px; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; color: #d1d5db;">
+                html_voci += f"""
+                    <div class="feature-item">
                         <span>• {titolo_voce}</span>
                         <span class="tooltip-container">
                             <span class="info-icon">i</span>
                             <span class="tooltip-text">{desc_voce}</span>
                         </span>
                     </div>
-                """, unsafe_allow_html=True)
+                """
 
-            # Spaziatura e pulsante di azione allineato in basso
-            st.markdown("<div style='margin-bottom: 10px;'></div>", unsafe_allow_html=True)
+            # Card principale con altezza fissa flexbox
+            st.markdown(f"""
+                <div class="pricing-card-wrapper">
+                    <div class="pricing-content-top">
+                        <h3 style="color: #f9fafc; font-size: 15px; margin-bottom: 4px;">{piano['titolo']}</h3>
+                        <h2 style="color: #fb923c; font-size: 20px; font-weight: 800; margin: 6px 0;">{piano['prezzo']}</h2>
+                        <p style="color: #9ca3af; font-size: 11px; margin: 0 0 8px 0;">{piano['sottotitolo']}</p>
+                        <hr style="border-color: rgba(255,255,255,0.1); margin: 4px 0 8px 0;">
+                        <div class="pricing-features-list">
+                            {html_voci}
+                        </div>
+                    </div>
+                    <div style="font-size: 11px; color: #9ca3af; padding-top: 5px;">
+                        <!-- Spaziatore interno per garantire l'ancoraggio del bottone -->
+                    </div>
+                </div>
+            """, unsafe_allow_html=True)
+            
+            # Pulsante posizionato esattamente alla stessa altezza per ogni colonna
             if piano.get("is_free"):
-                st.markdown("<div style='text-align: center; color: #9ca3af; font-size: 12px; padding: 10px;'>Piano Attuale</div>", unsafe_allow_html=True)
+                st.markdown("<div style='text-align: center; color: #9ca3af; font-size: 12px; padding: 10px; background: rgba(31, 41, 55, 0.5); border-radius: 6px; border: 1px solid rgba(255,255,255,0.08);'>Piano Attuale</div>", unsafe_allow_html=True)
             else:
-                if st.button(piano['btn_label'], use_container_width=True, key=piano['btn_key'], type="primary" if i == 3 else "secondary"):
+                is_primary = (i == 3) # Evidenzia Lifetime Promo come piano consigliato
+                if st.button(piano['btn_label'], use_container_width=True, key=piano['btn_key'], type="primary" if is_primary else "secondary"):
                     if piano['price_id']:
                         url = create_checkout_session(piano['price_id'], piano['is_subscription'], user_email)
                         if url:
