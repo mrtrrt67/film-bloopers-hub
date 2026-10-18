@@ -324,7 +324,6 @@ class AdminComponent:
                 except Exception:
                     film_senza_poster = [f for f in tutti_i_film if not f.get("poster_url") or str(f.get("poster_url")).strip() == ""]
 
-                # Ordinamento alfabetico per titolo del film
                 film_senza_poster = sorted(film_senza_poster, key=lambda x: (x.get("titolo") or "").lower())
 
                 if not film_senza_poster:
@@ -354,6 +353,51 @@ class AdminComponent:
                                         st.error("Impossibile trovare una locandina su TMDB.")
                                 except Exception as e:
                                     st.error(f"Errore durante la ricerca: {e}")
+
+            # --- SEZIONE MANUTENZIONE CAST TMDB (ATTORI MANCANTI, ORDINATA ALFABETICAMENTE) ---
+            with st.expander("👥 Manutenzione e Ricerca Cast TMDB Mancanti", expanded=False):
+                try:
+                    res_attori = supabase.table("films").select("id, titolo, anno, attori").or_("attori.is.null,attori.eq.").execute()
+                    film_senza_attori = res_attori.data if res_attori.data else []
+                except Exception:
+                    film_senza_attori = [f for f in tutti_i_film if not f.get("attori") or str(f.get("attori")).strip() == ""]
+
+                film_senza_attori = sorted(film_senza_attori, key=lambda x: (x.get("titolo") or "").lower())
+
+                if not film_senza_attori:
+                    st.success("Ottimo! Tutti i film in archivio hanno un cast registrato sul database.")
+                else:
+                    st.info(f"Trovati {len(film_senza_attori)} film con cast (attori) NULL o vuoto.")
+                    for film in film_senza_attori:
+                        col_a1, col_a2 = st.columns([4, 1])
+                        with col_a1:
+                            st.write(f"🎬 **{film.get('titolo')}** ({film.get('anno', 'N/D')})")
+                        with col_a2:
+                            if st.button("Rilancia Cast TMDB", key=f"btn_attori_{film.get('id')}"):
+                                try:
+                                    from services.tmdb_service import TMDBService
+                                    tmdb_serv = TMDBService()
+                                    supabase.table("films").update({"attori": None}).eq("id", film.get("id")).execute()
+                                    
+                                    # Se nel tuo TMDBService hai un metodo specifico per recuperare il cast (es. fetch_or_update_cast o simile), 
+                                    # puoi invocarlo qui. Di norma i servizi TMDB aggiornano i dettagli completi del film.
+                                    nuovo_cast = None
+                                    if hasattr(tmdb_serv, "get_or_fetch_cast"):
+                                        nuovo_cast = tmdb_serv.get_or_fetch_cast(film.get("id"), film.get("titolo"), film.get("anno"), supabase)
+                                    elif hasattr(tmdb_serv, "fetch_movie_details"):
+                                        # Esempio generico di aggiornamento tramite dettagli TMDB
+                                        details = tmdb_serv.fetch_movie_details(film.get("titolo"), film.get("anno"))
+                                        if details and details.get("attori"):
+                                            nuovo_cast = details.get("attori")
+                                            supabase.table("films").update({"attori": nuovo_cast}).eq("id", film.get("id")).execute()
+
+                                    if nuovo_cast:
+                                        st.success("Cast recuperato con successo!")
+                                        st.rerun()
+                                    else:
+                                        st.error("Impossibile trovare il cast su TMDB o metodo di servizio da configurare.")
+                                except Exception as e:
+                                    st.error(f"Errore durante il recupero del cast: {e}")
             
             st.markdown("---")
             if tutti_i_film:
