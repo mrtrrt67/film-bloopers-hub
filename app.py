@@ -2,6 +2,7 @@ from datetime import date, datetime
 import os
 import streamlit as st
 from supabase import create_client
+import stripe
 
 # --- IMPORT MODULI CUSTOM ---
 from views.home_view import render_home
@@ -45,6 +46,19 @@ def get_secret(key_name, default=""):
         return os.environ[key_name]
         
     return default
+
+# --- CONFIGURAZIONE STRIPE ---
+STRIPE_PUBLISHABLE_KEY = get_secret("STRIPE_PUBLISHABLE_KEY")
+STRIPE_SECRET_KEY = get_secret("STRIPE_SECRET_KEY")
+
+stripe.api_key = STRIPE_SECRET_KEY
+
+PRICE_IDS = {
+    "Mensile": get_secret("STRIPE_PRICE_MONTHLY", "price_1URqXC6dphUuH9QPbzkwGM2v"),
+    "Annuale": get_secret("STRIPE_PRICE_YEARLY", "price_1URqXC6dphUuH9QPHaBaJ8lw"),
+    "Lifetime Standard": get_secret("STRIPE_PRICE_LIFETIME", "price_1URqXC6dphUuH9QPgBkKVw27"),
+    "Lifetime Promo": get_secret("STRIPE_PRICE_PROMO", "price_1URqXC6dphUuH9QPvYwigDhc"),
+}
 
 # --- CARICAMENTO CSS ESTERNO (GLASSMORPHISM) ---
 def local_css(file_name):
@@ -321,7 +335,7 @@ elif sezione == "Esporta Archivio":
 elif sezione == "Premium":
     user_email = st.session_state.user.email if st.session_state.user else None
     render_pricing(PRICE_IDS, user_email)
-    
+
 elif sezione == "Pannello Admin" and utente_corrente_e_admin(supabase, ADMIN_EMAIL):
     AdminComponent.render_admin_panel(
         supabase, tutti_i_film, AMAZON_DASHBOARD_URL, 

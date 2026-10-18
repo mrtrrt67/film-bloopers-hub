@@ -48,6 +48,18 @@ def render_sidebar(supabase, is_promo_active, utente_corrente_e_admin, cb_naviga
             with st.expander("Navigazione Principale", expanded=True):
                 render_nav_btn("Home", "Home")
                 render_nav_btn("Esplora e Cerca", "Esplora e Cerca")
+                 # Stile personalizzato per evidenziare il pulsante Premium nella sidebar con testo colorato
+                st.markdown(
+                    """
+                    <style>
+                    div.stButton > button[kind="secondary"]:has(span:text("Premium")) {
+                        border: 1px solid #10b981 !important;
+                        color: #10b981 !important;
+                    }
+                    </style>
+                """,
+                    unsafe_allow_html=True,
+                )
                 render_nav_btn("Premium", "Premium")
             
             if st.session_state.get("user"):
