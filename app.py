@@ -3,11 +3,10 @@ import os
 import streamlit as st
 from supabase import create_client
 import stripe
-import gc
 from tornado.web import Application, RequestHandler
 from tornado.routing import Rule, PathMatches
+import gc
 
-# --- GESTORE TORNADO PER SITEMAP.XML IN STREAMLIT ---
 class SitemapHandler(RequestHandler):
     def get(self):
         self.set_header("Content-Type", "application/xml; charset=UTF-8")
@@ -40,8 +39,9 @@ def setup_sitemap_route():
     try:
         tornado_app = next(o for o in gc.get_referrers(Application) if o.__class__ is Application)
         tornado_app.wildcard_router.rules.insert(0, Rule(PathMatches('/sitemap.xml'), SitemapHandler))
+        print(">>> SITEMAP ROUTE AGGIUNTA CON SUCCESSO A TORNADO! <<<")
     except Exception as e:
-        pass
+        print(lays := f">>> ERRORE AGGANCIO TORNADO SITEMAP: {e}")
 
 setup_sitemap_route()
 
