@@ -3,6 +3,47 @@ import os
 import streamlit as st
 from supabase import create_client
 import stripe
+import gc
+from tornado.web import Application, RequestHandler
+from tornado.routing import Rule, PathMatches
+
+# --- GESTORE TORNADO PER SITEMAP.XML IN STREAMLIT ---
+class SitemapHandler(RequestHandler):
+    def get(self):
+        self.set_header("Content-Type", "application/xml; charset=UTF-8")
+        self.write("""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://filmbloopers.online/</loc>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+  <url>
+    <loc>https://filmbloopers.online/?sezione=Esplora</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://filmbloopers.online/?sezione=Classifica</loc>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://filmbloopers.online/?sezione=Premium</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+</urlset>""")
+
+@st.cache_resource
+def setup_sitemap_route():
+    try:
+        tornado_app = next(o for o in gc.get_referrers(Application) if o.__class__ is Application)
+        tornado_app.wildcard_router.rules.insert(0, Rule(PathMatches('/sitemap.xml'), SitemapHandler))
+    except Exception as e:
+        pass
+
+setup_sitemap_route()
 
 # --- IMPORT MODULI CUSTOM ---
 from views.home_view import render_home
