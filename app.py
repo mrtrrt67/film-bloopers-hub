@@ -4,36 +4,6 @@ import streamlit as st
 from supabase import create_client
 import stripe
 
-# --- INTERCETTAZIONE RAPIDA PER SITEMAP.XML ---
-try:
-    if "sitemap.xml" in str(st.query_params) or "/sitemap.xml" in str(st.context.headers.get("host", "")):
-        st.code("""<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://filmbloopers.online/</loc>
-    <changefreq>daily</changefreq>
-    <priority>1.0</priority>
-  </url>
-  <url>
-    <loc>https://filmbloopers.online/?sezione=Esplora</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://filmbloopers.online/?sezione=Classifica</loc>
-    <changefreq>daily</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://filmbloopers.online/?sezione=Premium</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
-  </url>
-</urlset>""", language="xml")
-        st.stop()
-except Exception:
-    pass
-
 # --- IMPORT MODULI CUSTOM ---
 from views.home_view import render_home
 from views.community_view import render_classifica, render_segnala_errore, render_suggerimenti
