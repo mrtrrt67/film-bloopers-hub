@@ -1,6 +1,13 @@
 from datetime import date, datetime
 import os
 import streamlit as st
+
+st.set_page_config(
+    page_title="FilmBloopers Hub - Errori e Curiosità dai Film",
+    page_icon="🎬",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
 from supabase import create_client
 import stripe
 
