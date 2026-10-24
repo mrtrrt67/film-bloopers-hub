@@ -7,20 +7,34 @@ export async function GET() {
     const supabase = await createClient();
 
     // Recupera tutti i film che non hanno la locandina
-    const { data: missingPosters, error } = await supabase
+    const { data: missingPosters, error: errPosters } = await supabase
       .from("films")
       .select("id, titolo, anno, poster_url, regista, attori")
       .or("poster_url.is.null,poster_url.eq.")
       .order("titolo", { ascending: true });
 
-    if (error) throw error;
+    if (errPosters) throw errPosters;
+
+    // Recupera tutti i film che non hanno il cast
+    const { data: missingCast, error: errCast } = await supabase
+      .from("films")
+      .select("id, titolo, anno, poster_url, regista, attori")
+      .or("attori.is.null,attori.eq.")
+      .order("titolo", { ascending: true });
+
+    if (errCast) throw errCast;
 
     return NextResponse.json({
+      missingPostersCount: missingPosters?.length || 0,
+      missingPosters: missingPosters || [],
+      missingCastCount: missingCast?.length || 0,
+      missingCast: missingCast || [],
+      // retrocompatibilità
       count: missingPosters?.length || 0,
       films: missingPosters || [],
     });
   } catch (err: any) {
-    console.error("Errore recupero film senza poster:", err);
+    console.error("Errore recupero film senza poster o cast:", err);
     return NextResponse.json(
       { error: err.message || "Errore recupero dati" },
       { status: 500 }
@@ -40,10 +54,60 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Accesso non autorizzato" }, { status: 403 });
     }
 
-    const { film_id, all, updateCast } = await request.json();
+    const { film_id, all, action, updateCast } = await request.json();
 
+    // 1. Aggiornamento in massa del CAST mancante
+    if (action === "bulk_cast" || (all && action === "cast")) {
+      const { data: missingCastFilms } = await supabase
+        .from("films")
+        .select("id, titolo, anno, attori, regista")
+        .or("attori.is.null,attori.eq.");
+
+      const updatedFilms: any[] = [];
+      for (const film of missingCastFilms || []) {
+        const details = await fetchDetailsForMovie(film.titolo, film.anno);
+        if (details?.attori && details.attori !== "N/D") {
+          const up: Record<string, any> = { attori: details.attori };
+          if (!film.regista || film.regista === "N/D") {
+            if (details.regista && details.regista !== "N/D") up.regista = details.regista;
+          }
+          await supabase.from("films").update(up).eq("id", film.id);
+          updatedFilms.push({ id: film.id, titolo: film.titolo, attori: details.attori });
+        }
+      }
+
+      return NextResponse.json({
+        success: true,
+        updatedCount: updatedFilms.length,
+        updatedFilms,
+      });
+    }
+
+    // 2. Aggiornamento cast per SINGOLO film
+    if (film_id && action === "cast") {
+      const { data: film } = await supabase
+        .from("films")
+        .select("id, titolo, anno, regista")
+        .eq("id", film_id)
+        .single();
+
+      if (!film) return NextResponse.json({ error: "Film non trovato" }, { status: 404 });
+
+      const details = await fetchDetailsForMovie(film.titolo, film.anno);
+      if (details?.attori && details.attori !== "N/D") {
+        const up: Record<string, any> = { attori: details.attori };
+        if (!film.regista || film.regista === "N/D") {
+          if (details.regista && details.regista !== "N/D") up.regista = details.regista;
+        }
+        await supabase.from("films").update(up).eq("id", film.id);
+        return NextResponse.json({ success: true, attori: details.attori });
+      }
+
+      return NextResponse.json({ error: "Cast non trovato su TMDB" }, { status: 404 });
+    }
+
+    // 3. Aggiornamento in massa delle LOCANDINE
     if (all) {
-      // Aggiorna tutte le locandine mancanti in bulk
       const { data: missingFilms } = await supabase
         .from("films")
         .select("id, titolo, anno, poster_url, attori, regista")
@@ -58,7 +122,6 @@ export async function POST(request: Request) {
             poster_url: result.poster_url,
           };
 
-          // Se richiesto, aggiorna anche cast e regista se mancanti
           if (updateCast && (!film.attori || film.attori === "N/D")) {
             const details = await fetchDetailsForMovie(film.titolo, film.anno);
             if (details) {
@@ -79,8 +142,8 @@ export async function POST(request: Request) {
       });
     }
 
+    // 4. Aggiornamento singola locandina
     if (film_id) {
-      // Aggiorna singolo film
       const { data: film } = await supabase
         .from("films")
         .select("id, titolo, anno")
@@ -110,7 +173,7 @@ export async function POST(request: Request) {
       }
     }
 
-    return NextResponse.json({ error: "Parametro film_id o all mancante" }, { status: 400 });
+    return NextResponse.json({ error: "Parametro non valido" }, { status: 400 });
   } catch (err: any) {
     console.error("Errore aggiornamento locandine:", err);
     return NextResponse.json(

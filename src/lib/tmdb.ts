@@ -116,10 +116,105 @@ export function formatCredits(details: TMDBMovieDetails) {
   };
 }
 
+function normalizeTitle(str?: string | null): string {
+  if (!str) return "";
+  return str
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+export function scoreMovieMatch(
+  targetTitle: string,
+  targetYear: string | undefined,
+  cand: TMDBMovieResult
+): number {
+  const normTarget = normalizeTitle(targetTitle);
+  const candTitle = normalizeTitle(cand.title);
+  const candOrig = normalizeTitle(cand.original_title);
+
+  let score = 0;
+
+  // Corrispondenza esatta
+  if (candTitle === normTarget || candOrig === normTarget) {
+    score += 100;
+  } else {
+    const targetWords = normTarget.split(" ").filter(Boolean);
+    const candWords = candTitle.split(" ").filter(Boolean);
+    const candOrigWords = candOrig.split(" ").filter(Boolean);
+
+    const matchItalian = targetWords.filter((w) => candWords.includes(w)).length;
+    const matchOrig = targetWords.filter((w) => candOrigWords.includes(w)).length;
+    const maxMatch = Math.max(matchItalian, matchOrig);
+
+    if (maxMatch === targetWords.length && targetWords.length > 0) {
+      score += 50;
+      // Penalità se ci sono troppe parole aggiuntive (es. "La fine di Oak Street" vs "Oak Street")
+      const extraWords = Math.abs(candWords.length - targetWords.length);
+      score -= Math.min(extraWords * 15, 45);
+    } else {
+      score += (maxMatch / Math.max(targetWords.length, 1)) * 35;
+    }
+  }
+
+  // Corrispondenza anno di uscita
+  if (targetYear && cand.release_date) {
+    const candYear = parseInt(cand.release_date.slice(0, 4), 10);
+    const tYear = parseInt(targetYear, 10);
+    if (!isNaN(candYear) && !isNaN(tYear)) {
+      const diff = Math.abs(candYear - tYear);
+      if (diff === 0) score += 40;
+      else if (diff === 1) score += 20;
+      else if (diff >= 3) score -= 40;
+    }
+  }
+
+  return Math.round(score);
+}
+
+export interface TMDBCandidateResult {
+  id: number;
+  title: string;
+  original_title: string;
+  release_date: string;
+  poster_url: string | null;
+  backdrop_url: string | null;
+  overview: string;
+  score?: number;
+}
+
+export async function searchTMDBMovieCandidates(
+  query: string,
+  year?: string | number
+): Promise<TMDBCandidateResult[]> {
+  const cleanYear = year ? String(year).trim().slice(0, 4) : undefined;
+  const results = await searchTMDBMovies(query, cleanYear);
+
+  // Se con anno non trova nulla, prova senza anno
+  let finalResults = results;
+  if ((!finalResults || finalResults.length === 0) && cleanYear) {
+    finalResults = await searchTMDBMovies(query);
+  }
+
+  return (finalResults || []).map((item) => ({
+    id: item.id,
+    title: item.title,
+    original_title: item.original_title,
+    release_date: item.release_date || "",
+    poster_url: getTMDBImageUrl(item.poster_path, "w500"),
+    backdrop_url: getTMDBImageUrl(item.backdrop_path, "original"),
+    overview: item.overview || "",
+    score: scoreMovieMatch(query, cleanYear, item),
+  }));
+}
+
 export async function fetchPosterForMovie(
   titolo: string,
   anno?: string | number | null
-): Promise<{ poster_url: string | null; backdrop_url: string | null }> {
+): Promise<{ poster_url: string | null; backdrop_url: string | null; candidate?: TMDBCandidateResult }> {
   if (!titolo) return { poster_url: null, backdrop_url: null };
 
   const candidates: string[] = [];
@@ -144,6 +239,7 @@ export async function fetchPosterForMovie(
   }
 
   const cleanYear = anno ? String(anno).trim().slice(0, 4) : undefined;
+  const scoredItems: Array<{ item: TMDBMovieResult; score: number }> = [];
 
   for (const useYear of [true, false]) {
     const yearToUse = useYear ? cleanYear : undefined;
@@ -151,16 +247,35 @@ export async function fetchPosterForMovie(
     for (const query of candidates) {
       if (!query) continue;
       const results = await searchTMDBMovies(query, yearToUse);
-      if (results && results.length > 0) {
-        for (const item of results) {
-          if (item.poster_path) {
-            return {
-              poster_url: getTMDBImageUrl(item.poster_path, "w500"),
-              backdrop_url: getTMDBImageUrl(item.backdrop_path, "original"),
-            };
-          }
-        }
+      for (const item of results) {
+        if (!item.poster_path) continue;
+        const s = scoreMovieMatch(query, cleanYear, item);
+        scoredItems.push({ item, score: s });
       }
+    }
+    // Se abbiamo trovato corrispondenze ad alto punteggio con l'anno, non serve cercare senza anno
+    if (scoredItems.some((s) => s.score >= 80)) break;
+  }
+
+  if (scoredItems.length > 0) {
+    scoredItems.sort((a, b) => b.score - a.score);
+    const best = scoredItems[0];
+    // Soglia minima di accuratezza per evitare falsi positivi casuali
+    if (best.score >= 45) {
+      return {
+        poster_url: getTMDBImageUrl(best.item.poster_path, "w500"),
+        backdrop_url: getTMDBImageUrl(best.item.backdrop_path, "original"),
+        candidate: {
+          id: best.item.id,
+          title: best.item.title,
+          original_title: best.item.original_title,
+          release_date: best.item.release_date || "",
+          poster_url: getTMDBImageUrl(best.item.poster_path, "w500"),
+          backdrop_url: getTMDBImageUrl(best.item.backdrop_path, "original"),
+          overview: best.item.overview || "",
+          score: best.score,
+        },
+      };
     }
   }
 
@@ -180,37 +295,22 @@ export async function fetchDetailsForMovie(
 } | null> {
   if (!titolo) return null;
 
-  const candidates: string[] = [
-    titolo,
-    titolo.replace(/\s*\([^)]*\)/g, "").trim(),
-    titolo.split(/[-–:—]/)[0].replace(/\s*\([^)]*\)/g, "").trim(),
-  ];
-  const matchParen = titolo.match(/\(([^)]+)\)/);
-  if (matchParen && matchParen[1]) candidates.push(matchParen[1].trim());
-
-  const cleanYear = anno ? String(anno).trim().slice(0, 4) : undefined;
-
-  for (const useYear of [true, false]) {
-    for (const q of candidates) {
-      if (!q) continue;
-      const res = await searchTMDBMovies(q, useYear ? cleanYear : undefined);
-      if (res && res.length > 0) {
-        const top = res[0];
-        const details = await getTMDBMovieDetails(top.id);
-        if (details) {
-          const cred = formatCredits(details);
-          return {
-            poster_url: cred.poster_url,
-            backdrop_url: cred.backdrop_url,
-            regista: cred.regista,
-            attori: cred.attori,
-            genere: cred.genere,
-            trama: cred.trama,
-          };
-        }
-      }
+  const posterRes = await fetchPosterForMovie(titolo, anno);
+  if (posterRes.candidate?.id) {
+    const details = await getTMDBMovieDetails(posterRes.candidate.id);
+    if (details) {
+      const cred = formatCredits(details);
+      return {
+        poster_url: cred.poster_url,
+        backdrop_url: cred.backdrop_url,
+        regista: cred.regista,
+        attori: cred.attori,
+        genere: cred.genere,
+        trama: cred.trama,
+      };
     }
   }
 
   return null;
 }
+
