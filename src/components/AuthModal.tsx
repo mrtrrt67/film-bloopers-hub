@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { X, Lock, Mail, ArrowRight, UserCheck, KeyRound, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -283,6 +284,27 @@ export default function AuthModal({
               </>
             )}
           </button>
+
+          {mode === "register" && (
+            <p className="text-[11px] text-zinc-500 text-center leading-normal pt-1">
+              Creando un account accetti i nostri{" "}
+              <Link
+                href="/termini"
+                target="_blank"
+                className="text-amber-400/90 underline hover:text-amber-300"
+              >
+                Termini di Servizio
+              </Link>{" "}
+              e l&apos;
+              <Link
+                href="/privacy"
+                target="_blank"
+                className="text-amber-400/90 underline hover:text-amber-300"
+              >
+                Informativa Privacy
+              </Link>.
+            </p>
+          )}
         </form>
 
         {mode === "forgot" && (

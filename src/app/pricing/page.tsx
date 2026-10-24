@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Sparkles, Zap, Shield, ArrowRight } from "lucide-react";
+import Link from "next/link";
+import { Check, Sparkles, Zap, Shield, ArrowRight, ShieldCheck } from "lucide-react";
 import { PRICING_PLANS } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/client";
 
@@ -144,6 +145,28 @@ export default function PricingPage() {
             </div>
           );
         })}
+      </div>
+
+      {/* Note Legali e Trasparenza Contrattuale */}
+      <div className="mt-12 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-3 text-xs text-zinc-400">
+        <div className="flex items-center gap-2 text-zinc-200 font-bold">
+          <ShieldCheck className="h-4 w-4 text-amber-400" />
+          <span>Garanzia di Trasparenza, Sicurezza e Condizioni di Recesso</span>
+        </div>
+        <p className="leading-relaxed">
+          <strong>Pagamenti Sicuri:</strong> Tutte le transazioni sono elaborate in modo sicuro con crittografia end-to-end da <strong>Stripe Inc.</strong> (conforme PCI-DSS Livello 1). Nessun dato di carta di credito viene memorizzato sui nostri server.
+        </p>
+        <p className="leading-relaxed">
+          <strong>Informativa Recesso Servizi Digitali:</strong> Ai sensi dell&apos;art. 59, lett. o) del Codice del Consumo (D.Lgs. 206/2005), la fornitura di contenuti digitali ad esecuzione immediata non è soggetta al diritto di recesso una volta avviata l&apos;esecuzione del servizio. L&apos;abbonamento mensile può comunque essere annullato in qualsiasi momento con un semplice click dal pannello Stripe, mantenendo l&apos;accesso fino alla scadenza del mese pagato.
+        </p>
+        <div className="flex flex-wrap items-center gap-4 pt-2 text-[11px] text-zinc-400 border-t border-zinc-800/80">
+          <span>Consulta i documenti legali completi:</span>
+          <Link href="/termini" className="text-amber-400 hover:underline">Termini e Condizioni</Link>
+          <span>•</span>
+          <Link href="/privacy" className="text-amber-400 hover:underline">Informativa Privacy</Link>
+          <span>•</span>
+          <Link href="/note-legali" className="text-amber-400 hover:underline">Note Legali & Dati Societari</Link>
+        </div>
       </div>
     </div>
   );
