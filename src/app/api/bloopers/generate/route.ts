@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { generateBloopersForMovie } from "@/lib/gemini";
 
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
+    const adminDb = createAdminClient();
     const { data: { user } } = await supabase.auth.getUser();
 
     const body = await request.json();
@@ -17,9 +19,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Verifica quota utente
+    const adminEmail = (process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL || "mrtrrt67@gmail.com").toLowerCase();
+    const isUserAdmin = user && user.email && user.email.toLowerCase() === adminEmail;
     const today = new Date().toISOString().slice(0, 10);
-    if (user) {
+
+    // 1. Verifica quota per utenti non admin
+    if (user && !isUserAdmin) {
       const { data: profile } = await supabase
         .from("profiles")
         .select("*")
@@ -38,8 +43,8 @@ export async function POST(request: Request) {
           );
         }
 
-        // Incrementa chiamate
-        await supabase
+        // Incrementa chiamate solo per utenti non admin
+        await adminDb
           .from("profiles")
           .update({
             calls_today: callsToday + 1,
@@ -49,7 +54,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // Recupera errori già presenti a DB per evitare duplicati
+    // 2. Recupera errori già presenti a DB per evitare duplicati
     const { data: existingBloopers } = await supabase
       .from("errori")
       .select("descrizione")
@@ -57,8 +62,8 @@ export async function POST(request: Request) {
 
     const descrizioniEsistenti = (existingBloopers || []).map((e: any) => e.descrizione);
 
-    // Chiamata specializzata a Gemini con contesto TMDB
-    const { bloopers: generati, error: genError } = await generateBloopersForMovie({
+    // 3. Chiamata specializzata a Gemini con contesto TMDB
+    const genResult = await generateBloopersForMovie({
       titolo,
       anno,
       regista,
@@ -67,7 +72,37 @@ export async function POST(request: Request) {
       erroriEsistenti: descrizioniEsistenti,
     });
 
+    const { bloopers: generati, error: genError, modelUsed, executionTimeSec, errorsLog } = genResult;
+
+    // 4. Se ci sono stati errori parziali o totali, registrali in log_errori_ia
+    if (errorsLog && errorsLog.length > 0) {
+      for (const errItem of errorsLog) {
+        try {
+          await adminDb.from("log_errori_ia").insert({
+            utente: user?.email || "ospite",
+            film: titolo,
+            modello: errItem.model,
+            operazione: "Ricerca Bloopers",
+            errore_dettaglio: errItem.error,
+          });
+        } catch (e) {
+          console.error("Errore salvataggio log_errori_ia:", e);
+        }
+      }
+    }
+
+    // Se la chiamata è fallita del tutto
     if (genError && (!generati || generati.length === 0)) {
+      try {
+        await adminDb.from("log_errori_ia").insert({
+          utente: user?.email || "ospite",
+          film: titolo,
+          modello: "gemini",
+          operazione: "Ricerca Bloopers",
+          errore_dettaglio: genError,
+        });
+      } catch {}
+
       return NextResponse.json(
         { error: genError },
         { status: genError.includes("GEMINI_API_KEY") ? 500 : 404 }
@@ -81,6 +116,19 @@ export async function POST(request: Request) {
       );
     }
 
+    // 5. REGISTRAZIONE CHIAMATA RIUSCITA IN statistiche_ia
+    if (modelUsed) {
+      try {
+        await adminDb.from("statistiche_ia").insert({
+          modello: modelUsed,
+          tempo_esecuzione: executionTimeSec || 1.5,
+        });
+      } catch (e) {
+        console.error("Errore salvataggio statistiche_ia:", e);
+      }
+    }
+
+    // 6. Inserimento bloopers generati
     const emailInserimento = user?.email || "IA (Sistema)";
     const daInserire = generati.map((g) => ({
       film_id,
@@ -94,7 +142,7 @@ export async function POST(request: Request) {
       provenienza: "ia",
     }));
 
-    const { data: inserted, error: insertErr } = await supabase
+    const { data: inserted, error: insertErr } = await adminDb
       .from("errori")
       .insert(daInserire)
       .select();

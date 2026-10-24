@@ -132,91 +132,145 @@ export default function AdminUsersTab() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
-                {filtered.map((profile) => (
-                  <tr key={profile.id} className="hover:bg-zinc-800/30">
-                    <td className="py-3 px-4">
-                      <p className="font-bold text-white">{profile.email || "N/D"}</p>
-                      <p className="text-[10px] text-zinc-500 font-mono mt-0.5">
-                        📅 {profile.created_at ? profile.created_at.slice(0, 10) : "N/D"} | 🏆 {profile.punti || 0} pts
-                      </p>
-                    </td>
+                {filtered.map((profile) => {
+                  const todayStr = new Date().toISOString().slice(0, 10);
+                  const isCallToday = profile.last_reset_date === todayStr;
 
-                    {/* Tier Select */}
-                    <td className="py-3 px-4">
-                      <select
-                        value={profile.tier || "free"}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          setProfiles((prev) =>
-                            prev.map((p) => (p.id === profile.id ? { ...p, tier: val } : p))
-                          );
-                        }}
-                        className="rounded-lg bg-zinc-950 border border-zinc-700 px-2 py-1 text-xs text-zinc-200 font-bold focus:outline-none focus:border-amber-500"
-                      >
-                        <option value="free">free</option>
-                        <option value="premium">premium</option>
-                        <option value="admin">admin</option>
-                      </select>
-                    </td>
+                  return (
+                    <tr key={profile.id} className="hover:bg-zinc-800/30">
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-2">
+                          <p className="font-bold text-white">{profile.email || "N/D"}</p>
+                          {profile.is_admin && (
+                            <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-[10px] font-black uppercase text-amber-300 border border-amber-400/40">
+                              ADMIN
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-[10px] text-zinc-500 font-mono mt-0.5">
+                          📅 {profile.created_at ? profile.created_at.slice(0, 10) : "N/D"} | 🏆 {profile.punti || 0} pts
+                        </p>
+                      </td>
 
-                    {/* Subscription Type */}
-                    <td className="py-3 px-4">
-                      {profile.tier === "premium" ? (
-                        <select
-                          value={profile.tipo_abbonamento || profile.subscription_type || "lifetime"}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setProfiles((prev) =>
-                              prev.map((p) =>
-                                p.id === profile.id
-                                  ? { ...p, tipo_abbonamento: val, subscription_type: val }
-                                  : p
-                              )
-                            );
-                          }}
-                          className="rounded-lg bg-zinc-950 border border-zinc-700 px-2 py-1 text-xs text-zinc-200 focus:outline-none focus:border-amber-500"
-                        >
-                          <option value="mensile">mensile</option>
-                          <option value="lifetime">lifetime</option>
-                        </select>
-                      ) : (
-                        <span className="text-zinc-600 text-[11px] font-mono">N/A</span>
-                      )}
-                    </td>
+                      {/* Tier Select */}
+                      <td className="py-3 px-4">
+                        {profile.is_admin ? (
+                          <span className="font-bold text-amber-400 text-xs flex items-center gap-1">
+                            <Shield className="h-3.5 w-3.5" /> admin
+                          </span>
+                        ) : (
+                          <select
+                            value={profile.tier || "free"}
+                            onChange={(e) => {
+                              const val = e.target.value;
+                              setProfiles((prev) =>
+                                prev.map((p) => (p.id === profile.id ? { ...p, tier: val } : p))
+                              );
+                            }}
+                            className="rounded-lg bg-zinc-950 border border-zinc-700 px-2 py-1 text-xs text-zinc-200 font-bold focus:outline-none focus:border-amber-500"
+                          >
+                            <option value="free">free</option>
+                            <option value="premium">premium</option>
+                            <option value="admin">admin</option>
+                          </select>
+                        )}
+                      </td>
 
-                    {/* Expiration Date */}
-                    <td className="py-3 px-4">
-                      {profile.tier === "premium" && (profile.tipo_abbonamento === "mensile" || profile.subscription_type === "mensile") ? (
-                        <input
-                          type="date"
-                          value={(profile.data_scadenza || profile.expires_at || "").slice(0, 10)}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setProfiles((prev) =>
-                              prev.map((p) =>
-                                p.id === profile.id
-                                  ? { ...p, data_scadenza: val, expires_at: val }
-                                  : p
-                              )
-                            );
-                          }}
-                          className="rounded-lg bg-zinc-950 border border-zinc-700 px-2 py-1 text-xs text-zinc-200 focus:outline-none focus:border-amber-500 font-mono"
-                        />
-                      ) : (
-                        <span className="text-zinc-500 text-[11px]">Illimitato</span>
-                      )}
-                    </td>
+                      {/* Subscription Type */}
+                      <td className="py-3 px-4">
+                        {profile.is_admin ? (
+                          <span className="text-zinc-400 text-[11px] font-mono">Illimitato (Admin)</span>
+                        ) : profile.tier === "premium" ? (
+                          <div className="flex flex-col gap-1">
+                            <select
+                              value={profile.tipo_abbonamento || "mensile"}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setProfiles((prev) =>
+                                  prev.map((p) =>
+                                    p.id === profile.id
+                                      ? { ...p, tipo_abbonamento: val, subscription_type: val }
+                                      : p
+                                  )
+                                );
+                              }}
+                              className="rounded-lg bg-zinc-950 border border-zinc-700 px-2 py-1 text-xs text-zinc-200 focus:outline-none focus:border-amber-500"
+                            >
+                              <option value="mensile">mensile</option>
+                              <option value="lifetime">lifetime</option>
+                              <option value="nessuno">nessuno</option>
+                            </select>
+                            {profile.is_expired && (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/30">
+                                ⚠️ Scaduto
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-zinc-600 text-[11px] font-mono">nessuno (Free)</span>
+                        )}
+                      </td>
 
-                    {/* Calls Today */}
-                    <td className="py-3 px-4 font-mono font-bold">
-                      {profile.tier === "admin" ? (
-                        <span className="text-amber-400">🛡️ Illimitate</span>
-                      ) : (
-                        <span className="text-zinc-300">{profile.calls_today ?? 0}</span>
-                      )}
-                    </td>
+                      {/* Expiration Date */}
+                      <td className="py-3 px-4">
+                        {profile.is_admin ? (
+                          <span className="text-zinc-500 text-[11px]">Nessuna (Admin)</span>
+                        ) : profile.tier === "premium" && (profile.tipo_abbonamento === "mensile" || profile.subscription_type === "mensile") ? (
+                          <div className="flex flex-col gap-1">
+                            <input
+                              type="date"
+                              value={(profile.data_scadenza || profile.expires_at || "").slice(0, 10)}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                const isExp = val < todayStr;
+                                setProfiles((prev) =>
+                                  prev.map((p) =>
+                                    p.id === profile.id
+                                      ? { ...p, data_scadenza: val, expires_at: val, is_expired: isExp }
+                                      : p
+                                  )
+                                );
+                              }}
+                              className={`rounded-lg bg-zinc-950 border px-2 py-1 text-xs focus:outline-none font-mono ${
+                                profile.is_expired
+                                  ? "border-rose-500/60 text-rose-300"
+                                  : "border-zinc-700 text-zinc-200 focus:border-amber-500"
+                              }`}
+                            />
+                            {profile.is_expired && (
+                              <span className="text-[10px] text-rose-400 font-semibold">
+                                Scaduto il {(profile.data_scadenza || profile.expires_at || "").slice(0, 10)}
+                              </span>
+                            )}
+                          </div>
+                        ) : profile.tier === "premium" && profile.tipo_abbonamento === "lifetime" ? (
+                          <span className="text-emerald-400 text-[11px] font-semibold">A vita (Lifetime)</span>
+                        ) : (
+                          <span className="text-zinc-500 text-[11px]">Nessuna</span>
+                        )}
+                      </td>
 
-                    {/* Actions */}
+                      {/* Calls Today */}
+                      <td className="py-3 px-4 font-mono">
+                        {profile.is_admin ? (
+                          <span className="text-amber-400 font-bold">🛡️ Illimitate</span>
+                        ) : (
+                          <div>
+                            <span className={`font-bold text-sm ${(profile.calls_today || 0) > 0 ? "text-emerald-400" : "text-zinc-400"}`}>
+                              {profile.calls_today ?? 0}
+                            </span>
+                            <p className="text-[10px] text-zinc-500 font-sans mt-0.5">
+                              {isCallToday && (profile.calls_today || 0) > 0
+                                ? "Oggi"
+                                : profile.last_reset_date
+                                ? `Ult. uso: ${profile.last_reset_date}`
+                                : "Nessun uso"}
+                            </p>
+                          </div>
+                        )}
+                      </td>
+
+                      {/* Actions */}
                     <td className="py-3 px-4 text-right">
                       <div className="flex items-center justify-end gap-1.5">
                         <button
@@ -244,8 +298,9 @@ export default function AdminUsersTab() {
                       </div>
                     </td>
                   </tr>
-                ))}
-              </tbody>
+                );
+              })}
+            </tbody>
             </table>
           </div>
         </div>

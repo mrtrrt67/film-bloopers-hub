@@ -55,10 +55,13 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
     );
   }
 
+  const [searchView, setSearchView] = useState<"recent" | "top">("recent");
+
   const metrics = data?.metrics || {};
   const duplicatePosters = data?.duplicatePosters || [];
   const aiPerformance = data?.aiPerformance || [];
   const topSearches = data?.topSearches || [];
+  const recentSearches = data?.recentSearches || [];
   const topVotedBloopers = data?.topVotedBloopers || [];
 
   return (
@@ -111,26 +114,44 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
             <span className="text-xs text-zinc-400 font-medium">👁️ Visite Totali</span>
             <p className="text-2xl font-black text-white mt-1">{metrics.totalVisits ?? 0}</p>
+            <p className="text-[10px] text-zinc-500 font-mono mt-0.5">Oggi: {metrics.todayVisits ?? 0}</p>
           </div>
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
             <span className="text-xs text-zinc-400 font-medium">👻 Visite Ospiti</span>
             <p className="text-2xl font-black text-zinc-200 mt-1">{metrics.guestVisits ?? 0}</p>
+            <p className="text-[10px] text-zinc-500 font-mono mt-0.5">Oggi: {metrics.guestVisitsToday ?? 0}</p>
           </div>
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
             <span className="text-xs text-zinc-400 font-medium">👥 Utenti Reg.</span>
             <p className="text-2xl font-black text-amber-400 mt-1">{metrics.totalUsers ?? 0}</p>
+            <p className="text-[10px] text-zinc-500 font-mono mt-0.5">Free: {metrics.freeUsers ?? 0}</p>
           </div>
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
-            <span className="text-xs text-zinc-400 font-medium">⭐ Premium</span>
+            <span className="text-xs text-zinc-400 font-medium">⭐ Premium Attivi</span>
             <p className="text-2xl font-black text-amber-300 mt-1">{metrics.premiumUsers ?? 0}</p>
+            <p className="text-[10px] text-zinc-500 font-mono mt-0.5">
+              {(metrics.expiredUsers || 0) > 0 ? (
+                <span className="text-rose-400 font-semibold">⚠️ {metrics.expiredUsers} scaduti</span>
+              ) : (
+                "Tutti attivi"
+              )}
+            </p>
+          </div>
+          <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
+            <span className="text-xs text-zinc-400 font-medium">🔍 Ricerche Oggi</span>
+            <p className="text-2xl font-black text-sky-400 mt-1">{metrics.searchesTodayCount ?? 0}</p>
+            <p className="text-[10px] text-zinc-500 font-mono mt-0.5">Totali: {metrics.totalSearches ?? 0}</p>
           </div>
           <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
             <span className="text-xs text-zinc-400 font-medium">🤖 IA Riuscite Oggi</span>
             <p className="text-2xl font-black text-emerald-400 mt-1">{metrics.aiCallsToday ?? 0}</p>
-          </div>
-          <div className="rounded-xl border border-zinc-800 bg-zinc-900/70 p-4">
-            <span className="text-xs text-zinc-400 font-medium">🎬 Film Totali</span>
-            <p className="text-2xl font-black text-white mt-1">{metrics.totalFilms ?? 0}</p>
+            <p className="text-[10px] text-zinc-500 font-mono mt-0.5">
+              {(metrics.aiErrorsToday || 0) > 0 ? (
+                <span className="text-rose-400 font-semibold">⚠️ {metrics.aiErrorsToday} err.</span>
+              ) : (
+                "0 errori oggi"
+              )}
+            </p>
           </div>
         </div>
       </div>
@@ -172,48 +193,103 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
         </div>
       )}
 
-      {/* 2 COLONNE: TOP RICERCHE & BLOOPERS PIÙ VOTATI */}
+      {/* 2 COLONNE: RICERCHE & BLOOPERS PIÙ VOTATI */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* TOP FILM / SAGHE PIÙ CERCATI */}
+        {/* TABELLA RICERCHE: RECENTI VS TOP */}
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
               <Search className="h-4 w-4 text-amber-400" />
-              🎬 Film / Saghe più cercati
+              <span>Ricerche Utenti & Visitatori</span>
             </h4>
-            <span className="text-xs text-zinc-500 font-mono">Dati da log_ricerche</span>
+            <div className="flex items-center gap-1 bg-zinc-950 p-1 rounded-xl border border-zinc-800 text-[11px]">
+              <button
+                onClick={() => setSearchView("recent")}
+                className={`px-2.5 py-1 rounded-lg font-bold transition ${
+                  searchView === "recent"
+                    ? "bg-amber-500 text-zinc-950 shadow"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                Ultime ({recentSearches.length})
+              </button>
+              <button
+                onClick={() => setSearchView("top")}
+                className={`px-2.5 py-1 rounded-lg font-bold transition ${
+                  searchView === "top"
+                    ? "bg-amber-500 text-zinc-950 shadow"
+                    : "text-zinc-400 hover:text-white"
+                }`}
+              >
+                Top 10 Frequenti
+              </button>
+            </div>
           </div>
 
-          {topSearches.length === 0 ? (
-            <p className="text-xs text-zinc-500 py-6 text-center">Nessuna ricerca registrata al momento.</p>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-xs">
-                <thead>
-                  <tr className="border-b border-zinc-800 text-zinc-400">
-                    <th className="pb-2 font-medium">Termine di Ricerca</th>
-                    <th className="pb-2 text-right font-medium">Ricerche</th>
-                    <th className="pb-2 text-right font-medium">Ultima Ricerca</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
-                  {topSearches.map((s: any, idx: number) => (
-                    <tr key={idx} className="hover:bg-zinc-800/30">
-                      <td className="py-2.5 font-bold text-white flex items-center gap-2">
-                        <span className="text-zinc-600 font-mono text-[10px]">{idx + 1}.</span>
-                        {s.termine}
-                      </td>
-                      <td className="py-2.5 text-right font-mono font-bold text-amber-400">
-                        {s.count}
-                      </td>
-                      <td className="py-2.5 text-right font-mono text-zinc-500 text-[11px]">
-                        {s.lastSearch ? s.lastSearch.slice(0, 16).replace("T", " ") : "N/D"}
-                      </td>
+          {searchView === "recent" ? (
+            recentSearches.length === 0 ? (
+              <p className="text-xs text-zinc-500 py-6 text-center">Nessuna ricerca recente registrata.</p>
+            ) : (
+              <div className="overflow-x-auto max-h-[360px] overflow-y-auto pr-1">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-zinc-800 text-zinc-400">
+                      <th className="pb-2 font-medium">Termine Cercato</th>
+                      <th className="pb-2 text-right font-medium">Data / Ora</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-800/60 text-zinc-300 font-mono">
+                    {recentSearches.map((s: any, idx: number) => (
+                      <tr key={s.id || idx} className="hover:bg-zinc-800/30">
+                        <td className="py-2.5 font-bold text-white font-sans flex items-center gap-2">
+                          <span>{s.termine}</span>
+                          {s.is_today && (
+                            <span className="rounded bg-sky-500/20 text-sky-300 text-[9px] font-mono px-1.5 py-0.5 border border-sky-500/30">
+                              OGGI
+                            </span>
+                          )}
+                        </td>
+                        <td className="py-2.5 text-right text-zinc-400 text-[11px]">
+                          {s.created_at ? s.created_at.slice(0, 16).replace("T", " ") : "N/D"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )
+          ) : (
+            topSearches.length === 0 ? (
+              <p className="text-xs text-zinc-500 py-6 text-center">Nessuna ricerca frequente al momento.</p>
+            ) : (
+              <div className="overflow-x-auto max-h-[360px] overflow-y-auto pr-1">
+                <table className="w-full text-left text-xs">
+                  <thead>
+                    <tr className="border-b border-zinc-800 text-zinc-400">
+                      <th className="pb-2 font-medium">Termine di Ricerca</th>
+                      <th className="pb-2 text-right font-medium">Frequenza</th>
+                      <th className="pb-2 text-right font-medium">Ultima Ricerca</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
+                    {topSearches.map((s: any, idx: number) => (
+                      <tr key={idx} className="hover:bg-zinc-800/30">
+                        <td className="py-2.5 font-bold text-white flex items-center gap-2">
+                          <span className="text-zinc-600 font-mono text-[10px]">{idx + 1}.</span>
+                          {s.termine}
+                        </td>
+                        <td className="py-2.5 text-right font-mono font-bold text-amber-400">
+                          {s.count}
+                        </td>
+                        <td className="py-2.5 text-right font-mono text-zinc-500 text-[11px]">
+                          {s.lastSearch ? s.lastSearch.slice(0, 16).replace("T", " ") : "N/D"}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )
           )}
         </div>
 
