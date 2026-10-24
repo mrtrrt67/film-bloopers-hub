@@ -33,7 +33,21 @@ export async function POST(request: Request) {
 
       if (profile) {
         const prof = profile as any;
-        const isFree = (prof.tier || "free") === "free";
+        const scad = prof.data_scadenza || prof.expires_at ? String(prof.data_scadenza || prof.expires_at).slice(0, 10) : null;
+        const sub = prof.tipo_abbonamento || prof.subscription_type || "nessuno";
+        const isExpired = sub === "mensile" && scad ? scad < today : false;
+
+        if (isExpired && prof.tier !== "free") {
+          try {
+            await adminDb.from("profiles").update({
+              tier: "free",
+              tipo_abbonamento: "nessuno",
+              subscription_type: "nessuno",
+            }).eq("id", user.id);
+          } catch {}
+        }
+
+        const isFree = (prof.tier || "free") === "free" || isExpired;
         const callsToday = prof.last_reset_date === today ? prof.calls_today || 0 : 0;
 
         if (isFree && callsToday >= 15) {

@@ -159,20 +159,31 @@ export default function AdminUsersTab() {
                             <Shield className="h-3.5 w-3.5" /> admin
                           </span>
                         ) : (
-                          <select
-                            value={profile.tier || "free"}
-                            onChange={(e) => {
-                              const val = e.target.value;
-                              setProfiles((prev) =>
-                                prev.map((p) => (p.id === profile.id ? { ...p, tier: val } : p))
-                              );
-                            }}
-                            className="rounded-lg bg-zinc-950 border border-zinc-700 px-2 py-1 text-xs text-zinc-200 font-bold focus:outline-none focus:border-amber-500"
-                          >
-                            <option value="free">free</option>
-                            <option value="premium">premium</option>
-                            <option value="admin">admin</option>
-                          </select>
+                          <div className="flex flex-col gap-0.5">
+                            <select
+                              value={profile.tier || "free"}
+                              onChange={(e) => {
+                                const val = e.target.value;
+                                setProfiles((prev) =>
+                                  prev.map((p) => (p.id === profile.id ? { ...p, tier: val } : p))
+                                );
+                              }}
+                              className={`rounded-lg bg-zinc-950 border px-2 py-1 text-xs font-bold focus:outline-none ${
+                                profile.tier === "premium"
+                                  ? "border-amber-500/50 text-amber-300 focus:border-amber-400"
+                                  : "border-zinc-700 text-zinc-200 focus:border-amber-500"
+                              }`}
+                            >
+                              <option value="free">free</option>
+                              <option value="premium">premium</option>
+                              <option value="admin">admin</option>
+                            </select>
+                            {profile.is_expired && profile.tier === "free" && (
+                              <span className="text-[9px] text-rose-400 font-semibold">
+                                ⬇️ Downgradato a free
+                              </span>
+                            )}
+                          </div>
                         )}
                       </td>
 
@@ -200,11 +211,13 @@ export default function AdminUsersTab() {
                               <option value="lifetime">lifetime</option>
                               <option value="nessuno">nessuno</option>
                             </select>
-                            {profile.is_expired && (
-                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/30">
-                                ⚠️ Scaduto
-                              </span>
-                            )}
+                          </div>
+                        ) : profile.is_expired ? (
+                          <div className="flex flex-col gap-0.5">
+                            <span className="text-zinc-400 text-xs font-mono">nessuno</span>
+                            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/30">
+                              ⚠️ Ex-Mensile (Scaduto)
+                            </span>
                           </div>
                         ) : (
                           <span className="text-zinc-600 text-[11px] font-mono">nessuno (Free)</span>
@@ -231,20 +244,20 @@ export default function AdminUsersTab() {
                                   )
                                 );
                               }}
-                              className={`rounded-lg bg-zinc-950 border px-2 py-1 text-xs focus:outline-none font-mono ${
-                                profile.is_expired
-                                  ? "border-rose-500/60 text-rose-300"
-                                  : "border-zinc-700 text-zinc-200 focus:border-amber-500"
-                              }`}
+                              className="rounded-lg bg-zinc-950 border border-zinc-700 text-zinc-200 focus:border-amber-500 px-2 py-1 text-xs focus:outline-none font-mono"
                             />
-                            {profile.is_expired && (
-                              <span className="text-[10px] text-rose-400 font-semibold">
-                                Scaduto il {(profile.data_scadenza || profile.expires_at || "").slice(0, 10)}
-                              </span>
-                            )}
                           </div>
                         ) : profile.tier === "premium" && profile.tipo_abbonamento === "lifetime" ? (
                           <span className="text-emerald-400 text-[11px] font-semibold">A vita (Lifetime)</span>
+                        ) : profile.is_expired && profile.data_scadenza ? (
+                          <div className="flex flex-col gap-0.5">
+                            <span className="text-[11px] text-rose-400 font-mono font-bold">
+                              Scaduto il {(profile.data_scadenza || profile.expires_at || "").slice(0, 10)}
+                            </span>
+                            <span className="text-[9px] text-zinc-500">
+                              Passato a Free
+                            </span>
+                          </div>
                         ) : (
                           <span className="text-zinc-500 text-[11px]">Nessuna</span>
                         )}

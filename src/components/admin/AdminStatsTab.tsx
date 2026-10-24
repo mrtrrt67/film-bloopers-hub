@@ -23,6 +23,7 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [searchView, setSearchView] = useState<"recent" | "top">("recent");
 
   const amazonDashboardUrl = process.env.NEXT_PUBLIC_AMAZON_DASHBOARD_URL || "https://programma-affiliazione.amazon.it/home";
   const amazonTag = process.env.NEXT_PUBLIC_AMAZON_TAG || "cineblp196704-21";
@@ -54,8 +55,6 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
       </div>
     );
   }
-
-  const [searchView, setSearchView] = useState<"recent" | "top">("recent");
 
   const metrics = data?.metrics || {};
   const duplicatePosters = data?.duplicatePosters || [];

@@ -19,35 +19,60 @@ export async function GET() {
 
     if (error) throw error;
 
+    const adminDb = createAdminClient();
     const today = new Date().toISOString().slice(0, 10);
 
-    const profiles = (rawProfiles || []).map((p) => {
-      const isUserAdmin = p.email?.toLowerCase() === adminEmail;
-      const lastResetStr = p.last_reset_date ? String(p.last_reset_date).slice(0, 10) : "";
-      
-      // Le chiamate di OGGI sono conteggiate solo se last_reset_date coincide con la data odierna
-      const callsTodayReal = isUserAdmin ? 0 : (lastResetStr === today ? (p.calls_today || 0) : 0);
+    const profiles = await Promise.all(
+      (rawProfiles || []).map(async (p) => {
+        const isUserAdmin = p.email?.toLowerCase() === adminEmail;
+        const lastResetStr = p.last_reset_date ? String(p.last_reset_date).slice(0, 10) : "";
+        
+        // Le chiamate di OGGI sono conteggiate solo se last_reset_date coincide con la data odierna
+        const callsTodayReal = isUserAdmin ? 0 : (lastResetStr === today ? (p.calls_today || 0) : 0);
 
-      // Verifica eventuale scadenza abbonamento mensile
-      const tipoSub = p.tipo_abbonamento || p.subscription_type || "nessuno";
-      const scadenza = p.data_scadenza || p.expires_at ? String(p.data_scadenza || p.expires_at).slice(0, 10) : null;
-      const isExpired = tipoSub === "mensile" && scadenza ? scadenza < today : false;
+        // Verifica eventuale scadenza abbonamento mensile
+        const tipoSub = p.tipo_abbonamento || p.subscription_type || "nessuno";
+        const scadenza = p.data_scadenza || p.expires_at ? String(p.data_scadenza || p.expires_at).slice(0, 10) : null;
+        const isExpired = !isUserAdmin && tipoSub === "mensile" && scadenza ? scadenza < today : false;
 
-      let tierEffettivo = p.tier || "free";
-      if (isUserAdmin) {
-        tierEffettivo = "admin";
-      }
+        let tierEffettivo = p.tier || "free";
+        let subEffettivo = tipoSub;
 
-      return {
-        ...p,
-        tier: tierEffettivo,
-        tipo_abbonamento: isUserAdmin ? "illimitato" : tipoSub,
-        data_scadenza: scadenza,
-        calls_today_real: callsTodayReal,
-        is_admin: isUserAdmin,
-        is_expired: isExpired,
-      };
-    });
+        if (isUserAdmin) {
+          tierEffettivo = "admin";
+          subEffettivo = "illimitato";
+        } else if (isExpired) {
+          // DOWNGRADE AUTOMATICO A FREE SE SCADUTO
+          tierEffettivo = "free";
+          subEffettivo = "nessuno";
+
+          // Aggiorna il database se non ancora downgradato a DB
+          if (p.tier !== "free" || p.tipo_abbonamento !== "nessuno") {
+            try {
+              await adminDb.from("profiles").update({
+                tier: "free",
+                tipo_abbonamento: "nessuno",
+                subscription_type: "nessuno",
+              }).eq("id", p.id);
+            } catch (e) {
+              console.error("Errore downgrade DB utente scaduto:", e);
+            }
+          }
+        }
+
+        return {
+          ...p,
+          tier: tierEffettivo,
+          tipo_abbonamento: subEffettivo,
+          data_scadenza: scadenza,
+          calls_today: callsTodayReal,
+          calls_today_real: callsTodayReal,
+          last_reset_date: lastResetStr,
+          is_admin: isUserAdmin,
+          is_expired: isExpired,
+        };
+      })
+    );
 
     return NextResponse.json({ profiles });
   } catch (err: any) {
