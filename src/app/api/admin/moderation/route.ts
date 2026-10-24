@@ -85,20 +85,28 @@ export async function POST(request: Request) {
     }
 
     if (action === "correct_contestation") {
-      // Aggiorna blooper con la correzione
+      // 1. Rimuovi contestazione risolta
+      if (contestazione_id) {
+        await supabase.from("voti_bloopers").delete().eq("id", contestazione_id);
+      }
+
+      // 2. Aggiorna blooper con la correzione e ricalcola i contatori
       if (blooper_id) {
-        const updateData: Record<string, any> = {};
+        const { data: voti } = await supabase
+          .from("voti_bloopers")
+          .select("tipo")
+          .eq("errore_id", blooper_id);
+
+        const conferme = (voti || []).filter((v: any) => v.tipo === "conferma").length;
+        const contestazioni = (voti || []).filter((v: any) => v.tipo === "contestazione").length;
+
+        const updateData: Record<string, any> = { conferme, contestazioni };
         if (minuto) updateData.minuto = minuto;
         if (descrizione) updateData.descrizione = descrizione;
         await supabase.from("errori").update(updateData).eq("id", blooper_id);
       }
 
-      // Rimuovi contestazione risolta
-      if (contestazione_id) {
-        await supabase.from("voti_bloopers").delete().eq("id", contestazione_id);
-      }
-
-      // Assegna punti se previsti
+      // 3. Assegna punti se previsti
       if (userId && points) {
         const { data: profile } = await supabase.from("profiles").select("id, punti").eq("id", userId).single();
         if (profile) {
@@ -120,9 +128,31 @@ export async function POST(request: Request) {
     }
 
     if (action === "ignore_contestation") {
+      let bId = blooper_id;
+      if (!bId && contestazione_id) {
+        const { data: cData } = await supabase
+          .from("voti_bloopers")
+          .select("errore_id")
+          .eq("id", contestazione_id)
+          .single();
+        bId = cData?.errore_id;
+      }
+
       if (contestazione_id) {
         await supabase.from("voti_bloopers").delete().eq("id", contestazione_id);
       }
+
+      if (bId) {
+        const { data: voti } = await supabase
+          .from("voti_bloopers")
+          .select("tipo")
+          .eq("errore_id", bId);
+
+        const conferme = (voti || []).filter((v: any) => v.tipo === "conferma").length;
+        const contestazioni = (voti || []).filter((v: any) => v.tipo === "contestazione").length;
+        await supabase.from("errori").update({ conferme, contestazioni }).eq("id", bId);
+      }
+
       return NextResponse.json({ success: true, message: "Contestazione ignorata ed archiviata." });
     }
 
