@@ -58,7 +58,7 @@ export async function POST(request: Request) {
     const descrizioniEsistenti = (existingBloopers || []).map((e: any) => e.descrizione);
 
     // Chiamata specializzata a Gemini con contesto TMDB
-    const generati = await generateBloopersForMovie({
+    const { bloopers: generati, error: genError } = await generateBloopersForMovie({
       titolo,
       anno,
       regista,
@@ -66,6 +66,13 @@ export async function POST(request: Request) {
       trama,
       erroriEsistenti: descrizioniEsistenti,
     });
+
+    if (genError && (!generati || generati.length === 0)) {
+      return NextResponse.json(
+        { error: genError },
+        { status: genError.includes("GEMINI_API_KEY") ? 500 : 404 }
+      );
+    }
 
     if (!generati || generati.length === 0) {
       return NextResponse.json(
@@ -81,6 +88,8 @@ export async function POST(request: Request) {
       categoria: g.categoria,
       descrizione: g.descrizione,
       approvato: true,
+      conferme: 0,
+      contestazioni: 0,
       inserito_da: emailInserimento,
       provenienza: "ia",
     }));

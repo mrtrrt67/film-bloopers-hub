@@ -2,13 +2,16 @@ import { GoogleGenAI } from "@google/genai";
 import { BlooperCategoria } from "./types";
 
 const GEMINI_MODELS = [
-  "gemini-2.5-flash",
   "gemini-2.0-flash",
   "gemini-1.5-flash",
+  "gemini-1.5-pro",
 ];
 
 function getGeminiClient(): GoogleGenAI | null {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey =
+    process.env.GEMINI_API_KEY ||
+    process.env.GOOGLE_API_KEY ||
+    process.env.GOOGLE_GENAI_API_KEY;
   if (!apiKey) return null;
   return new GoogleGenAI({ apiKey });
 }
@@ -26,11 +29,15 @@ export async function generateBloopersForMovie(params: {
   attori?: string | null;
   trama?: string | null;
   erroriEsistenti?: string[];
-}): Promise<GeneratedBlooper[]> {
+}): Promise<{ bloopers: GeneratedBlooper[]; error?: string }> {
   const ai = getGeminiClient();
   if (!ai) {
-    console.warn("GEMINI_API_KEY non configurata");
-    return [];
+    console.warn("GEMINI_API_KEY non configurata nelle variabili d'ambiente");
+    return {
+      bloopers: [],
+      error:
+        "Chiave GEMINI_API_KEY non trovata nelle Environment Variables di Vercel. Aggiungi GEMINI_API_KEY (o GOOGLE_API_KEY) nella dashboard di Vercel per abilitare la generazione.",
+    };
   }
 
   const { titolo, anno, regista, attori, trama, erroriEsistenti = [] } = params;
@@ -74,6 +81,8 @@ FORMATO OUTPUT:
   }
 ]`;
 
+  let lastErrorMsg = "";
+
   for (const model of GEMINI_MODELS) {
     try {
       const response = await ai.models.generateContent({
@@ -94,18 +103,25 @@ FORMATO OUTPUT:
 
       const parsed = JSON.parse(cleanJson) as GeneratedBlooper[];
       if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map((item) => ({
-          minuto: item.minuto || "00:00:00",
-          categoria: (item.categoria as BlooperCategoria) || "Errori di scena / Posizione",
-          descrizione: item.descrizione || "",
-        }));
+        return {
+          bloopers: parsed.map((item) => ({
+            minuto: item.minuto || "00:00:00",
+            categoria: (item.categoria as BlooperCategoria) || "Errori di scena / Posizione",
+            descrizione: item.descrizione || "",
+          })),
+        };
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(`Errore Gemini con modello ${model}:`, err);
-      // Continua con il fallback sul modello successivo
+      lastErrorMsg = err?.message || String(err);
       continue;
     }
   }
 
-  return [];
+  return {
+    bloopers: [],
+    error: lastErrorMsg
+      ? `Errore durante la chiamata Gemini: ${lastErrorMsg}`
+      : "Nessun nuovo blooper trovato per questa pellicola.",
+  };
 }
