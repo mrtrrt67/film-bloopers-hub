@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function GET(request: Request) {
   try {
@@ -13,7 +14,7 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q") || "";
-    const filter = searchParams.get("filter") || "all"; // 'all', 'missing_poster', 'missing_cast'
+    const filter = searchParams.get("filter") || "all";
 
     let req = supabase.from("films").select("id, titolo, anno, regista, genere, trama, poster_url, attori, creato_il");
 
@@ -65,7 +66,8 @@ export async function PATCH(request: Request) {
     if (poster_url !== undefined) updatePayload.poster_url = poster_url || null;
     if (attori !== undefined) updatePayload.attori = attori;
 
-    const { data, error } = await supabase
+    const adminClient = createAdminClient();
+    const { data, error } = await adminClient
       .from("films")
       .update(updatePayload)
       .eq("id", id)
@@ -92,19 +94,53 @@ export async function DELETE(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
+    const idParam = searchParams.get("id");
 
-    if (!id) {
+    if (!idParam) {
       return NextResponse.json({ error: "ID film mancante" }, { status: 400 });
     }
 
-    // Elimina prima eventuali errori associati per evitare vincoli di foreign key
-    await supabase.from("errori").delete().eq("film_id", id);
-    const { error } = await supabase.from("films").delete().eq("id", id);
+    const filmId = parseInt(idParam, 10);
+    const adminClient = createAdminClient();
 
-    if (error) throw error;
+    // 1. Elimina prima i voti/contestazioni legati agli errori di questo film
+    const { data: erroriFilm } = await adminClient
+      .from("errori")
+      .select("id")
+      .eq("film_id", filmId);
 
-    return NextResponse.json({ success: true, deletedId: id });
+    if (erroriFilm && erroriFilm.length > 0) {
+      const erroreIds = erroriFilm.map((e) => e.id);
+      await adminClient.from("voti_bloopers").delete().in("errore_id", erroreIds);
+    }
+
+    // 2. Elimina gli errori del film
+    await adminClient.from("errori").delete().eq("film_id", filmId);
+
+    // 3. Elimina il film verificando con .select() che la riga sia stata effettivamente cancellata
+    const { data: deleted, error } = await adminClient
+      .from("films")
+      .delete()
+      .eq("id", filmId)
+      .select();
+
+    if (error) {
+      console.error("Errore Postgres DELETE film:", error);
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    if (!deleted || deleted.length === 0) {
+      return NextResponse.json(
+        {
+          error:
+            "L'eliminazione è stata bloccata dalle policy di sicurezza RLS (Row Level Security) del tuo database Supabase. Per consentire la cancellazione definitiva dei film, aggiungi la chiave SUPABASE_SERVICE_ROLE_KEY su Vercel oppure esegui il comando SQL 'CREATE POLICY' nel pannello Supabase.",
+          requiresRlsPolicy: true,
+        },
+        { status: 403 }
+      );
+    }
+
+    return NextResponse.json({ success: true, deletedId: filmId, deleted: deleted[0] });
   } catch (err: any) {
     console.error("Errore eliminazione film:", err);
     return NextResponse.json({ error: err.message || "Errore eliminazione" }, { status: 500 });

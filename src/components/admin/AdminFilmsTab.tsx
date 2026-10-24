@@ -147,21 +147,43 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     }
   };
 
+  // Stato per spiegazione RLS se la cancellazione è bloccata
+  const [rlsModalOpen, setRlsModalOpen] = useState(false);
+  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [copiedSql, setCopiedSql] = useState(false);
+
   // Elimina film
   const handleDeleteFilm = async (film: any) => {
     if (!confirm(`Sei sicuro di voler eliminare definitivamente il film "${film.titolo}" (${film.anno}) e tutti i suoi bloopers?`)) {
       return;
     }
     try {
+      setDeletingId(film.id);
       const res = await fetch(`/api/admin/films?id=${film.id}`, { method: "DELETE" });
-      if (res.ok) {
+      const data = await res.json();
+      if (res.ok && data.success) {
         setFilms((prev) => prev.filter((item) => item.id !== film.id));
+        setActionMessage(`🗑️ Film "${film.titolo}" eliminato con successo dal database.`);
       } else {
-        alert("Errore durante l'eliminazione.");
+        if (data.requiresRlsPolicy) {
+          setRlsModalOpen(true);
+        } else {
+          alert(data.error || "Errore durante l'eliminazione.");
+        }
       }
     } catch (err) {
       console.error(err);
+      alert("Errore di connessione.");
+    } finally {
+      setDeletingId(null);
     }
+  };
+
+  const copySqlToClipboard = () => {
+    const sql = `CREATE POLICY "Allow delete on films" ON films FOR DELETE USING (true);\nCREATE POLICY "Allow delete on errori" ON errori FOR DELETE USING (true);\nCREATE POLICY "Allow delete on voti_bloopers" ON voti_bloopers FOR DELETE USING (true);`;
+    navigator.clipboard.writeText(sql);
+    setCopiedSql(true);
+    setTimeout(() => setCopiedSql(false), 3000);
   };
 
   // Apertura modale di modifica
@@ -675,6 +697,75 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                 className="rounded-xl bg-amber-500 px-6 py-2 text-xs font-bold text-zinc-950 shadow-md hover:brightness-110 active:scale-95 transition disabled:opacity-50"
               >
                 {savingEdit ? "Salvataggio..." : "Salva Modifiche"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL ISTRUZIONI PER RLS SUPABASE */}
+      {rlsModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 overflow-y-auto">
+          <div className="relative w-full max-w-lg rounded-2xl border border-amber-500/40 bg-zinc-950 p-6 shadow-2xl space-y-5 my-8">
+            <div className="flex items-center justify-between pb-3 border-b border-zinc-800">
+              <div className="flex items-center gap-2">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/20 text-amber-400">
+                  <AlertTriangle className="h-4 w-4" />
+                </span>
+                <h3 className="text-base font-black text-white">
+                  Abilita l&apos;Eliminazione su Supabase
+                </h3>
+              </div>
+              <button
+                onClick={() => setRlsModalOpen(false)}
+                className="rounded-lg p-1 text-zinc-500 hover:text-white"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs text-zinc-300 leading-relaxed">
+              <p>
+                Il tuo database Supabase ha le <strong>Policy di Sicurezza RLS (Row Level Security)</strong> attive sulla tabella <code className="text-amber-400 bg-zinc-900 px-1 py-0.5 rounded">films</code>: questo impedisce la cancellazione fisica delle righe tramite la chiave pubblica, a meno che non si conceda il permesso.
+              </p>
+
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-3.5 space-y-2">
+                <span className="font-bold text-white block">
+                  ⚡ Soluzione 1 (Immediata in 30 secondi):
+                </span>
+                <p className="text-[11px] text-zinc-400">
+                  Apri la console di Supabase &rarr; vai su <strong>SQL Editor</strong> &rarr; incolla ed esegui questa query:
+                </p>
+                <pre className="p-2.5 rounded-lg bg-zinc-950 text-amber-300 font-mono text-[11px] overflow-x-auto whitespace-pre-wrap border border-zinc-800">
+{`CREATE POLICY "Allow delete on films" ON films FOR DELETE USING (true);
+CREATE POLICY "Allow delete on errori" ON errori FOR DELETE USING (true);
+CREATE POLICY "Allow delete on voti_bloopers" ON voti_bloopers FOR DELETE USING (true);`}
+                </pre>
+                <button
+                  onClick={copySqlToClipboard}
+                  className="w-full flex items-center justify-center gap-1.5 py-1.5 rounded-lg bg-amber-500 text-zinc-950 font-bold text-xs hover:brightness-110 active:scale-95 transition"
+                >
+                  <Check className={`h-3.5 w-3.5 ${copiedSql ? "text-emerald-950" : ""}`} />
+                  <span>{copiedSql ? "Copiato negli appunti!" : "Copia Codice SQL"}</span>
+                </button>
+              </div>
+
+              <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-3.5 space-y-1.5">
+                <span className="font-bold text-white block">
+                  🛡️ Soluzione 2 (Consigliata per la produzione):
+                </span>
+                <p className="text-[11px] text-zinc-400">
+                  Nel pannello Supabase (<em>Project Settings &gt; API &gt; Project API keys</em>), copia la chiave segreta <strong>service_role (secret)</strong> e incollala nelle impostazioni di Vercel (<em>Settings &gt; Environment Variables</em>) con il nome <code className="text-amber-400">SUPABASE_SERVICE_ROLE_KEY</code>.
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-2 flex justify-end">
+              <button
+                onClick={() => setRlsModalOpen(false)}
+                className="px-5 py-2 rounded-xl bg-zinc-800 text-zinc-200 font-bold text-xs hover:text-white hover:bg-zinc-700 transition"
+              >
+                Ho capito, chiudi
               </button>
             </div>
           </div>
