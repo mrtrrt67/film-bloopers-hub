@@ -153,6 +153,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
               src={film.backdrop_url}
               alt={film.titolo}
               fill
+              unoptimized
               priority
               className="object-cover opacity-30 blur-sm scale-105"
             />
@@ -183,6 +184,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
                     src={film.poster_url}
                     alt={film.titolo}
                     fill
+                    unoptimized
                     priority
                     sizes="(max-width: 768px) 240px, 320px"
                     className="object-cover"

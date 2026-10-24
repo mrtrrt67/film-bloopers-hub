@@ -77,6 +77,7 @@ export interface TMDBMovieResult {
   backdrop_path?: string | null;
   genre_ids?: number[];
   vote_average?: number;
+  media_type?: string;
 }
 
 export interface TMDBMovieDetails extends TMDBMovieResult {

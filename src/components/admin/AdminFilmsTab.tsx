@@ -16,6 +16,7 @@ import {
   ExternalLink,
   Sparkles
 } from "lucide-react";
+import { normalizePosterUrl } from "@/lib/tmdb";
 
 interface AdminFilmsTabProps {
   initialFilter?: string;
@@ -35,12 +36,15 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   // Modal Modifica Film
   const [editingFilm, setEditingFilm] = useState<any | null>(null);
   const [savingEdit, setSavingEdit] = useState(false);
+  const [previewError, setPreviewError] = useState(false);
 
   // Ricerca Candidati TMDB nel Modal
   const [tmdbSearchQuery, setTmdbSearchQuery] = useState("");
   const [tmdbSearchYear, setTmdbSearchYear] = useState("");
   const [tmdbCandidates, setTmdbCandidates] = useState<any[]>([]);
   const [searchingTmdb, setSearchingTmdb] = useState(false);
+  const [tmdbSearchError, setTmdbSearchError] = useState<string | null>(null);
+  const [tmdbSearched, setTmdbSearched] = useState(false);
 
   const fetchFilms = async () => {
     try {
@@ -192,6 +196,9 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     setTmdbSearchQuery(film.titolo || "");
     setTmdbSearchYear(film.anno ? String(film.anno) : "");
     setTmdbCandidates([]);
+    setTmdbSearchError(null);
+    setTmdbSearched(false);
+    setPreviewError(false);
   };
 
   // Cerca candidati su TMDB
@@ -199,15 +206,21 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     if (!tmdbSearchQuery.trim()) return;
     try {
       setSearchingTmdb(true);
+      setTmdbSearchError(null);
+      setTmdbSearched(true);
       const params = new URLSearchParams({ q: tmdbSearchQuery.trim() });
       if (tmdbSearchYear.trim()) params.append("year", tmdbSearchYear.trim());
       const res = await fetch(`/api/admin/tmdb-search?${params.toString()}`);
+      const json = await res.json().catch(() => ({}));
       if (res.ok) {
-        const json = await res.json();
         setTmdbCandidates(json.candidates || []);
+      } else {
+        setTmdbCandidates([]);
+        setTmdbSearchError(json.error || "Errore durante la ricerca TMDB");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Errore ricerca candidati TMDB:", err);
+      setTmdbSearchError(err.message || "Errore di connessione a TMDB");
     } finally {
       setSearchingTmdb(false);
     }
@@ -217,9 +230,14 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   const handleSelectFullTmdbCandidate = async (candidateId: number) => {
     try {
       setSearchingTmdb(true);
-      const res = await fetch(`/api/admin/tmdb-search?tmdbId=${candidateId}`);
+      const cand = tmdbCandidates.find((c) => c.id === candidateId);
+      const url = cand?.media_type
+        ? `/api/admin/tmdb-search?tmdbId=${candidateId}&mediaType=${cand.media_type}`
+        : `/api/admin/tmdb-search?tmdbId=${candidateId}`;
+      const res = await fetch(url);
       if (res.ok) {
         const d = await res.json();
+        setPreviewError(false);
         setEditingFilm((prev: any) => ({
           ...prev,
           titolo: d.title || prev.titolo,
@@ -396,6 +414,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                         src={film.poster_url}
                         alt={film.titolo}
                         fill
+                        unoptimized
                         className="object-cover"
                         sizes="64px"
                       />
@@ -531,11 +550,32 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                 </button>
               </div>
 
+              {/* Errore o Avviso Ricerca TMDB */}
+              {tmdbSearchError && (
+                <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-3 text-xs text-amber-200 flex items-start gap-2.5">
+                  <AlertTriangle className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <p className="font-bold text-amber-300">Avviso Ricerca TMDB</p>
+                    <p className="text-[11px] text-zinc-300">{tmdbSearchError}</p>
+                    <p className="text-[10px] text-zinc-400">
+                      Puoi comunque incollare qualsiasi link immagine valido direttamente nel campo &quot;URL Locandina&quot; in basso.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Nessun risultato trovato */}
+              {tmdbSearched && !tmdbSearchError && tmdbCandidates.length === 0 && (
+                <div className="rounded-xl border border-zinc-800 bg-zinc-900/80 p-3 text-center text-xs text-zinc-400">
+                  Nessun risultato trovato su TMDB per &quot;{tmdbSearchQuery}&quot;. Prova a rimuovere l&apos;anno o incolla direttamente l&apos;URL della locandina qui sotto.
+                </div>
+              )}
+
               {/* RISULTATI CANDIDATI TMDB */}
               {tmdbCandidates.length > 0 && (
                 <div className="space-y-2 pt-2 border-t border-amber-500/20 max-h-56 overflow-y-auto pr-1">
                   <span className="text-[11px] text-zinc-400 font-bold block">
-                    Trovati {tmdbCandidates.length} film candidati su TMDB:
+                    Trovati {tmdbCandidates.length} film/serie candidati su TMDB:
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {tmdbCandidates.map((cand) => (
@@ -545,7 +585,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                       >
                         <div className="relative h-16 w-11 shrink-0 overflow-hidden rounded bg-zinc-950">
                           {cand.poster_url ? (
-                            <Image src={cand.poster_url} alt={cand.title} fill className="object-cover" sizes="44px" />
+                            <Image src={cand.poster_url} alt={cand.title} fill unoptimized className="object-cover" sizes="44px" />
                           ) : (
                             <ImageIcon className="h-4 w-4 m-auto text-zinc-700" />
                           )}
@@ -557,7 +597,10 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                           </p>
                           <div className="flex items-center gap-1.5 pt-0.5">
                             <button
-                              onClick={() => setEditingFilm({ ...editingFilm, poster_url: cand.poster_url })}
+                              onClick={() => {
+                                setPreviewError(false);
+                                setEditingFilm({ ...editingFilm, poster_url: cand.poster_url });
+                              }}
                               className="text-[10px] font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded hover:bg-amber-500 hover:text-zinc-950 transition"
                             >
                               Usa solo poster
@@ -584,16 +627,23 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
               <div className="space-y-3">
                 <label className="text-xs font-bold text-zinc-300 block">Locandina Attuale</label>
                 <div className="relative aspect-[2/3] w-full max-w-[180px] mx-auto rounded-xl overflow-hidden border border-zinc-800 bg-zinc-900 flex items-center justify-center">
-                  {editingFilm.poster_url ? (
+                  {editingFilm.poster_url && !previewError ? (
                     <Image
                       src={editingFilm.poster_url}
                       alt={editingFilm.titolo}
                       fill
+                      unoptimized
+                      onError={() => setPreviewError(true)}
                       className="object-cover"
                       sizes="180px"
                     />
                   ) : (
-                    <span className="text-xs text-zinc-600 text-center p-2">Nessun poster</span>
+                    <div className="flex flex-col items-center justify-center p-3 text-center">
+                      <ImageIcon className="h-8 w-8 text-zinc-600 mb-1" />
+                      <span className="text-[11px] text-zinc-500">
+                        {previewError ? "Impossibile caricare l'immagine da questo URL" : "Nessun poster"}
+                      </span>
+                    </div>
                   )}
                 </div>
                 <div>
@@ -601,13 +651,21 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                   <input
                     type="text"
                     value={editingFilm.poster_url || ""}
-                    onChange={(e) => setEditingFilm({ ...editingFilm, poster_url: e.target.value })}
-                    placeholder="https://image.tmdb.org/..."
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      const normalized = normalizePosterUrl(val);
+                      setPreviewError(false);
+                      setEditingFilm({ ...editingFilm, poster_url: normalized });
+                    }}
+                    placeholder="https://image.tmdb.org/... oppure themoviedb.org"
                     className="w-full rounded-xl bg-zinc-900 border border-zinc-800 px-3 py-1.5 text-xs text-zinc-300 focus:outline-none focus:border-amber-500 font-mono text-[11px]"
                   />
                   {editingFilm.poster_url && (
                     <button
-                      onClick={() => setEditingFilm({ ...editingFilm, poster_url: null })}
+                      onClick={() => {
+                        setPreviewError(false);
+                        setEditingFilm({ ...editingFilm, poster_url: null });
+                      }}
                       className="text-[10px] text-rose-400 hover:underline mt-1 block"
                     >
                       Rimuovi locandina

@@ -7,58 +7,160 @@ function getApiKey(): string {
   return process.env.TMDB_API_KEY || "";
 }
 
+export function normalizePosterUrl(url?: string | null): string {
+  if (!url) return "";
+  let clean = url.trim();
+  if (!clean) return "";
+
+  // Se l'utente incolla solo il percorso relativo es. /lQqbnWsGt9RBGBWrmUKUOXZkl7N.jpg
+  if (clean.startsWith("/") && !clean.startsWith("//")) {
+    return `${TMDB_IMAGE_BASE}/w500${clean}`;
+  }
+
+  // Se l'utente incolla il link diretto da themoviedb.org o www.themoviedb.org
+  // lo normalizziamo sul CDN ufficiale image.tmdb.org
+  if (clean.includes("themoviedb.org/t/p/")) {
+    clean = clean.replace(/https?:\/\/(www\.)?themoviedb\.org\/t\/p\//i, "https://image.tmdb.org/t/p/");
+  }
+
+  return clean;
+}
+
 export function getTMDBImageUrl(path?: string | null, size: "w342" | "w500" | "w780" | "original" = "w500"): string | null {
   if (!path) return null;
-  if (path.startsWith("http")) return path;
+  if (path.startsWith("http")) return normalizePosterUrl(path);
   return `${TMDB_IMAGE_BASE}/${size}${path}`;
 }
 
-export async function searchTMDBMovies(query: string, year?: string | number, page = 1): Promise<TMDBMovieResult[]> {
-  const apiKey = getApiKey();
+export async function searchTMDBMovies(
+  query: string,
+  year?: string | number,
+  page = 1,
+  overrideApiKey?: string
+): Promise<TMDBMovieResult[]> {
+  const apiKey = overrideApiKey || getApiKey();
   if (!apiKey || !query.trim()) return [];
 
   try {
-    let url = `${TMDB_API_BASE}/search/movie?api_key=${apiKey}&query=${encodeURIComponent(
+    // Cerchiamo con /search/multi per supportare sia pellicole che serie TV (es. The Book of Boba Fett)
+    const url = `${TMDB_API_BASE}/search/multi?api_key=${apiKey}&query=${encodeURIComponent(
       query.trim()
     )}&language=it-IT&page=${page}&include_adult=false`;
 
-    if (year) {
-      url += `&year=${year}`;
+    const res = await fetch(url, { next: { revalidate: 3600 } });
+    if (!res.ok) {
+      const errJson = await res.json().catch(() => null);
+      const msg = errJson?.status_message || `Errore TMDB HTTP ${res.status}`;
+      console.error("Errore risposta TMDB:", res.status, msg);
+      throw new Error(msg);
     }
 
-    const res = await fetch(url, { next: { revalidate: 3600 } });
-    if (!res.ok) return [];
-
     const data = await res.json();
-    return (data.results || []) as TMDBMovieResult[];
-  } catch (err) {
+    const rawList = (data.results || []) as any[];
+
+    const results: TMDBMovieResult[] = [];
+    for (const item of rawList) {
+      if (item.media_type === "person") continue;
+
+      const isTv = item.media_type === "tv" || (!item.title && !!item.name);
+      const title = isTv ? (item.name || item.original_name) : (item.title || item.original_title);
+      const original_title = isTv ? (item.original_name || item.name) : (item.original_title || item.title);
+      const release_date = isTv ? item.first_air_date : item.release_date;
+
+      if (!title) continue;
+
+      results.push({
+        id: item.id,
+        title,
+        original_title: original_title || title,
+        release_date: release_date || "",
+        overview: item.overview || "",
+        poster_path: item.poster_path || null,
+        backdrop_path: item.backdrop_path || null,
+        genre_ids: item.genre_ids || [],
+        vote_average: item.vote_average,
+        media_type: isTv ? "tv" : "movie",
+      });
+    }
+
+    return results;
+  } catch (err: any) {
     console.error("Errore ricerca TMDB:", err);
-    return [];
+    throw err;
   }
 }
 
-export async function getTMDBMovieDetails(tmdbId: number): Promise<TMDBMovieDetails | null> {
-  const apiKey = getApiKey();
+export async function getTMDBMovieDetails(
+  tmdbId: number,
+  overrideApiKey?: string,
+  mediaType?: "movie" | "tv"
+): Promise<TMDBMovieDetails | null> {
+  const apiKey = overrideApiKey || getApiKey();
   if (!apiKey || !tmdbId) return null;
 
   try {
-    const url = `${TMDB_API_BASE}/movie/${tmdbId}?api_key=${apiKey}&append_to_response=credits,keywords&language=it-IT`;
-    let res = await fetch(url, { next: { revalidate: 86400 } });
+    // 1. Prova endpoint /movie se non è specificato come serie TV
+    if (mediaType !== "tv") {
+      const movieUrl = `${TMDB_API_BASE}/movie/${tmdbId}?api_key=${apiKey}&append_to_response=credits,keywords&language=it-IT`;
+      let res = await fetch(movieUrl, { next: { revalidate: 86400 } });
 
-    if (!res.ok) return null;
-    let data = (await res.json()) as TMDBMovieDetails;
-
-    // Se la trama in italiano non è presente, fallback in inglese
-    if (!data.overview || data.overview.trim() === "") {
-      const urlEn = `${TMDB_API_BASE}/movie/${tmdbId}?api_key=${apiKey}&language=en-US`;
-      const resEn = await fetch(urlEn, { next: { revalidate: 86400 } });
-      if (resEn.ok) {
-        const dataEn = await resEn.json();
-        data.overview = dataEn.overview;
+      if (res.ok) {
+        let data = (await res.json()) as TMDBMovieDetails;
+        if (!data.overview || data.overview.trim() === "") {
+          const urlEn = `${TMDB_API_BASE}/movie/${tmdbId}?api_key=${apiKey}&language=en-US`;
+          const resEn = await fetch(urlEn, { next: { revalidate: 86400 } });
+          if (resEn.ok) {
+            const dataEn = await resEn.json();
+            data.overview = dataEn.overview;
+          }
+        }
+        return data;
       }
     }
 
-    return data;
+    // 2. Se /movie restituisce 404 o fallisce, oppure mediaType === "tv", prova /tv/{id}
+    const tvUrl = `${TMDB_API_BASE}/tv/${tmdbId}?api_key=${apiKey}&append_to_response=credits,keywords&language=it-IT`;
+    let resTv = await fetch(tvUrl, { next: { revalidate: 86400 } });
+    if (resTv.ok) {
+      const tvData = await resTv.json();
+      let overview = tvData.overview;
+      if (!overview || overview.trim() === "") {
+        const tvUrlEn = `${TMDB_API_BASE}/tv/${tmdbId}?api_key=${apiKey}&language=en-US`;
+        const resEn = await fetch(tvUrlEn, { next: { revalidate: 86400 } });
+        if (resEn.ok) {
+          const dataEn = await resEn.json();
+          overview = dataEn.overview;
+        }
+      }
+
+      const crew = [...(tvData.credits?.crew || [])];
+      if (Array.isArray(tvData.created_by)) {
+        for (const creator of tvData.created_by) {
+          crew.unshift({ id: creator.id, name: creator.name, job: "Director" });
+        }
+      }
+
+      const adapted: TMDBMovieDetails = {
+        id: tvData.id,
+        title: tvData.name || tvData.original_name,
+        original_title: tvData.original_name || tvData.name,
+        release_date: tvData.first_air_date || "",
+        overview: overview || "",
+        poster_path: tvData.poster_path,
+        backdrop_path: tvData.backdrop_path,
+        genres: tvData.genres || [],
+        credits: {
+          cast: tvData.credits?.cast || [],
+          crew,
+        },
+        belongs_to_collection: null,
+        media_type: "tv",
+      };
+
+      return adapted;
+    }
+
+    return null;
   } catch (err) {
     console.error("Errore dettaglio TMDB:", err);
     return null;
@@ -101,7 +203,11 @@ export function formatCredits(details: TMDBMovieDetails) {
   const crew = details.credits?.crew || [];
   const cast = details.credits?.cast || [];
 
-  const director = crew.find((c) => c.job === "Director")?.name || "N/D";
+  const director =
+    crew.find((c) => c.job === "Director")?.name ||
+    crew.find((c) => c.job === "Creator")?.name ||
+    crew.find((c) => c.job === "Executive Producer")?.name ||
+    "N/D";
   const topActors = cast.slice(0, 7).map((a) => a.name).join(", ") || "N/D";
   const genres = (details.genres || []).map((g) => g.name).join(", ") || "N/D";
 
@@ -184,22 +290,23 @@ export interface TMDBCandidateResult {
   backdrop_url: string | null;
   overview: string;
   score?: number;
+  media_type?: string;
 }
 
 export async function searchTMDBMovieCandidates(
   query: string,
-  year?: string | number
+  year?: string | number,
+  overrideApiKey?: string
 ): Promise<TMDBCandidateResult[]> {
   const cleanYear = year ? String(year).trim().slice(0, 4) : undefined;
-  const results = await searchTMDBMovies(query, cleanYear);
+  let results = await searchTMDBMovies(query, cleanYear, 1, overrideApiKey);
 
   // Se con anno non trova nulla, prova senza anno
-  let finalResults = results;
-  if ((!finalResults || finalResults.length === 0) && cleanYear) {
-    finalResults = await searchTMDBMovies(query);
+  if ((!results || results.length === 0) && cleanYear) {
+    results = await searchTMDBMovies(query, undefined, 1, overrideApiKey);
   }
 
-  return (finalResults || []).map((item) => ({
+  const mapped = (results || []).map((item) => ({
     id: item.id,
     title: item.title,
     original_title: item.original_title,
@@ -208,7 +315,11 @@ export async function searchTMDBMovieCandidates(
     backdrop_url: getTMDBImageUrl(item.backdrop_path, "original"),
     overview: item.overview || "",
     score: scoreMovieMatch(query, cleanYear, item),
+    media_type: item.media_type,
   }));
+
+  mapped.sort((a, b) => (b.score || 0) - (a.score || 0));
+  return mapped;
 }
 
 export async function fetchPosterForMovie(

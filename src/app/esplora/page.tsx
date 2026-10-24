@@ -227,6 +227,7 @@ export default function EsploraPage() {
                         src={poster}
                         alt={movie.title}
                         fill
+                        unoptimized
                         sizes="(max-width: 768px) 100vw, 25vw"
                         className="object-cover"
                       />

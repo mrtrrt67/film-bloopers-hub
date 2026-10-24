@@ -16,10 +16,35 @@ export async function GET(request: Request) {
     const query = searchParams.get("q") || "";
     const year = searchParams.get("year") || undefined;
     const tmdbId = searchParams.get("tmdbId");
+    const mediaType = (searchParams.get("mediaType") || undefined) as "movie" | "tv" | undefined;
+
+    // Recupera API Key da process.env o da tabella configurazioni di Supabase
+    let apiKey = process.env.TMDB_API_KEY;
+    if (!apiKey) {
+      const { data: conf } = await supabase
+        .from("configurazioni")
+        .select("valore")
+        .eq("chiave", "tmdb_api_key")
+        .maybeSingle();
+      if (conf?.valore && conf.valore.trim()) {
+        apiKey = conf.valore.trim();
+      }
+    }
+
+    if (!apiKey) {
+      return NextResponse.json(
+        {
+          error: "Chiave TMDB_API_KEY non configurata. Inseriscila nelle variabili d'ambiente di Vercel (o in .env.local).",
+          missing_key: true,
+          candidates: [],
+        },
+        { status: 400 }
+      );
+    }
 
     if (tmdbId) {
-      // Se viene passato tmdbId, recupera i dettagli completi del film selezionato
-      const details = await getTMDBMovieDetails(parseInt(tmdbId, 10));
+      // Se viene passato tmdbId, recupera i dettagli completi del film/serie selezionato
+      const details = await getTMDBMovieDetails(parseInt(tmdbId, 10), apiKey, mediaType);
       if (!details) {
         return NextResponse.json({ error: "Dettagli non trovati su TMDB" }, { status: 404 });
       }
@@ -36,7 +61,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ candidates: [] });
     }
 
-    const candidates = await searchTMDBMovieCandidates(query, year);
+    const candidates = await searchTMDBMovieCandidates(query, year, apiKey);
     return NextResponse.json({ candidates });
   } catch (err: any) {
     console.error("Errore ricerca candidati TMDB:", err);
