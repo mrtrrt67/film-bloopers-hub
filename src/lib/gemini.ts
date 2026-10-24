@@ -1,18 +1,24 @@
 import { GoogleGenAI } from "@google/genai";
 import { BlooperCategoria } from "./types";
 
-const GEMINI_MODELS = [
+const DEFAULT_MODELS = [
+  "gemini-flash-latest",
+  "gemini-2.5-flash",
   "gemini-2.0-flash",
+  "gemini-2.0-flash-001",
   "gemini-1.5-flash",
+  "gemini-1.5-flash-latest",
+  "gemini-2.5-pro",
   "gemini-1.5-pro",
 ];
 
 function getGeminiClient(): GoogleGenAI | null {
-  const apiKey =
+  const rawKey =
     process.env.GEMINI_API_KEY ||
     process.env.GOOGLE_API_KEY ||
     process.env.GOOGLE_GENAI_API_KEY;
-  if (!apiKey) return null;
+  if (!rawKey) return null;
+  const apiKey = rawKey.trim().replace(/^["']|["']$/g, "");
   return new GoogleGenAI({ apiKey });
 }
 
@@ -20,6 +26,25 @@ export interface GeneratedBlooper {
   minuto: string;
   categoria: BlooperCategoria;
   descrizione: string;
+}
+
+async function getAvailableModels(ai: GoogleGenAI): Promise<string[]> {
+  const discovered: string[] = [];
+  try {
+    const pager = await ai.models.list();
+    for await (const m of pager) {
+      const name = m.name?.replace(/^models\//, "") || "";
+      const methods = (m as any).supportedGenerationMethods || [];
+      if (methods.length === 0 || methods.includes("generateContent")) {
+        if (name && name.toLowerCase().includes("gemini") && !name.includes("embedding") && !name.includes("aqa")) {
+          discovered.push(name);
+        }
+      }
+    }
+  } catch (err) {
+    console.warn("Impossibile elencare i modelli Gemini:", err);
+  }
+  return discovered;
 }
 
 export async function generateBloopersForMovie(params: {
@@ -36,7 +61,7 @@ export async function generateBloopersForMovie(params: {
     return {
       bloopers: [],
       error:
-        "Chiave GEMINI_API_KEY non trovata nelle Environment Variables di Vercel. Aggiungi GEMINI_API_KEY (o GOOGLE_API_KEY) nella dashboard di Vercel per abilitare la generazione.",
+        "Chiave GEMINI_API_KEY non trovata nelle Environment Variables di Vercel. Aggiungi GEMINI_API_KEY nella dashboard di Vercel per abilitare la generazione.",
     };
   }
 
@@ -81,9 +106,10 @@ FORMATO OUTPUT:
   }
 ]`;
 
-  let lastErrorMsg = "";
+  const errorsLog: string[] = [];
 
-  for (const model of GEMINI_MODELS) {
+  // 1. Prova prima con i modelli prioritari
+  for (const model of DEFAULT_MODELS) {
     try {
       const response = await ai.models.generateContent({
         model,
@@ -97,7 +123,6 @@ FORMATO OUTPUT:
       const text = response.text?.trim() || "";
       if (!text) continue;
 
-      // Estrazione array JSON
       const jsonMatch = text.match(/\[[\s\S]*\]/);
       const cleanJson = jsonMatch ? jsonMatch[0] : text;
 
@@ -113,15 +138,53 @@ FORMATO OUTPUT:
       }
     } catch (err: any) {
       console.error(`Errore Gemini con modello ${model}:`, err);
-      lastErrorMsg = err?.message || String(err);
+      errorsLog.push(`[${model}]: ${err?.message || err}`);
+      continue;
+    }
+  }
+
+  // 2. Se tutti i modelli di default hanno fallito, interroga dinamicamente i modelli abilitati sulla chiave
+  const discoveredModels = await getAvailableModels(ai);
+  const remainingModels = discoveredModels.filter((m) => !DEFAULT_MODELS.includes(m));
+
+  for (const model of remainingModels) {
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          temperature: 0.1,
+        },
+      });
+
+      const text = response.text?.trim() || "";
+      if (!text) continue;
+
+      const jsonMatch = text.match(/\[[\s\S]*\]/);
+      const cleanJson = jsonMatch ? jsonMatch[0] : text;
+
+      const parsed = JSON.parse(cleanJson) as GeneratedBlooper[];
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return {
+          bloopers: parsed.map((item) => ({
+            minuto: item.minuto || "00:00:00",
+            categoria: (item.categoria as BlooperCategoria) || "Errori di scena / Posizione",
+            descrizione: item.descrizione || "",
+          })),
+        };
+      }
+    } catch (err: any) {
+      console.error(`Errore Gemini con modello dinamico ${model}:`, err);
+      errorsLog.push(`[${model}]: ${err?.message || err}`);
       continue;
     }
   }
 
   return {
     bloopers: [],
-    error: lastErrorMsg
-      ? `Errore durante la chiamata Gemini: ${lastErrorMsg}`
+    error: errorsLog.length > 0
+      ? `Errore durante la chiamata Gemini: ${errorsLog[0]}`
       : "Nessun nuovo blooper trovato per questa pellicola.",
   };
 }
