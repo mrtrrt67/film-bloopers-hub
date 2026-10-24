@@ -1,0 +1,54 @@
+import { NextResponse } from "next/server";
+import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
+
+export async function POST(request: Request) {
+  try {
+    const supabase = await createClient();
+    const adminDb = createAdminClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    const body = await request.json();
+    const { email, messaggio } = body;
+
+    if (!messaggio || !messaggio.trim()) {
+      return NextResponse.json(
+        { error: "Il messaggio o suggerimento non può essere vuoto." },
+        { status: 400 }
+      );
+    }
+
+    const emailUtente = (user?.email || email || "").trim();
+    if (!emailUtente) {
+      return NextResponse.json(
+        { error: "Inserisci un indirizzo email valido per poter ricevere un riscontro." },
+        { status: 400 }
+      );
+    }
+
+    const { error: insertErr } = await adminDb.from("suggerimenti").insert({
+      user_id: user?.id || null,
+      email: emailUtente,
+      messaggio: messaggio.trim(),
+    });
+
+    if (insertErr) {
+      console.error("Errore salvataggio suggerimento:", insertErr);
+      return NextResponse.json(
+        { error: "Errore durante il salvataggio del suggerimento: " + insertErr.message },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: "Grazie! Il tuo suggerimento è stato inviato allo staff e verrà esaminato a breve.",
+    });
+  } catch (err: any) {
+    console.error("Errore suggerimenti API:", err);
+    return NextResponse.json(
+      { error: err?.message || "Errore interno durante l'invio del suggerimento" },
+      { status: 500 }
+    );
+  }
+}

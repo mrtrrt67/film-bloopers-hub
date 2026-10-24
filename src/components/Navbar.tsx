@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState, useEffect } from "react";
-import { Film, Trophy, Compass, Sparkles, User, LogOut, Menu, X, Shield, LogIn } from "lucide-react";
+import { Film, Trophy, Compass, Sparkles, User, LogOut, Menu, X, Shield, LogIn, Lightbulb } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import AuthModal from "./AuthModal";
 
@@ -41,6 +41,7 @@ export default function Navbar() {
     { href: "/esplora", label: "Esplora & Cerca", icon: Compass },
     { href: "/classifica", label: "Classifica", icon: Trophy },
     { href: "/pricing", label: "Piani Premium", icon: Sparkles },
+    { href: "/suggerimenti", label: "Suggerimenti", icon: Lightbulb },
   ];
 
   return (

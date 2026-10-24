@@ -40,6 +40,11 @@ export default function Footer() {
               <li>
                 <Link href="/pricing" className="hover:text-amber-400 transition-colors">Piani & Abbonamenti</Link>
               </li>
+              <li>
+                <Link href="/suggerimenti" className="text-amber-400/90 hover:text-amber-300 font-semibold transition-colors flex items-center gap-1">
+                  💡 Invia Suggerimento
+                </Link>
+              </li>
             </ul>
           </div>
 

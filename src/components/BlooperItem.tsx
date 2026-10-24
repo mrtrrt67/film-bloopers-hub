@@ -7,7 +7,7 @@ import { calculateAttendibilita } from "@/lib/utils";
 
 interface BlooperItemProps {
   blooper: Blooper;
-  onVote?: (blooperId: string | number, tipo: "conferma" | "contestazione") => Promise<void>;
+  onVote?: (blooperId: string | number, tipo: "conferma" | "contestazione", motivo?: string) => Promise<void>;
   userLoggedIn?: boolean;
 }
 
@@ -18,12 +18,14 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn = false }: B
     blooper.voto_utente || null
   );
   const [loading, setLoading] = useState(false);
+  const [showContestForm, setShowContestForm] = useState(false);
+  const [contestReason, setContestReason] = useState("");
 
   const attendibilita = calculateAttendibilita(conferme, contestazioni);
 
-  const handleVote = async (tipo: "conferma" | "contestazione") => {
+  const handleVote = async (tipo: "conferma" | "contestazione", motivo?: string) => {
     if (!userLoggedIn) {
-      alert("Accedi per votare e confermare l'attendibilità dei bloopers!");
+      alert("Accedi per votare o contestare i bloopers della community!");
       return;
     }
 
@@ -35,7 +37,7 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn = false }: B
     const prevCont = contestazioni;
 
     // Aggiornamento ottimistico
-    if (votoUtente === tipo) {
+    if (votoUtente === tipo && !motivo) {
       // Rimuove il voto
       setVotoUtente(null);
       if (tipo === "conferma") setConferme((c) => Math.max(0, c - 1));
@@ -52,23 +54,46 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn = false }: B
 
     try {
       if (onVote) {
-        await onVote(blooper.id, tipo);
+        await onVote(blooper.id, tipo, motivo);
       } else {
         const res = await fetch("/api/bloopers/vote", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ errore_id: blooper.id, tipo }),
+          body: JSON.stringify({ errore_id: blooper.id, tipo, motivo }),
         });
-        if (!res.ok) throw new Error("Errore durante il voto");
+        if (!res.ok) {
+          const errData = await res.json();
+          throw new Error(errData.error || "Errore durante il voto");
+        }
+        const json = await res.json();
+        if (json.conferme !== undefined) setConferme(json.conferme);
+        if (json.contestazioni !== undefined) setContestazioni(json.contestazioni);
       }
-    } catch (err) {
+    } catch (err: any) {
       // Ripristino in caso di errore
       setVotoUtente(prevVoto);
       setConferme(prevConf);
       setContestazioni(prevCont);
+      alert(err?.message || "Impossibile registrare il voto.");
       console.error(err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDislikeButtonClick = () => {
+    if (!userLoggedIn) {
+      alert("Accedi per votare o contestare i bloopers della community!");
+      return;
+    }
+
+    if (votoUtente === "contestazione") {
+      // Se già contestato, cliccando di nuovo rimuove la contestazione
+      handleVote("contestazione");
+      setShowContestForm(false);
+    } else {
+      // Apre il box per inserire la motivazione
+      setShowContestForm((prev) => !prev);
     }
   };
 
@@ -125,6 +150,59 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn = false }: B
         {blooper.descrizione}
       </p>
 
+      {/* Box Inserimento Motivazione Contestazione (Dislike) */}
+      {showContestForm && (
+        <div className="mb-4 rounded-xl border border-rose-500/40 bg-rose-500/10 p-3.5 space-y-2.5 animate-in fade-in">
+          <div className="flex items-center justify-between text-xs font-bold text-rose-300">
+            <span className="flex items-center gap-1.5">
+              <AlertTriangle className="h-3.5 w-3.5 text-rose-400" />
+              Motiva la contestazione dell&apos;errore
+            </span>
+            <button
+              type="button"
+              onClick={() => setShowContestForm(false)}
+              className="text-zinc-400 hover:text-white text-xs"
+            >
+              ✕ Chiudi
+            </button>
+          </div>
+          <p className="text-[11px] text-zinc-300 leading-normal">
+            Spiega brevemente perché ritieni questo errore non attendibile (es. è giustificato dalla trama, minuto errato, effetto speciale intenzionale, ecc.):
+          </p>
+          <textarea
+            value={contestReason}
+            onChange={(e) => setContestReason(e.target.value)}
+            placeholder="Scrivi qui la motivazione del dislike..."
+            rows={2}
+            className="w-full rounded-lg bg-zinc-950 border border-zinc-700 p-2 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-rose-400"
+          />
+          <div className="flex items-center justify-end gap-2 pt-1">
+            <button
+              type="button"
+              onClick={() => setShowContestForm(false)}
+              className="px-2.5 py-1 rounded-lg text-xs font-medium text-zinc-400 hover:text-white bg-zinc-800/80 transition"
+            >
+              Annulla
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!contestReason.trim()) {
+                  alert("Inserisci una breve motivazione per la tua contestazione.");
+                  return;
+                }
+                handleVote("contestazione", contestReason.trim());
+                setShowContestForm(false);
+              }}
+              disabled={loading}
+              className="px-3 py-1 rounded-lg text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 transition shadow disabled:opacity-50"
+            >
+              Invia Contestazione (👎)
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Footer & Voting */}
       <div className="mt-auto pt-3 border-t border-zinc-800/60 flex flex-wrap items-center justify-between gap-3 text-xs text-zinc-400">
         <div className="flex items-center gap-1.5 text-zinc-500">
@@ -151,12 +229,12 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn = false }: B
           </button>
 
           <button
-            onClick={() => handleVote("contestazione")}
+            onClick={handleDislikeButtonClick}
             disabled={loading}
             className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1 font-semibold text-xs transition-colors ${
               votoUtente === "contestazione"
-                ? "bg-amber-500/20 text-amber-300 border-amber-500/50 shadow-sm shadow-amber-500/20"
-                : "border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:text-amber-400"
+                ? "bg-rose-500/20 text-rose-300 border-rose-500/50 shadow-sm shadow-rose-500/20"
+                : "border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:text-rose-400"
             }`}
             title="Contesta errore (👎)"
           >
