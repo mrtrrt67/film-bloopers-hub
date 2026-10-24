@@ -96,7 +96,8 @@ export default function EsploraPage() {
         const filmSlug = slugify(data.film.titolo, data.film.anno);
         router.push(`/film/${filmSlug}-${String(data.film.id)}`);
       } else {
-        alert("Impossibile importare la scheda del film.");
+        const errData = await res.json().catch(() => ({}));
+        alert(errData.error || "Impossibile importare la scheda del film.");
       }
     } catch (err) {
       console.error(err);

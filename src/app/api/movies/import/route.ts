@@ -11,57 +11,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "tmdb_id mancante" }, { status: 400 });
     }
 
-    // 1. Verifica se già archiviato su Supabase
-    const { data: existing } = await supabase
-      .from("films")
-      .select("*")
-      .eq("tmdb_id", tmdb_id)
-      .maybeSingle();
-
-    if (existing) {
-      return NextResponse.json({ film: existing });
-    }
-
-    // 2. Recupera dettagli ufficiali da TMDB
+    // 1. Recupera dettagli ufficiali da TMDB
     const details = await getTMDBMovieDetails(Number(tmdb_id));
     if (!details) {
       return NextResponse.json({ error: "Film non trovato su TMDB" }, { status: 404 });
     }
 
-    const year = details.release_date?.substring(0, 4) || null;
+    const rawYear = details.release_date?.substring(0, 4);
+    const year = rawYear ? parseInt(rawYear, 10) : null;
     const formatted = formatCredits(details);
 
-    // Verifica anche per titolo e anno nel caso sia presente un vecchio record senza tmdb_id
-    const { data: existingByTitle } = await supabase
-      .from("films")
-      .select("*")
-      .ilike("titolo", details.title)
-      .maybeSingle();
+    // 2. Verifica se già archiviato su Supabase (per titolo e anno)
+    let query = supabase.from("films").select("*").ilike("titolo", details.title);
+    if (year) {
+      query = query.eq("anno", year);
+    }
+    const { data: existingByTitle } = await query.maybeSingle();
 
     if (existingByTitle) {
-      // Aggiorna con dati TMDB ufficiali e tmdb_id
-      const { data: updated } = await supabase
-        .from("films")
-        .update({
-          tmdb_id: details.id,
-          anno: year,
-          regista: formatted.regista,
-          attori: formatted.attori,
-          genere: formatted.genere,
-          trama: formatted.trama,
-          poster_url: formatted.poster_url,
-          backdrop_url: formatted.backdrop_url,
-          tmdb_collection_id: formatted.tmdb_collection_id,
-        })
-        .eq("id", (existingByTitle as any).id)
-        .select()
-        .single();
-
-      return NextResponse.json({ film: updated || existingByTitle });
+      return NextResponse.json({ film: existingByTitle });
     }
 
-    // 3. Inserimento nuovo record ufficiale nel DB
-    const newRecord = {
+    // 3. Inserimento nuovo record ufficiale nel DB con solo le colonne presenti nella tabella films
+    const newRecord: Record<string, any> = {
       titolo: details.title,
       anno: year,
       regista: formatted.regista,
@@ -69,10 +41,6 @@ export async function POST(request: Request) {
       genere: formatted.genere,
       trama: formatted.trama,
       poster_url: formatted.poster_url,
-      backdrop_url: formatted.backdrop_url,
-      tmdb_id: details.id,
-      original_title: details.original_title,
-      tmdb_collection_id: formatted.tmdb_collection_id,
     };
 
     const { data: inserted, error: insertErr } = await supabase
@@ -83,12 +51,18 @@ export async function POST(request: Request) {
 
     if (insertErr) {
       console.error("Errore inserimento film da TMDB:", insertErr);
-      return NextResponse.json({ error: "Errore salvataggio a database" }, { status: 500 });
+      return NextResponse.json(
+        { error: "Errore salvataggio nel database: " + insertErr.message },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({ film: inserted });
   } catch (err: any) {
     console.error("Errore importazione film:", err);
-    return NextResponse.json({ error: "Errore interno durante l'importazione" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Errore interno durante l'importazione: " + (err?.message || err) },
+      { status: 500 }
+    );
   }
 }
