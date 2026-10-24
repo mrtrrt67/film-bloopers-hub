@@ -23,13 +23,13 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn = false }: B
 
   const attendibilita = calculateAttendibilita(conferme, contestazioni);
 
-  const handleVote = async (tipo: "conferma" | "contestazione", motivo?: string) => {
+  const handleVote = async (tipo: "conferma" | "contestazione", motivo?: string): Promise<boolean> => {
     if (!userLoggedIn) {
       alert("Accedi per votare o contestare i bloopers della community!");
-      return;
+      return false;
     }
 
-    if (loading) return;
+    if (loading) return false;
     setLoading(true);
 
     const prevVoto = votoUtente;
@@ -43,7 +43,7 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn = false }: B
       if (tipo === "conferma") setConferme((c) => Math.max(0, c - 1));
       else setContestazioni((c) => Math.max(0, c - 1));
     } else {
-      // Assegna nuovo voto
+      // Assegna nuovo voto o aggiorna
       if (prevVoto === "conferma") setConferme((c) => Math.max(0, c - 1));
       if (prevVoto === "contestazione") setContestazioni((c) => Math.max(0, c - 1));
 
@@ -68,7 +68,9 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn = false }: B
         const json = await res.json();
         if (json.conferme !== undefined) setConferme(json.conferme);
         if (json.contestazioni !== undefined) setContestazioni(json.contestazioni);
+        if (json.tipo !== undefined) setVotoUtente(json.tipo);
       }
+      return true;
     } catch (err: any) {
       // Ripristino in caso di errore
       setVotoUtente(prevVoto);
@@ -76,6 +78,7 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn = false }: B
       setContestazioni(prevCont);
       alert(err?.message || "Impossibile registrare il voto.");
       console.error(err);
+      return false;
     } finally {
       setLoading(false);
     }
@@ -186,13 +189,17 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn = false }: B
             </button>
             <button
               type="button"
-              onClick={() => {
-                if (!contestReason.trim()) {
+              onClick={async () => {
+                const reason = contestReason.trim();
+                if (!reason) {
                   alert("Inserisci una breve motivazione per la tua contestazione.");
                   return;
                 }
-                handleVote("contestazione", contestReason.trim());
-                setShowContestForm(false);
+                const ok = await handleVote("contestazione", reason);
+                if (ok) {
+                  setShowContestForm(false);
+                  setContestReason("");
+                }
               }}
               disabled={loading}
               className="px-3 py-1 rounded-lg text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 transition shadow disabled:opacity-50"

@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
-    const adminDb = createAdminClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
     if (!user) {
       return NextResponse.json(
@@ -24,66 +24,108 @@ export async function POST(request: Request) {
       );
     }
 
+    const cleanErrId = typeof errore_id === "string" ? parseInt(errore_id, 10) : Number(errore_id);
+    if (isNaN(cleanErrId)) {
+      return NextResponse.json(
+        { error: "ID blooper non valido." },
+        { status: 400 }
+      );
+    }
+
     const motivoPulito = motivo && typeof motivo === "string" ? motivo.trim() : null;
 
     // Verifica se l'utente ha già votato questo errore
-    const { data: existingVote } = await adminDb
+    const { data: existingVote, error: selectErr } = await supabase
       .from("voti_bloopers")
-      .select("id, tipo")
-      .eq("errore_id", errore_id)
+      .select("id, tipo, motivo")
+      .eq("errore_id", cleanErrId)
       .eq("user_id", user.id)
       .maybeSingle();
 
+    if (selectErr) {
+      console.error("Errore verifica voto esistente:", selectErr);
+    }
+
+    let resultingTipo: "conferma" | "contestazione" | null = tipo;
+
     if (existingVote) {
-      if ((existingVote as any).tipo === tipo && !motivoPulito) {
-        // Se riclicca sullo stesso voto (senza aggiornare motivo), lo rimuove
-        await adminDb
+      if (existingVote.tipo === tipo && !motivoPulito) {
+        // Se riclicca sullo stesso voto (stesso tipo e senza motivazione), lo rimuove (toggle off)
+        const { error: delErr } = await supabase
           .from("voti_bloopers")
           .delete()
-          .eq("id", (existingVote as any).id);
+          .eq("id", existingVote.id)
+          .eq("user_id", user.id);
+
+        if (delErr) {
+          console.error("Errore eliminazione voto:", delErr);
+          throw new Error("Impossibile rimuovere il voto: " + delErr.message);
+        }
+        resultingTipo = null;
       } else {
-        // Cambia tipo di voto o aggiorna la motivazione
-        await adminDb
+        // Cambia tipo di voto o aggiorna/conferma la motivazione
+        const { error: updErr } = await supabase
           .from("voti_bloopers")
           .update({
             tipo,
-            motivo: tipo === "contestazione" ? motivoPulito : null,
+            motivo: tipo === "contestazione" ? (motivoPulito || existingVote.motivo || null) : null,
           })
-          .eq("id", (existingVote as any).id);
+          .eq("id", existingVote.id)
+          .eq("user_id", user.id);
+
+        if (updErr) {
+          console.error("Errore aggiornamento voto:", updErr);
+          throw new Error("Impossibile aggiornare il voto: " + updErr.message);
+        }
       }
     } else {
       // Nuovo voto
-      await adminDb.from("voti_bloopers").insert({
-        errore_id,
-        user_id: user.id,
-        tipo,
-        motivo: tipo === "contestazione" ? motivoPulito : null,
-      });
+      const { error: insErr } = await supabase
+        .from("voti_bloopers")
+        .insert({
+          errore_id: cleanErrId,
+          user_id: user.id,
+          tipo,
+          motivo: tipo === "contestazione" ? motivoPulito : null,
+        });
+
+      if (insErr) {
+        console.error("Errore inserimento voto:", insErr);
+        throw new Error("Impossibile registrare il voto: " + insErr.message);
+      }
     }
 
     // Recupera conteggio aggiornato dei voti da voti_bloopers
-    const { data: voti } = await adminDb
+    const { data: voti, error: countErr } = await supabase
       .from("voti_bloopers")
       .select("tipo")
-      .eq("errore_id", errore_id);
+      .eq("errore_id", cleanErrId);
+
+    if (countErr) {
+      console.error("Errore conteggio voti:", countErr);
+    }
 
     const conferme = (voti || []).filter((v: any) => v.tipo === "conferma").length;
     const contestazioni = (voti || []).filter((v: any) => v.tipo === "contestazione").length;
 
     // Sincronizza i contatori direttamente nella tabella errori
-    await adminDb
+    const { error: updateErr } = await supabase
       .from("errori")
       .update({
         conferme,
         contestazioni,
       })
-      .eq("id", errore_id);
+      .eq("id", cleanErrId);
+
+    if (updateErr) {
+      console.error("Errore aggiornamento contatori in errori:", updateErr);
+    }
 
     return NextResponse.json({
       success: true,
       conferme,
       contestazioni,
-      tipo,
+      tipo: resultingTipo,
       motivo: motivoPulito,
     });
   } catch (err: any) {
@@ -94,3 +136,4 @@ export async function POST(request: Request) {
     );
   }
 }
+

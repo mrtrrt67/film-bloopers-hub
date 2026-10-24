@@ -109,17 +109,24 @@ export default async function FilmDetailPage({ params }: PageProps) {
     notFound();
   }
 
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const { film, bloopers: rawBloopers } = data;
 
-  // Normalizza i bloopers calcolando conferme e contestazioni
+  // Normalizza i bloopers calcolando conferme, contestazioni e voto dell'utente autenticato
   const bloopers: Blooper[] = rawBloopers.map((b: any) => {
     const voti = b.voti_bloopers || [];
     const conferme = voti.filter((v: any) => v.tipo === "conferma").length;
     const contestazioni = voti.filter((v: any) => v.tipo === "contestazione").length;
+    const userVote = user ? voti.find((v: any) => v.user_id === user.id)?.tipo : null;
     return {
       ...b,
       conferme,
       contestazioni,
+      voto_utente: userVote || null,
     };
   });
 
