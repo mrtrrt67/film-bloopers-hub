@@ -45,7 +45,7 @@ export default function EsploraPage() {
     }
 
     loadDbFilms();
-  }, [supabase]);
+  }, []);
 
   // Ricerca istantanea su TMDB con debounce
   useEffect(() => {
@@ -64,7 +64,7 @@ export default function EsploraPage() {
           if (data.results?.length > 0 && activeTab === "archivio") {
             // Se non ci sono risultati locali, suggerisce la tab TMDB
             const localMatches = dbFilms.filter((f) =>
-              f.titolo.toLowerCase().includes(searchTerm.toLowerCase())
+              f.titolo?.toLowerCase().includes(searchTerm.toLowerCase())
             );
             if (localMatches.length === 0) {
               setActiveTab("tmdb");
@@ -94,7 +94,7 @@ export default function EsploraPage() {
       if (res.ok) {
         const data = await res.json();
         const filmSlug = slugify(data.film.titolo, data.film.anno);
-        router.push(`/film/${filmSlug}-${data.film.id.slice(0, 8)}`);
+        router.push(`/film/${filmSlug}-${String(data.film.id)}`);
       } else {
         alert("Impossibile importare la scheda del film.");
       }
@@ -109,10 +109,10 @@ export default function EsploraPage() {
     if (!searchTerm) return true;
     const term = searchTerm.toLowerCase();
     return (
-      f.titolo?.toLowerCase().includes(term) ||
-      String(f.anno || "").includes(term) ||
-      f.regista?.toLowerCase().includes(term) ||
-      f.attori?.toLowerCase().includes(term)
+      (f.titolo && f.titolo.toLowerCase().includes(term)) ||
+      (f.anno && String(f.anno).includes(term)) ||
+      (f.regista && f.regista.toLowerCase().includes(term)) ||
+      (f.attori && f.attori.toLowerCase().includes(term))
     );
   });
 

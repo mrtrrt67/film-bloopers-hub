@@ -10,7 +10,7 @@ interface MovieCardProps {
 
 export default function MovieCard({ film }: MovieCardProps) {
   const filmSlug = slugify(film.titolo, film.anno);
-  const href = `/film/${filmSlug}-${film.id.slice(0, 8)}`;
+  const href = `/film/${filmSlug}-${String(film.id)}`;
 
   return (
     <Link

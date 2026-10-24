@@ -41,15 +41,15 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     const { data: films } = await supabase
       .from("films")
-      .select("id, titolo, anno, created_at")
+      .select("id, titolo, anno, creato_il")
       .limit(1000);
 
     const movieRoutes: MetadataRoute.Sitemap = (films || []).map((film: any) => {
       const slug = slugify(film.titolo, film.anno);
-      const shortId = film.id.slice(0, 8);
+      const shortId = String(film.id);
       return {
         url: `${baseUrl}/film/${slug}-${shortId}`,
-        lastModified: film.created_at ? new Date(film.created_at) : new Date(),
+        lastModified: film.creato_il ? new Date(film.creato_il) : new Date(),
         changeFrequency: "weekly",
         priority: 0.7,
       };

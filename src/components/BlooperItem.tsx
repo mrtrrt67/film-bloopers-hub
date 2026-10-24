@@ -7,7 +7,7 @@ import { calculateAttendibilita } from "@/lib/utils";
 
 interface BlooperItemProps {
   blooper: Blooper;
-  onVote?: (blooperId: string, tipo: "conferma" | "contestazione") => Promise<void>;
+  onVote?: (blooperId: string | number, tipo: "conferma" | "contestazione") => Promise<void>;
   userLoggedIn?: boolean;
 }
 

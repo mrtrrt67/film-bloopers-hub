@@ -27,18 +27,16 @@ interface PageProps {
 async function getFilmData(slug: string) {
   const supabase = await createClient();
 
-  // Estrae eventuale ID parziale dallo slug (es. "matrix-1999-a1b2c3d4")
+  // Estrae eventuale ID parziale dallo slug (es. "matrix-1999-143" o "matrix-1999")
   const parts = slug.split("-");
-  const potentialShortId = parts[parts.length - 1];
+  const potentialId = parts[parts.length - 1];
 
-  let query = supabase.from("films").select("*");
-
-  if (potentialShortId && potentialShortId.length >= 6) {
-    // Prova a cercare per prefisso ID
+  if (potentialId && /^\d+$/.test(potentialId)) {
+    // Ricerca per ID numerico intero nel database Supabase
     const { data: byId } = await supabase
       .from("films")
       .select("*")
-      .ilike("id", `${potentialShortId}%`)
+      .eq("id", parseInt(potentialId, 10))
       .maybeSingle();
 
     if (byId) {
@@ -53,23 +51,27 @@ async function getFilmData(slug: string) {
   }
 
   // Fallback: cerca per titolo approssimativo dallo slug
-  const titleGuess = slug.replace(/-[0-9]{4}.*$/, "").replace(/-/g, " ");
-  const { data: byTitle } = await supabase
-    .from("films")
-    .select("*")
-    .ilike("titolo", `%${titleGuess}%`)
-    .limit(1)
-    .maybeSingle();
+  const titleGuess = slug.replace(/-[0-9]{4}.*$/, "").replace(/-/g, " ").trim();
+  if (titleGuess) {
+    const { data: byTitle } = await supabase
+      .from("films")
+      .select("*")
+      .ilike("titolo", `%${titleGuess}%`)
+      .limit(1)
+      .maybeSingle();
 
-  if (!byTitle) return null;
+    if (byTitle) {
+      const { data: bloopers } = await supabase
+        .from("errori")
+        .select("*, voti_bloopers(tipo, user_id)")
+        .eq("film_id", byTitle.id)
+        .eq("approvato", true);
 
-  const { data: bloopers } = await supabase
-    .from("errori")
-    .select("*, voti_bloopers(tipo, user_id)")
-    .eq("film_id", byTitle.id)
-    .eq("approvato", true);
+      return { film: byTitle as Film, bloopers: (bloopers || []) as any[] };
+    }
+  }
 
-  return { film: byTitle as Film, bloopers: (bloopers || []) as any[] };
+  return null;
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {

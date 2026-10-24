@@ -1,5 +1,5 @@
 export interface Film {
-  id: string;
+  id: string | number;
   titolo: string;
   anno?: string | number | null;
   regista?: string | null;
@@ -12,6 +12,7 @@ export interface Film {
   backdrop_url?: string | null;
   tmdb_collection_id?: number | null;
   slug?: string;
+  creato_il?: string;
   created_at?: string;
 }
 
@@ -19,20 +20,20 @@ export type BlooperCategoria =
   | "Errori di scena / Posizione"
   | "Troupe o microfoni visibili"
   | "Anacronismi"
-  | "Errori storici o fattuali";
+  | "Errori storici o fattuali"
+  | string;
 
 export interface Blooper {
-  id: string;
-  film_id: string;
+  id: string | number;
+  film_id: string | number;
   minuto: string;
-  categoria: BlooperCategoria | string;
+  categoria: BlooperCategoria;
   descrizione: string;
   approvato: boolean;
   inserito_da?: string | null;
   provenienza?: "ia" | "utente";
   creato_il?: string;
   created_at?: string;
-  // Computed client-side
   conferme?: number;
   contestazioni?: number;
   attendibilita?: number;
@@ -54,7 +55,7 @@ export interface Profile {
 
 export interface VotoBlooper {
   id?: string;
-  errore_id: string;
+  errore_id: string | number;
   user_id: string;
   tipo: "conferma" | "contestazione";
   created_at?: string;

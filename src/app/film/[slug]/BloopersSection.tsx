@@ -28,8 +28,8 @@ export default function BloopersSection({ film, initialBloopers }: BloopersSecti
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-  }, [supabase]);
+    supabase.auth.getUser().then(({ data }: { data: any }) => setUser(data?.user || null));
+  }, []);
 
   // Generazione bloopers con Gemini
   const handleGenerateWithAI = async () => {

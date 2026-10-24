@@ -31,7 +31,7 @@ export default async function HomePage() {
   const { data: filmsRaw } = await supabase
     .from("films")
     .select("*, errori(id)")
-    .order("created_at", { ascending: false })
+    .order("creato_il", { ascending: false })
     .limit(8);
 
   const featuredFilms: (Film & { bloopers_count?: number })[] = (filmsRaw || []).map((f: any) => ({
@@ -44,7 +44,7 @@ export default async function HomePage() {
     .from("errori")
     .select("*, films(titolo, anno, id), voti_bloopers(tipo)")
     .eq("approvato", true)
-    .order("created_at", { ascending: false })
+    .order("creato_il", { ascending: false })
     .limit(4);
 
   const recentBloopers = (recentBloopersRaw || []).map((b: any) => {

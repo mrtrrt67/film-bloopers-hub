@@ -43,9 +43,10 @@ export default function PromoBanner({
                 {badge}
               </span>
             </div>
-            <p className="text-sm text-zinc-300 leading-snug">
-              {testoFormattato}
-            </p>
+            <p
+              className="text-sm text-zinc-300 leading-snug"
+              dangerouslySetInnerHTML={{ __html: testoFormattato }}
+            />
           </div>
         </div>
 
