@@ -31,10 +31,17 @@ export async function POST(request: Request) {
       );
     }
 
-    const priceId = process.env[plan.priceIdEnv];
+    let priceId = process.env[plan.priceIdEnv];
+    if (!priceId) {
+      if (plan.id === "mensile") priceId = process.env.STRIPE_PRICE_MONTHLY || process.env.STRIPE_PRICE_MENSILE;
+      if (plan.id === "annuale") priceId = process.env.STRIPE_PRICE_YEARLY || process.env.STRIPE_PRICE_ANNUALE;
+      if (plan.id === "lifetime-promo") priceId = process.env.STRIPE_PRICE_PROMO || process.env.STRIPE_PRICE_LIFETIME_PROMO;
+      if (plan.id === "lifetime-standard") priceId = process.env.STRIPE_PRICE_LIFETIME || process.env.STRIPE_PRICE_LIFETIME_STANDARD;
+    }
+
     if (!priceId) {
       return NextResponse.json(
-        { error: `ID Prezzo Stripe non configurato per il piano ${plan.name} (${plan.priceIdEnv}).` },
+        { error: `ID Prezzo Stripe non configurato per il piano ${plan.name}.` },
         { status: 500 }
       );
     }
