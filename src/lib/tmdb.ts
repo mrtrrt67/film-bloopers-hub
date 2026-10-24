@@ -115,3 +115,102 @@ export function formatCredits(details: TMDBMovieDetails) {
     tmdb_collection_id: details.belongs_to_collection?.id || null,
   };
 }
+
+export async function fetchPosterForMovie(
+  titolo: string,
+  anno?: string | number | null
+): Promise<{ poster_url: string | null; backdrop_url: string | null }> {
+  if (!titolo) return { poster_url: null, backdrop_url: null };
+
+  const candidates: string[] = [];
+  candidates.push(titolo);
+
+  const cleanedParens = titolo.replace(/\s*\([^)]*\)/g, "").trim();
+  if (cleanedParens && !candidates.includes(cleanedParens)) {
+    candidates.push(cleanedParens);
+  }
+
+  const beforeDash = cleanedParens.split(/[-–:—]/)[0].trim();
+  if (beforeDash && !candidates.includes(beforeDash)) {
+    candidates.push(beforeDash);
+  }
+
+  const matchParen = titolo.match(/\(([^)]+)\)/);
+  if (matchParen && matchParen[1]) {
+    const inside = matchParen[1].trim();
+    if (inside && !candidates.includes(inside)) {
+      candidates.push(inside);
+    }
+  }
+
+  const cleanYear = anno ? String(anno).trim().slice(0, 4) : undefined;
+
+  for (const useYear of [true, false]) {
+    const yearToUse = useYear ? cleanYear : undefined;
+
+    for (const query of candidates) {
+      if (!query) continue;
+      const results = await searchTMDBMovies(query, yearToUse);
+      if (results && results.length > 0) {
+        for (const item of results) {
+          if (item.poster_path) {
+            return {
+              poster_url: getTMDBImageUrl(item.poster_path, "w500"),
+              backdrop_url: getTMDBImageUrl(item.backdrop_path, "original"),
+            };
+          }
+        }
+      }
+    }
+  }
+
+  return { poster_url: null, backdrop_url: null };
+}
+
+export async function fetchDetailsForMovie(
+  titolo: string,
+  anno?: string | number | null
+): Promise<{
+  poster_url: string | null;
+  backdrop_url: string | null;
+  regista: string | null;
+  attori: string | null;
+  genere: string | null;
+  trama: string | null;
+} | null> {
+  if (!titolo) return null;
+
+  const candidates: string[] = [
+    titolo,
+    titolo.replace(/\s*\([^)]*\)/g, "").trim(),
+    titolo.split(/[-–:—]/)[0].replace(/\s*\([^)]*\)/g, "").trim(),
+  ];
+  const matchParen = titolo.match(/\(([^)]+)\)/);
+  if (matchParen && matchParen[1]) candidates.push(matchParen[1].trim());
+
+  const cleanYear = anno ? String(anno).trim().slice(0, 4) : undefined;
+
+  for (const useYear of [true, false]) {
+    for (const q of candidates) {
+      if (!q) continue;
+      const res = await searchTMDBMovies(q, useYear ? cleanYear : undefined);
+      if (res && res.length > 0) {
+        const top = res[0];
+        const details = await getTMDBMovieDetails(top.id);
+        if (details) {
+          const cred = formatCredits(details);
+          return {
+            poster_url: cred.poster_url,
+            backdrop_url: cred.backdrop_url,
+            regista: cred.regista,
+            attori: cred.attori,
+            genere: cred.genere,
+            trama: cred.trama,
+          };
+        }
+      }
+    }
+  }
+
+  return null;
+}
