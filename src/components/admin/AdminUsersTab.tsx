@@ -139,8 +139,11 @@ export default function AdminUsersTab() {
                   return (
                     <tr key={profile.id} className="hover:bg-zinc-800/30">
                       <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
-                          <p className="font-bold text-white">{profile.email || "N/D"}</p>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-bold text-amber-400">
+                            @{profile.username || (profile.email ? profile.email.split("@")[0] : "utente")}
+                          </p>
+                          <span className="text-[11px] text-zinc-400 font-mono">({profile.email || "N/D"})</span>
                           {profile.is_admin && (
                             <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-[10px] font-black uppercase text-amber-300 border border-amber-400/40">
                               ADMIN

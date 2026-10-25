@@ -24,10 +24,10 @@
     "passed": true,
     "tables": {
       "films": {
-        "count": 217
+        "count": 219
       },
       "errori": {
-        "count": 989
+        "count": 1002
       },
       "profiles": {
         "count": 5
@@ -42,7 +42,7 @@
         "count": 7
       },
       "log_ricerche": {
-        "count": 203
+        "count": 212
       }
     },
     "issues": []
@@ -91,7 +91,7 @@
   },
   "git": {
     "branch": "main",
-    "status": "M src/app/globals.css\n M src/app/layout.tsx\n M src/components/PromoBanner.tsx",
+    "status": "M src/components/AuthModal.tsx\n M src/components/admin/AdminUsersTab.tsx",
     "issues": []
   },
   "typecheck": {

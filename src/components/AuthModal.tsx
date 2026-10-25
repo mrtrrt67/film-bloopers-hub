@@ -39,21 +39,53 @@ export default function AuthModal({
 
     try {
       if (mode === "login") {
-        let targetEmail = email.trim();
+        const rawInput = email.trim();
+        // Un'email valida contiene caratteri prima della chiocciola, la chiocciola e un dominio con punto
+        const isFullEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(rawInput);
+        let targetEmail = rawInput;
 
-        // Se l'utente ha inserito uno username invece dell'email (nessuna @)
-        if (!targetEmail.includes("@")) {
-          const cleanUsername = targetEmail.replace(/^@/, "").trim();
-          const { data: found } = await supabase
-            .from("profiles")
-            .select("email")
-            .ilike("email", `${cleanUsername}@%`)
-            .maybeSingle();
+        // Se l'utente ha inserito uno username (es. "@mrtrrt" o "mrtrrt")
+        if (!isFullEmail) {
+          const cleanUsername = rawInput.replace(/^@/, "").trim().toLowerCase();
 
-          if (found?.email) {
-            targetEmail = found.email;
+          if (!cleanUsername) {
+            throw new Error("Inserisci la tua email o il tuo username.");
+          }
+
+          let foundEmail: string | null = null;
+
+          // 1. Prova prima a cercare per colonna username (se presente nella tabella profiles)
+          try {
+            const { data: byUsername } = await supabase
+              .from("profiles")
+              .select("email, username")
+              .eq("username", cleanUsername)
+              .maybeSingle();
+
+            if (byUsername?.email) {
+              foundEmail = byUsername.email;
+            }
+          } catch (_) {
+            // Se la colonna username non è ancora presente nel DB, si procede col fallback
+          }
+
+          // 2. Se non trovato, cerca per prefisso email (es. "mrtrrt" corrisponde a "mrtrrt@libero.it")
+          if (!foundEmail) {
+            const { data: byEmailPrefix } = await supabase
+              .from("profiles")
+              .select("email")
+              .ilike("email", `${cleanUsername}@%`)
+              .maybeSingle();
+
+            if (byEmailPrefix?.email) {
+              foundEmail = byEmailPrefix.email;
+            }
+          }
+
+          if (foundEmail) {
+            targetEmail = foundEmail;
           } else {
-            throw new Error(`Nessun account trovato per l'username "${cleanUsername}". Prova ad accedere inserendo la tua email.`);
+            throw new Error(`Nessun account trovato per l'username "@${cleanUsername}". Prova ad accedere inserendo la tua email completa.`);
           }
         }
 
