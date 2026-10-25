@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="amberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b" />
+      <stop offset="50%" stop-color="#ea580c" />
+      <stop offset="100%" stop-color="#d97706" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="16" flood-color="#ea580c" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="#09090b"/>
+  <rect x="24" y="24" width="464" height="464" rx="104" fill="none" stroke="#27272a" stroke-width="4"/>
+  <g filter="url(#glow)">
+    <rect x="96" y="96" width="320" height="320" rx="64" fill="url(#amberGrad)"/>
+    <path d="M160 160h192v192H160z" fill="none"/>
+    <!-- Film icon -->
+    <rect x="156" y="156" width="200" height="200" rx="24" fill="#09090b"/>
+    <rect x="180" y="180" width="32" height="32" rx="6" fill="url(#amberGrad)"/>
+    <rect x="240" y="180" width="32" height="32" rx="6" fill="url(#amberGrad)"/>
+    <rect x="300" y="180" width="32" height="32" rx="6" fill="url(#amberGrad)"/>
+    <rect x="180" y="240" width="152" height="92" rx="12" fill="#18181b"/>
+    <polygon points="240,266 280,286 240,306" fill="url(#amberGrad)"/>
+  </g>
+</svg>

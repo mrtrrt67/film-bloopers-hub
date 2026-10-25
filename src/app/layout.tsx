@@ -21,28 +21,74 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "FilmBloopers Hub | Il Portale Italiano degli Errori nei Film",
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://filmbloopers.online"),
+  title: {
+    default: "FilmBloopers Hub | Il Portale Italiano degli Errori nei Film",
+    template: "%s | FilmBloopers Hub",
+  },
   description:
-    "Scopri migliaia di bloopers, errori di montaggio, anacronismi e ciak falsi nella storia del cinema. Archivio completo con dati TMDB e analisi IA.",
+    "Scopri oltre 1.000 bloopers, errori di montaggio, ciak imperfetti, anacronismi storici e troupe visibili al minuto esatto nei film più famosi della storia del cinema. Archivio verificato e gratuito.",
   keywords: [
-    "bloopers",
+    "bloopers film",
     "errori film",
+    "errori nei film famosi",
     "ciak falsi",
     "anacronismi cinema",
-    "movie mistakes",
+    "movie mistakes italiano",
     "errori di montaggio",
     "curiosità cinema",
+    "troupe visibile nei film",
+    "errori di continuità film",
+    "filmbloopers",
   ],
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://filmbloopers.online"),
+  authors: [{ name: "FilmBloopers Hub" }],
+  creator: "FilmBloopers Hub",
+  publisher: "FilmBloopers Hub",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "FilmBloopers Hub | Errori e Ciak Falsi nei Film",
+    title: "FilmBloopers Hub | Il Portale Italiano degli Errori nei Film",
     description:
-      "Il più grande archivio italiano di bloopers cinematografici. Trova gli errori delle tue pellicole preferite al minuto esatto.",
+      "Scopri oltre 1.000 bloopers, errori di scena e curiosità nei capolavori del cinema. Cerca per titolo o anno e trova l'errore al minuto esatto.",
     url: "https://filmbloopers.online",
     siteName: "FilmBloopers Hub",
     locale: "it_IT",
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "FilmBloopers Hub | Il Portale Italiano degli Errori nei Film",
+    description:
+      "Tutti i bloopers, errori di scena e curiosità del cinema italiano e internazionale al minuto esatto.",
+    creator: "@FilmBloopersHub",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  icons: {
+    icon: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+    apple: [
+      { url: "/icon.svg", type: "image/svg+xml" },
+    ],
+  },
+  manifest: "/manifest.webmanifest",
+  category: "entertainment",
 };
 
 export default function RootLayout({

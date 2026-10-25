@@ -85,18 +85,47 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const { film } = data;
-  const title = `${film.titolo} (${film.anno || "N/D"}) — Bloopers, Errori di Scena e Curiosità | FilmBloopers Hub`;
-  const description = `Scopri tutti i bloopers, errori di montaggio, troupe visibile e anacronismi del film ${film.titolo}. ${film.trama?.slice(0, 150)}...`;
+  const { film, bloopers } = data;
+  const title = `${film.titolo} (${film.anno || "N/D"}) — Bloopers, Errori di Scena e Curiosità`;
+  const countDesc = bloopers?.length
+    ? `Scopri ${bloopers.length} bloopers verificati al minuto esatto.`
+    : "Scopri tutti i bloopers e le curiosità del film.";
+  const description = `${countDesc} Errori di montaggio, troupe visibile e anacronismi in "${film.titolo}"${film.regista ? ` di ${film.regista}` : ""}. ${film.trama?.slice(0, 130) || ""}`.trim();
+  const imageUrl = film.backdrop_url || film.poster_url || "/icon.svg";
 
   return {
     title,
     description,
+    keywords: [
+      `bloopers ${film.titolo}`,
+      `errori film ${film.titolo}`,
+      `curiosità ${film.titolo}`,
+      `errori di scena ${film.titolo}`,
+      film.regista ? `film ${film.regista}` : "",
+      film.genere || "",
+    ].filter(Boolean),
+    alternates: {
+      canonical: `/film/${slug}`,
+    },
     openGraph: {
+      title: `${title} | FilmBloopers Hub`,
+      description,
+      url: `/film/${slug}`,
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: `Bloopers ed errori in ${film.titolo}`,
+        },
+      ],
+      type: "video.movie",
+    },
+    twitter: {
+      card: "summary_large_image",
       title,
       description,
-      images: film.backdrop_url ? [film.backdrop_url] : film.poster_url ? [film.poster_url] : [],
-      type: "video.movie",
+      images: [imageUrl],
     },
   };
 }
@@ -133,23 +162,72 @@ export default async function FilmDetailPage({ params }: PageProps) {
   const amazonUrl = getAmazonSearchUrl(film.titolo, film.anno);
   const youtubeUrl = getYouTubeSearchUrl(film.titolo);
 
-  // Schema.org Structured Data (JSON-LD) per Google Rich Snippets
-  const jsonLd = {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://filmbloopers.online";
+  const filmUrl = `${siteUrl}/film/${slug}`;
+
+  // Schema.org Structured Data (JSON-LD) per Google Rich Snippets & Breadcrumbs
+  const jsonLdMovie = {
     "@context": "https://schema.org",
     "@type": "Movie",
     name: film.titolo,
+    url: filmUrl,
     datePublished: film.anno ? `${film.anno}-01-01` : undefined,
     director: film.regista ? { "@type": "Person", name: film.regista } : undefined,
-    image: film.poster_url || undefined,
+    actor: film.attori
+      ? film.attori.split(",").map((a: string) => ({ "@type": "Person", name: a.trim() }))
+      : undefined,
+    image: film.poster_url || film.backdrop_url || undefined,
     description: film.trama || undefined,
     genre: film.genere || undefined,
   };
+
+  const jsonLdBreadcrumbs = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: siteUrl,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Esplora",
+        item: `${siteUrl}/esplora`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: `${film.titolo} (${film.anno || ""})`,
+        item: filmUrl,
+      },
+    ],
+  };
+
+  const jsonLdBloopers =
+    bloopers.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: `Errori e Bloopers in ${film.titolo}`,
+          itemListElement: bloopers.map((b, idx) => ({
+            "@type": "ListItem",
+            position: idx + 1,
+            name: `${b.categoria} (minuto ${b.minuto})`,
+            description: b.descrizione,
+          })),
+        }
+      : null;
+
+  const schemasToRender = [jsonLdMovie, jsonLdBreadcrumbs, jsonLdBloopers].filter(Boolean);
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemasToRender) }}
       />
 
       <div className="min-h-screen pb-20">

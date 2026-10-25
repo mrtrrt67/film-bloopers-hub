@@ -68,8 +68,71 @@ export default async function HomePage() {
     .select("*", { count: "exact", head: true })
     .eq("approvato", true);
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://filmbloopers.online";
+
+  const jsonLdWebsite = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "FilmBloopers Hub",
+    url: siteUrl,
+    description: "Il Portale Italiano degli Errori nei Film e Bloopers Cinematografici",
+    inLanguage: "it-IT",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${siteUrl}/esplora?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+
+  const jsonLdOrg = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    name: "FilmBloopers Hub",
+    url: siteUrl,
+    logo: `${siteUrl}/icon.svg`,
+    description: "Il primo archivio collaborativo in lingua italiana dedicato alla scoperta e verifica di errori di montaggio, bloopers e anacronismi nei film.",
+  };
+
+  const jsonLdFaq = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "Cosa sono i bloopers cinematografici?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "I bloopers sono errori non voluti avvenuti durante le riprese o in fase di montaggio di un film, come anacronismi storici, oggetti di scena che cambiano posizione tra inquadrature, o riflessi della troupe e microfoni visibili nella pellicola finale.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "Come posso trovare gli errori di un film specifico su FilmBloopers Hub?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Puoi utilizzare la barra di ricerca o la sezione Esplora digitando il titolo del film o l'anno di uscita per consultare l'elenco completo di tutti i bloopers catalogati con il minuto esatto in cui compaiono.",
+        },
+      },
+      {
+        "@type": "Question",
+        name: "È possibile segnalare nuovi errori o votare quelli esistenti?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "Sì, registrandoti gratuitamente puoi confermare o contestare i bloopers segnalati dalla community e inserire nuovi errori per scalare la classifica dei cercatori di bloopers.",
+        },
+      },
+    ],
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify([jsonLdWebsite, jsonLdOrg, jsonLdFaq]) }}
+      />
       {/* Promo Banner Dinamico */}
       <PromoBanner
         titolo={bannerTitolo}
