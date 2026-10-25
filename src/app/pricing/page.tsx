@@ -2,30 +2,15 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import {
-  Check,
-  Sparkles,
-  Zap,
-  Shield,
-  ArrowRight,
-  ShieldCheck,
-  CheckCircle2,
-  Minus,
-  Crown,
-  ChevronDown,
-  ChevronUp,
-  HelpCircle,
-  ExternalLink
-} from "lucide-react";
+import { Check, Sparkles, Zap, Shield, ArrowRight, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { PRICING_PLANS } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/client";
 import AuthModal from "@/components/AuthModal";
 
 export default function PricingPage() {
-  const [billingCycle, setBillingCycle] = useState<"mensile" | "annuale">("annuale");
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [openingPortal, setOpeningPortal] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
-  const [showFullComparison, setShowFullComparison] = useState(true);
   const [user, setUser] = useState<any>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const supabase = createClient();
@@ -100,545 +85,177 @@ export default function PricingPage() {
   const isUserSubscribed = userProfile?.tier === "premium";
   const userSub = userProfile?.tipo_abbonamento;
 
-  // Caratteristiche per la tabella comparativa completa
-  const comparisonSections = [
-    {
-      category: "Esplorazione & Ricerca",
-      features: [
-        {
-          name: "Ricerche film giornaliere",
-          free: "15 al giorno",
-          sub: "Illimitate",
-          lifetime: "Illimitate",
-        },
-        {
-          name: "Consultazione archivio bloopers e schede",
-          free: true,
-          sub: true,
-          lifetime: true,
-        },
-        {
-          name: "Importazione nuovi film da catalogo TMDB",
-          free: true,
-          sub: true,
-          lifetime: true,
-        },
-        {
-          name: "Filtri avanzati per categoria e minuto",
-          free: true,
-          sub: true,
-          lifetime: true,
-        },
-      ],
-    },
-    {
-      category: "Intelligenza Artificiale (Google Gemini)",
-      features: [
-        {
-          name: "Generazione bloopers con IA",
-          free: false,
-          sub: "Illimitata",
-          lifetime: "Illimitata",
-        },
-        {
-          name: "Analisi accurata del minutaggio e del ciak",
-          free: false,
-          sub: true,
-          lifetime: true,
-        },
-      ],
-    },
-    {
-      category: "Community, Votazioni & Classifiche",
-      features: [
-        {
-          name: "Votazione attendibilità bloopers (conferma)",
-          free: false,
-          sub: true,
-          lifetime: true,
-        },
-        {
-          name: "Contestazione motivata degli errori",
-          free: false,
-          sub: true,
-          lifetime: true,
-        },
-        {
-          name: "Partecipazione alla Classifica Cacciatori",
-          free: false,
-          sub: true,
-          lifetime: true,
-        },
-        {
-          name: "Sblocco automatico premi (+1 mese ogni 50 pt)",
-          free: false,
-          sub: true,
-          lifetime: true,
-        },
-      ],
-    },
-    {
-      category: "Privilegi Esclusivi & Supporto",
-      features: [
-        {
-          name: "Badge profilo pubblico nella community",
-          free: "—",
-          sub: "⭐ VIP",
-          lifetime: "👑 Leggenda",
-        },
-        {
-          name: "Moltiplicatore punti sulle segnalazioni",
-          free: "1x",
-          sub: billingCycle === "annuale" ? "2x (Punti Doppi)" : "1x",
-          lifetime: "2x (Punti Doppi)",
-        },
-        {
-          name: "Supporto e revisione prioritaria",
-          free: "Standard",
-          sub: billingCycle === "annuale" ? "Prioritario ⚡" : "Standard",
-          lifetime: "Prioritario ⚡",
-        },
-      ],
-    },
-    {
-      category: "Flessibilità & Condizioni",
-      features: [
-        {
-          name: "Tipo di pagamento",
-          free: "Gratis per sempre",
-          sub: "Ricorrente (Mese o Anno)",
-          lifetime: "Una tantum (Nessun rinnovo)",
-        },
-        {
-          name: "Disdetta autonoma con 1 clic in qualsiasi momento",
-          free: "—",
-          sub: true,
-          lifetime: "Non necessaria",
-        },
-      ],
-    },
-  ];
-
   return (
-    <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12">
-      {/* Intestazione Leggera e Accattivante */}
-      <div className="flex flex-col items-center text-center max-w-2xl mx-auto mb-10">
-        <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 px-3.5 py-1 text-xs font-semibold text-amber-400 mb-3">
-          <Sparkles className="h-3.5 w-3.5" />
-          <span>Trasparenza Totale • Nessun Vincolo</span>
-        </div>
+    <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+      {/* Intestazione */}
+      <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-10">
+        <span className="rounded-full bg-amber-500/10 border border-amber-500/30 px-3.5 py-1 text-xs font-bold text-amber-400 mb-3">
+          Sblocca l&apos;Esperienza Completa
+        </span>
         <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-          Piani Semplici e Flessibili
+          Scegli il Tuo Piano Ideale
         </h1>
         <p className="text-sm sm:text-base text-zinc-400 mt-3 leading-relaxed">
-          Tutto ciò che serve per scoprire, votare e analizzare i bloopers con l&apos;IA. Disdici in qualsiasi momento con un solo clic.
+          Nessuna sorpresa. Ricerche e bloopers illimitati generati dall&apos;IA, partecipazione alla community, classifiche e accesso a vita a partire da soli 0,99€.
         </p>
       </div>
 
-      {/* Banner Abbonamento Attivo Snello & Non Invasivo */}
-      {isUserSubscribed && (userSub === "mensile" || userSub === "annuale" || userSub === "lifetime") && (
-        <div className="mb-8 rounded-xl border border-purple-500/30 bg-purple-950/20 px-4 py-3 sm:px-5 sm:py-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs shadow-lg backdrop-blur-sm">
-          <div className="flex items-center gap-2.5 text-center sm:text-left">
-            <span className="flex h-2.5 w-2.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-            <p className="text-zinc-300">
-              Hai un piano attivo:{" "}
-              <strong className="text-white capitalize font-bold">
-                {userSub === "lifetime" ? "Lifetime a Vita" : `Piano ${userSub}`}
-              </strong>
-              {userSub !== "lifetime" && (
-                <span className="text-zinc-400 hidden md:inline">
-                  {" "}• Rinnovo automatico gestibile in completa autonomia
-                </span>
-              )}
+      {/* Banner Abbonamento Attivo (Disdici con 1 Clic nel portale Stripe) */}
+      {isUserSubscribed && (userSub === "mensile" || userSub === "annuale") && (
+        <div className="mb-10 rounded-2xl border-2 border-purple-500/50 bg-gradient-to-r from-purple-950/40 via-zinc-900 to-zinc-950 p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+          <div className="space-y-1 text-center sm:text-left">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-purple-500/20 text-purple-300 px-3 py-0.5 text-xs font-bold border border-purple-500/30">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              <span>Abbonamento Attivo: Piano {userSub === "annuale" ? "Annuale" : "Mensile"}</span>
+            </div>
+            <h3 className="text-base font-bold text-white">Gestione e Disdetta in 1 Clic</h3>
+            <p className="text-xs text-zinc-400">
+              Puoi disdire il rinnovo automatico in qualsiasi momento o aggiornare il tuo metodo di pagamento direttamente nel portale Stripe.
             </p>
           </div>
-          {userSub !== "lifetime" && (
-            <button
-              onClick={handleManageBilling}
-              disabled={openingPortal}
-              className="shrink-0 flex items-center gap-1.5 font-bold text-purple-300 hover:text-purple-200 transition underline underline-offset-4"
-            >
-              <span>{openingPortal ? "Apertura..." : "Gestisci o Disdici (1 Clic)"}</span>
-              <ArrowRight className="h-3.5 w-3.5" />
-            </button>
-          )}
+          <button
+            onClick={handleManageBilling}
+            disabled={openingPortal}
+            className="shrink-0 flex items-center gap-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white px-5 py-2.5 text-xs font-bold transition shadow-lg shadow-purple-500/20 active:scale-95"
+          >
+            <span>{openingPortal ? "Apertura..." : "Gestisci o Disdici Abbonamento (1 Clic)"}</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </button>
         </div>
       )}
 
-      {/* Selettore Flessibile Fatturazione (Mensile vs Annuale) */}
-      <div className="flex items-center justify-center mb-10">
-        <div className="inline-flex items-center rounded-xl bg-zinc-900 border border-zinc-800 p-1 shadow-inner">
-          <button
-            type="button"
-            onClick={() => setBillingCycle("mensile")}
-            className={`px-4 py-2 text-xs font-bold rounded-lg transition-all ${
-              billingCycle === "mensile"
-                ? "bg-zinc-800 text-white shadow-sm"
-                : "text-zinc-400 hover:text-zinc-200"
-            }`}
-          >
-            Fatturazione Mensile
-          </button>
-          <button
-            type="button"
-            onClick={() => setBillingCycle("annuale")}
-            className={`flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-lg transition-all ${
-              billingCycle === "annuale"
-                ? "bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-950 shadow-md font-black"
-                : "text-zinc-400 hover:text-zinc-200"
-            }`}
-          >
-            <span>Fatturazione Annuale</span>
-            <span
-              className={`rounded-full px-1.5 py-0.2 text-[10px] uppercase font-bold tracking-tight ${
-                billingCycle === "annuale"
-                  ? "bg-zinc-950 text-amber-300"
-                  : "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+      {/* Grid Piani */}
+      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 items-stretch">
+        {PRICING_PLANS.map((plan) => {
+          const isPromo = plan.id === "lifetime-promo";
+          const isAnnuale = plan.id === "annuale";
+          const isCurrentPlan =
+            (plan.id === "free" && (!isUserSubscribed || !userSub || userSub === "nessuno")) ||
+            (isUserSubscribed && userSub === plan.id) ||
+            (isUserSubscribed && userSub === "lifetime" && (plan.id === "lifetime-promo" || plan.id === "lifetime-standard"));
+
+          return (
+            <div
+              key={plan.id}
+              className={`relative flex flex-col justify-between rounded-2xl p-6 transition-all ${
+                isPromo
+                  ? "border-2 border-amber-500 bg-gradient-to-b from-amber-950/40 via-zinc-900 to-zinc-950 shadow-2xl shadow-amber-500/10 scale-[1.02]"
+                  : isAnnuale
+                  ? "border-2 border-purple-500/60 bg-gradient-to-b from-purple-950/30 via-zinc-900 to-zinc-950"
+                  : "border border-zinc-800 bg-zinc-900/40 hover:border-zinc-700"
               }`}
             >
-              -17% (2 Mesi Gratis)
-            </span>
-          </button>
-        </div>
-      </div>
-
-      {/* 3 CARD PULITE, ARIOSE E PROPORZIONATE */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch mb-16">
-        {/* CARD 1: FREE */}
-        <div className="relative flex flex-col justify-between rounded-2xl border border-zinc-800/80 bg-zinc-900/30 p-6 sm:p-7 backdrop-blur-sm transition-all hover:border-zinc-700/80">
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-bold text-white">Free</h2>
-              {(!isUserSubscribed || userSub === "nessuno") && (
-                <span className="rounded-full bg-zinc-800 border border-zinc-700 text-zinc-300 text-[10px] font-semibold px-2 py-0.5">
-                  Attuale
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-zinc-400 mb-6 leading-relaxed">
-              Per curiosi e appassionati occasionali di cinema.
-            </p>
-
-            <div className="flex items-baseline gap-1 mb-6">
-              <span className="text-4xl font-black text-white">0,00 €</span>
-              <span className="text-xs text-zinc-500 font-medium">/ per sempre</span>
-            </div>
-
-            <div className="space-y-3 text-xs border-t border-zinc-800/80 pt-5 mb-8">
-              <div className="flex items-center gap-2.5 text-zinc-300">
-                <Check className="h-4 w-4 text-zinc-400 shrink-0" />
-                <span>15 ricerche al giorno</span>
-              </div>
-              <div className="flex items-center gap-2.5 text-zinc-300">
-                <Check className="h-4 w-4 text-zinc-400 shrink-0" />
-                <span>Lettura completa bloopers e cast TMDB</span>
-              </div>
-              <div className="flex items-center gap-2.5 text-zinc-300">
-                <Check className="h-4 w-4 text-zinc-400 shrink-0" />
-                <span>Invio segnalazione errori per moderazione</span>
-              </div>
-              <div className="flex items-center gap-2.5 text-zinc-500">
-                <Minus className="h-4 w-4 text-zinc-700 shrink-0" />
-                <span>Votazioni e classifiche escluse</span>
-              </div>
-            </div>
-          </div>
-
-          <button
-            disabled
-            className="w-full rounded-xl border border-zinc-800 bg-zinc-900/40 py-3 text-xs font-bold text-zinc-500 cursor-default"
-          >
-            {(!isUserSubscribed || userSub === "nessuno") ? "Piano Attuale" : "Incluso"}
-          </button>
-        </div>
-
-        {/* CARD 2: ABBONAMENTO PREMIUM (MENSILE O ANNUALE) */}
-        <div className="relative flex flex-col justify-between rounded-2xl border-2 border-amber-500/50 bg-gradient-to-b from-amber-500/10 via-zinc-900/60 to-zinc-950 p-6 sm:p-7 shadow-xl shadow-amber-500/5 transition-all scale-[1.01]">
-          {/* Badge Scelto */}
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-amber-500 px-3.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-zinc-950 shadow-md">
-            ⭐ Più Popolare
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-bold text-white">
-                {billingCycle === "annuale" ? "Premium Annuale" : "Premium Mensile"}
-              </h2>
-              {isUserSubscribed && userSub === billingCycle && (
-                <span className="rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5">
-                  Attivo
-                </span>
-              )}
-            </div>
-            <p className="text-xs text-zinc-300 mb-6 leading-relaxed">
-              {billingCycle === "annuale"
-                ? "Il piano più conveniente per i veri cacciatori della community."
-                : "Accesso totale a tutte le funzionalità della community."}
-            </p>
-
-            <div className="flex items-baseline gap-1.5 mb-6">
-              <span className="text-4xl font-black text-white">
-                {billingCycle === "annuale" ? "9,99 €" : "0,99 €"}
-              </span>
-              <span className="text-xs text-zinc-400 font-medium">
-                {billingCycle === "annuale" ? "/ all'anno" : "/ al mese"}
-              </span>
-              {billingCycle === "annuale" && (
-                <span className="text-[11px] font-bold text-emerald-400 ml-1">
-                  (0,83€/mese)
-                </span>
-              )}
-            </div>
-
-            <div className="space-y-3 text-xs border-t border-zinc-800/80 pt-5 mb-8">
-              <div className="flex items-center gap-2.5 text-zinc-200">
-                <Check className="h-4 w-4 text-amber-400 shrink-0" />
-                <span className="font-semibold">Ricerche e generazioni IA illimitate</span>
-              </div>
-              <div className="flex items-center gap-2.5 text-zinc-200">
-                <Check className="h-4 w-4 text-amber-400 shrink-0" />
-                <span>Votazione e contestazione bloopers</span>
-              </div>
-              <div className="flex items-center gap-2.5 text-zinc-200">
-                <Check className="h-4 w-4 text-amber-400 shrink-0" />
-                <span>Classifica, sblocco premi e badge ⭐ VIP</span>
-              </div>
-              {billingCycle === "annuale" && (
-                <div className="flex items-center gap-2.5 text-amber-300 font-bold">
-                  <Check className="h-4 w-4 text-amber-400 shrink-0" />
-                  <span>Punti Doppi (2x) + Supporto prioritario</span>
+              {/* Badge in evidenza */}
+              {isPromo && (
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-0.5 text-[10px] font-black uppercase tracking-wider text-zinc-950 shadow-md">
+                  Offerta di Lancio
                 </div>
               )}
-              <div className="flex items-center gap-2.5 text-zinc-400 text-[11px]">
-                <Check className="h-4 w-4 text-zinc-500 shrink-0" />
-                <span>Disdici in qualsiasi momento con 1 clic</span>
-              </div>
-            </div>
-          </div>
+              {isAnnuale && (
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-purple-500 px-3 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-md">
+                  Più Popolare
+                </div>
+              )}
 
-          {isUserSubscribed && (userSub === "mensile" || userSub === "annuale") ? (
-            <button
-              onClick={handleManageBilling}
-              disabled={openingPortal}
-              className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-purple-500/50 bg-purple-500/20 py-3 text-xs font-bold text-purple-200 hover:bg-purple-500/30 transition shadow-md"
-            >
-              <span>{openingPortal ? "Apertura..." : "Gestisci o Disdici (1 Clic)"}</span>
-            </button>
-          ) : (
-            <button
-              onClick={() => handleSelectPlan(billingCycle)}
-              disabled={loadingPlan === billingCycle}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 py-3 text-xs font-black text-zinc-950 shadow-lg shadow-orange-500/20 hover:brightness-110 active:scale-98 transition"
-            >
-              {loadingPlan === billingCycle ? (
-                "Reindirizzamento..."
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="text-base font-bold text-white">{plan.name}</h3>
+                  {isCurrentPlan && (
+                    <span className="rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5">
+                      Attivo
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-zinc-400 min-h-[36px] mb-4">{plan.description}</p>
+
+                <div className="flex items-baseline gap-1 mb-6">
+                  <span className="text-3xl font-black text-white">{plan.price}</span>
+                  <span className="text-xs text-zinc-400 font-medium">/ {plan.period}</span>
+                </div>
+
+                {/* Features List */}
+                <div className="space-y-2.5 mb-6 text-xs border-t border-zinc-800 pt-4">
+                  {plan.features.map((f, i) => (
+                    <div key={i} className="flex items-start gap-2">
+                      <Check
+                        className={`h-3.5 w-3.5 shrink-0 mt-0.5 ${
+                          f.included ? "text-amber-400" : "text-zinc-600"
+                        }`}
+                      />
+                      <span className={f.included ? "text-zinc-300" : "text-zinc-500 line-through"}>
+                        {f.name}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Action Button */}
+              {plan.id === "free" ? (
+                <button
+                  disabled
+                  className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 py-2.5 text-xs font-bold text-zinc-400 cursor-default"
+                >
+                  {isCurrentPlan ? "Piano Attuale" : "Incluso"}
+                </button>
+              ) : isCurrentPlan && (userSub === "mensile" || userSub === "annuale") ? (
+                <button
+                  onClick={handleManageBilling}
+                  disabled={openingPortal}
+                  className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-purple-500/50 bg-purple-500/20 py-2.5 text-xs font-bold text-purple-300 hover:bg-purple-500/30 transition shadow"
+                >
+                  <span>{openingPortal ? "Apertura..." : "Disdici / Gestisci"}</span>
+                </button>
               ) : (
-                <>
-                  <span>
-                    {billingCycle === "annuale"
-                      ? "Attiva Annuale (9,99€)"
-                      : "Attiva Mensile (0,99€)"}
-                  </span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </>
-              )}
-            </button>
-          )}
-        </div>
-
-        {/* CARD 3: LIFETIME PROMO (ACCESSO A VITA) */}
-        <div className="relative flex flex-col justify-between rounded-2xl border border-purple-500/40 bg-gradient-to-b from-purple-950/20 via-zinc-900/40 to-zinc-950 p-6 sm:p-7 backdrop-blur-sm transition-all hover:border-purple-500/60">
-          {/* Badge Offerta Lancio */}
-          <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 px-3.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-md">
-            👑 Offerta di Lancio -50%
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-lg font-bold text-white">Lifetime Pass</h2>
-              {isUserSubscribed && userSub === "lifetime" && (
-                <span className="rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5">
-                  Attivo
-                </span>
+                <button
+                  onClick={() => handleSelectPlan(plan.id)}
+                  disabled={loadingPlan === plan.id}
+                  className={`w-full flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-bold transition-all shadow-md ${
+                    isPromo
+                      ? "bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-950 hover:brightness-110 shadow-amber-500/20"
+                      : isAnnuale
+                      ? "bg-purple-600 text-white hover:bg-purple-500 shadow-purple-500/20"
+                      : "bg-zinc-800 text-white hover:bg-zinc-700"
+                  }`}
+                >
+                  {loadingPlan === plan.id ? (
+                    "Reindirizzamento..."
+                  ) : (
+                    <>
+                      <span>{isPromo ? "Acquista Promo" : `Scegli ${plan.name}`}</span>
+                      <ArrowRight className="h-3 w-3" />
+                    </>
+                  )}
+                </button>
               )}
             </div>
-            <p className="text-xs text-zinc-400 mb-6 leading-relaxed">
-              Un solo pagamento, nessun rinnovo. Accesso completo per sempre.
-            </p>
-
-            <div className="flex items-baseline gap-2 mb-6">
-              <span className="text-4xl font-black text-white">9,99 €</span>
-              <span className="text-base text-zinc-500 line-through">19,99 €</span>
-              <span className="text-xs text-zinc-400 font-medium">/ una tantum</span>
-            </div>
-
-            <div className="space-y-3 text-xs border-t border-zinc-800/80 pt-5 mb-8">
-              <div className="flex items-center gap-2.5 text-zinc-200">
-                <Check className="h-4 w-4 text-purple-400 shrink-0" />
-                <span className="font-semibold">Accesso Premium per sempre a vita</span>
-              </div>
-              <div className="flex items-center gap-2.5 text-zinc-200">
-                <Check className="h-4 w-4 text-purple-400 shrink-0" />
-                <span>Nessun costo mensile né rinnovo futuro</span>
-              </div>
-              <div className="flex items-center gap-2.5 text-zinc-200">
-                <Check className="h-4 w-4 text-purple-400 shrink-0" />
-                <span>Grado esclusivo 👑 Leggenda nella community</span>
-              </div>
-              <div className="flex items-center gap-2.5 text-purple-300 font-bold">
-                <Check className="h-4 w-4 text-purple-400 shrink-0" />
-                <span>Punti doppi (2x) + Supporto prioritario</span>
-              </div>
-              <div className="flex items-center gap-2.5 text-zinc-400 text-[11px]">
-                <Check className="h-4 w-4 text-zinc-500 shrink-0" />
-                <span>Include tutte le future funzionalità del sito</span>
-              </div>
-            </div>
-          </div>
-
-          {isUserSubscribed && userSub === "lifetime" ? (
-            <button
-              disabled
-              className="w-full rounded-xl border border-emerald-500/40 bg-emerald-500/10 py-3 text-xs font-bold text-emerald-400 cursor-default"
-            >
-              Piano a Vita Attivo
-            </button>
-          ) : (
-            <button
-              onClick={() => handleSelectPlan("lifetime-promo")}
-              disabled={loadingPlan === "lifetime-promo"}
-              className="w-full flex items-center justify-center gap-2 rounded-xl bg-zinc-800 hover:bg-purple-600 text-white py-3 text-xs font-bold transition shadow-md active:scale-98"
-            >
-              {loadingPlan === "lifetime-promo" ? (
-                "Reindirizzamento..."
-              ) : (
-                <>
-                  <span>Ottieni Pass a Vita (9,99€)</span>
-                  <ArrowRight className="h-3.5 w-3.5" />
-                </>
-              )}
-            </button>
-          )}
-        </div>
+          );
+        })}
       </div>
 
-      {/* TABELLA COMPARATIVA DELLE FUNZIONALITÀ (LAYOUT TRASPARENTE & ORDINATO) */}
-      <div className="rounded-3xl border border-zinc-800/80 bg-zinc-950/60 p-6 sm:p-10 mb-16 shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-zinc-800">
-          <div>
-            <h3 className="text-xl font-black text-white">Confronto Completo delle Funzionalità</h3>
-            <p className="text-xs text-zinc-400 mt-1">
-              Panoramica dettagliata delle caratteristiche incluse in ciascun piano.
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={() => setShowFullComparison((prev) => !prev)}
-            className="self-start sm:self-auto flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 transition"
-          >
-            <span>{showFullComparison ? "Comprimi Tabella" : "Espandi Tabella"}</span>
-            {showFullComparison ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </button>
-        </div>
-
-        {showFullComparison && (
-          <div className="overflow-x-auto pt-6">
-            <table className="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr className="border-b border-zinc-800 text-zinc-400">
-                  <th className="py-3 pr-4 font-bold uppercase tracking-wider text-[11px] w-2/5">
-                    Funzionalità
-                  </th>
-                  <th className="py-3 px-3 font-bold uppercase tracking-wider text-[11px] text-center w-1/5">
-                    Free
-                  </th>
-                  <th className="py-3 px-3 font-bold uppercase tracking-wider text-[11px] text-center w-1/5 text-amber-400">
-                    Premium ({billingCycle === "annuale" ? "Annuale" : "Mensile"})
-                  </th>
-                  <th className="py-3 pl-3 font-bold uppercase tracking-wider text-[11px] text-center w-1/5 text-purple-400">
-                    Lifetime Pass
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800/60">
-                {comparisonSections.map((sec, sIdx) => (
-                  <tr key={`sec-${sIdx}`} className="contents">
-                    <tr className="bg-zinc-900/40">
-                      <td colSpan={4} className="py-2.5 px-3 font-bold text-zinc-300 text-[11px] uppercase tracking-wider">
-                        {sec.category}
-                      </td>
-                    </tr>
-                    {sec.features.map((feat, fIdx) => (
-                      <tr key={`feat-${sIdx}-${fIdx}`} className="hover:bg-zinc-900/20 transition-colors">
-                        <td className="py-3 pr-4 text-zinc-300 font-medium">
-                          {feat.name}
-                        </td>
-                        <td className="py-3 px-3 text-center text-zinc-400">
-                          {typeof feat.free === "boolean" ? (
-                            feat.free ? (
-                              <Check className="h-4 w-4 text-emerald-400 mx-auto" />
-                            ) : (
-                              <Minus className="h-4 w-4 text-zinc-700 mx-auto" />
-                            )
-                          ) : (
-                            feat.free
-                          )}
-                        </td>
-                        <td className="py-3 px-3 text-center text-zinc-200 font-semibold bg-amber-500/[0.02]">
-                          {typeof feat.sub === "boolean" ? (
-                            feat.sub ? (
-                              <Check className="h-4 w-4 text-amber-400 mx-auto" />
-                            ) : (
-                              <Minus className="h-4 w-4 text-zinc-700 mx-auto" />
-                            )
-                          ) : (
-                            feat.sub
-                          )}
-                        </td>
-                        <td className="py-3 pl-3 text-center text-zinc-200 font-semibold bg-purple-500/[0.02]">
-                          {typeof feat.lifetime === "boolean" ? (
-                            feat.lifetime ? (
-                              <Check className="h-4 w-4 text-purple-400 mx-auto" />
-                            ) : (
-                              <Minus className="h-4 w-4 text-zinc-700 mx-auto" />
-                            )
-                          ) : (
-                            feat.lifetime
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-
-      {/* Box Sicurezza e Trasparenza Contrattuale */}
-      <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/20 p-6 space-y-3 text-xs text-zinc-400">
+      {/* Note Legali e Trasparenza Contrattuale */}
+      <div className="mt-12 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-3 text-xs text-zinc-400">
         <div className="flex items-center gap-2 text-zinc-200 font-bold">
           <ShieldCheck className="h-4 w-4 text-amber-400" />
-          <span>Sicurezza dei Pagamenti & Flessibilità Contrattuale</span>
+          <span>Garanzia di Trasparenza, Sicurezza e Condizioni di Recesso</span>
         </div>
         <p className="leading-relaxed">
-          <strong>Elaborazione Stripe Ufficiale:</strong> Tutte le transazioni sono crittografate end-to-end con standard bancari PCI-DSS Livello 1 da <strong>Stripe Inc.</strong>. Nessun dato di pagamento viene mai memorizzato sui nostri server.
+          <strong>Pagamenti Sicuri:</strong> Tutte le transazioni sono elaborate in modo sicuro con crittografia end-to-end da <strong>Stripe Inc.</strong> (conforme PCI-DSS Livello 1). Nessun dato di carta di credito viene memorizzato sui nostri server.
         </p>
         <p className="leading-relaxed">
-          <strong>Disdetta 1-Clic:</strong> L&apos;abbonamento può essere revocato in qualsiasi momento con un solo click dal portale clienti Stripe, mantenendo l&apos;accesso a tutte le funzionalità fino alla fine del periodo già saldato.
+          <strong>Informativa Recesso Servizi Digitali:</strong> Ai sensi dell&apos;art. 59, lett. o) del Codice del Consumo (D.Lgs. 206/2005), la fornitura di contenuti digitali ad esecuzione immediata non è soggetta al diritto di recesso una volta avviata l&apos;esecuzione del servizio. L&apos;abbonamento mensile e annuale può essere annullato in qualsiasi momento con un semplice click dal pannello Stripe, mantenendo l&apos;accesso fino alla scadenza del periodo già pagato.
         </p>
-        <div className="flex flex-wrap items-center gap-4 pt-2 text-[11px] text-zinc-500 border-t border-zinc-800">
-          <span>Consulta i documenti legali:</span>
-          <Link href="/termini" className="text-amber-400 hover:underline">Termini di Servizio</Link>
+        <div className="flex flex-wrap items-center gap-4 pt-2 text-[11px] text-zinc-400 border-t border-zinc-800/80">
+          <span>Consulta i documenti legali completi:</span>
+          <Link href="/termini" className="text-amber-400 hover:underline">Termini e Condizioni</Link>
           <span>•</span>
-          <Link href="/privacy" className="text-amber-400 hover:underline">Privacy Policy</Link>
+          <Link href="/privacy" className="text-amber-400 hover:underline">Informativa Privacy</Link>
           <span>•</span>
-          <Link href="/note-legali" className="text-amber-400 hover:underline">Note Legali</Link>
+          <Link href="/note-legali" className="text-amber-400 hover:underline">Note Legali & Dati Societari</Link>
         </div>
       </div>
 
-      {/* Auth Modal per visitatori non registrati */}
+      {/* Auth Modal per visitatori */}
       <AuthModal
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}

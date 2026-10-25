@@ -91,7 +91,7 @@
   },
   "git": {
     "branch": "main",
-    "status": "M src/app/pricing/page.tsx\n M src/components/Navbar.tsx",
+    "status": "M  src/app/pricing/page.tsx\n M src/components/Navbar.tsx",
     "issues": []
   },
   "typecheck": {
