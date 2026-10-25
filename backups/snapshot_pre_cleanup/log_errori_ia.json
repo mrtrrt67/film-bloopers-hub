@@ -1,0 +1,2369 @@
+[
+  {
+    "id": 1,
+    "created_at": "2026-09-28T08:37:56.006776+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 2,
+    "created_at": "2026-09-28T08:37:56.558812+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 3,
+    "created_at": "2026-09-28T08:38:00.267109+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 4,
+    "created_at": "2026-09-28T08:38:03.009585+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 5,
+    "created_at": "2026-09-28T08:38:03.325431+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.1-pro-preview",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 resource_exhausted. {'error': {'code': 429, 'message': 'you exceeded your current quota, please check your plan and billing details. for more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. to monitor your current usage, head to: https://ai.dev/rate-limit. \\n* quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\nplease retry in 56.871502717s.', 'status': 'resource_exhausted', 'details': [{'@type': 'type.googleapis.com/google.rpc.help', 'links': [{'description': 'learn more about gemini api quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.quotafailure', 'violations': [{'quotametric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaid': 'generatecontentinputtokenspermodelperminute-freetier', 'quotadimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotametric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaid': 'generaterequestsperminuteperprojectpermodel-freetier', 'quotadimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotametric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaid': 'generaterequestsperdayperprojectpermodel-freetier', 'quotadimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}}, {'quotametric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaid': 'generatecontentinputtokenspermodelperday-freetier', 'quotadimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}]}, {'@type': 'type.googleapis.com/google.rpc.retryinfo', 'retrydelay': '56s'}]}}"
+  },
+  {
+    "id": 6,
+    "created_at": "2026-09-28T08:38:05.68895+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-flash-latest",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 7,
+    "created_at": "2026-09-28T09:29:52.323926+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 8,
+    "created_at": "2026-09-28T09:29:55.712749+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 9,
+    "created_at": "2026-09-28T09:30:01.335587+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 10,
+    "created_at": "2026-09-28T09:30:03.663482+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 11,
+    "created_at": "2026-09-28T09:30:03.979154+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.1-pro-preview",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 resource_exhausted. {'error': {'code': 429, 'message': 'you exceeded your current quota, please check your plan and billing details. for more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. to monitor your current usage, head to: https://ai.dev/rate-limit. \\n* quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\nplease retry in 56.218616089s.', 'status': 'resource_exhausted', 'details': [{'@type': 'type.googleapis.com/google.rpc.help', 'links': [{'description': 'learn more about gemini api quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.quotafailure', 'violations': [{'quotametric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaid': 'generatecontentinputtokenspermodelperday-freetier', 'quotadimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotametric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaid': 'generaterequestsperdayperprojectpermodel-freetier', 'quotadimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotametric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaid': 'generaterequestsperminuteperprojectpermodel-freetier', 'quotadimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotametric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaid': 'generatecontentinputtokenspermodelperminute-freetier', 'quotadimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}]}, {'@type': 'type.googleapis.com/google.rpc.retryinfo', 'retrydelay': '56s'}]}}"
+  },
+  {
+    "id": 12,
+    "created_at": "2026-09-28T09:30:10.826229+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-flash-latest",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 13,
+    "created_at": "2026-09-28T09:30:52.511264+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 14,
+    "created_at": "2026-09-28T09:30:53.09881+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 15,
+    "created_at": "2026-09-28T09:30:58.447487+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 16,
+    "created_at": "2026-09-28T09:31:58.765747+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "server disconnected without sending a response."
+  },
+  {
+    "id": 17,
+    "created_at": "2026-09-28T09:31:59.09715+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.1-pro-preview",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 resource_exhausted. {'error': {'code': 429, 'message': 'you exceeded your current quota, please check your plan and billing details. for more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. to monitor your current usage, head to: https://ai.dev/rate-limit. \\n* quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\nplease retry in 1.068746779s.', 'status': 'resource_exhausted', 'details': [{'@type': 'type.googleapis.com/google.rpc.help', 'links': [{'description': 'learn more about gemini api quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.quotafailure', 'violations': [{'quotametric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaid': 'generatecontentinputtokenspermodelperday-freetier', 'quotadimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotametric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaid': 'generatecontentinputtokenspermodelperminute-freetier', 'quotadimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotametric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaid': 'generaterequestsperminuteperprojectpermodel-freetier', 'quotadimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}}, {'quotametric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaid': 'generaterequestsperdayperprojectpermodel-freetier', 'quotadimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}]}, {'@type': 'type.googleapis.com/google.rpc.retryinfo', 'retrydelay': '1s'}]}}"
+  },
+  {
+    "id": 18,
+    "created_at": "2026-09-28T09:32:05.120009+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-flash-latest",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 19,
+    "created_at": "2026-09-28T10:28:30.539706+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 20,
+    "created_at": "2026-09-28T10:28:31.363579+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 21,
+    "created_at": "2026-09-28T10:28:32.069424+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 22,
+    "created_at": "2026-09-28T10:28:38.170082+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 23,
+    "created_at": "2026-09-28T10:28:38.451689+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-3.1-pro-preview",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 resource_exhausted. {'error': {'code': 429, 'message': 'you exceeded your current quota, please check your plan and billing details. for more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. to monitor your current usage, head to: https://ai.dev/rate-limit. \\n* quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\nplease retry in 21.746061114s.', 'status': 'resource_exhausted', 'details': [{'@type': 'type.googleapis.com/google.rpc.help', 'links': [{'description': 'learn more about gemini api quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.quotafailure', 'violations': [{'quotametric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaid': 'generatecontentinputtokenspermodelperday-freetier', 'quotadimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}}, {'quotametric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaid': 'generaterequestsperdayperprojectpermodel-freetier', 'quotadimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotametric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaid': 'generaterequestsperminuteperprojectpermodel-freetier', 'quotadimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotametric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaid': 'generatecontentinputtokenspermodelperminute-freetier', 'quotadimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.retryinfo', 'retrydelay': '21s'}]}}"
+  },
+  {
+    "id": 24,
+    "created_at": "2026-09-28T10:28:42.11715+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "gemini-flash-latest",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 unavailable. {'error': {'code': 503, 'message': 'this model is currently experiencing high demand. spikes in demand are usually temporary. please try again later.', 'status': 'unavailable'}}"
+  },
+  {
+    "id": 25,
+    "created_at": "2026-09-28T10:33:53.824714+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "Eccezione Generale",
+    "operazione": "Generazione Bloopers",
+    "errore_dettaglio": "cannot access local variable 'e' where it is not associated with a value"
+  },
+  {
+    "id": 26,
+    "created_at": "2026-09-28T10:35:14.886536+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Bastardi senza gloria",
+    "modello": "Eccezione Generale",
+    "operazione": "Generazione Bloopers",
+    "errore_dettaglio": "cannot access local variable 'e' where it is not associated with a value"
+  },
+  {
+    "id": 27,
+    "created_at": "2026-09-28T13:20:55.249781+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "zombieland",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 28,
+    "created_at": "2026-09-28T13:21:00.014195+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "zombieland",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 29,
+    "created_at": "2026-09-28T13:21:02.590785+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "zombieland",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 30,
+    "created_at": "2026-09-28T13:21:06.683049+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "zombieland",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 31,
+    "created_at": "2026-09-28T13:21:10.877535+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "zombieland",
+    "modello": "gemini-3.1-pro-preview",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\nPlease retry in 49.301506085s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerDay-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '49s'}]}}"
+  },
+  {
+    "id": 32,
+    "created_at": "2026-09-28T13:21:13.99163+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "zombieland",
+    "modello": "gemini-flash-latest",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 33,
+    "created_at": "2026-09-28T17:15:05.009811+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Le iene",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 34,
+    "created_at": "2026-09-28T17:15:41.775847+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Le iene",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 35,
+    "created_at": "2026-09-28T17:15:48.673415+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Le iene",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 36,
+    "created_at": "2026-09-28T17:15:54.577863+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Le iene",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 37,
+    "created_at": "2026-09-28T17:16:00.094076+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Le iene",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 38,
+    "created_at": "2026-09-28T17:16:03.066618+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Le iene",
+    "modello": "gemini-3.1-pro-preview",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\nPlease retry in 57.086938972s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerDay-FreeTier', 'quotaDimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '57s'}]}}"
+  },
+  {
+    "id": 39,
+    "created_at": "2026-09-28T17:16:03.668618+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Le iene",
+    "modello": "gemini-flash-latest",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 40,
+    "created_at": "2026-09-28T17:54:50.137338+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Gladiatori di Roma",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Aggiornamento Dettagli",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 41,
+    "created_at": "2026-09-28T17:54:54.203144+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Gladiatori di Roma",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Aggiornamento Dettagli",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 42,
+    "created_at": "2026-09-28T17:54:57.271718+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Gladiatori di Roma",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Aggiornamento Dettagli",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 43,
+    "created_at": "2026-09-28T17:55:08.740252+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Gladiatori di Roma",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Aggiornamento Dettagli",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 44,
+    "created_at": "2026-09-28T17:55:11.193479+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Gladiatori di Roma",
+    "modello": "gemini-3.1-pro-preview",
+    "operazione": "Aggiornamento Dettagli",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\nPlease retry in 48.983946606s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerDay-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '48s'}]}}"
+  },
+  {
+    "id": 45,
+    "created_at": "2026-09-28T17:55:11.804711+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Gladiatori di Roma",
+    "modello": "gemini-flash-latest",
+    "operazione": "Aggiornamento Dettagli",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 46,
+    "created_at": "2026-09-28T18:33:27.227824+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Gladiatori di Roma",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Aggiornamento Dettagli",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 47,
+    "created_at": "2026-09-28T18:33:33.395705+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Gladiatori di Roma",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Aggiornamento Dettagli",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 48,
+    "created_at": "2026-09-28T18:33:44.560415+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Gladiatori di Roma",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Aggiornamento Dettagli",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 49,
+    "created_at": "2026-09-28T18:33:48.529924+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Gladiatori di Roma",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Aggiornamento Dettagli",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 50,
+    "created_at": "2026-09-28T18:33:50.971579+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Gladiatori di Roma",
+    "modello": "gemini-3.1-pro-preview",
+    "operazione": "Aggiornamento Dettagli",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\nPlease retry in 9.124417417s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerDay-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '9s'}]}}"
+  },
+  {
+    "id": 51,
+    "created_at": "2026-09-28T18:33:51.272572+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Gladiatori di Roma",
+    "modello": "gemini-flash-latest",
+    "operazione": "Aggiornamento Dettagli",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 8.928834381s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.8-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '8s'}]}}"
+  },
+  {
+    "id": 52,
+    "created_at": "2026-09-28T18:41:53.612816+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - La maledizione della prima luna",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 53,
+    "created_at": "2026-09-28T18:42:03.982069+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - La maledizione della prima luna",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 54,
+    "created_at": "2026-09-28T18:42:08.741428+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - La maledizione della prima luna",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 55,
+    "created_at": "2026-09-28T18:42:13.394536+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - La maledizione della prima luna",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 56,
+    "created_at": "2026-09-28T18:42:16.939402+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - La maledizione della prima luna",
+    "modello": "gemini-3.1-pro-preview",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\nPlease retry in 43.264407706s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerDay-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '43s'}]}}"
+  },
+  {
+    "id": 68,
+    "created_at": "2026-09-29T14:07:44.412877+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Blade Runner",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 57,
+    "created_at": "2026-09-28T18:42:17.262856+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - La maledizione della prima luna",
+    "modello": "gemini-flash-latest",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 42.896815466s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.8-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '42s'}]}}"
+  },
+  {
+    "id": 58,
+    "created_at": "2026-09-28T18:47:03.240009+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - La maledizione della prima luna",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 56.947921351s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.6-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '56s'}]}}"
+  },
+  {
+    "id": 59,
+    "created_at": "2026-09-28T18:47:04.885927+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - La maledizione della prima luna",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 60,
+    "created_at": "2026-09-28T18:47:13.827912+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - La maledizione della prima luna",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 46.458425354s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.8-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '46s'}]}}"
+  },
+  {
+    "id": 61,
+    "created_at": "2026-09-28T18:47:52.971239+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - La maledizione della prima luna",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 62,
+    "created_at": "2026-09-28T18:47:55.495193+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - La maledizione della prima luna",
+    "modello": "gemini-3.1-pro-preview",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\nPlease retry in 4.728735615s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerDay-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '4s'}]}}"
+  },
+  {
+    "id": 63,
+    "created_at": "2026-09-28T18:47:55.909175+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - La maledizione della prima luna",
+    "modello": "gemini-flash-latest",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 4.400371324s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-3.8-flash', 'location': 'global'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '4s'}]}}"
+  },
+  {
+    "id": 64,
+    "created_at": "2026-09-29T13:48:24.678874+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "blade runner",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 65,
+    "created_at": "2026-09-29T13:48:54.067309+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "blade runner",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 66,
+    "created_at": "2026-09-29T14:07:19.893351+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Blade Runner",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 67,
+    "created_at": "2026-09-29T14:07:22.672767+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Blade Runner",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 69,
+    "created_at": "2026-09-29T14:08:00.982276+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Blade Runner",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 70,
+    "created_at": "2026-09-29T14:08:07.339096+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Blade Runner",
+    "modello": "gemini-3.1-pro-preview",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\nPlease retry in 52.94947592s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerDay-FreeTier', 'quotaDimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '52s'}]}}"
+  },
+  {
+    "id": 71,
+    "created_at": "2026-09-29T14:08:15.640722+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Blade Runner",
+    "modello": "gemini-flash-latest",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 72,
+    "created_at": "2026-09-29T14:08:42.051971+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Blade Runner",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 73,
+    "created_at": "2026-09-29T14:08:52.187564+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Blade Runner",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 74,
+    "created_at": "2026-09-29T14:09:03.70374+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Blade Runner",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 75,
+    "created_at": "2026-09-29T14:09:16.975354+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Blade Runner",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 76,
+    "created_at": "2026-09-29T14:09:20.831649+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Blade Runner",
+    "modello": "gemini-3.1-pro-preview",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_input_token_count, limit: 0, model: gemini-3.1-pro\\nPlease retry in 39.328865908s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerMinutePerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-3.1-pro', 'location': 'global'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerMinute-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}, {'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_input_token_count', 'quotaId': 'GenerateContentInputTokensPerModelPerDay-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.1-pro'}}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '39s'}]}}"
+  },
+  {
+    "id": 77,
+    "created_at": "2026-09-29T14:09:22.914724+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Blade Runner",
+    "modello": "gemini-flash-latest",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 78,
+    "created_at": "2026-09-29T14:16:26.828219+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Blade Runner",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 79,
+    "created_at": "2026-09-29T14:21:01.670507+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "crocodile dundee",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 80,
+    "created_at": "2026-09-29T14:37:52.749097+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mr. Crocodile Dundee",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 81,
+    "created_at": "2026-09-29T14:38:14.070404+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mr. Crocodile Dundee",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 82,
+    "created_at": "2026-09-29T14:38:43.656985+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mr. Crocodile Dundee",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 83,
+    "created_at": "2026-09-29T14:45:08.185183+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mr. Crocodile Dundee",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 84,
+    "created_at": "2026-09-29T15:08:56.252612+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "master and commander",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 85,
+    "created_at": "2026-09-29T15:11:17.612736+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Master & Commander - Sfida ai confini del mare",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 86,
+    "created_at": "2026-09-29T15:12:58.059964+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Master & Commander - Sfida ai confini del mare",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "Server disconnected without sending a response."
+  },
+  {
+    "id": 87,
+    "created_at": "2026-09-29T15:12:59.79752+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Master & Commander - Sfida ai confini del mare",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 88,
+    "created_at": "2026-09-29T15:13:08.782295+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Master & Commander - Sfida ai confini del mare",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 89,
+    "created_at": "2026-09-29T16:26:30.686277+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Giù la testa",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 90,
+    "created_at": "2026-09-29T16:26:44.115365+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Giù la testa",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 91,
+    "created_at": "2026-09-29T16:30:41.443278+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "...altrimenti ci arrabbiamo!",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 18.746241807s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-3.6-flash', 'location': 'global'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '18s'}]}}"
+  },
+  {
+    "id": 92,
+    "created_at": "2026-09-29T16:32:42.248109+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "dune",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 17.993280635s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.6-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '17s'}]}}"
+  },
+  {
+    "id": 93,
+    "created_at": "2026-09-29T16:33:39.512771+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Dune - Parte due",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 20.652814012s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.6-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '20s'}]}}"
+  },
+  {
+    "id": 94,
+    "created_at": "2026-09-29T16:35:36.538862+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 23.621255905s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.6-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '23s'}]}}"
+  },
+  {
+    "id": 95,
+    "created_at": "2026-09-29T16:35:39.323435+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 96,
+    "created_at": "2026-09-29T16:35:53.359152+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 97,
+    "created_at": "2026-09-29T16:35:58.377289+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 98,
+    "created_at": "2026-09-29T16:37:01.314001+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-flash-latest",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 99,
+    "created_at": "2026-09-29T17:45:28.486078+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 100,
+    "created_at": "2026-09-29T17:45:45.100961+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 101,
+    "created_at": "2026-09-29T17:45:49.185383+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 102,
+    "created_at": "2026-09-29T17:45:54.021266+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 169,
+    "created_at": "2026-10-05T17:18:23.719786+00:00",
+    "utente": "ospite",
+    "film": "Il primo re",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 170,
+    "created_at": "2026-10-05T17:18:33.117619+00:00",
+    "utente": "ospite",
+    "film": "Il primo re",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 103,
+    "created_at": "2026-09-29T17:45:57.157609+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-flash-latest",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 3.03960444s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.8-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '3s'}]}}"
+  },
+  {
+    "id": 104,
+    "created_at": "2026-09-29T17:49:42.738347+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 17.43734394s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.6-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '17s'}]}}"
+  },
+  {
+    "id": 105,
+    "created_at": "2026-09-29T17:49:43.158262+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\\nPlease retry in 16.995324359s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-3.5-flash', 'location': 'global'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '16s'}]}}"
+  },
+  {
+    "id": 106,
+    "created_at": "2026-09-29T17:49:43.653666+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 16.567237378s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.8-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '16s'}]}}"
+  },
+  {
+    "id": 107,
+    "created_at": "2026-09-29T17:49:44.612575+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 108,
+    "created_at": "2026-09-29T17:49:47.255934+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-flash-latest",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 12.936663025s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.8-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '12s'}]}}"
+  },
+  {
+    "id": 109,
+    "created_at": "2026-09-29T17:50:02.910495+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 57.256583485s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-3.6-flash', 'location': 'global'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '57s'}]}}"
+  },
+  {
+    "id": 171,
+    "created_at": "2026-10-05T17:18:45.405008+00:00",
+    "utente": "ospite",
+    "film": "Il primo re",
+    "modello": "gemini-flash-latest",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 175,
+    "created_at": "2026-10-06T17:19:56.65373+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "The untouchables",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 110,
+    "created_at": "2026-09-29T17:50:03.220729+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\\nPlease retry in 56.966040416s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.5-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '56s'}]}}"
+  },
+  {
+    "id": 111,
+    "created_at": "2026-09-29T17:50:03.560054+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 56.615262168s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.8-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '56s'}]}}"
+  },
+  {
+    "id": 112,
+    "created_at": "2026-09-29T17:50:04.552484+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 113,
+    "created_at": "2026-09-29T17:50:14.749419+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Mickey 17",
+    "modello": "gemini-flash-latest",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 45.702214717s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.8-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '45s'}]}}"
+  },
+  {
+    "id": 114,
+    "created_at": "2026-09-29T18:40:42.260778+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "digger",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 17.815157276s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.6-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '17s'}]}}"
+  },
+  {
+    "id": 115,
+    "created_at": "2026-09-29T18:40:42.689884+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "digger",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.5-flash\\nPlease retry in 17.481387304s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.5-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '17s'}]}}"
+  },
+  {
+    "id": 116,
+    "created_at": "2026-09-29T18:40:43.093704+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "digger",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 17.055058031s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.8-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '17s'}]}}"
+  },
+  {
+    "id": 117,
+    "created_at": "2026-09-29T18:40:47.289322+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "digger",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 172,
+    "created_at": "2026-10-06T17:19:09.166465+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "The untouchables",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 118,
+    "created_at": "2026-09-29T18:40:50.644992+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "digger",
+    "modello": "gemini-flash-latest",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 9.644284966s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.8-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '9s'}]}}"
+  },
+  {
+    "id": 119,
+    "created_at": "2026-09-30T13:28:01.156355+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Poseidon",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 120,
+    "created_at": "2026-09-30T13:58:49.762619+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Poseidon",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 121,
+    "created_at": "2026-09-30T13:59:09.545122+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Poseidon",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 122,
+    "created_at": "2026-09-30T13:59:25.648053+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Poseidon",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 123,
+    "created_at": "2026-09-30T14:00:38.517398+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Poseidon",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 124,
+    "created_at": "2026-09-30T14:00:48.354317+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Poseidon",
+    "modello": "gemini-flash-latest",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 125,
+    "created_at": "2026-09-30T14:06:58.850964+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Poseidon",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 126,
+    "created_at": "2026-09-30T14:13:02.280266+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Ace Ventura - L'acchiappanimali",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Errori Inediti",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 127,
+    "created_at": "2026-09-30T14:13:10.249917+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Ace Ventura - L'acchiappanimali",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Errori Inediti",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 128,
+    "created_at": "2026-09-30T18:28:55.746063+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Toy Story 3",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 129,
+    "created_at": "2026-09-30T18:29:24.530633+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Toy Story 4",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 130,
+    "created_at": "2026-09-30T18:30:06.406972+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Toy Story 5",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 131,
+    "created_at": "2026-09-30T18:30:17.546241+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Toy Story 5",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 132,
+    "created_at": "2026-09-30T18:32:45.411389+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Toy Story - Il mondo dei giocattoli",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 133,
+    "created_at": "2026-09-30T18:51:41.85643+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Il cavaliere oscuro",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 18.268487417s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-3.6-flash', 'location': 'global'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '18s'}]}}"
+  },
+  {
+    "id": 134,
+    "created_at": "2026-09-30T18:52:42.370775+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Il cavaliere oscuro",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "Server disconnected without sending a response."
+  },
+  {
+    "id": 135,
+    "created_at": "2026-09-30T18:52:45.648188+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Il cavaliere oscuro",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 136,
+    "created_at": "2026-09-30T18:52:52.004633+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Il cavaliere oscuro",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 173,
+    "created_at": "2026-10-06T17:19:19.913869+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "The untouchables",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 137,
+    "created_at": "2026-09-30T18:57:39.015917+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "il cavaliere oscuro - il ritorno",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 21.058342924s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.6-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '21s'}]}}"
+  },
+  {
+    "id": 138,
+    "created_at": "2026-09-30T18:58:44.459945+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Batman Begins",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 15.67592876s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.6-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '15s'}]}}"
+  },
+  {
+    "id": 139,
+    "created_at": "2026-09-30T19:34:52.468323+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Lucy",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 7.654077121s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.6-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '7s'}]}}"
+  },
+  {
+    "id": 140,
+    "created_at": "2026-09-30T19:37:07.666376+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Lucy",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 52.42300982s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.6-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '52s'}]}}"
+  },
+  {
+    "id": 141,
+    "created_at": "2026-09-30T19:37:11.540301+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Lucy",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 142,
+    "created_at": "2026-09-30T19:37:27.32929+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Lucy",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 143,
+    "created_at": "2026-09-30T19:37:47.244953+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Lucy",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 144,
+    "created_at": "2026-09-30T19:38:23.02484+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Lucy",
+    "modello": "gemini-flash-latest",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 145,
+    "created_at": "2026-09-30T19:53:07.041107+00:00",
+    "utente": "mrtlsn07@gmail.com",
+    "film": "truman show",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 53.065031328s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.6-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '53s'}]}}"
+  },
+  {
+    "id": 174,
+    "created_at": "2026-10-06T17:19:24.881991+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "The untouchables",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 176,
+    "created_at": "2026-10-06T17:20:02.319281+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "The untouchables",
+    "modello": "gemini-flash-latest",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 146,
+    "created_at": "2026-09-30T19:53:30.261844+00:00",
+    "utente": "mrtlsn07@gmail.com",
+    "film": "The Truman Show",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 29.862899939s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.6-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '29s'}]}}"
+  },
+  {
+    "id": 147,
+    "created_at": "2026-10-03T07:34:16.623206+00:00",
+    "utente": "mrtrrt@libero.it",
+    "film": "digger",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 148,
+    "created_at": "2026-10-03T07:50:53.993218+00:00",
+    "utente": "mrtrrt@libero.it",
+    "film": "il momento di uccidere",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 149,
+    "created_at": "2026-10-03T13:16:32.849293+00:00",
+    "utente": "mrtrrt@libero.it",
+    "film": "Marty Supreme",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 150,
+    "created_at": "2026-10-03T13:23:16.402862+00:00",
+    "utente": "mrtrrt@libero.it",
+    "film": "non è un paese per vecchi",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 151,
+    "created_at": "2026-10-03T13:23:43.850516+00:00",
+    "utente": "mrtrrt@libero.it",
+    "film": "Non è un paese per vecchi",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 152,
+    "created_at": "2026-10-03T15:01:42.26798+00:00",
+    "utente": "ospite",
+    "film": "Il patriota",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 153,
+    "created_at": "2026-10-03T17:18:45.047581+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - La maledizione della prima luna",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 154,
+    "created_at": "2026-10-03T17:21:49.452391+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - La maledizione del forziere fantasma",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 6h38m10.722831817s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.6-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '23890s'}]}}"
+  },
+  {
+    "id": 155,
+    "created_at": "2026-10-03T17:22:00.744176+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - La maledizione del forziere fantasma",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 156,
+    "created_at": "2026-10-03T17:23:12.661241+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - La maledizione del forziere fantasma",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 157,
+    "created_at": "2026-10-03T17:23:31.854983+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - La maledizione del forziere fantasma",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 162,
+    "created_at": "2026-10-05T17:14:35.157377+00:00",
+    "utente": "ospite",
+    "film": "Il primo re",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 163,
+    "created_at": "2026-10-05T17:14:59.017072+00:00",
+    "utente": "ospite",
+    "film": "Il primo re",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 164,
+    "created_at": "2026-10-05T17:15:07.044608+00:00",
+    "utente": "ospite",
+    "film": "Il primo re",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 165,
+    "created_at": "2026-10-05T17:15:40.153037+00:00",
+    "utente": "ospite",
+    "film": "Il primo re",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 166,
+    "created_at": "2026-10-05T17:16:04.598535+00:00",
+    "utente": "ospite",
+    "film": "Il primo re",
+    "modello": "gemini-flash-latest",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 167,
+    "created_at": "2026-10-05T17:18:07.784203+00:00",
+    "utente": "ospite",
+    "film": "Il primo re",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 168,
+    "created_at": "2026-10-05T17:18:17.710696+00:00",
+    "utente": "ospite",
+    "film": "Il primo re",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 177,
+    "created_at": "2026-10-06T17:20:53.914235+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "gli intoccabili",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 178,
+    "created_at": "2026-10-06T17:21:35.432638+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "gli intoccabili",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 179,
+    "created_at": "2026-10-06T17:21:43.099438+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "gli intoccabili",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 180,
+    "created_at": "2026-10-06T17:22:06.563982+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "gli intoccabili",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 181,
+    "created_at": "2026-10-06T17:22:14.598376+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "gli intoccabili",
+    "modello": "gemini-flash-latest",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 182,
+    "created_at": "2026-10-06T18:42:12.582743+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "the untouchables",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 183,
+    "created_at": "2026-10-06T18:49:55.136076+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 184,
+    "created_at": "2026-10-06T18:50:18.780495+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 185,
+    "created_at": "2026-10-06T18:50:30.230647+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 186,
+    "created_at": "2026-10-06T18:53:33.750461+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 187,
+    "created_at": "2026-10-06T18:53:46.818457+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 188,
+    "created_at": "2026-10-06T18:53:49.361383+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 189,
+    "created_at": "2026-10-06T18:53:52.155695+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 190,
+    "created_at": "2026-10-06T18:53:55.454428+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-flash-latest",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 191,
+    "created_at": "2026-10-06T18:57:53.740856+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 192,
+    "created_at": "2026-10-06T18:57:58.952916+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 193,
+    "created_at": "2026-10-06T18:58:06.740769+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 194,
+    "created_at": "2026-10-06T18:58:44.238109+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 195,
+    "created_at": "2026-10-06T18:59:38.008703+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-flash-latest",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 196,
+    "created_at": "2026-10-06T19:00:38.037286+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 197,
+    "created_at": "2026-10-06T19:01:03.293135+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 198,
+    "created_at": "2026-10-06T19:01:16.792365+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 199,
+    "created_at": "2026-10-06T19:02:08.957547+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 200,
+    "created_at": "2026-10-06T19:02:51.853322+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-flash-latest",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 201,
+    "created_at": "2026-10-06T19:08:31.529831+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 202,
+    "created_at": "2026-10-06T19:08:46.300196+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 203,
+    "created_at": "2026-10-06T19:08:48.41042+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 4h51m11.753124274s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.8-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '17471s'}]}}"
+  },
+  {
+    "id": 205,
+    "created_at": "2026-10-06T19:08:58.303137+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-flash-latest",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 4h51m1.88920282s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.8-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '17461s'}]}}"
+  },
+  {
+    "id": 204,
+    "created_at": "2026-10-06T19:08:48.85469+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 206,
+    "created_at": "2026-10-06T19:12:43.343055+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "king kong",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 207,
+    "created_at": "2026-10-06T19:30:35.310568+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 208,
+    "created_at": "2026-10-06T19:30:44.411312+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 209,
+    "created_at": "2026-10-06T19:30:47.070108+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 4h29m13.417238991s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.8-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '16153s'}]}}"
+  },
+  {
+    "id": 210,
+    "created_at": "2026-10-06T19:30:49.281772+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 211,
+    "created_at": "2026-10-06T19:30:51.78417+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-flash-latest",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 4h29m8.349277762s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.8-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '16148s'}]}}"
+  },
+  {
+    "id": 212,
+    "created_at": "2026-10-06T19:34:00.143883+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 213,
+    "created_at": "2026-10-06T19:34:07.579901+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 214,
+    "created_at": "2026-10-06T19:34:10.566952+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 4h25m49.915937958s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.8-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '15949s'}]}}"
+  },
+  {
+    "id": 215,
+    "created_at": "2026-10-06T19:34:14.152806+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 216,
+    "created_at": "2026-10-06T19:34:16.793898+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-flash-latest",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 4h25m43.335291235s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.8-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '15943s'}]}}"
+  },
+  {
+    "id": 217,
+    "created_at": "2026-10-06T19:41:07.464364+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-1.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}"
+  },
+  {
+    "id": 263,
+    "created_at": "2026-10-24T21:24:36.996867+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Independence Day",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "{\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}"
+  },
+  {
+    "id": 218,
+    "created_at": "2026-10-06T19:41:07.77072+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-1.5-pro",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-pro is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}"
+  },
+  {
+    "id": 220,
+    "created_at": "2026-10-06T19:41:08.355604+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-flash-latest",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 4h18m51.789622577s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-3.8-flash', 'location': 'global'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '15531s'}]}}"
+  },
+  {
+    "id": 222,
+    "created_at": "2026-10-06T19:41:24.99967+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-1.5-pro",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-pro is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}"
+  },
+  {
+    "id": 224,
+    "created_at": "2026-10-06T19:41:25.823865+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-flash-latest",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.8-flash\\nPlease retry in 4h18m34.327175247s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.8-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '15514s'}]}}"
+  },
+  {
+    "id": 219,
+    "created_at": "2026-10-06T19:41:08.053215+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-1.5-flash-8b",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash-8b is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}"
+  },
+  {
+    "id": 221,
+    "created_at": "2026-10-06T19:41:24.675671+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-1.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}"
+  },
+  {
+    "id": 223,
+    "created_at": "2026-10-06T19:41:25.290775+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-1.5-flash-8b",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "404 NOT_FOUND. {'error': {'code': 404, 'message': 'models/gemini-1.5-flash-8b is not found for API version v1beta, or is not supported for generateContent. Call ModelService.ListModels to see the list of available models and their supported methods.', 'status': 'NOT_FOUND'}}"
+  },
+  {
+    "id": 225,
+    "created_at": "2026-10-06T19:44:08.981647+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "King Kong (King Kong)",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 4h15m51.147626328s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.6-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '15351s'}]}}"
+  },
+  {
+    "id": 226,
+    "created_at": "2026-10-09T15:04:17.806239+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Lo Hobbit",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 227,
+    "created_at": "2026-10-09T15:05:32.138739+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Lo Hobbit - Un viaggio inaspettato (The Hobbit: An Unexpected Journey)",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 228,
+    "created_at": "2026-10-09T15:06:06.840704+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "domani avvenne",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 229,
+    "created_at": "2026-10-09T15:06:48.890678+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Avvenne domani (It Happened Tomorrow)",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 230,
+    "created_at": "2026-10-09T15:11:07.611053+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "always",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 231,
+    "created_at": "2026-10-09T15:14:03.412731+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Rocky",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Aggiornamento Dettagli",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 232,
+    "created_at": "2026-10-09T15:26:05.32439+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Harry ti presento Sally",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 233,
+    "created_at": "2026-10-09T15:26:43.86071+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Harry, ti presento Sally... (When Harry Met Sally...)",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 234,
+    "created_at": "2026-10-09T15:46:31.081703+00:00",
+    "utente": "ospite",
+    "film": "il tempo delle mele",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 235,
+    "created_at": "2026-10-09T16:31:02.78624+00:00",
+    "utente": "ospite",
+    "film": "L'avvocato del diavolo (The Devil's Advocate)",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 236,
+    "created_at": "2026-10-09T18:13:39.416441+00:00",
+    "utente": "ospite",
+    "film": "mad max",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 237,
+    "created_at": "2026-10-09T18:14:03.453589+00:00",
+    "utente": "ospite",
+    "film": "mad max",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 238,
+    "created_at": "2026-10-09T18:17:27.036073+00:00",
+    "utente": "ospite",
+    "film": "Furiosa: A Mad Max Saga",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 239,
+    "created_at": "2026-10-09T18:18:30.61429+00:00",
+    "utente": "ospite",
+    "film": "Furiosa: A Mad Max Saga",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "Server disconnected without sending a response."
+  },
+  {
+    "id": 240,
+    "created_at": "2026-10-09T18:19:05.779414+00:00",
+    "utente": "ospite",
+    "film": "Furiosa: A Mad Max Saga",
+    "modello": "gemini-3.8-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 241,
+    "created_at": "2026-10-09T18:20:51.336457+00:00",
+    "utente": "ospite",
+    "film": "Furiosa: A Mad Max Saga",
+    "modello": "gemini-3.7-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 242,
+    "created_at": "2026-10-09T20:07:25.380748+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Pirati dei Caraibi - Ai confini del mondo",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Aggiornamento Dettagli",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 264,
+    "created_at": "2026-10-24T21:24:37.325542+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Independence Day",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "{\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}"
+  },
+  {
+    "id": 243,
+    "created_at": "2026-10-09T21:19:49.793575+00:00",
+    "utente": "mrrtgrg11@gmail.com",
+    "film": "Quel pomeriggio di un giorno da cani (Dog Day Afternoon)",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 2h40m10.254016844s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'location': 'global', 'model': 'gemini-3.6-flash'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '9610s'}]}}"
+  },
+  {
+    "id": 244,
+    "created_at": "2026-10-09T21:22:23.791278+00:00",
+    "utente": "mrrtgrg11@gmail.com",
+    "film": "soldato blu",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "429 RESOURCE_EXHAUSTED. {'error': {'code': 429, 'message': 'You exceeded your current quota, please check your plan and billing details. For more information on this error, head to: https://ai.google.dev/gemini-api/docs/rate-limits. To monitor your current usage, head to: https://ai.dev/rate-limit. \\n* Quota exceeded for metric: generativelanguage.googleapis.com/generate_content_free_tier_requests, limit: 20, model: gemini-3.6-flash\\nPlease retry in 2h37m36.25434173s.', 'status': 'RESOURCE_EXHAUSTED', 'details': [{'@type': 'type.googleapis.com/google.rpc.Help', 'links': [{'description': 'Learn more about Gemini API quotas', 'url': 'https://ai.google.dev/gemini-api/docs/rate-limits'}]}, {'@type': 'type.googleapis.com/google.rpc.QuotaFailure', 'violations': [{'quotaMetric': 'generativelanguage.googleapis.com/generate_content_free_tier_requests', 'quotaId': 'GenerateRequestsPerDayPerProjectPerModel-FreeTier', 'quotaDimensions': {'model': 'gemini-3.6-flash', 'location': 'global'}, 'quotaValue': '20'}]}, {'@type': 'type.googleapis.com/google.rpc.RetryInfo', 'retryDelay': '9456s'}]}}"
+  },
+  {
+    "id": 245,
+    "created_at": "2026-10-11T16:25:13.151629+00:00",
+    "utente": "ospite",
+    "film": "Hunger Games",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 246,
+    "created_at": "2026-10-11T16:28:00.079457+00:00",
+    "utente": "ospite",
+    "film": "Hunger Games (The Hunger Games)",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 247,
+    "created_at": "2026-10-11T16:57:35.746989+00:00",
+    "utente": "ospite",
+    "film": "I minions",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 248,
+    "created_at": "2026-10-17T15:11:36.97907+00:00",
+    "utente": "ospite",
+    "film": "le origini di moby dick",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 249,
+    "created_at": "2026-10-17T15:12:43.8757+00:00",
+    "utente": "ospite",
+    "film": "Heart of the Sea - Le origini di Moby Dick (In the Heart of the Sea)",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 250,
+    "created_at": "2026-10-17T15:13:07.265724+00:00",
+    "utente": "ospite",
+    "film": "Heart of the Sea - Le origini di Moby Dick (In the Heart of the Sea)",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 251,
+    "created_at": "2026-10-17T17:44:38.838849+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Prisoners",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 252,
+    "created_at": "2026-10-17T23:29:14.2078+00:00",
+    "utente": "ospite",
+    "film": "la leggenda del pianista sull'oceano",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 253,
+    "created_at": "2026-10-18T02:03:00.160382+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "quo vadis",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 254,
+    "created_at": "2026-10-18T02:03:14.221318+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "quo vadis",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 255,
+    "created_at": "2026-10-18T13:31:16.020453+00:00",
+    "utente": "ospite",
+    "film": "Spartacus",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 256,
+    "created_at": "2026-10-18T13:31:23.998755+00:00",
+    "utente": "ospite",
+    "film": "Spartacus",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 257,
+    "created_at": "2026-10-21T20:26:47.727173+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "l'ultimo samurai",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 258,
+    "created_at": "2026-10-21T20:26:55.298098+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "l'ultimo samurai",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Creazione Film DB",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 259,
+    "created_at": "2026-10-23T13:15:01.025062+00:00",
+    "utente": "ospite",
+    "film": "Home Sweet Home Alone - Mamma, ho perso l'aereo (Home Sweet Home Alone)",
+    "modello": "gemini-3.6-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "503 UNAVAILABLE. {'error': {'code': 503, 'message': 'This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.', 'status': 'UNAVAILABLE'}}"
+  },
+  {
+    "id": 260,
+    "created_at": "2026-10-24T17:47:24.451569+00:00",
+    "utente": "test@example.com",
+    "film": "Test Movie",
+    "modello": "test-model",
+    "operazione": "Test",
+    "errore_dettaglio": "Test error detail"
+  },
+  {
+    "id": 261,
+    "created_at": "2026-10-24T19:39:36.911777+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Lucy",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "{\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}"
+  },
+  {
+    "id": 262,
+    "created_at": "2026-10-24T21:24:18.566357+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Independence Day",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "{\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}"
+  },
+  {
+    "id": 265,
+    "created_at": "2026-10-25T12:32:22.295854+00:00",
+    "utente": "mrtrrt67@gmail.com",
+    "film": "Halloween - La notte delle streghe",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "{\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}"
+  },
+  {
+    "id": 266,
+    "created_at": "2026-10-25T12:35:48.251307+00:00",
+    "utente": "mrtrrt@libero.it",
+    "film": "It - Capitolo uno",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "{\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}"
+  },
+  {
+    "id": 267,
+    "created_at": "2026-10-25T14:10:24.040347+00:00",
+    "utente": "ospite",
+    "film": "E.T. l'extra-terrestre",
+    "modello": "gemini-3.5-flash",
+    "operazione": "Ricerca Bloopers",
+    "errore_dettaglio": "{\"error\":{\"code\":503,\"message\":\"This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.\",\"status\":\"UNAVAILABLE\"}}"
+  }
+]

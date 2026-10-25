@@ -1,0 +1,1610 @@
+[
+  {
+    "id": 4,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-16T10:21:59.802278",
+    "tempo_esecuzione": null
+  },
+  {
+    "id": 5,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-16T10:28:13.24731",
+    "tempo_esecuzione": 9.59
+  },
+  {
+    "id": 6,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-16T10:29:42.004601",
+    "tempo_esecuzione": 14.84
+  },
+  {
+    "id": 7,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-16T10:32:34.215911",
+    "tempo_esecuzione": 14.75
+  },
+  {
+    "id": 8,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-16T10:34:41.846531",
+    "tempo_esecuzione": 15.65
+  },
+  {
+    "id": 9,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-16T10:41:21.232774",
+    "tempo_esecuzione": 21.22
+  },
+  {
+    "id": 10,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-16T10:45:07.601632",
+    "tempo_esecuzione": 12.91
+  },
+  {
+    "id": 11,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-16T11:10:18.136792",
+    "tempo_esecuzione": 17.4
+  },
+  {
+    "id": 12,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-16T11:23:04.193711",
+    "tempo_esecuzione": 10.51
+  },
+  {
+    "id": 13,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-16T11:30:56.846154",
+    "tempo_esecuzione": 6.92
+  },
+  {
+    "id": 14,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-16T11:31:20.405896",
+    "tempo_esecuzione": 10.95
+  },
+  {
+    "id": 15,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-16T11:55:48.646818",
+    "tempo_esecuzione": 6.11
+  },
+  {
+    "id": 16,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-16T11:56:08.615519",
+    "tempo_esecuzione": 11.02
+  },
+  {
+    "id": 17,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-16T12:02:51.723586",
+    "tempo_esecuzione": 7.68
+  },
+  {
+    "id": 18,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-16T12:03:22.429333",
+    "tempo_esecuzione": 15.69
+  },
+  {
+    "id": 19,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-16T12:04:38.930268",
+    "tempo_esecuzione": 5.41
+  },
+  {
+    "id": 20,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-16T12:05:02.390115",
+    "tempo_esecuzione": 10.04
+  },
+  {
+    "id": 21,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-16T12:06:47.396588",
+    "tempo_esecuzione": 18.72
+  },
+  {
+    "id": 22,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-16T13:01:37.31925",
+    "tempo_esecuzione": 12.08
+  },
+  {
+    "id": 23,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-16T13:02:08.337061",
+    "tempo_esecuzione": 19.88
+  },
+  {
+    "id": 24,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-16T16:05:19.582587",
+    "tempo_esecuzione": 9.12
+  },
+  {
+    "id": 25,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-16T16:09:24.633638",
+    "tempo_esecuzione": 18.03
+  },
+  {
+    "id": 26,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-16T16:13:29.703932",
+    "tempo_esecuzione": 9.69
+  },
+  {
+    "id": 27,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-16T16:15:06.679099",
+    "tempo_esecuzione": 9.21
+  },
+  {
+    "id": 28,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-16T16:28:52.862371",
+    "tempo_esecuzione": 18.33
+  },
+  {
+    "id": 29,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-16T16:46:40.750495",
+    "tempo_esecuzione": 17.1
+  },
+  {
+    "id": 31,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-17T11:01:31.022623",
+    "tempo_esecuzione": 8.14
+  },
+  {
+    "id": 32,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-17T11:02:44.925985",
+    "tempo_esecuzione": 5.51
+  },
+  {
+    "id": 33,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-17T11:04:33.232244",
+    "tempo_esecuzione": 5.7
+  },
+  {
+    "id": 34,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-17T11:04:56.736603",
+    "tempo_esecuzione": 7.36
+  },
+  {
+    "id": 35,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-17T11:15:13.118215",
+    "tempo_esecuzione": 8.39
+  },
+  {
+    "id": 36,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-17T11:16:35.66059",
+    "tempo_esecuzione": 11.71
+  },
+  {
+    "id": 37,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-17T12:47:38.4817",
+    "tempo_esecuzione": 5.19
+  },
+  {
+    "id": 38,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-17T12:48:03.959277",
+    "tempo_esecuzione": 15.05
+  },
+  {
+    "id": 39,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-17T13:02:53.307497",
+    "tempo_esecuzione": 4.6
+  },
+  {
+    "id": 40,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-17T13:04:39.793629",
+    "tempo_esecuzione": 13.54
+  },
+  {
+    "id": 41,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-17T13:06:24.007445",
+    "tempo_esecuzione": 8.06
+  },
+  {
+    "id": 42,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-17T13:06:47.354184",
+    "tempo_esecuzione": 3.79
+  },
+  {
+    "id": 43,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-17T16:00:28.378312",
+    "tempo_esecuzione": 4.64
+  },
+  {
+    "id": 44,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-17T16:00:59.87869",
+    "tempo_esecuzione": 13.43
+  },
+  {
+    "id": 45,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-17T16:01:46.641994",
+    "tempo_esecuzione": 6.85
+  },
+  {
+    "id": 46,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-17T16:06:11.573737",
+    "tempo_esecuzione": 8.5
+  },
+  {
+    "id": 47,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-17T16:07:04.907277",
+    "tempo_esecuzione": 10.75
+  },
+  {
+    "id": 48,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-17T16:13:06.272379",
+    "tempo_esecuzione": 15.38
+  },
+  {
+    "id": 49,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-17T17:53:00.875812",
+    "tempo_esecuzione": 4.73
+  },
+  {
+    "id": 50,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-17T17:53:41.653256",
+    "tempo_esecuzione": 19.26
+  },
+  {
+    "id": 51,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-17T18:00:05.527235",
+    "tempo_esecuzione": 21.31
+  },
+  {
+    "id": 52,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-17T18:07:46.119352",
+    "tempo_esecuzione": 21.09
+  },
+  {
+    "id": 53,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-17T18:13:20.101578",
+    "tempo_esecuzione": 11.43
+  },
+  {
+    "id": 54,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-17T18:14:01.235406",
+    "tempo_esecuzione": 18.05
+  },
+  {
+    "id": 55,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-17T18:14:36.113052",
+    "tempo_esecuzione": 16.9
+  },
+  {
+    "id": 56,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-17T20:55:22.628058",
+    "tempo_esecuzione": 13.86
+  },
+  {
+    "id": 57,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-17T20:55:55.433127",
+    "tempo_esecuzione": 16.49
+  },
+  {
+    "id": 58,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-18T06:39:52.270255",
+    "tempo_esecuzione": 4.74
+  },
+  {
+    "id": 59,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-18T06:40:36.545136",
+    "tempo_esecuzione": 18.77
+  },
+  {
+    "id": 60,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-18T10:34:27.196556",
+    "tempo_esecuzione": 9.24
+  },
+  {
+    "id": 61,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-18T10:34:54.133829",
+    "tempo_esecuzione": 5.96
+  },
+  {
+    "id": 62,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-18T10:36:10.260387",
+    "tempo_esecuzione": 16.09
+  },
+  {
+    "id": 63,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-18T13:15:40.281639",
+    "tempo_esecuzione": 14.34
+  },
+  {
+    "id": 64,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-18T13:36:16.346792",
+    "tempo_esecuzione": 11.78
+  },
+  {
+    "id": 65,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-18T13:40:00.012516",
+    "tempo_esecuzione": 15.87
+  },
+  {
+    "id": 66,
+    "modello": "gemini-flash-latest",
+    "data_chiamata": "2026-09-18T18:40:18.6292",
+    "tempo_esecuzione": 5.43
+  },
+  {
+    "id": 67,
+    "modello": "gemini-flash-latest",
+    "data_chiamata": "2026-09-18T18:43:22.671286",
+    "tempo_esecuzione": 13.82
+  },
+  {
+    "id": 68,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-18T18:45:36.993184",
+    "tempo_esecuzione": 17.1
+  },
+  {
+    "id": 69,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-18T18:50:53.90861",
+    "tempo_esecuzione": 6.56
+  },
+  {
+    "id": 70,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-18T18:52:11.945183",
+    "tempo_esecuzione": 17.11
+  },
+  {
+    "id": 71,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-18T18:57:49.15847",
+    "tempo_esecuzione": 10.75
+  },
+  {
+    "id": 72,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-19T18:03:10.682424",
+    "tempo_esecuzione": 19.47
+  },
+  {
+    "id": 73,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-19T18:05:07.087433",
+    "tempo_esecuzione": 54.37
+  },
+  {
+    "id": 74,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-19T18:05:53.239765",
+    "tempo_esecuzione": 7.05
+  },
+  {
+    "id": 75,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-19T18:06:28.630498",
+    "tempo_esecuzione": 12.28
+  },
+  {
+    "id": 76,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-19T18:07:01.759157",
+    "tempo_esecuzione": 5.78
+  },
+  {
+    "id": 77,
+    "modello": "gemini-3.8-flash",
+    "data_chiamata": "2026-09-19T18:08:28.923704",
+    "tempo_esecuzione": 7.15
+  },
+  {
+    "id": 78,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-19T18:13:53.436834",
+    "tempo_esecuzione": 6.99
+  },
+  {
+    "id": 79,
+    "modello": "gemini-flash-latest",
+    "data_chiamata": "2026-09-19T18:14:45.522528",
+    "tempo_esecuzione": 3.69
+  },
+  {
+    "id": 80,
+    "modello": "gemini-flash-latest",
+    "data_chiamata": "2026-09-19T18:15:16.890594",
+    "tempo_esecuzione": 4.62
+  },
+  {
+    "id": 81,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-19T18:15:41.928486",
+    "tempo_esecuzione": 6.16
+  },
+  {
+    "id": 82,
+    "modello": "gemini-3.8-flash",
+    "data_chiamata": "2026-09-19T18:16:28.264239",
+    "tempo_esecuzione": 2.46
+  },
+  {
+    "id": 83,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-19T19:34:51.974062",
+    "tempo_esecuzione": 4.51
+  },
+  {
+    "id": 84,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-19T19:35:28.321783",
+    "tempo_esecuzione": 4.2
+  },
+  {
+    "id": 85,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-19T19:35:59.756561",
+    "tempo_esecuzione": 8.89
+  },
+  {
+    "id": 86,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-19T19:38:51.592924",
+    "tempo_esecuzione": 5.21
+  },
+  {
+    "id": 87,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-19T19:39:34.534862",
+    "tempo_esecuzione": 4.81
+  },
+  {
+    "id": 88,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-19T19:40:30.914607",
+    "tempo_esecuzione": 8.26
+  },
+  {
+    "id": 89,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-19T19:43:00.859304",
+    "tempo_esecuzione": 6.14
+  },
+  {
+    "id": 90,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-19T19:44:18.690086",
+    "tempo_esecuzione": 15.04
+  },
+  {
+    "id": 91,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-19T19:47:16.536051",
+    "tempo_esecuzione": 3.35
+  },
+  {
+    "id": 92,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-19T19:47:51.817291",
+    "tempo_esecuzione": 19.01
+  },
+  {
+    "id": 93,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-19T20:12:41.291001",
+    "tempo_esecuzione": 11.48
+  },
+  {
+    "id": 94,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-19T20:13:17.764981",
+    "tempo_esecuzione": 12.11
+  },
+  {
+    "id": 95,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-19T20:14:06.500171",
+    "tempo_esecuzione": 12.92
+  },
+  {
+    "id": 96,
+    "modello": "gemini-3.7-flash",
+    "data_chiamata": "2026-09-19T20:15:33.841648",
+    "tempo_esecuzione": 4.61
+  },
+  {
+    "id": 97,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-19T20:16:38.017753",
+    "tempo_esecuzione": 13.41
+  },
+  {
+    "id": 98,
+    "modello": "gemini-3.8-flash",
+    "data_chiamata": "2026-09-19T20:29:23.592597",
+    "tempo_esecuzione": 4.81
+  },
+  {
+    "id": 99,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-19T20:35:12.789819",
+    "tempo_esecuzione": 14.88
+  },
+  {
+    "id": 100,
+    "modello": "gemini-3.7-flash",
+    "data_chiamata": "2026-09-19T21:04:00.059982",
+    "tempo_esecuzione": 3.72
+  },
+  {
+    "id": 101,
+    "modello": "gemini-3.7-flash",
+    "data_chiamata": "2026-09-19T21:04:30.737529",
+    "tempo_esecuzione": 3.28
+  },
+  {
+    "id": 102,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-19T22:19:08.282722",
+    "tempo_esecuzione": 3.99
+  },
+  {
+    "id": 103,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-19T22:20:24.608804",
+    "tempo_esecuzione": 8.52
+  },
+  {
+    "id": 104,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-20T08:34:47.477889",
+    "tempo_esecuzione": 12.41
+  },
+  {
+    "id": 105,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-20T08:45:01.128325",
+    "tempo_esecuzione": 13.62
+  },
+  {
+    "id": 106,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-20T08:47:38.669662",
+    "tempo_esecuzione": 11.78
+  },
+  {
+    "id": 107,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-20T08:55:59.398454",
+    "tempo_esecuzione": 14.34
+  },
+  {
+    "id": 108,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-20T09:04:48.46151",
+    "tempo_esecuzione": 5.39
+  },
+  {
+    "id": 109,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-20T09:09:28.440326",
+    "tempo_esecuzione": 15.16
+  },
+  {
+    "id": 110,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-20T09:23:19.334213",
+    "tempo_esecuzione": 28.07
+  },
+  {
+    "id": 111,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-20T09:24:55.914809",
+    "tempo_esecuzione": 31.65
+  },
+  {
+    "id": 112,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-20T09:26:01.813792",
+    "tempo_esecuzione": 10.9
+  },
+  {
+    "id": 113,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-20T09:29:21.791317",
+    "tempo_esecuzione": 10.65
+  },
+  {
+    "id": 114,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-20T09:32:38.890935",
+    "tempo_esecuzione": 17.1
+  },
+  {
+    "id": 115,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-20T09:37:19.696497",
+    "tempo_esecuzione": 13.52
+  },
+  {
+    "id": 116,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-20T10:18:20.13949",
+    "tempo_esecuzione": 39.33
+  },
+  {
+    "id": 117,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-20T11:13:30.359678",
+    "tempo_esecuzione": 34.83
+  },
+  {
+    "id": 118,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-20T11:40:03.282965",
+    "tempo_esecuzione": 23.78
+  },
+  {
+    "id": 119,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-20T11:54:17.440265",
+    "tempo_esecuzione": 21.14
+  },
+  {
+    "id": 120,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-20T12:02:00.061985",
+    "tempo_esecuzione": 28.47
+  },
+  {
+    "id": 121,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-20T12:25:16.833296",
+    "tempo_esecuzione": 30.61
+  },
+  {
+    "id": 122,
+    "modello": "gemini-3.7-flash",
+    "data_chiamata": "2026-09-20T12:40:48.137802",
+    "tempo_esecuzione": 9.93
+  },
+  {
+    "id": 123,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-20T12:51:50.783453",
+    "tempo_esecuzione": 28.88
+  },
+  {
+    "id": 124,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-20T13:01:26.480462",
+    "tempo_esecuzione": 26.24
+  },
+  {
+    "id": 125,
+    "modello": "gemini-flash-latest",
+    "data_chiamata": "2026-09-21T17:52:21.313823",
+    "tempo_esecuzione": 15.06
+  },
+  {
+    "id": 126,
+    "modello": "gemini-3.8-flash",
+    "data_chiamata": "2026-09-21T17:52:34.205848",
+    "tempo_esecuzione": 4.41
+  },
+  {
+    "id": 127,
+    "modello": "gemini-3.8-flash",
+    "data_chiamata": "2026-09-21T18:25:12.607926",
+    "tempo_esecuzione": 37.81
+  },
+  {
+    "id": 128,
+    "modello": "gemini-flash-latest",
+    "data_chiamata": "2026-09-21T20:00:51.490684",
+    "tempo_esecuzione": 4.28
+  },
+  {
+    "id": 129,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-21T20:04:07.635793",
+    "tempo_esecuzione": 19.46
+  },
+  {
+    "id": 130,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-21T20:09:18.165377",
+    "tempo_esecuzione": 8.38
+  },
+  {
+    "id": 131,
+    "modello": "gemini-flash-latest",
+    "data_chiamata": "2026-09-21T20:10:26.597612",
+    "tempo_esecuzione": 3.08
+  },
+  {
+    "id": 132,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-21T20:11:33.746611",
+    "tempo_esecuzione": 44.25
+  },
+  {
+    "id": 133,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-21T20:19:54.750479",
+    "tempo_esecuzione": 3.82
+  },
+  {
+    "id": 134,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-21T20:20:37.116392",
+    "tempo_esecuzione": 14.26
+  },
+  {
+    "id": 135,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-21T20:27:04.410081",
+    "tempo_esecuzione": 10.57
+  },
+  {
+    "id": 136,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-21T20:36:15.469248",
+    "tempo_esecuzione": 17.72
+  },
+  {
+    "id": 137,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-21T20:46:10.228682",
+    "tempo_esecuzione": 32.32
+  },
+  {
+    "id": 138,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-22T20:36:28.323749",
+    "tempo_esecuzione": 28.33
+  },
+  {
+    "id": 139,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-22T21:12:39.628698",
+    "tempo_esecuzione": 17.21
+  },
+  {
+    "id": 140,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-25T19:09:14.021777",
+    "tempo_esecuzione": 11.58
+  },
+  {
+    "id": 141,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-25T19:11:13.525519",
+    "tempo_esecuzione": 5.64
+  },
+  {
+    "id": 142,
+    "modello": "gemini-3.8-flash",
+    "data_chiamata": "2026-09-25T19:11:52.969056",
+    "tempo_esecuzione": 9.83
+  },
+  {
+    "id": 143,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-25T19:12:24.419856",
+    "tempo_esecuzione": 5.55
+  },
+  {
+    "id": 144,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-25T19:12:49.275836",
+    "tempo_esecuzione": 5.92
+  },
+  {
+    "id": 145,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-25T19:13:32.90354",
+    "tempo_esecuzione": 5.74
+  },
+  {
+    "id": 146,
+    "modello": "gemini-3.8-flash",
+    "data_chiamata": "2026-09-25T19:13:56.469068",
+    "tempo_esecuzione": 4.51
+  },
+  {
+    "id": 147,
+    "modello": "gemini-3.8-flash",
+    "data_chiamata": "2026-09-25T19:14:38.65805",
+    "tempo_esecuzione": 13.03
+  },
+  {
+    "id": 148,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-25T19:15:32.729789",
+    "tempo_esecuzione": 6.06
+  },
+  {
+    "id": 149,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-25T19:15:59.95965",
+    "tempo_esecuzione": 5.04
+  },
+  {
+    "id": 150,
+    "modello": "gemini-flash-latest",
+    "data_chiamata": "2026-09-25T19:24:22.355624",
+    "tempo_esecuzione": 9.54
+  },
+  {
+    "id": 151,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-25T20:39:36.948322",
+    "tempo_esecuzione": 4.62
+  },
+  {
+    "id": 152,
+    "modello": "gemini-3.8-flash",
+    "data_chiamata": "2026-09-25T20:39:51.975492",
+    "tempo_esecuzione": 12.91
+  },
+  {
+    "id": 153,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-26T07:51:25.299226",
+    "tempo_esecuzione": 16.91
+  },
+  {
+    "id": 154,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-26T14:35:51.306103",
+    "tempo_esecuzione": 57.37
+  },
+  {
+    "id": 155,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-26T14:36:06.854969",
+    "tempo_esecuzione": 14.64
+  },
+  {
+    "id": 156,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-26T15:21:16.885095",
+    "tempo_esecuzione": 4.3
+  },
+  {
+    "id": 157,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-26T15:22:10.960817",
+    "tempo_esecuzione": 51.64
+  },
+  {
+    "id": 158,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-27T17:50:02.589012",
+    "tempo_esecuzione": 4.8
+  },
+  {
+    "id": 159,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-27T17:50:13.115307",
+    "tempo_esecuzione": 10.03
+  },
+  {
+    "id": 160,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-27T19:10:54.764342",
+    "tempo_esecuzione": 4.09
+  },
+  {
+    "id": 161,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-27T19:21:15.69286",
+    "tempo_esecuzione": 4.49
+  },
+  {
+    "id": 162,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-27T19:48:39.95964",
+    "tempo_esecuzione": 4.07
+  },
+  {
+    "id": 163,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-27T19:53:01.614099",
+    "tempo_esecuzione": 5.12
+  },
+  {
+    "id": 164,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-27T20:28:00.809218",
+    "tempo_esecuzione": 4.56
+  },
+  {
+    "id": 165,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-27T20:29:10.208456",
+    "tempo_esecuzione": 4.19
+  },
+  {
+    "id": 166,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-27T20:43:10.649582",
+    "tempo_esecuzione": 15.04
+  },
+  {
+    "id": 167,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-28T06:16:30.175684",
+    "tempo_esecuzione": 10.04
+  },
+  {
+    "id": 168,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-28T06:24:16.438938",
+    "tempo_esecuzione": 20.82
+  },
+  {
+    "id": 169,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-28T08:43:56.686717",
+    "tempo_esecuzione": 4.73
+  },
+  {
+    "id": 170,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-28T10:37:29.587834",
+    "tempo_esecuzione": 16.37
+  },
+  {
+    "id": 171,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-28T17:20:35.161747",
+    "tempo_esecuzione": 15.56
+  },
+  {
+    "id": 172,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-29T14:16:40.925176",
+    "tempo_esecuzione": 11.95
+  },
+  {
+    "id": 173,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-29T14:21:36.215384",
+    "tempo_esecuzione": 32.44
+  },
+  {
+    "id": 174,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-29T14:45:36.055333",
+    "tempo_esecuzione": 25.8
+  },
+  {
+    "id": 175,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-29T15:09:03.165128",
+    "tempo_esecuzione": 4.42
+  },
+  {
+    "id": 176,
+    "modello": "gemini-flash-latest",
+    "data_chiamata": "2026-09-29T15:13:52.227674",
+    "tempo_esecuzione": 38.83
+  },
+  {
+    "id": 177,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-29T16:26:57.15448",
+    "tempo_esecuzione": 11.2
+  },
+  {
+    "id": 178,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-29T16:30:07.341735",
+    "tempo_esecuzione": 6.54
+  },
+  {
+    "id": 179,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-29T16:30:54.196428",
+    "tempo_esecuzione": 12.38
+  },
+  {
+    "id": 180,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-29T16:32:47.496271",
+    "tempo_esecuzione": 5.02
+  },
+  {
+    "id": 181,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-29T16:33:43.708092",
+    "tempo_esecuzione": 4.1
+  },
+  {
+    "id": 182,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-30T13:28:17.852885",
+    "tempo_esecuzione": 14.13
+  },
+  {
+    "id": 183,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-30T14:07:31.519744",
+    "tempo_esecuzione": 25.19
+  },
+  {
+    "id": 184,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-30T14:12:31.674724",
+    "tempo_esecuzione": 4.54
+  },
+  {
+    "id": 185,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-30T14:13:27.271577",
+    "tempo_esecuzione": 15.23
+  },
+  {
+    "id": 186,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-30T18:28:22.271345",
+    "tempo_esecuzione": 5.65
+  },
+  {
+    "id": 187,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-30T18:28:42.515708",
+    "tempo_esecuzione": 4.3
+  },
+  {
+    "id": 188,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-30T18:29:06.081994",
+    "tempo_esecuzione": 7.15
+  },
+  {
+    "id": 189,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-30T18:29:34.227369",
+    "tempo_esecuzione": 5.33
+  },
+  {
+    "id": 190,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-30T18:29:50.615443",
+    "tempo_esecuzione": 4.6
+  },
+  {
+    "id": 191,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-30T18:30:32.501476",
+    "tempo_esecuzione": 13.15
+  },
+  {
+    "id": 192,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-30T18:32:59.170359",
+    "tempo_esecuzione": 12.05
+  },
+  {
+    "id": 193,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-30T18:34:58.343863",
+    "tempo_esecuzione": 6.12
+  },
+  {
+    "id": 194,
+    "modello": "gemini-flash-latest",
+    "data_chiamata": "2026-09-30T18:52:58.940676",
+    "tempo_esecuzione": 3.99
+  },
+  {
+    "id": 195,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-09-30T18:55:13.408536",
+    "tempo_esecuzione": 5.38
+  },
+  {
+    "id": 196,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-30T18:57:43.660663",
+    "tempo_esecuzione": 4.44
+  },
+  {
+    "id": 197,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-30T18:58:54.935476",
+    "tempo_esecuzione": 10.27
+  },
+  {
+    "id": 198,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-30T19:35:00.893234",
+    "tempo_esecuzione": 8.19
+  },
+  {
+    "id": 199,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-30T19:53:15.247359",
+    "tempo_esecuzione": 6.27
+  },
+  {
+    "id": 200,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-09-30T19:53:40.920471",
+    "tempo_esecuzione": 10.38
+  },
+  {
+    "id": 201,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-03T07:26:57.726834",
+    "tempo_esecuzione": 5.95
+  },
+  {
+    "id": 202,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-03T07:28:11.662518",
+    "tempo_esecuzione": 4.61
+  },
+  {
+    "id": 203,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-03T07:34:31.297926",
+    "tempo_esecuzione": 8.4
+  },
+  {
+    "id": 204,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-03T07:38:16.844444",
+    "tempo_esecuzione": 11.19
+  },
+  {
+    "id": 205,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-03T07:41:01.539514",
+    "tempo_esecuzione": 9.1
+  },
+  {
+    "id": 206,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-03T07:51:04.224668",
+    "tempo_esecuzione": 4.16
+  },
+  {
+    "id": 207,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-03T07:51:46.446191",
+    "tempo_esecuzione": 11.78
+  },
+  {
+    "id": 208,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-03T13:16:07.702398",
+    "tempo_esecuzione": 5.33
+  },
+  {
+    "id": 209,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-03T13:16:45.036454",
+    "tempo_esecuzione": 10.39
+  },
+  {
+    "id": 210,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-03T13:23:22.979411",
+    "tempo_esecuzione": 4.85
+  },
+  {
+    "id": 211,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-03T13:23:56.146957",
+    "tempo_esecuzione": 9.2
+  },
+  {
+    "id": 212,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-03T13:27:20.839694",
+    "tempo_esecuzione": 4.51
+  },
+  {
+    "id": 213,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-03T13:27:46.874713",
+    "tempo_esecuzione": 12.7
+  },
+  {
+    "id": 214,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-03T15:01:57.364697",
+    "tempo_esecuzione": 11.88
+  },
+  {
+    "id": 215,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-03T15:02:29.736591",
+    "tempo_esecuzione": 4.41
+  },
+  {
+    "id": 216,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-03T17:19:15.907234",
+    "tempo_esecuzione": 20.76
+  },
+  {
+    "id": 217,
+    "modello": "gemini-flash-latest",
+    "data_chiamata": "2026-10-03T17:23:47.633623",
+    "tempo_esecuzione": 9.62
+  },
+  {
+    "id": 218,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-05T17:07:45.885933",
+    "tempo_esecuzione": 5.55
+  },
+  {
+    "id": 219,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-05T17:08:03.550075",
+    "tempo_esecuzione": 3.63
+  },
+  {
+    "id": 220,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-05T17:08:15.209704",
+    "tempo_esecuzione": 4.81
+  },
+  {
+    "id": 221,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-05T17:14:16.051516",
+    "tempo_esecuzione": 4.62
+  },
+  {
+    "id": 222,
+    "modello": "gemini-flash-latest",
+    "data_chiamata": "2026-10-05T17:18:54.770833",
+    "tempo_esecuzione": 7.63
+  },
+  {
+    "id": 223,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-06T17:47:59.650214",
+    "tempo_esecuzione": 7.16
+  },
+  {
+    "id": 224,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-06T18:42:23.765964",
+    "tempo_esecuzione": 9.4
+  },
+  {
+    "id": 225,
+    "modello": "gemini-3.8-flash",
+    "data_chiamata": "2026-10-06T18:50:40.308676",
+    "tempo_esecuzione": 8.32
+  },
+  {
+    "id": 226,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-06T19:12:52.858917",
+    "tempo_esecuzione": 7.78
+  },
+  {
+    "id": 227,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-06T19:44:34.780208",
+    "tempo_esecuzione": 22.45
+  },
+  {
+    "id": 228,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-09T15:04:31.799834",
+    "tempo_esecuzione": 7.79
+  },
+  {
+    "id": 229,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-09T15:05:48.315627",
+    "tempo_esecuzione": 9.64
+  },
+  {
+    "id": 230,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-09T15:06:19.26792",
+    "tempo_esecuzione": 4.19
+  },
+  {
+    "id": 231,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-09T15:07:02.447303",
+    "tempo_esecuzione": 8.11
+  },
+  {
+    "id": 232,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-09T15:11:20.178248",
+    "tempo_esecuzione": 6.45
+  },
+  {
+    "id": 233,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-09T15:14:10.186225",
+    "tempo_esecuzione": 3.49
+  },
+  {
+    "id": 234,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-09T15:26:15.097799",
+    "tempo_esecuzione": 3.79
+  },
+  {
+    "id": 235,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-09T15:27:00.233098",
+    "tempo_esecuzione": 9.73
+  },
+  {
+    "id": 236,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-09T15:46:43.367679",
+    "tempo_esecuzione": 5.55
+  },
+  {
+    "id": 237,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-09T16:27:56.34778",
+    "tempo_esecuzione": 9.15
+  },
+  {
+    "id": 238,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-09T16:31:26.40712",
+    "tempo_esecuzione": 10.15
+  },
+  {
+    "id": 239,
+    "modello": "gemini-3.8-flash",
+    "data_chiamata": "2026-10-09T18:15:31.934503",
+    "tempo_esecuzione": 25
+  },
+  {
+    "id": 240,
+    "modello": "gemini-3.7-flash",
+    "data_chiamata": "2026-10-09T18:21:31.864376",
+    "tempo_esecuzione": 37.12
+  },
+  {
+    "id": 241,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-09T20:07:55.204573",
+    "tempo_esecuzione": 26.44
+  },
+  {
+    "id": 242,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-09T21:17:12.749298",
+    "tempo_esecuzione": 6.22
+  },
+  {
+    "id": 243,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-09T21:20:04.848581",
+    "tempo_esecuzione": 11.66
+  },
+  {
+    "id": 244,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-09T21:22:31.902975",
+    "tempo_esecuzione": 4.68
+  },
+  {
+    "id": 245,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-11T16:25:26.469606",
+    "tempo_esecuzione": 10.05
+  },
+  {
+    "id": 246,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-11T16:28:20.770943",
+    "tempo_esecuzione": 12.02
+  },
+  {
+    "id": 247,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-11T16:57:53.48424",
+    "tempo_esecuzione": 11.15
+  },
+  {
+    "id": 248,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-17T15:11:52.044412",
+    "tempo_esecuzione": 11.78
+  },
+  {
+    "id": 249,
+    "modello": "gemini-3.8-flash",
+    "data_chiamata": "2026-10-17T15:13:30.753313",
+    "tempo_esecuzione": 17.41
+  },
+  {
+    "id": 250,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-17T17:44:48.578471",
+    "tempo_esecuzione": 6.56
+  },
+  {
+    "id": 251,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-17T17:46:07.918132",
+    "tempo_esecuzione": 11.45
+  },
+  {
+    "id": 252,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-17T23:10:59.759229",
+    "tempo_esecuzione": 6.76
+  },
+  {
+    "id": 253,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-17T23:29:21.371994",
+    "tempo_esecuzione": 3.89
+  },
+  {
+    "id": 254,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-18T00:57:36.894442",
+    "tempo_esecuzione": 7.3
+  },
+  {
+    "id": 255,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-18T00:57:38.997014",
+    "tempo_esecuzione": 5.52
+  },
+  {
+    "id": 256,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-18T02:03:26.545884",
+    "tempo_esecuzione": 9.27
+  },
+  {
+    "id": 257,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-18T02:08:04.60614",
+    "tempo_esecuzione": 11.45
+  },
+  {
+    "id": 258,
+    "modello": "gemini-3.8-flash",
+    "data_chiamata": "2026-10-18T13:31:42.985387",
+    "tempo_esecuzione": 14.18
+  },
+  {
+    "id": 259,
+    "modello": "gemini-3.8-flash",
+    "data_chiamata": "2026-10-21T20:28:35.718383",
+    "tempo_esecuzione": 93.47
+  },
+  {
+    "id": 260,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-23T13:14:06.445347",
+    "tempo_esecuzione": 13.39
+  },
+  {
+    "id": 261,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-23T13:15:21.212295",
+    "tempo_esecuzione": 11.72
+  },
+  {
+    "id": 262,
+    "modello": "test-model",
+    "data_chiamata": "2026-10-24T17:47:24.147994",
+    "tempo_esecuzione": 1.23
+  },
+  {
+    "id": 263,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-24T18:58:42.228946",
+    "tempo_esecuzione": 13.1
+  },
+  {
+    "id": 264,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-24T19:39:37.247983",
+    "tempo_esecuzione": 14.25
+  },
+  {
+    "id": 265,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-24T21:20:29.728894",
+    "tempo_esecuzione": 10.81
+  },
+  {
+    "id": 266,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-24T21:24:18.914564",
+    "tempo_esecuzione": 15.95
+  },
+  {
+    "id": 267,
+    "modello": "gemini-3.8-flash",
+    "data_chiamata": "2026-10-24T21:24:37.637764",
+    "tempo_esecuzione": 77.77
+  },
+  {
+    "id": 268,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-25T08:35:00.172157",
+    "tempo_esecuzione": 14.82
+  },
+  {
+    "id": 269,
+    "modello": "gemini-3.5-flash",
+    "data_chiamata": "2026-10-25T08:58:52.07348",
+    "tempo_esecuzione": 13.88
+  },
+  {
+    "id": 270,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-25T12:32:22.45163",
+    "tempo_esecuzione": 20.18
+  },
+  {
+    "id": 271,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-25T12:35:48.560781",
+    "tempo_esecuzione": 14.17
+  },
+  {
+    "id": 272,
+    "modello": "gemini-3.6-flash",
+    "data_chiamata": "2026-10-25T14:10:24.185349",
+    "tempo_esecuzione": 15.48
+  }
+]

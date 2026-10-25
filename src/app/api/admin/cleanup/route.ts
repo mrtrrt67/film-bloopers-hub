@@ -40,6 +40,16 @@ export async function POST() {
     // 7. Reset log ricerche
     await adminDb.from("log_ricerche").delete().neq("id", "00000000-0000-0000-0000-000000000000");
 
+    // 8. Pulizia log accessi ed errori IA
+    try {
+      await adminDb.from("log_accessi").delete().neq("id", 0);
+      await adminDb.from("log_errori_ia").delete().neq("id", 0);
+      await adminDb.from("statistiche_ia").delete().neq("id", 0);
+      await adminDb.from("storico_moderazione").delete().neq("id", 0);
+    } catch (e) {
+      console.warn("Tabelle log opzionali non presenti o già vuote:", e);
+    }
+
     return NextResponse.json({
       success: true,
       message: "Pulizia ambiente di produzione completata con successo! Dati di test, ricerche, voti e classifiche azzerati.",

@@ -41,3 +41,5 @@ DELETE FROM public.log_ricerche;
 -- 8. Pulizia log interni
 DELETE FROM public.log_accessi;
 DELETE FROM public.log_errori_ia;
+DELETE FROM public.statistiche_ia;
+DELETE FROM public.storico_moderazione;
