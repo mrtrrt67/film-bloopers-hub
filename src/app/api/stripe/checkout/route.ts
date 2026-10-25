@@ -48,9 +48,12 @@ export async function POST(request: Request) {
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://filmbloopers.online";
 
-    const session = await stripe.checkout.sessions.create({
+    // Cerca se esiste già un customer Stripe per questo utente
+    const existingCustomers = await stripe.customers.list({ email: user.email, limit: 1 });
+    const existingCustomer = existingCustomers.data[0];
+
+    const sessionParams: any = {
       client_reference_id: user.id,
-      customer_email: user.email,
       line_items: [
         {
           price: priceId,
@@ -64,7 +67,15 @@ export async function POST(request: Request) {
         userId: user.id,
         planId: plan.id,
       },
-    });
+    };
+
+    if (existingCustomer) {
+      sessionParams.customer = existingCustomer.id;
+    } else {
+      sessionParams.customer_email = user.email;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionParams);
 
     return NextResponse.json({ url: session.url });
   } catch (err: any) {

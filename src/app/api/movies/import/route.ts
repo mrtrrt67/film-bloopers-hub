@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { getTMDBMovieDetails, formatCredits } from "@/lib/tmdb";
 
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
+    const adminDb = createAdminClient();
     const { tmdb_id } = await request.json();
 
     if (!tmdb_id) {
@@ -43,7 +45,7 @@ export async function POST(request: Request) {
       poster_url: formatted.poster_url,
     };
 
-    const { data: inserted, error: insertErr } = await supabase
+    const { data: inserted, error: insertErr } = await adminDb
       .from("films")
       .insert(newRecord)
       .select()

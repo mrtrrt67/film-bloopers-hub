@@ -92,7 +92,7 @@ export default async function ClassificaPage() {
           {(profiles || []).map((p: any, idx: number) => {
             const rank = idx + 1;
             const isCurrentUser = user && p.id === user.id;
-            const rankInfo = getRankInfo(p.punti || 0, sogliaMensile, sogliaLifetime);
+            const rankInfo = getRankInfo(p.punti || 0, p.tier, p.tipo_abbonamento, sogliaMensile, sogliaLifetime);
 
             return (
               <div

@@ -15,6 +15,35 @@ export async function POST(request: Request) {
       );
     }
 
+    const adminEmail = (process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL || "mrtrrt67@gmail.com").toLowerCase();
+    const isUserAdmin = user.email?.toLowerCase() === adminEmail;
+
+    if (!isUserAdmin) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("tier, tipo_abbonamento, data_scadenza")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      const today = new Date().toISOString().slice(0, 10);
+      const isExpired =
+        (profile?.tipo_abbonamento === "mensile" || profile?.tipo_abbonamento === "annuale") &&
+        profile?.data_scadenza &&
+        profile.data_scadenza < today;
+      const isPremium = profile?.tier === "premium" && !isExpired;
+
+      if (!isPremium) {
+        return NextResponse.json(
+          {
+            error:
+              "La votazione e la contestazione dei bloopers sono riservate agli iscritti ai Piani Premium. Sblocca il tuo piano per votare e scalare la classifica!",
+            requires_premium: true,
+          },
+          { status: 403 }
+        );
+      }
+    }
+
     const { errore_id, tipo, motivo } = await request.json();
 
     if (!errore_id || !["conferma", "contestazione"].includes(tipo)) {

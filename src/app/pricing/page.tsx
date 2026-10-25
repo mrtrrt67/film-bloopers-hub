@@ -1,27 +1,67 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Check, Sparkles, Zap, Shield, ArrowRight, ShieldCheck } from "lucide-react";
+import { Check, Sparkles, Zap, Shield, ArrowRight, ShieldCheck, CheckCircle2 } from "lucide-react";
 import { PRICING_PLANS } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/client";
+import AuthModal from "@/components/AuthModal";
 
 export default function PricingPage() {
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [openingPortal, setOpeningPortal] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [user, setUser] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
   const supabase = createClient();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(async ({ data }: { data: any }) => {
+      const u = data?.user || null;
+      setUser(u);
+      if (u) {
+        try {
+          const { data: prof } = await supabase
+            .from("profiles")
+            .select("tier, tipo_abbonamento, data_scadenza, punti")
+            .eq("id", u.id)
+            .maybeSingle();
+          if (prof) setUserProfile(prof);
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    });
+  }, []);
+
+  const handleManageBilling = async () => {
+    setOpeningPortal(true);
+    try {
+      const res = await fetch("/api/stripe/portal", { method: "POST" });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data.error || "Impossibile aprire il portale Stripe in questo momento.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Si è verificato un errore di connessione.");
+    } finally {
+      setOpeningPortal(false);
+    }
+  };
 
   const handleSelectPlan = async (planId: string) => {
     if (planId === "free") return;
 
+    if (!user) {
+      setAuthModalOpen(true);
+      return;
+    }
+
     setLoadingPlan(planId);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-
-      if (!user) {
-        alert("Devi registrarti o effettuare l'accesso prima di abbonarti.");
-        return;
-      }
-
       const res = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -42,10 +82,13 @@ export default function PricingPage() {
     }
   };
 
+  const isUserSubscribed = userProfile?.tier === "premium";
+  const userSub = userProfile?.tipo_abbonamento;
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
       {/* Intestazione */}
-      <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-14">
+      <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-10">
         <span className="rounded-full bg-amber-500/10 border border-amber-500/30 px-3.5 py-1 text-xs font-bold text-amber-400 mb-3">
           Sblocca l&apos;Esperienza Completa
         </span>
@@ -57,11 +100,39 @@ export default function PricingPage() {
         </p>
       </div>
 
+      {/* Banner Abbonamento Attivo (Disdici con 1 Clic nel portale Stripe) */}
+      {isUserSubscribed && (userSub === "mensile" || userSub === "annuale") && (
+        <div className="mb-10 rounded-2xl border-2 border-purple-500/50 bg-gradient-to-r from-purple-950/40 via-zinc-900 to-zinc-950 p-6 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
+          <div className="space-y-1 text-center sm:text-left">
+            <div className="inline-flex items-center gap-1.5 rounded-full bg-purple-500/20 text-purple-300 px-3 py-0.5 text-xs font-bold border border-purple-500/30">
+              <CheckCircle2 className="h-3.5 w-3.5" />
+              <span>Abbonamento Attivo: Piano {userSub === "annuale" ? "Annuale" : "Mensile"}</span>
+            </div>
+            <h3 className="text-base font-bold text-white">Gestione e Disdetta in 1 Clic</h3>
+            <p className="text-xs text-zinc-400">
+              Puoi disdire il rinnovo automatico in qualsiasi momento o aggiornare il tuo metodo di pagamento direttamente nel portale Stripe.
+            </p>
+          </div>
+          <button
+            onClick={handleManageBilling}
+            disabled={openingPortal}
+            className="shrink-0 flex items-center gap-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white px-5 py-2.5 text-xs font-bold transition shadow-lg shadow-purple-500/20 active:scale-95"
+          >
+            <span>{openingPortal ? "Apertura..." : "Gestisci o Disdici Abbonamento (1 Clic)"}</span>
+            <ArrowRight className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
+
       {/* Grid Piani */}
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 items-stretch">
         {PRICING_PLANS.map((plan) => {
           const isPromo = plan.id === "lifetime-promo";
           const isAnnuale = plan.id === "annuale";
+          const isCurrentPlan =
+            (plan.id === "free" && (!isUserSubscribed || !userSub || userSub === "nessuno")) ||
+            (isUserSubscribed && userSub === plan.id) ||
+            (isUserSubscribed && userSub === "lifetime" && (plan.id === "lifetime-promo" || plan.id === "lifetime-standard"));
 
           return (
             <div
@@ -87,7 +158,14 @@ export default function PricingPage() {
               )}
 
               <div>
-                <h3 className="text-base font-bold text-white mb-1">{plan.name}</h3>
+                <div className="flex items-center justify-between mb-1">
+                  <h3 className="text-base font-bold text-white">{plan.name}</h3>
+                  {isCurrentPlan && (
+                    <span className="rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5">
+                      Attivo
+                    </span>
+                  )}
+                </div>
                 <p className="text-xs text-zinc-400 min-h-[36px] mb-4">{plan.description}</p>
 
                 <div className="flex items-baseline gap-1 mb-6">
@@ -118,7 +196,15 @@ export default function PricingPage() {
                   disabled
                   className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 py-2.5 text-xs font-bold text-zinc-400 cursor-default"
                 >
-                  Piano Attuale
+                  {isCurrentPlan ? "Piano Attuale" : "Incluso"}
+                </button>
+              ) : isCurrentPlan && (userSub === "mensile" || userSub === "annuale") ? (
+                <button
+                  onClick={handleManageBilling}
+                  disabled={openingPortal}
+                  className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-purple-500/50 bg-purple-500/20 py-2.5 text-xs font-bold text-purple-300 hover:bg-purple-500/30 transition shadow"
+                >
+                  <span>{openingPortal ? "Apertura..." : "Disdici / Gestisci"}</span>
                 </button>
               ) : (
                 <button
@@ -157,7 +243,7 @@ export default function PricingPage() {
           <strong>Pagamenti Sicuri:</strong> Tutte le transazioni sono elaborate in modo sicuro con crittografia end-to-end da <strong>Stripe Inc.</strong> (conforme PCI-DSS Livello 1). Nessun dato di carta di credito viene memorizzato sui nostri server.
         </p>
         <p className="leading-relaxed">
-          <strong>Informativa Recesso Servizi Digitali:</strong> Ai sensi dell&apos;art. 59, lett. o) del Codice del Consumo (D.Lgs. 206/2005), la fornitura di contenuti digitali ad esecuzione immediata non è soggetta al diritto di recesso una volta avviata l&apos;esecuzione del servizio. L&apos;abbonamento mensile può comunque essere annullato in qualsiasi momento con un semplice click dal pannello Stripe, mantenendo l&apos;accesso fino alla scadenza del mese pagato.
+          <strong>Informativa Recesso Servizi Digitali:</strong> Ai sensi dell&apos;art. 59, lett. o) del Codice del Consumo (D.Lgs. 206/2005), la fornitura di contenuti digitali ad esecuzione immediata non è soggetta al diritto di recesso una volta avviata l&apos;esecuzione del servizio. L&apos;abbonamento mensile e annuale può essere annullato in qualsiasi momento con un semplice click dal pannello Stripe, mantenendo l&apos;accesso fino alla scadenza del periodo già pagato.
         </p>
         <div className="flex flex-wrap items-center gap-4 pt-2 text-[11px] text-zinc-400 border-t border-zinc-800/80">
           <span>Consulta i documenti legali completi:</span>
@@ -168,6 +254,12 @@ export default function PricingPage() {
           <Link href="/note-legali" className="text-amber-400 hover:underline">Note Legali & Dati Societari</Link>
         </div>
       </div>
+
+      {/* Auth Modal per visitatori */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={() => setAuthModalOpen(false)}
+      />
     </div>
   );
 }

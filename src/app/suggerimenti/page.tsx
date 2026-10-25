@@ -10,7 +10,8 @@ import {
   MessageSquare, 
   Sparkles, 
   ArrowLeft,
-  HelpCircle
+  HelpCircle,
+  Zap
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -21,13 +22,24 @@ export default function SuggerimentiPage() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [profile, setProfile] = useState<any>(null);
 
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }: { data: any }) => {
+    supabase.auth.getUser().then(async ({ data }: { data: any }) => {
       if (data?.user?.email) {
         setEmail(data.user.email);
+        try {
+          const { data: prof } = await supabase
+            .from("profiles")
+            .select("tier, tipo_abbonamento")
+            .eq("id", data.user.id)
+            .maybeSingle();
+          if (prof) setProfile(prof);
+        } catch (e) {
+          console.error(e);
+        }
       }
     });
   }, []);
@@ -101,6 +113,22 @@ export default function SuggerimentiPage() {
           <p className="text-xs sm:text-sm text-zinc-400 mt-2 leading-relaxed">
             Hai trovato un errore nei dati, desideri richiedere l&apos;inserimento di una pellicola o hai idee per migliorare FilmBloopers Hub? Faccelo sapere compilando questo form.
           </p>
+
+          {profile && (profile.tipo_abbonamento === "annuale" || profile.tipo_abbonamento === "lifetime") && (
+            <div className="mt-4 rounded-2xl border-2 border-amber-500/60 bg-gradient-to-r from-amber-950/40 via-zinc-900 to-zinc-950 p-4 shadow-lg shadow-amber-500/10 flex items-center gap-3">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/40">
+                <Zap className="h-5 w-5" />
+              </div>
+              <div>
+                <h4 className="text-xs font-black uppercase text-amber-400 tracking-wider">
+                  ⚡ Supporto Prioritario Attivo ({profile.tipo_abbonamento === "annuale" ? "Piano Annuale" : "Piano Lifetime"})
+                </h4>
+                <p className="text-[11px] text-zinc-300 mt-0.5 leading-normal">
+                  Il tuo abbonamento include l&apos;assistenza prioritaria: la tua richiesta verrà evidenziata in cima alla coda di revisione dello staff!
+                </p>
+              </div>
+            </div>
+          )}
 
           {success ? (
             <div className="mt-8 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-6 text-center space-y-3 animate-in fade-in">

@@ -208,6 +208,7 @@ export default function AdminUsersTab() {
                               className="rounded-lg bg-zinc-950 border border-zinc-700 px-2 py-1 text-xs text-zinc-200 focus:outline-none focus:border-amber-500"
                             >
                               <option value="mensile">mensile</option>
+                              <option value="annuale">annuale</option>
                               <option value="lifetime">lifetime</option>
                               <option value="nessuno">nessuno</option>
                             </select>
@@ -216,7 +217,7 @@ export default function AdminUsersTab() {
                           <div className="flex flex-col gap-0.5">
                             <span className="text-zinc-400 text-xs font-mono">nessuno</span>
                             <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-400 bg-rose-500/10 px-1.5 py-0.5 rounded border border-rose-500/30">
-                              ⚠️ Ex-Mensile (Scaduto)
+                              ⚠️ Ex-Abbonato (Scaduto)
                             </span>
                           </div>
                         ) : (
@@ -228,7 +229,7 @@ export default function AdminUsersTab() {
                       <td className="py-3 px-4">
                         {profile.is_admin ? (
                           <span className="text-zinc-500 text-[11px]">Nessuna (Admin)</span>
-                        ) : profile.tier === "premium" && (profile.tipo_abbonamento === "mensile" || profile.subscription_type === "mensile") ? (
+                        ) : profile.tier === "premium" && (profile.tipo_abbonamento === "mensile" || profile.tipo_abbonamento === "annuale" || profile.subscription_type === "mensile" || profile.subscription_type === "annuale") ? (
                           <div className="flex flex-col gap-1">
                             <input
                               type="date"

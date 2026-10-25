@@ -35,7 +35,7 @@ export async function POST(request: Request) {
         const prof = profile as any;
         const scad = prof.data_scadenza || prof.expires_at ? String(prof.data_scadenza || prof.expires_at).slice(0, 10) : null;
         const sub = prof.tipo_abbonamento || prof.subscription_type || "nessuno";
-        const isExpired = sub === "mensile" && scad ? scad < today : false;
+        const isExpired = (sub === "mensile" || sub === "annuale") && scad ? scad < today : false;
 
         if (isExpired && prof.tier !== "free") {
           try {

@@ -35,14 +35,14 @@ export async function GET() {
       if (p.tier !== "premium") return false;
       const scad = p.data_scadenza || p.expires_at ? String(p.data_scadenza || p.expires_at).slice(0, 10) : null;
       const sub = p.tipo_abbonamento || p.subscription_type || "nessuno";
-      if (sub === "mensile" && scad && scad < todayUtc) return false;
+      if ((sub === "mensile" || sub === "annuale") && scad && scad < todayUtc) return false;
       return true;
     }).length;
 
     const expiredUsers = nonAdminProfiles.filter((p) => {
       const scad = p.data_scadenza || p.expires_at ? String(p.data_scadenza || p.expires_at).slice(0, 10) : null;
       const sub = p.tipo_abbonamento || p.subscription_type || "nessuno";
-      return sub === "mensile" && scad && scad < todayUtc;
+      return (sub === "mensile" || sub === "annuale") && scad && scad < todayUtc;
     }).length;
 
     const freeUsers = nonAdminProfiles.filter((p) => p.tier === "free" || !p.tier).length;

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { checkAndAwardPointRewards } from "@/lib/rewards";
 
 export async function GET() {
   try {
@@ -18,6 +19,41 @@ export async function GET() {
       .eq("approvato", false)
       .order("creato_il", { ascending: false });
 
+    // Recupera profili degli autori per evidenziare priorità e punti doppi
+    const submitterEmails = Array.from(new Set((pendingBloopers || []).map((b: any) => b.inserito_da).filter(Boolean)));
+    let profilesByEmail: Record<string, any> = {};
+
+    if (submitterEmails.length > 0) {
+      const { data: profs } = await supabase
+        .from("profiles")
+        .select("id, email, tier, tipo_abbonamento, punti")
+        .in("email", submitterEmails);
+
+      (profs || []).forEach((p: any) => {
+        if (p.email) profilesByEmail[p.email.toLowerCase()] = p;
+      });
+    }
+
+    const enrichedPending = (pendingBloopers || []).map((b: any) => {
+      const p = b.inserito_da ? profilesByEmail[b.inserito_da.toLowerCase()] : null;
+      const isPriority = p && (p.tipo_abbonamento === "annuale" || p.tipo_abbonamento === "lifetime");
+      const isDoublePoints = isPriority;
+      return {
+        ...b,
+        user_tier: p?.tier || "free",
+        user_sub: p?.tipo_abbonamento || "nessuno",
+        is_priority: !!isPriority,
+        is_double_points: !!isDoublePoints,
+      };
+    });
+
+    // Ordina mettendo le segnalazioni prioritarie (Annuale/Lifetime) in cima
+    enrichedPending.sort((a: any, b: any) => {
+      if (a.is_priority && !b.is_priority) return -1;
+      if (!a.is_priority && b.is_priority) return 1;
+      return 0;
+    });
+
     // 2. Contestazioni attive
     const { data: contestazioni } = await supabase
       .from("voti_bloopers")
@@ -35,7 +71,7 @@ export async function GET() {
       .limit(50);
 
     return NextResponse.json({
-      pending: pendingBloopers || [],
+      pending: enrichedPending,
       contestazioni: contestazioni || [],
       approved: approvedUserBloopers || [],
     });
@@ -62,21 +98,39 @@ export async function POST(request: Request) {
       // 1. Approva blooper
       await supabase.from("errori").update({ approvato: true }).eq("id", blooper_id);
 
-      // 2. Assegna punti se l'utente è registrato
-      const pts = points ? parseInt(String(points), 10) : 10;
+      // 2. Assegna punti se l'utente è registrato e applica moltiplicatore 2x se annuale/lifetime
+      let targetProfile = null;
       if (userEmail) {
-        const { data: profile } = await supabase.from("profiles").select("id, punti").eq("email", userEmail).single();
-        if (profile) {
-          await supabase.from("profiles").update({ punti: (profile.punti || 0) + pts }).eq("id", profile.id);
-        }
+        const { data: p } = await supabase.from("profiles").select("*").eq("email", userEmail).maybeSingle();
+        targetProfile = p;
       } else if (userId) {
-        const { data: profile } = await supabase.from("profiles").select("id, punti").eq("id", userId).single();
-        if (profile) {
-          await supabase.from("profiles").update({ punti: (profile.punti || 0) + pts }).eq("id", profile.id);
+        const { data: p } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
+        targetProfile = p;
+      }
+
+      let awardedPts = points ? parseInt(String(points), 10) : 10;
+      let isDouble = false;
+      let rewardMsg = "";
+
+      if (targetProfile) {
+        if (targetProfile.tipo_abbonamento === "annuale" || targetProfile.tipo_abbonamento === "lifetime") {
+          // Se non è stato specificato manualmente un punteggio custom, raddoppia i 10 punti base a 20
+          awardedPts = points ? parseInt(String(points), 10) : 20;
+          isDouble = true;
+        }
+
+        const newTotal = (targetProfile.punti || 0) + awardedPts;
+        const resReward = await checkAndAwardPointRewards(supabase, targetProfile.id, newTotal);
+        if (resReward?.message) {
+          rewardMsg = ` (${resReward.message})`;
         }
       }
 
-      return NextResponse.json({ success: true, message: "Blooper approvato e punti assegnati!" });
+      const msg = isDouble
+        ? `Blooper approvato! Assegnati ${awardedPts} pt (Raddoppiati per Piano Annuale/Lifetime)${rewardMsg}`
+        : `Blooper approvato e ${awardedPts} pt assegnati!${rewardMsg}`;
+
+      return NextResponse.json({ success: true, message: msg });
     }
 
     if (action === "reject") {
@@ -108,9 +162,11 @@ export async function POST(request: Request) {
 
       // 3. Assegna punti se previsti
       if (userId && points) {
-        const { data: profile } = await supabase.from("profiles").select("id, punti").eq("id", userId).single();
+        const { data: profile } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
         if (profile) {
-          await supabase.from("profiles").update({ punti: (profile.punti || 0) + parseInt(String(points), 10) }).eq("id", profile.id);
+          const isDouble = profile.tipo_abbonamento === "annuale" || profile.tipo_abbonamento === "lifetime";
+          const finalPts = isDouble ? parseInt(String(points), 10) * 2 : parseInt(String(points), 10);
+          await checkAndAwardPointRewards(supabase, profile.id, (profile.punti || 0) + finalPts);
         }
       }
 

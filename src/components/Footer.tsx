@@ -107,7 +107,7 @@ export default function Footer() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-1">
-            <p>© {new Date().getFullYear()} FilmBloopers Hub. Tutti i diritti riservati. Uso critico e divulgativo ai sensi dell&apos;art. 70 L. 633/1941.</p>
+            <p suppressHydrationWarning>© {new Date().getFullYear()} FilmBloopers Hub. Tutti i diritti riservati. Uso critico e divulgativo ai sensi dell&apos;art. 70 L. 633/1941.</p>
             <div className="flex items-center gap-1 text-zinc-400">
               <span>Realizzato con passione per il cinema</span>
               <Heart className="h-3 w-3 text-red-500 fill-red-500 inline" />

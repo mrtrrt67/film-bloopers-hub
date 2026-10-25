@@ -1,9 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Clock, Tag, ThumbsUp, ThumbsDown, CheckCircle, AlertTriangle, User } from "lucide-react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { Clock, Tag, ThumbsUp, ThumbsDown, CheckCircle, AlertTriangle, User, Sparkles, ArrowRight } from "lucide-react";
 import { Blooper } from "@/lib/types";
 import { calculateAttendibilita } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
+import AuthModal from "./AuthModal";
 
 interface BlooperItemProps {
   blooper: Blooper;
@@ -11,7 +14,7 @@ interface BlooperItemProps {
   userLoggedIn?: boolean;
 }
 
-export default function BlooperItem({ blooper, onVote, userLoggedIn = false }: BlooperItemProps) {
+export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperItemProps) {
   const [conferme, setConferme] = useState(blooper.conferme || 0);
   const [contestazioni, setContestazioni] = useState(blooper.contestazioni || 0);
   const [votoUtente, setVotoUtente] = useState<"conferma" | "contestazione" | null>(
@@ -19,13 +22,27 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn = false }: B
   );
   const [loading, setLoading] = useState(false);
   const [showContestForm, setShowContestForm] = useState(false);
+  const [showPremiumModal, setShowPremiumModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const [contestReason, setContestReason] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(Boolean(userLoggedIn));
+
+  useEffect(() => {
+    if (userLoggedIn !== undefined) {
+      setIsLoggedIn(userLoggedIn);
+      return;
+    }
+    const supabase = createClient();
+    supabase.auth.getUser().then(({ data }: { data: any }) => {
+      if (data?.user) setIsLoggedIn(true);
+    });
+  }, [userLoggedIn]);
 
   const attendibilita = calculateAttendibilita(conferme, contestazioni);
 
   const handleVote = async (tipo: "conferma" | "contestazione", motivo?: string): Promise<boolean> => {
-    if (!userLoggedIn) {
-      alert("Accedi per votare o contestare i bloopers della community!");
+    if (!isLoggedIn) {
+      setShowAuthModal(true);
       return false;
     }
 
@@ -62,7 +79,14 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn = false }: B
           body: JSON.stringify({ errore_id: blooper.id, tipo, motivo }),
         });
         if (!res.ok) {
-          const errData = await res.json();
+          const errData = await res.json().catch(() => ({}));
+          if (res.status === 403 && errData.requires_premium) {
+            setShowPremiumModal(true);
+            setVotoUtente(prevVoto);
+            setConferme(prevConf);
+            setContestazioni(prevCont);
+            return false;
+          }
           throw new Error(errData.error || "Errore durante il voto");
         }
         const json = await res.json();
@@ -76,7 +100,9 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn = false }: B
       setVotoUtente(prevVoto);
       setConferme(prevConf);
       setContestazioni(prevCont);
-      alert(err?.message || "Impossibile registrare il voto.");
+      if (!showPremiumModal) {
+        alert(err?.message || "Impossibile registrare il voto.");
+      }
       console.error(err);
       return false;
     } finally {
@@ -85,8 +111,8 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn = false }: B
   };
 
   const handleDislikeButtonClick = () => {
-    if (!userLoggedIn) {
-      alert("Accedi per votare o contestare i bloopers della community!");
+    if (!isLoggedIn) {
+      setShowAuthModal(true);
       return;
     }
 
@@ -250,6 +276,60 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn = false }: B
           </button>
         </div>
       </div>
+
+      {/* Modal Richiesta Premium per Votazione */}
+      {showPremiumModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
+          <div className="w-full max-w-md rounded-2xl border border-amber-500/40 bg-gradient-to-b from-zinc-900 via-zinc-950 to-zinc-950 p-6 shadow-2xl text-center space-y-4">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
+              <Sparkles className="h-6 w-6" />
+            </div>
+
+            <div className="space-y-1">
+              <h3 className="text-lg font-black text-white">Funzionalità Riservata ai Piani Premium</h3>
+              <p className="text-xs text-zinc-400 leading-relaxed">
+                La votazione dell&apos;attendibilità e la contestazione degli errori sono riservate ai membri della community con un piano Premium attivo.
+              </p>
+            </div>
+
+            <div className="rounded-xl border border-zinc-800 bg-zinc-900/60 p-3.5 text-xs text-left text-zinc-300 space-y-1.5">
+              <div className="flex items-center gap-2 text-amber-400 font-bold">
+                <span>⭐ Con Premium sblocchi:</span>
+              </div>
+              <p className="text-[11px] text-zinc-400">
+                • Votazione & contestazione illimitata<br />
+                • Badge VIP visibile nella community<br />
+                • Generazioni IA illimitate e partecipazione alla classifica<br />
+                • Piani a partire da soli 0,99€ (disdici con 1 clic)
+              </p>
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowPremiumModal(false)}
+                className="w-1/2 rounded-xl border border-zinc-800 px-4 py-2.5 text-xs font-bold text-zinc-400 hover:text-white transition"
+              >
+                Chiudi
+              </button>
+              <Link
+                href="/pricing"
+                className="w-1/2 flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2.5 text-xs font-bold text-zinc-950 shadow-md shadow-amber-500/20 hover:brightness-110 transition"
+              >
+                <span>Vedi Piani</span>
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal di Login/Registrazione */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={() => setIsLoggedIn(true)}
+      />
     </div>
   );
 }

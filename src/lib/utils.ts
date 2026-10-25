@@ -64,40 +64,60 @@ export function calculateAttendibilita(conferme: number, contestazioni: number) 
   };
 }
 
-export function getRankInfo(punti: number, sogliaMensile = 50, sogliaLifetime = 10000) {
-  if (punti >= sogliaLifetime) {
+export function getRankInfo(
+  punti: number,
+  tier?: string | null,
+  tipoAbbonamento?: string | null,
+  sogliaMensile = 50,
+  sogliaLifetime = 10000
+) {
+  const isLifetime = tipoAbbonamento === "lifetime" || punti >= sogliaLifetime;
+  const isPremiumSub = tier === "premium" || tipoAbbonamento === "mensile" || tipoAbbonamento === "annuale";
+
+  if (isLifetime) {
     return {
       grado: "Leggenda",
       icon: "👑",
       badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/40",
       prossimoTraguardo: null,
       puntiMancanti: 0,
+      isVip: true,
+      isLifetime: true,
     };
   }
-  if (punti >= sogliaMensile) {
+
+  if (isPremiumSub || punti >= sogliaMensile) {
     return {
       grado: "VIP",
       icon: "⭐",
       badgeColor: "bg-purple-500/20 text-purple-300 border-purple-500/40",
       prossimoTraguardo: "Leggenda",
-      puntiMancanti: sogliaLifetime - punti,
+      puntiMancanti: Math.max(0, sogliaLifetime - punti),
+      isVip: true,
+      isLifetime: false,
     };
   }
+
   if (punti >= 20) {
     return {
       grado: "Critico",
       icon: "🎬",
       badgeColor: "bg-blue-500/20 text-blue-300 border-blue-500/40",
       prossimoTraguardo: "VIP",
-      puntiMancanti: sogliaMensile - punti,
+      puntiMancanti: Math.max(0, sogliaMensile - punti),
+      isVip: false,
+      isLifetime: false,
     };
   }
+
   return {
     grado: "Cacciatore",
     icon: "🔍",
     badgeColor: "bg-zinc-800 text-zinc-300 border-zinc-700",
     prossimoTraguardo: "Critico",
-    puntiMancanti: 20 - punti,
+    puntiMancanti: Math.max(0, 20 - punti),
+    isVip: false,
+    isLifetime: false,
   };
 }
 

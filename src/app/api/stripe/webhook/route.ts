@@ -47,7 +47,8 @@ export async function POST(request: Request) {
           scadenza.setDate(scadenza.getDate() + 32);
           updateData.data_scadenza = scadenza.toISOString().slice(0, 10);
         } else if (planId === "annuale") {
-          updateData.tipo_abbonamento = "mensile";
+          updateData.tipo_abbonamento = "annuale";
+          updateData.subscription_type = "annuale";
           const scadenza = new Date();
           scadenza.setDate(scadenza.getDate() + 366);
           updateData.data_scadenza = scadenza.toISOString().slice(0, 10);
@@ -57,13 +58,64 @@ export async function POST(request: Request) {
       }
     }
 
+    if (event.type === "customer.subscription.updated") {
+      const subscription = event.data.object as any;
+      let customerEmail = subscription.customer_email;
+
+      if (!customerEmail && subscription.customer) {
+        try {
+          const cust = await stripe.customers.retrieve(subscription.customer) as any;
+          customerEmail = cust?.email;
+        } catch (cErr) {
+          console.error("Errore recupero customer Stripe su subscription.updated:", cErr);
+        }
+      }
+
+      if (customerEmail) {
+        if (subscription.status === "canceled") {
+          await supabase
+            .from("profiles")
+            .update({ tier: "free", tipo_abbonamento: "nessuno", subscription_type: "nessuno" })
+            .eq("email", customerEmail);
+        } else if (subscription.status === "active" || subscription.status === "trialing") {
+          const interval = subscription.items?.data?.[0]?.price?.recurring?.interval;
+          const subType = interval === "year" ? "annuale" : "mensile";
+          let scadenza = null;
+          if (subscription.current_period_end) {
+            scadenza = new Date(subscription.current_period_end * 1000).toISOString().slice(0, 10);
+          }
+
+          await supabase
+            .from("profiles")
+            .update({
+              tier: "premium",
+              tipo_abbonamento: subType,
+              subscription_type: subType,
+              data_scadenza: scadenza,
+            })
+            .eq("email", customerEmail);
+        }
+      }
+    }
+
     if (event.type === "customer.subscription.deleted") {
       const subscription = event.data.object as any;
-      const customerEmail = subscription.customer_email;
+      let customerEmail = subscription.customer_email;
+
+      // In Stripe subscription.deleted, il customer_email è spesso assente e va recuperato dal customer ID
+      if (!customerEmail && subscription.customer) {
+        try {
+          const cust = await stripe.customers.retrieve(subscription.customer) as any;
+          customerEmail = cust?.email;
+        } catch (cErr) {
+          console.error("Errore recupero customer Stripe su subscription.deleted:", cErr);
+        }
+      }
+
       if (customerEmail) {
         await supabase
           .from("profiles")
-          .update({ tier: "free", tipo_abbonamento: null })
+          .update({ tier: "free", tipo_abbonamento: "nessuno", subscription_type: "nessuno" })
           .eq("email", customerEmail);
       }
     }

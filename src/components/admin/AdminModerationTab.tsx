@@ -34,7 +34,8 @@ export default function AdminModerationTab() {
   }, []);
 
   const handleApprove = async (blooper: any) => {
-    const pts = pointsMap[blooper.id] ?? 10;
+    const defaultPts = blooper.is_double_points ? 20 : 10;
+    const pts = pointsMap[blooper.id] ?? defaultPts;
     try {
       const res = await fetch("/api/admin/moderation", {
         method: "POST",
@@ -226,48 +227,60 @@ export default function AdminModerationTab() {
               Nessuna segnalazione in attesa di moderazione 🎉
             </div>
           ) : (
-            data.pending.map((blooper) => (
-              <div
-                key={blooper.id}
-                className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 space-y-3"
-              >
-                <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
-                  <div className="flex items-center gap-2">
-                    <span className="font-black text-white">🎬 {blooper.films?.titolo || "Film"}</span>
-                    <span className="text-zinc-500 font-mono">({blooper.films?.anno || "N/D"})</span>
-                    <span className="bg-amber-500/20 text-amber-300 font-mono font-bold px-2 py-0.5 rounded text-[11px]">
-                      ⏱️ {blooper.minuto}
-                    </span>
-                    <span className="text-zinc-400 capitalize">📂 {blooper.categoria}</span>
-                  </div>
-                  <span className="text-[11px] text-zinc-500 font-mono">
-                    {blooper.creato_il ? blooper.creato_il.slice(0, 16).replace("T", " ") : ""}
-                  </span>
-                </div>
-
-                <p className="text-xs text-zinc-200 leading-relaxed bg-zinc-950/60 p-3 rounded-xl border border-zinc-800/80">
-                  {blooper.descrizione}
-                </p>
-
-                <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 text-xs">
-                  <span className="text-zinc-400 text-[11px]">
-                    ✍️ Segnalato da: <strong className="text-zinc-200">{blooper.inserito_da || "Anonimo"}</strong>
-                  </span>
-
-                  <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
-                    <div className="flex items-center gap-1 text-[11px] text-zinc-400">
-                      <span>Punti:</span>
-                      <input
-                        type="number"
-                        min="1"
-                        max="50"
-                        value={pointsMap[blooper.id] ?? 10}
-                        onChange={(e) =>
-                          setPointsMap({ ...pointsMap, [blooper.id]: parseInt(e.target.value, 10) || 10 })
-                        }
-                        className="w-14 rounded-lg bg-zinc-950 border border-zinc-700 px-2 py-1 text-xs text-white font-mono"
-                      />
+            data.pending.map((blooper) => {
+              const defaultPts = blooper.is_double_points ? 20 : 10;
+              return (
+                <div
+                  key={blooper.id}
+                  className={`rounded-2xl p-5 space-y-3 transition ${
+                    blooper.is_priority
+                      ? "border-2 border-amber-500/80 bg-gradient-to-r from-amber-950/20 via-zinc-900/80 to-zinc-900/60 shadow-lg shadow-amber-500/10"
+                      : "border border-zinc-800 bg-zinc-900/60"
+                  }`}
+                >
+                  {blooper.is_priority && (
+                    <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 px-2.5 py-0.5 text-[10px] font-black uppercase text-amber-300">
+                      ⚡ Segnalazione Prioritaria • Piano {blooper.user_sub} (Punti Doppi)
                     </div>
+                  )}
+
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-white">🎬 {blooper.films?.titolo || "Film"}</span>
+                      <span className="text-zinc-500 font-mono">({blooper.films?.anno || "N/D"})</span>
+                      <span className="bg-amber-500/20 text-amber-300 font-mono font-bold px-2 py-0.5 rounded text-[11px]">
+                        ⏱️ {blooper.minuto}
+                      </span>
+                      <span className="text-zinc-400 capitalize">📂 {blooper.categoria}</span>
+                    </div>
+                    <span className="text-[11px] text-zinc-500 font-mono">
+                      {blooper.creato_il ? blooper.creato_il.slice(0, 16).replace("T", " ") : ""}
+                    </span>
+                  </div>
+
+                  <p className="text-xs text-zinc-200 leading-relaxed bg-zinc-950/60 p-3 rounded-xl border border-zinc-800/80">
+                    {blooper.descrizione}
+                  </p>
+
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 text-xs">
+                    <span className="text-zinc-400 text-[11px]">
+                      ✍️ Segnalato da: <strong className="text-zinc-200">{blooper.inserito_da || "Anonimo"}</strong>
+                    </span>
+
+                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                      <div className="flex items-center gap-1 text-[11px] text-zinc-400">
+                        <span>Punti:</span>
+                        <input
+                          type="number"
+                          min="1"
+                          max="100"
+                          value={pointsMap[blooper.id] ?? defaultPts}
+                          onChange={(e) =>
+                            setPointsMap({ ...pointsMap, [blooper.id]: parseInt(e.target.value, 10) || defaultPts })
+                          }
+                          className="w-14 rounded-lg bg-zinc-950 border border-zinc-700 px-2 py-1 text-xs text-white font-mono"
+                        />
+                      </div>
                     <button
                       onClick={() => handleApprove(blooper)}
                       className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-500 text-zinc-950 font-bold hover:brightness-110 active:scale-95 transition"
@@ -285,8 +298,9 @@ export default function AdminModerationTab() {
                   </div>
                 </div>
               </div>
-            ))
-          )}
+            );
+          })
+        )}
         </div>
       )}
 

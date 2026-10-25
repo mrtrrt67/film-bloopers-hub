@@ -10,6 +10,8 @@ import AuthModal from "./AuthModal";
 export default function Navbar() {
   const pathname = usePathname();
   const [user, setUser] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [openingPortal, setOpeningPortal] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const supabase = createClient();
@@ -18,18 +20,64 @@ export default function Navbar() {
   const isAdmin = user && user.email && user.email.toLowerCase() === adminEmail;
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }: { data: any }) => {
-      setUser(data?.user || null);
+    supabase.auth.getUser().then(async ({ data }: { data: any }) => {
+      const u = data?.user || null;
+      setUser(u);
+      if (u) {
+        try {
+          const { data: p } = await supabase
+            .from("profiles")
+            .select("tier, tipo_abbonamento, punti")
+            .eq("id", u.id)
+            .maybeSingle();
+          if (p) setUserProfile(p);
+        } catch (e) {
+          console.error(e);
+        }
+      }
     });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
-      setUser(session?.user || null);
+    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event: any, session: any) => {
+      const u = session?.user || null;
+      setUser(u);
+      if (u) {
+        try {
+          const { data: p } = await supabase
+            .from("profiles")
+            .select("tier, tipo_abbonamento, punti")
+            .eq("id", u.id)
+            .maybeSingle();
+          if (p) setUserProfile(p);
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        setUserProfile(null);
+      }
     });
 
     return () => {
       authListener.subscription.unsubscribe();
     };
   }, []);
+
+  const handleManageSubscription = async () => {
+    setOpeningPortal(true);
+    try {
+      const res = await fetch("/api/stripe/portal", { method: "POST" });
+      const data = await res.json();
+      if (res.ok && data.url) {
+        window.location.href = data.url;
+      } else {
+        alert(data.error || "Impossibile aprire il portale Stripe in questo momento.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Errore di connessione.");
+    } finally {
+      setOpeningPortal(false);
+    }
+  };
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -102,10 +150,32 @@ export default function Navbar() {
           <div className="hidden md:flex items-center gap-2.5">
             {user ? (
               <div className="flex items-center gap-2">
-                <div className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs text-zinc-300">
+                <div className="flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900/60 px-3 py-1.5 text-xs text-zinc-300">
                   <User className="h-3.5 w-3.5 text-amber-400" />
-                  <span className="max-w-[140px] truncate">{user.email}</span>
+                  <span className="max-w-[130px] truncate">{user.email}</span>
+                  {userProfile?.tipo_abbonamento === "lifetime" ? (
+                    <span className="rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[10px] font-black px-1.5 py-0.5">
+                      👑 Leggenda
+                    </span>
+                  ) : userProfile?.tier === "premium" || userProfile?.tipo_abbonamento === "mensile" || userProfile?.tipo_abbonamento === "annuale" ? (
+                    <span className="rounded bg-purple-500/20 text-purple-300 border border-purple-500/40 text-[10px] font-black px-1.5 py-0.5">
+                      ⭐ VIP
+                    </span>
+                  ) : null}
                 </div>
+
+                {/* Pulsante Disdici / Gestisci Abbonamento (1 Clic) se abbonato */}
+                {(userProfile?.tipo_abbonamento === "mensile" || userProfile?.tipo_abbonamento === "annuale") && (
+                  <button
+                    onClick={handleManageSubscription}
+                    disabled={openingPortal}
+                    className="flex items-center gap-1 rounded-lg border border-purple-500/40 bg-purple-500/10 px-2.5 py-1.5 text-xs font-semibold text-purple-300 hover:bg-purple-500/20 transition-all shadow-sm"
+                    title="Disdici quando vuoi con 1 clic o gestisci il metodo di pagamento nel portale Stripe"
+                  >
+                    <span>{openingPortal ? "Apertura..." : "Gestisci / Disdici"}</span>
+                  </button>
+                )}
+
                 <button
                   onClick={handleLogout}
                   className="flex items-center gap-1.5 rounded-lg border border-zinc-800 p-2 text-zinc-400 hover:bg-zinc-900 hover:text-red-400 transition-colors"
@@ -178,14 +248,36 @@ export default function Navbar() {
 
             <div className="pt-2 border-t border-zinc-800/80">
               {user ? (
-                <div className="flex items-center justify-between px-3 py-2">
-                  <span className="text-xs text-zinc-400 truncate">{user.email}</span>
-                  <button
-                    onClick={handleLogout}
-                    className="text-xs font-bold text-red-400 hover:underline"
-                  >
-                    Esci
-                  </button>
+                <div className="space-y-2 px-3 py-2">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-xs text-zinc-300 truncate max-w-[170px]">{user.email}</span>
+                      {userProfile?.tipo_abbonamento === "lifetime" ? (
+                        <span className="rounded bg-amber-500/20 text-amber-300 text-[10px] font-black px-1.5 py-0.5">
+                          👑 Leggenda
+                        </span>
+                      ) : userProfile?.tier === "premium" || userProfile?.tipo_abbonamento === "mensile" || userProfile?.tipo_abbonamento === "annuale" ? (
+                        <span className="rounded bg-purple-500/20 text-purple-300 text-[10px] font-black px-1.5 py-0.5">
+                          ⭐ VIP
+                        </span>
+                      ) : null}
+                    </div>
+                    <button
+                      onClick={handleLogout}
+                      className="text-xs font-bold text-red-400 hover:underline"
+                    >
+                      Esci
+                    </button>
+                  </div>
+                  {(userProfile?.tipo_abbonamento === "mensile" || userProfile?.tipo_abbonamento === "annuale") && (
+                    <button
+                      onClick={handleManageSubscription}
+                      disabled={openingPortal}
+                      className="w-full text-center py-2 rounded-lg border border-purple-500/40 bg-purple-500/10 text-xs font-semibold text-purple-300 hover:bg-purple-500/20 transition"
+                    >
+                      {openingPortal ? "Apertura Portale Stripe..." : "Gestisci o Disdici Abbonamento (1 Clic)"}
+                    </button>
+                  )}
                 </div>
               ) : (
                 <div className="flex flex-col gap-2 pt-1">

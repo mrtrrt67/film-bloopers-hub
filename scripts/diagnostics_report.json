@@ -1,0 +1,101 @@
+{
+  "env": {
+    "passed": true,
+    "issues": [
+      "Notice: SUPABASE_SERVICE_ROLE_KEY is hosted on Vercel Cloud",
+      "Notice: TMDB_API_KEY is hosted on Vercel Cloud",
+      "Notice: GEMINI_API_KEY is hosted on Vercel Cloud"
+    ],
+    "presentKeys": [
+      "NEXT_PUBLIC_SUPABASE_URL",
+      "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+      "NEXT_PUBLIC_SITE_URL",
+      "NEXT_PUBLIC_AMAZON_TAG",
+      "STRIPE_WEBHOOK_SECRET",
+      "STRIPE_PUBLISHABLE_KEY",
+      "STRIPE_SECRET_KEY",
+      "STRIPE_PRICE_MONTHLY",
+      "STRIPE_PRICE_YEARLY",
+      "STRIPE_PRICE_LIFETIME",
+      "STRIPE_PRICE_PROMO"
+    ]
+  },
+  "database": {
+    "passed": true,
+    "tables": {
+      "films": {
+        "count": 217
+      },
+      "errori": {
+        "count": 989
+      },
+      "profiles": {
+        "count": 5
+      },
+      "configurazioni": {
+        "count": 25
+      },
+      "voti_bloopers": {
+        "count": 21
+      },
+      "suggerimenti": {
+        "count": 7
+      },
+      "log_ricerche": {
+        "count": 194
+      }
+    },
+    "issues": []
+  },
+  "stripe": {
+    "passed": true,
+    "prices": {
+      "Mensile": {
+        "id": "price_1URqXC6dphUuH9QPbzkwGM2v",
+        "active": true,
+        "currency": "eur",
+        "unit_amount": 99,
+        "type": "recurring"
+      },
+      "Annuale": {
+        "id": "price_1URqXC6dphUuH9QPHaBaJ8lw",
+        "active": true,
+        "currency": "eur",
+        "unit_amount": 999,
+        "type": "recurring"
+      },
+      "Lifetime Standard": {
+        "id": "price_1URqXC6dphUuH9QPgBkKVw27",
+        "active": true,
+        "currency": "eur",
+        "unit_amount": 1999,
+        "type": "one_time"
+      },
+      "Lifetime Promo": {
+        "id": "price_1URqXC6dphUuH9QPvYwigDhc",
+        "active": true,
+        "currency": "eur",
+        "unit_amount": 999,
+        "type": "one_time"
+      }
+    },
+    "issues": []
+  },
+  "home": {
+    "passed": true,
+    "issues": []
+  },
+  "routes": {
+    "passed": true,
+    "issues": []
+  },
+  "git": {
+    "branch": "main",
+    "status": "M src/app/api/admin/moderation/route.ts\n M src/app/api/admin/stats/route.ts\n M src/app/api/admin/users/route.ts\n M src/app/api/bloopers/generate/route.ts\n M src/app/api/bloopers/vote/route.ts\n M src/app/api/movies/import/route.ts\n M src/app/api/stripe/checkout/route.ts\n M src/app/api/stripe/webhook/route.ts\n M src/app/api/suggestions/route.ts\n M src/app/classifica/page.tsx\n M src/app/pricing/page.tsx\n M src/app/suggerimenti/page.tsx\n M src/components/BlooperItem.tsx\n M src/components/Footer.tsx\n M src/components/Navbar.tsx\n M src/components/admin/AdminModerationTab.tsx\n M src/components/admin/AdminSuggestionsTab.tsx\n M src/components/admin/AdminUsersTab.tsx\n M src/lib/types.ts\n M src/lib/utils.ts\nD  src/middleware.ts\n?? scripts/\n?? src/app/api/stripe/portal/\n?? src/lib/rewards.ts\n?? src/proxy.ts",
+    "issues": []
+  },
+  "typecheck": {
+    "passed": true,
+    "issues": []
+  }
+}

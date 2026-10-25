@@ -44,8 +44,9 @@ export interface Profile {
   id: string;
   email: string;
   punti: number;
-  tier: "free" | "premium";
-  tipo_abbonamento?: "mensile" | "lifetime" | null;
+  tier: "free" | "premium" | "admin";
+  tipo_abbonamento?: "mensile" | "annuale" | "lifetime" | "nessuno" | null;
+  subscription_type?: string | null;
   data_scadenza?: string | null;
   mesi_accreditati?: number;
   calls_today?: number;

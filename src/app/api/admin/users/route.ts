@@ -33,7 +33,7 @@ export async function GET() {
         // Verifica eventuale scadenza abbonamento mensile
         const tipoSub = p.tipo_abbonamento || p.subscription_type || "nessuno";
         const scadenza = p.data_scadenza || p.expires_at ? String(p.data_scadenza || p.expires_at).slice(0, 10) : null;
-        const isExpired = !isUserAdmin && tipoSub === "mensile" && scadenza ? scadenza < today : false;
+        const isExpired = !isUserAdmin && (tipoSub === "mensile" || tipoSub === "annuale") && scadenza ? scadenza < today : false;
 
         let tierEffettivo = p.tier || "free";
         let subEffettivo = tipoSub;

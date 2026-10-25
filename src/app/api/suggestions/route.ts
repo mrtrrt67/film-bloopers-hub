@@ -26,10 +26,26 @@ export async function POST(request: Request) {
       );
     }
 
+    let isPriority = false;
+    let finalMessage = messaggio.trim();
+
+    if (user?.id) {
+      const { data: prof } = await supabase
+        .from("profiles")
+        .select("tier, tipo_abbonamento")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (prof && (prof.tipo_abbonamento === "annuale" || prof.tipo_abbonamento === "lifetime")) {
+        isPriority = true;
+        finalMessage = `[PRIORITARIO ⚡ - Piano ${prof.tipo_abbonamento.toUpperCase()}] ${finalMessage}`;
+      }
+    }
+
     const { error: insertErr } = await adminDb.from("suggerimenti").insert({
       user_id: user?.id || null,
       email: emailUtente,
-      messaggio: messaggio.trim(),
+      messaggio: finalMessage,
     });
 
     if (insertErr) {
