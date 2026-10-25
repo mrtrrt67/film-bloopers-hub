@@ -4,11 +4,12 @@ import { useState, useEffect } from "react";
 import { AlertTriangle, CheckCircle, XCircle, Trash2, Edit3, Shield, Award } from "lucide-react";
 
 export default function AdminModerationTab() {
-  const [subTab, setSubTab] = useState<"pending" | "contests" | "approved">("pending");
-  const [data, setData] = useState<{ pending: any[]; contestazioni: any[]; approved: any[] }>({
+  const [subTab, setSubTab] = useState<"pending" | "contests" | "corrections" | "approved">("pending");
+  const [data, setData] = useState<{ pending: any[]; contestazioni: any[]; approved: any[]; corrections: any[] }>({
     pending: [],
     contestazioni: [],
     approved: [],
+    corrections: [],
   });
   const [loading, setLoading] = useState(true);
   const [pointsMap, setPointsMap] = useState<Record<string, number>>({});
@@ -172,6 +173,56 @@ export default function AdminModerationTab() {
     }
   };
 
+  const handleApproveCorrection = async (corr: any) => {
+    const defaultPts = corr.is_double_points ? 20 : 10;
+    const pts = pointsMap[corr.id] ?? defaultPts;
+    try {
+      const res = await fetch("/api/admin/moderation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "approve_suggestion_correction",
+          suggestion_id: corr.id,
+          userId: corr.user_id,
+          userEmail: corr.email,
+          points: pts,
+        }),
+      });
+      if (res.ok) {
+        const resJson = await res.json();
+        alert(resJson.message || "Correzione approvata e punti assegnati!");
+        setData((prev) => ({
+          ...prev,
+          corrections: (prev.corrections || []).filter((c) => c.id !== corr.id),
+        }));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const handleRejectCorrection = async (corrId: string | number) => {
+    if (!confirm("Rifiutare ed eliminare questa correzione?")) return;
+    try {
+      const res = await fetch("/api/admin/moderation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "reject_suggestion_correction",
+          suggestion_id: corrId,
+        }),
+      });
+      if (res.ok) {
+        setData((prev) => ({
+          ...prev,
+          corrections: (prev.corrections || []).filter((c) => c.id !== corrId),
+        }));
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex min-h-[300px] items-center justify-center">
@@ -183,10 +234,10 @@ export default function AdminModerationTab() {
   return (
     <div className="space-y-6">
       {/* HEADER TABS */}
-      <div className="flex items-center gap-2 border-b border-zinc-800 pb-3">
+      <div className="flex items-center gap-2 border-b border-zinc-800 pb-3 overflow-x-auto">
         <button
           onClick={() => setSubTab("pending")}
-          className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition ${
+          className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             subTab === "pending"
               ? "bg-amber-500 text-zinc-950 shadow-md"
               : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
@@ -197,7 +248,7 @@ export default function AdminModerationTab() {
         </button>
         <button
           onClick={() => setSubTab("contests")}
-          className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition ${
+          className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             subTab === "contests"
               ? "bg-amber-500 text-zinc-950 shadow-md"
               : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
@@ -207,8 +258,22 @@ export default function AdminModerationTab() {
           Contestazioni ({data.contestazioni.length})
         </button>
         <button
+          onClick={() => setSubTab("corrections")}
+          className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            subTab === "corrections"
+              ? "bg-amber-500 text-zinc-950 shadow-md"
+              : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+          }`}
+        >
+          <Award className="h-3.5 w-3.5" />
+          Correzioni Community ({data.corrections?.length || 0})
+          {(data.corrections?.length || 0) > 0 && (
+            <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-pulse ml-0.5" />
+          )}
+        </button>
+        <button
           onClick={() => setSubTab("approved")}
-          className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition ${
+          className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
             subTab === "approved"
               ? "bg-amber-500 text-zinc-950 shadow-md"
               : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
@@ -416,7 +481,98 @@ export default function AdminModerationTab() {
         </div>
       )}
 
-      {/* 3. ARCHIVIO APPROVATI */}
+      {/* 3. CORREZIONI SUGGERITE DALLA COMMUNITY */}
+      {subTab === "corrections" && (
+        <div className="space-y-4">
+          {(!data.corrections || data.corrections.length === 0) ? (
+            <div className="py-12 text-center text-zinc-500 text-xs rounded-2xl border border-zinc-800 bg-zinc-900/40">
+              Nessuna correzione inviata dalla community in attesa di moderazione 🎉
+            </div>
+          ) : (
+            data.corrections.map((corr) => {
+              const defaultPts = corr.is_double_points ? 20 : 10;
+              return (
+                <div
+                  key={corr.id}
+                  className={`rounded-2xl p-5 space-y-3 transition ${
+                    corr.is_priority
+                      ? "border-2 border-amber-500/80 bg-gradient-to-r from-amber-950/20 via-zinc-900/80 to-zinc-900/60 shadow-lg shadow-amber-500/10"
+                      : "border border-zinc-800 bg-zinc-900/60"
+                  }`}
+                >
+                  {corr.is_priority && (
+                    <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 px-2.5 py-0.5 text-[10px] font-black uppercase text-amber-300">
+                      ⚡ Priorità Moderazione • Piano {corr.user_sub} (Punti Doppi Classifica)
+                    </div>
+                  )}
+
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="font-black text-amber-400">
+                        ✍️ {corr.user_handle || "Utente"}
+                      </span>
+                      <span className="bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded text-[11px] font-mono">
+                        Punti attuali: {corr.user_points} pt
+                      </span>
+                      <span className="text-zinc-500 text-[11px] uppercase">
+                        [{corr.user_tier}]
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-zinc-500 font-mono">
+                      {corr.created_at ? corr.created_at.slice(0, 16).replace("T", " ") : ""}
+                    </span>
+                  </div>
+
+                  <div className="p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-800 text-xs text-zinc-200 leading-relaxed whitespace-pre-wrap">
+                    {corr.messaggio}
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pt-2 text-xs border-t border-zinc-800/60">
+                    <span className="text-zinc-500 text-[11px]">
+                      ID Utente: <span className="font-mono text-zinc-400">{corr.user_id || "Non associato"}</span>
+                    </span>
+
+                    <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                      <div className="flex items-center gap-1 text-[11px] text-zinc-400">
+                        <span>Punti da assegnare:</span>
+                        <input
+                          type="number"
+                          min="1"
+                          max="100"
+                          value={pointsMap[corr.id] ?? defaultPts}
+                          onChange={(e) =>
+                            setPointsMap({
+                              ...pointsMap,
+                              [corr.id]: parseInt(e.target.value, 10) || defaultPts,
+                            })
+                          }
+                          className="w-14 rounded-lg bg-zinc-950 border border-zinc-700 px-2 py-1 text-xs text-white font-mono"
+                        />
+                      </div>
+                      <button
+                        onClick={() => handleApproveCorrection(corr)}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-emerald-500 text-zinc-950 font-bold hover:brightness-110 active:scale-95 transition"
+                      >
+                        <CheckCircle className="h-3.5 w-3.5" />
+                        Approva & Assegna Punti
+                      </button>
+                      <button
+                        onClick={() => handleRejectCorrection(corr.id)}
+                        className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-zinc-800 text-rose-400 font-bold hover:bg-rose-500/10 active:scale-95 transition"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                        Rifiuta
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      )}
+
+      {/* 4. ARCHIVIO APPROVATI */}
       {subTab === "approved" && (
         <div className="space-y-3">
           {data.approved.length === 0 ? (

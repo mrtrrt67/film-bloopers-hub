@@ -84,11 +84,18 @@ export default function AdminSuggestionsTab() {
                   }`}
                 >
                   <div className="space-y-2 flex-1">
-                    {isPriority && (
-                      <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 px-2.5 py-0.5 text-[10px] font-black uppercase text-amber-300">
-                        ⚡ Supporto Prioritario (Piano Annuale/Lifetime)
-                      </div>
-                    )}
+                    <div className="flex flex-wrap items-center gap-2">
+                      {isPriority && (
+                        <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 px-2.5 py-0.5 text-[10px] font-black uppercase text-amber-300">
+                          ⚡ Supporto Prioritario (Piano Annuale/Lifetime)
+                        </div>
+                      )}
+                      {s.messaggio?.includes("[Correzione blooper]") && s.user_id && (
+                        <div className="inline-flex items-center gap-1.5 rounded-full bg-purple-500/20 border border-purple-500/40 px-2.5 py-0.5 text-[10px] font-black uppercase text-purple-300">
+                          ⚖️ In Moderazione Bloopers (Assegnazione Punti)
+                        </div>
+                      )}
+                    </div>
                     <div className="flex flex-wrap items-center gap-3 text-xs">
                       <span className="flex items-center gap-1.5 font-bold text-amber-400">
                         <Mail className="h-3.5 w-3.5" />

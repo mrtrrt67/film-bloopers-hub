@@ -70,10 +70,38 @@ export async function GET() {
       .order("creato_il", { ascending: false })
       .limit(50);
 
+    // 4. Correzioni blooper inviate dal modulo suggerimenti (solo utenti registrati che partecipano alla classifica)
+    const { data: rawCorrections } = await supabase
+      .from("suggerimenti")
+      .select("*")
+      .ilike("messaggio", "%[Correzione blooper]%")
+      .not("user_id", "is", null)
+      .order("created_at", { ascending: false });
+
+    const pendingCorrections = (rawCorrections || [])
+      .filter((s: any) => !s.messaggio?.includes("[APPROVATO]") && !s.messaggio?.includes("[RIFIUTATO]"))
+      .map((s: any) => {
+        const key = s.email ? s.email.toLowerCase() : "";
+        const p = (s.user_id && allProfiles?.find((prof: any) => prof.id === s.user_id)) || (key ? profilesByHandleOrEmail[key] : null);
+        const isPriority = p && (p.tipo_abbonamento === "annuale" || p.tipo_abbonamento === "lifetime");
+        const handle = p?.email ? `@${p.email.split("@")[0]}` : (s.email ? `@${s.email.split("@")[0]}` : "Utente");
+        return {
+          ...s,
+          user_id: s.user_id || p?.id || null,
+          user_handle: handle,
+          user_tier: p?.tier || "free",
+          user_sub: p?.tipo_abbonamento || "nessuno",
+          user_points: p?.punti || 0,
+          is_priority: !!isPriority,
+          is_double_points: !!isPriority,
+        };
+      });
+
     return NextResponse.json({
       pending: enrichedPending,
       contestazioni: contestazioni || [],
       approved: approvedUserBloopers || [],
+      corrections: pendingCorrections,
     });
   } catch (err: any) {
     console.error("Errore moderazione:", err);
@@ -92,7 +120,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { action, blooper_id, contestazione_id, points, userId, userEmail, minuto, descrizione } = body;
+    const { action, blooper_id, contestazione_id, suggestion_id, points, userId, userEmail, minuto, descrizione } = body;
 
     if (action === "approve") {
       // 1. Approva blooper
@@ -224,6 +252,61 @@ export async function POST(request: Request) {
         await supabase.from("errori").delete().eq("id", blooper_id);
       }
       return NextResponse.json({ success: true, message: "Blooper eliminato dall'archivio." });
+    }
+
+    if (action === "approve_suggestion_correction") {
+      let targetProfile = null;
+      if (userId) {
+        const { data: p } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
+        targetProfile = p;
+      }
+      if (!targetProfile && userEmail) {
+        let query = supabase.from("profiles").select("*");
+        if (userEmail.includes("@")) {
+          query = query.eq("email", userEmail.trim());
+        } else {
+          const clean = userEmail.replace(/^@/, "").trim();
+          query = query.ilike("email", `${clean}@%`);
+        }
+        const { data: p } = await query.maybeSingle();
+        targetProfile = p;
+      }
+
+      let awardedPts = points ? parseInt(String(points), 10) : 10;
+      let isDouble = false;
+      let rewardMsg = "";
+
+      if (targetProfile) {
+        if (targetProfile.tipo_abbonamento === "annuale" || targetProfile.tipo_abbonamento === "lifetime") {
+          awardedPts = points ? parseInt(String(points), 10) : 20;
+          isDouble = true;
+        }
+
+        const newTotal = (targetProfile.punti || 0) + awardedPts;
+        await supabase.from("profiles").update({ punti: newTotal }).eq("id", targetProfile.id);
+        const resReward = await checkAndAwardPointRewards(supabase, targetProfile.id, newTotal);
+        if (resReward?.message) {
+          rewardMsg = ` (${resReward.message})`;
+        }
+      }
+
+      // Rimuovi la segnalazione approvata dalla coda dei suggerimenti
+      if (suggestion_id) {
+        await supabase.from("suggerimenti").delete().eq("id", suggestion_id);
+      }
+
+      const msg = isDouble
+        ? `Correzione approvata! Assegnati ${awardedPts} pt (Raddoppiati per Piano Annuale/Lifetime)${rewardMsg}`
+        : `Correzione approvata e ${awardedPts} pt assegnati alla classifica!${rewardMsg}`;
+
+      return NextResponse.json({ success: true, message: msg });
+    }
+
+    if (action === "reject_suggestion_correction") {
+      if (suggestion_id) {
+        await supabase.from("suggerimenti").delete().eq("id", suggestion_id);
+      }
+      return NextResponse.json({ success: true, message: "Correzione rifiutata ed eliminata dalla moderazione." });
     }
 
     return NextResponse.json({ error: "Azione non riconosciuta" }, { status: 400 });

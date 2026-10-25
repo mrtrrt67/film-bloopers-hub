@@ -91,7 +91,7 @@
   },
   "git": {
     "branch": "main",
-    "status": "M src/app/api/admin/moderation/route.ts\n M src/app/classifica/page.tsx\n M src/app/film/[slug]/BloopersSection.tsx\n M src/components/AuthModal.tsx\n M src/components/BlooperItem.tsx\n M src/components/Navbar.tsx\n M src/lib/utils.ts",
+    "status": "M scripts/diagnostics_report.json\n M src/app/api/admin/moderation/route.ts\n M src/app/suggerimenti/page.tsx\n M src/components/admin/AdminModerationTab.tsx\n M src/components/admin/AdminSuggestionsTab.tsx",
     "issues": []
   },
   "typecheck": {
