@@ -31,6 +31,23 @@ export default function Navbar() {
   const [openingPortal, setOpeningPortal] = useState(false);
   const userMenuRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
+  const [isStaging, setIsStaging] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const host = window.location.hostname.toLowerCase();
+      const stagingActive =
+        host.includes("staging") ||
+        host.includes("vercel.app") ||
+        host === "localhost" ||
+        host === "127.0.0.1";
+      setIsStaging(stagingActive);
+
+      if (stagingActive && !document.title.startsWith("[STAGING]")) {
+        document.title = `[STAGING] ${document.title}`;
+      }
+    }
+  }, [pathname]);
 
   const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "mrtrrt67@gmail.com").toLowerCase();
   const isAdmin = user && user.email && user.email.toLowerCase() === adminEmail;
@@ -129,22 +146,45 @@ export default function Navbar() {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full border-b border-zinc-800/60 bg-zinc-950/75 backdrop-blur-xl transition-all">
+      <header className={`sticky top-0 z-50 w-full backdrop-blur-xl transition-all ${
+        isStaging
+          ? "border-b border-cyan-500/30 bg-zinc-950/85 shadow-sm shadow-cyan-950/20"
+          : "border-b border-zinc-800/60 bg-zinc-950/75"
+      }`}>
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           
-          {/* Logo Minimalista & Moderno */}
+          {/* Logo Minimalista & Moderno (con variante Staging Cyan/Emerald) */}
           <Link href="/" className="flex items-center gap-2.5 group shrink-0">
-            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-tr from-amber-500 via-orange-500 to-amber-600 shadow-md shadow-orange-500/15 group-hover:scale-105 transition-all">
+            <div className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all group-hover:scale-105 ${
+              isStaging
+                ? "bg-gradient-to-tr from-cyan-500 via-teal-500 to-emerald-400 shadow-md shadow-cyan-500/25 ring-1 ring-cyan-400/40"
+                : "bg-gradient-to-tr from-amber-500 via-orange-500 to-amber-600 shadow-md shadow-orange-500/15"
+            }`}>
               <Film className="h-4.5 w-4.5 text-zinc-950" />
             </div>
             <div className="flex items-baseline gap-1">
-              <span className="text-base font-black tracking-tight text-white group-hover:text-amber-400 transition-colors">
+              <span className={`text-base font-black tracking-tight text-white transition-colors ${
+                isStaging ? "group-hover:text-cyan-400" : "group-hover:text-amber-400"
+              }`}>
                 FilmBloopers
               </span>
-              <span className="text-xs font-black uppercase tracking-wider text-amber-400">
+              <span className={`text-xs font-black uppercase tracking-wider ${
+                isStaging ? "text-cyan-400" : "text-amber-400"
+              }`}>
                 Hub
               </span>
             </div>
+
+            {/* Badge Staging con radar pulsante */}
+            {isStaging && (
+              <span className="ml-1 inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-cyan-950/90 border border-cyan-500/40 text-[9px] font-black uppercase tracking-wider text-cyan-300 shadow-sm shadow-cyan-500/20">
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-cyan-400"></span>
+                </span>
+                <span>STAGING</span>
+              </span>
+            )}
           </Link>
 
           {/* Navigazione Desktop Tipografica (Ariosa, senza icone ingombranti) */}
@@ -346,6 +386,17 @@ export default function Navbar() {
         {/* Menu Mobile Pulito & Ordinato */}
         {mobileMenuOpen && (
           <div className="md:hidden border-b border-zinc-800 bg-zinc-950/95 px-4 pt-3 pb-5 space-y-1 backdrop-blur-2xl">
+            {isStaging && (
+              <div className="mb-2 px-3 py-1.5 rounded-lg bg-cyan-950/70 border border-cyan-500/30 flex items-center justify-between text-[11px] text-cyan-300 font-bold">
+                <span className="flex items-center gap-1.5">
+                  <span className="h-2 w-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                  Ambiente Staging (Database Test)
+                </span>
+                <span className="text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded bg-cyan-500/20 text-cyan-300">
+                  Sandbox
+                </span>
+              </div>
+            )}
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
