@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AccessTracker from "@/components/AccessTracker";
+import PwaInstallPrompt from "@/components/PwaInstallPrompt";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -62,9 +63,10 @@ export const metadata: Metadata = {
     type: "website",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "https://filmbloopers.online/og-image.jpg",
         width: 1200,
         height: 630,
+        type: "image/jpeg",
         alt: "FilmBloopers Hub - L'Archivio degli Errori nei Film",
       },
     ],
@@ -75,7 +77,7 @@ export const metadata: Metadata = {
     description:
       "Tutti i bloopers, errori di scena e curiosità del cinema italiano e internazionale al minuto esatto.",
     creator: "@FilmBloopersHub",
-    images: ["/og-image.jpg"],
+    images: ["https://filmbloopers.online/og-image.jpg"],
   },
   robots: {
     index: true,
@@ -91,9 +93,11 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
     ],
     apple: [
-      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
     ],
   },
   manifest: "/manifest.webmanifest",
@@ -116,6 +120,7 @@ export default function RootLayout({
         style={{ backgroundColor: "#09090b" }}
       >
         <AccessTracker />
+        <PwaInstallPrompt />
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
