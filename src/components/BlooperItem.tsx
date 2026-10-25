@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Clock, Tag, ThumbsUp, ThumbsDown, CheckCircle, AlertTriangle, User, Sparkles, ArrowRight } from "lucide-react";
 import { Blooper } from "@/lib/types";
-import { calculateAttendibilita } from "@/lib/utils";
+import { calculateAttendibilita, formatPublicAuthor } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import AuthModal from "./AuthModal";
 
@@ -241,7 +241,7 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
         <div className="flex items-center gap-1.5 text-zinc-500">
           <User className="h-3.5 w-3.5" />
           <span>
-            Autore: <strong className="text-zinc-400">{blooper.inserito_da || "IA (Sistema)"}</strong>
+            Autore: <strong className="text-zinc-300 font-semibold">{formatPublicAuthor(blooper.inserito_da, blooper.provenienza)}</strong>
           </span>
         </div>
 

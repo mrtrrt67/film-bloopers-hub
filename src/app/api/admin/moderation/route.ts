@@ -20,22 +20,22 @@ export async function GET() {
       .order("creato_il", { ascending: false });
 
     // Recupera profili degli autori per evidenziare priorità e punti doppi
-    const submitterEmails = Array.from(new Set((pendingBloopers || []).map((b: any) => b.inserito_da).filter(Boolean)));
-    let profilesByEmail: Record<string, any> = {};
+    const { data: allProfiles } = await supabase
+      .from("profiles")
+      .select("id, email, tier, tipo_abbonamento, punti");
 
-    if (submitterEmails.length > 0) {
-      const { data: profs } = await supabase
-        .from("profiles")
-        .select("id, email, tier, tipo_abbonamento, punti")
-        .in("email", submitterEmails);
-
-      (profs || []).forEach((p: any) => {
-        if (p.email) profilesByEmail[p.email.toLowerCase()] = p;
-      });
-    }
+    const profilesByHandleOrEmail: Record<string, any> = {};
+    (allProfiles || []).forEach((p: any) => {
+      if (p.email) {
+        profilesByHandleOrEmail[p.email.toLowerCase()] = p;
+        const handle = `@${p.email.split("@")[0].toLowerCase()}`;
+        profilesByHandleOrEmail[handle] = p;
+      }
+    });
 
     const enrichedPending = (pendingBloopers || []).map((b: any) => {
-      const p = b.inserito_da ? profilesByEmail[b.inserito_da.toLowerCase()] : null;
+      const key = b.inserito_da ? b.inserito_da.toLowerCase() : "";
+      const p = key ? profilesByHandleOrEmail[key] : null;
       const isPriority = p && (p.tipo_abbonamento === "annuale" || p.tipo_abbonamento === "lifetime");
       const isDoublePoints = isPriority;
       return {
@@ -101,7 +101,14 @@ export async function POST(request: Request) {
       // 2. Assegna punti se l'utente è registrato e applica moltiplicatore 2x se annuale/lifetime
       let targetProfile = null;
       if (userEmail) {
-        const { data: p } = await supabase.from("profiles").select("*").eq("email", userEmail).maybeSingle();
+        let query = supabase.from("profiles").select("*");
+        if (userEmail.includes("@")) {
+          query = query.eq("email", userEmail.trim());
+        } else {
+          const clean = userEmail.replace(/^@/, "").trim();
+          query = query.ilike("email", `${clean}@%`);
+        }
+        const { data: p } = await query.maybeSingle();
         targetProfile = p;
       } else if (userId) {
         const { data: p } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();

@@ -188,9 +188,9 @@ export default function Navbar() {
                     {user.email ? user.email.slice(0, 1).toUpperCase() : "U"}
                   </div>
 
-                  {/* Nome/Email compatto */}
+                  {/* Nome/Username compatto */}
                   <span className="max-w-[110px] truncate font-medium text-zinc-200">
-                    {user.email?.split("@")[0]}
+                    {user.user_metadata?.username ? `@${user.user_metadata.username.replace(/^@/, "")}` : `@${user.email?.split("@")[0]}`}
                   </span>
 
                   {/* Badge Abbonamento */}
@@ -372,7 +372,7 @@ export default function Navbar() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between px-3 py-2 bg-zinc-900/40 rounded-xl">
                     <span className="text-xs text-zinc-300 truncate max-w-[180px] font-medium">
-                      {user.email}
+                      {user.user_metadata?.username ? `@${user.user_metadata.username.replace(/^@/, "")}` : `@${user.email?.split("@")[0]}`}
                     </span>
                     {userProfile?.tipo_abbonamento === "lifetime" ? (
                       <span className="rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black px-2 py-0.5">

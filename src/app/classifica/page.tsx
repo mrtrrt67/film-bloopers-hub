@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 import { Trophy, Award, Crown, Star, Sparkles, Shield, User } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { maskEmail, getRankInfo, replacePlaceholders } from "@/lib/utils";
+import { formatPublicAuthor, getRankInfo, replacePlaceholders } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Classifica Cacciatori di Bloopers | FilmBloopers Hub",
@@ -127,13 +127,15 @@ export default async function ClassificaPage() {
                   <span className="text-zinc-200">
                     {isCurrentUser ? (
                       <>
-                        <strong className="text-amber-400">{p.email}</strong>{" "}
-                        <span className="text-[10px] rounded bg-amber-500/20 text-amber-300 px-1.5 py-0.5">
+                        <strong className="text-amber-400 font-bold">{formatPublicAuthor(p.email, "utente")}</strong>{" "}
+                        <span className="text-[10px] rounded bg-amber-500/20 text-amber-300 font-bold px-1.5 py-0.5">
                           (Tu)
                         </span>
                       </>
                     ) : (
-                      maskEmail(p.email)
+                      <span className="font-medium text-zinc-300">
+                        {formatPublicAuthor(p.email, "utente")}
+                      </span>
                     )}
                   </span>
                 </div>

@@ -18,6 +18,33 @@ export function slugify(titolo: string, anno?: string | number | null): string {
   return `${base}${annoStr}`;
 }
 
+export function formatPublicAuthor(
+  inseritoDa?: string | null,
+  provenienza?: string | null
+): string {
+  // 1. Se generato dall'IA o inserito dal sistema, NON mostrare mai l'email dell'admin
+  if (
+    provenienza === "ia" ||
+    !inseritoDa ||
+    inseritoDa.toLowerCase().includes("ia") ||
+    inseritoDa.toLowerCase().includes("sistema") ||
+    inseritoDa.toLowerCase().includes("gemini")
+  ) {
+    return "IA (FilmBloopers Hub)";
+  }
+
+  const clean = inseritoDa.trim();
+
+  // 2. Se è un'email, per privacy e rispetto GDPR NON mostrare mai il dominio né l'indirizzo per esteso
+  if (clean.includes("@")) {
+    const [name] = clean.split("@");
+    return `@${name}`;
+  }
+
+  // 3. Se è già uno username personalizzato
+  return clean.startsWith("@") ? clean : `@${clean}`;
+}
+
 export function maskEmail(email: string): string {
   if (!email || !email.includes("@")) return "Utente";
   const [username, domain] = email.split("@");

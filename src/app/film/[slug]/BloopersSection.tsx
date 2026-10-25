@@ -72,15 +72,21 @@ export default function BloopersSection({ film, initialBloopers }: BloopersSecti
 
     setSubmitting(true);
     try {
-      const { error: insertErr } = await supabase.from("errori").insert({
-        film_id: film.id,
-        minuto: minuto.trim() || "00:00",
-        categoria,
-        descrizione: descrizione.trim(),
-        approvato: false,
-        inserito_da: user.email,
-        provenienza: "utente",
-      });
+        const authorHandle = user.user_metadata?.username
+          ? `@${user.user_metadata.username.replace(/^@/, "")}`
+          : user.email
+          ? `@${user.email.split("@")[0]}`
+          : "Utente";
+
+        const { error: insertErr } = await supabase.from("errori").insert({
+          film_id: film.id,
+          minuto: minuto.trim() || "00:00",
+          categoria,
+          descrizione: descrizione.trim(),
+          approvato: false,
+          inserito_da: authorHandle,
+          provenienza: "utente",
+        });
 
       if (insertErr) throw insertErr;
 

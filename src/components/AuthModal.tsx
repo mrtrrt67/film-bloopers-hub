@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { X, Lock, Mail, ArrowRight, UserCheck, KeyRound, Sparkles } from "lucide-react";
+import { X, Lock, Mail, User, ArrowRight, UserCheck, KeyRound, Sparkles } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 interface AuthModalProps {
@@ -20,6 +20,7 @@ export default function AuthModal({
 }: AuthModalProps) {
   const [mode, setMode] = useState<"login" | "register" | "forgot">(defaultMode);
   const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -38,14 +39,32 @@ export default function AuthModal({
 
     try {
       if (mode === "login") {
+        let targetEmail = email.trim();
+
+        // Se l'utente ha inserito uno username invece dell'email (nessuna @)
+        if (!targetEmail.includes("@")) {
+          const cleanUsername = targetEmail.replace(/^@/, "").trim();
+          const { data: found } = await supabase
+            .from("profiles")
+            .select("email")
+            .ilike("email", `${cleanUsername}@%`)
+            .maybeSingle();
+
+          if (found?.email) {
+            targetEmail = found.email;
+          } else {
+            throw new Error(`Nessun account trovato per l'username "${cleanUsername}". Prova ad accedere inserendo la tua email.`);
+          }
+        }
+
         const { error } = await supabase.auth.signInWithPassword({
-          email: email.trim(),
+          email: targetEmail,
           password,
         });
 
         if (error) {
           if (error.message.includes("Invalid login credentials")) {
-            throw new Error("Credenziali non valide. Controlla email e password.");
+            throw new Error("Credenziali non valide. Controlla email/username e password.");
           }
           throw error;
         }
@@ -64,9 +83,19 @@ export default function AuthModal({
           throw new Error("Le due password non corrispondono.");
         }
 
+        const cleanUsername =
+          username.trim().replace(/^@/, "").replace(/\s+/g, "_") ||
+          email.split("@")[0] ||
+          "Cacciatore";
+
         const { error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
+          options: {
+            data: {
+              username: cleanUsername,
+            },
+          },
         });
 
         if (error) throw error;
@@ -190,18 +219,43 @@ export default function AuthModal({
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          {mode === "register" && (
+            <div>
+              <label className="block text-xs font-bold text-zinc-300 mb-1.5">
+                Username pubblico <span className="text-zinc-500 font-normal">(Nickname)</span>
+              </label>
+              <div className="relative">
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <input
+                  type="text"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
+                  placeholder="es. Cinefilo99 (opzionale)"
+                  className="w-full rounded-xl border border-zinc-800 bg-zinc-950 pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                />
+              </div>
+              <p className="text-[11px] text-zinc-400 mt-1">
+                🔒 Questo nome comparirà come autore dei bloopers e in classifica al posto della tua email.
+              </p>
+            </div>
+          )}
+
           <div>
             <label className="block text-xs font-bold text-zinc-300 mb-1.5">
-              Indirizzo Email
+              {mode === "login" ? "Email o Username" : "Indirizzo Email"}
             </label>
             <div className="relative">
-              <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+              {mode === "login" ? (
+                <User className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+              ) : (
+                <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+              )}
               <input
-                type="email"
+                type={mode === "login" ? "text" : "email"}
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="nome@esempio.com"
+                placeholder={mode === "login" ? "nome@esempio.com oppure Cinefilo99" : "nome@esempio.com"}
                 className="w-full rounded-xl border border-zinc-800 bg-zinc-950 pl-10 pr-4 py-2.5 text-sm text-white placeholder-zinc-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
               />
             </div>
