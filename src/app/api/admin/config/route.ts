@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 
 export async function GET() {
@@ -43,15 +44,24 @@ export async function PATCH(request: Request) {
 
     for (const item of items) {
       if (item.chiave) {
-        await supabase
+        const { error: updErr } = await supabase
           .from("configurazioni")
           .update({
             valore: item.valore,
             visibile: item.visibile !== undefined ? item.visibile : true,
           })
           .eq("chiave", item.chiave);
+
+        if (updErr) {
+          console.error("Errore aggiornamento configurazione:", item.chiave, updErr);
+        }
       }
     }
+
+    // Invalida la cache delle pagine interessate per mostrare subito le nuove configurazioni
+    revalidatePath("/");
+    revalidatePath("/pricing");
+    revalidatePath("/classifica");
 
     return NextResponse.json({ success: true });
   } catch (err: any) {
@@ -59,3 +69,4 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: err.message || "Errore salvataggio configurazioni" }, { status: 500 });
   }
 }
+

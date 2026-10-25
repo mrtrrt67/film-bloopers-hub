@@ -120,3 +120,62 @@ export function getYouTubeSearchUrl(titolo: string): string {
   const query = encodeURIComponent(`${titolo} movie mistakes bloopers`);
   return `https://www.youtube.com/results?search_query=${query}`;
 }
+
+export function formatDateItalian(dateInput: string | Date | null | undefined): string {
+  if (!dateInput) return "";
+
+  if (typeof dateInput === "string") {
+    const trimmed = dateInput.trim();
+    // Match YYYY-MM-DD
+    const isoMatch = trimmed.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (isoMatch) {
+      const year = isoMatch[1];
+      const monthNum = parseInt(isoMatch[2], 10);
+      const day = parseInt(isoMatch[3], 10);
+      const months = [
+        "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+        "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"
+      ];
+      if (monthNum >= 1 && monthNum <= 12) {
+        return `${day} ${months[monthNum - 1]} ${year}`;
+      }
+      return `${day.toString().padStart(2, "0")}/${monthNum.toString().padStart(2, "0")}/${year}`;
+    }
+
+    // Match DD/MM/YYYY or DD-MM-YYYY
+    const itMatch = trimmed.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})/);
+    if (itMatch) {
+      const day = parseInt(itMatch[1], 10);
+      const monthNum = parseInt(itMatch[2], 10);
+      const year = itMatch[3];
+      const months = [
+        "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+        "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"
+      ];
+      if (monthNum >= 1 && monthNum <= 12) {
+        return `${day} ${months[monthNum - 1]} ${year}`;
+      }
+      return `${day.toString().padStart(2, "0")}/${monthNum.toString().padStart(2, "0")}/${year}`;
+    }
+  }
+
+  try {
+    const d = new Date(dateInput);
+    if (!isNaN(d.getTime())) {
+      return d.toLocaleDateString("it-IT", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+    }
+  } catch {}
+
+  return String(dateInput);
+}
+
+export function formatHighlightedDateItalian(dateInput: string | Date | null | undefined): string {
+  const formatted = formatDateItalian(dateInput);
+  if (!formatted) return "";
+  return `<strong class="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black shadow-sm mx-1 tracking-normal">${formatted}</strong>`;
+}
+

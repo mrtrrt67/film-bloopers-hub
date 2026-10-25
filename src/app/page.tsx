@@ -25,7 +25,7 @@ export default async function HomePage() {
   const bannerTitolo = conf["home_banner_top_titolo"];
   const bannerTesto = conf["home_banner_top_testo"];
   const bannerBadge = conf["home_banner_top_badge"];
-  const promoDeadline = conf["promo_lifetime_deadline"] || "31/12/2026";
+  const promoDeadline = conf["promo_lifetime_deadline"] || "2026-12-31";
 
   // 2. Film in evidenza (con conteggio errori)
   const { data: filmsRaw } = await supabase

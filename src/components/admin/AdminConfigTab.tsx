@@ -1,7 +1,58 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sliders, Save, Check, Calendar, Eye, EyeOff } from "lucide-react";
+import { Sliders, Save, Check, Calendar, Eye, EyeOff, Sparkles } from "lucide-react";
+import { formatDateItalian } from "@/lib/utils";
+
+const CONFIG_METADATA: Record<string, { label: string; desc?: string }> = {
+  home_banner_top_testo: {
+    label: "Testo Banner Promozionale Homepage",
+    desc: "Testo del banner promo in alto. Usa il segnaposto {scadenza} per inserire automaticamente la data della promo formattata in italiano ed evidenziata.",
+  },
+  home_banner_top_titolo: {
+    label: "Titolo Banner Promozionale Homepage",
+    desc: "Intestazione principale in evidenza nel banner (es. PROMO SPECIALE DI LANCIO STARTUP).",
+  },
+  home_banner_top_badge: {
+    label: "Badge Banner Promozionale Homepage",
+    desc: "Etichetta del banner promo (es. Offerta a Tempo Limitato).",
+  },
+  home_banner_top: {
+    label: "Visibilità Banner Promozionale Homepage",
+    desc: "Imposta 'true' per visualizzarlo o 'false' per nasconderlo.",
+  },
+  soglia_punti_mensile: {
+    label: "Soglia Punti per 1 Mese Premium Gratuito",
+    desc: "Numero di punti necessari affinché un utente guadagni automaticamente 1 mese gratis.",
+  },
+  soglia_punti_lifetime: {
+    label: "Soglia Punti per Accesso Lifetime a Vita",
+    desc: "Numero di punti necessari per sbloccare l'accesso Premium a vita.",
+  },
+  classifica_titolo: {
+    label: "Titolo Pagina Classifica",
+  },
+  classifica_banner_titolo: {
+    label: "Titolo Box Regole e Punteggi",
+  },
+  classifica_testo_1: {
+    label: "Spiegazione Regola Base Classifica",
+  },
+  classifica_testo_2: {
+    label: "Spiegazione Premio Mensile",
+    desc: "Puoi usare {soglia_mensile} nel testo.",
+  },
+  classifica_testo_3: {
+    label: "Spiegazione Premio Lifetime",
+    desc: "Puoi usare {soglia_lifetime} nel testo.",
+  },
+  footer_testo_principale: {
+    label: "Testo Principale Footer",
+  },
+  footer_testo_amazon: {
+    label: "Disclaimer Affiliazione Amazon Footer",
+  },
+};
 
 export default function AdminConfigTab() {
   const [configs, setConfigs] = useState<any[]>([]);
@@ -82,7 +133,7 @@ export default function AdminConfigTab() {
             Gestione Testi, Promo & Visibilità Sezioni
           </h3>
           <p className="text-xs text-zinc-400 mt-0.5">
-            Personalizza la data limite della promo Startup Lifetime, i messaggi promozionali e regola quali blocchi mostrare.
+            Personalizza dinamicamente la data limite della promo Startup Lifetime, i messaggi promozionali e regola i blocchi del portale.
           </p>
         </div>
         <button
@@ -106,35 +157,69 @@ export default function AdminConfigTab() {
         </button>
       </div>
 
-      {/* 1. SCADENZA PROMO STARTUP LIFETIME */}
+      {/* 1. SCADENZA PROMO STARTUP LIFETIME (DINAMICA & FORMATO ITALIANO) */}
       {promoConfig && (
-        <div className="rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5 space-y-3">
+        <div className="rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-500/10 via-amber-950/20 to-zinc-900 p-5 sm:p-6 space-y-4 shadow-lg shadow-amber-500/5">
           <div className="flex items-center justify-between">
             <h4 className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
               <Calendar className="h-4 w-4" />
-              ⭐ Scadenza Offerta Promo Lifetime Startup
+              ⭐ Scadenza Offerta Promo Lifetime Startup (Dinamica)
             </h4>
             <button
               onClick={() => handleVisibilityToggle(promoConfig.chiave)}
               className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${
                 promoConfig.visibile
-                  ? "bg-emerald-500/20 text-emerald-300"
-                  : "bg-zinc-800 text-zinc-500"
+                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                  : "bg-zinc-800 text-zinc-500 border border-zinc-700"
               }`}
             >
               {promoConfig.visibile ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
               {promoConfig.visibile ? "Visibile" : "Nascosto"}
             </button>
           </div>
-          <p className="text-xs text-zinc-300">
-            Questa data viene mostrata nel banner promozionale e nel conto alla rovescia dell&apos;offerta a vita.
+          <p className="text-xs text-zinc-300 leading-relaxed">
+            Seleziona la data limite per sbloccare l&apos;accesso Lifetime gratuito. La data verrà automaticamente convertita in <strong>formato italiano</strong> ed <strong>evidenziata graficamente</strong> nel banner in home e nelle pagine del sito.
           </p>
-          <input
-            type="date"
-            value={promoConfig.valore || ""}
-            onChange={(e) => handleTextChange(promoConfig.chiave, e.target.value)}
-            className="w-full sm:w-64 rounded-xl bg-zinc-950 border border-zinc-700 px-3 py-2 text-xs text-white font-mono focus:outline-none focus:border-amber-500"
-          />
+
+          <div className="flex flex-col sm:flex-row sm:items-center gap-3 pt-1">
+            <input
+              type="date"
+              value={promoConfig.valore || ""}
+              onChange={(e) => handleTextChange(promoConfig.chiave, e.target.value)}
+              className="w-full sm:w-64 rounded-xl bg-zinc-950 border border-zinc-700 px-3.5 py-2.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500 shadow-inner"
+            />
+            <div className="flex items-center gap-2 text-xs">
+              <span className="text-zinc-400">Anteprima nel sito:</span>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black shadow-sm">
+                {formatDateItalian(promoConfig.valore || "2026-12-31")}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2 pt-1 text-[11px] text-zinc-400">
+            <span className="font-semibold text-zinc-500">Scorciatoie veloci:</span>
+            <button
+              type="button"
+              onClick={() => handleTextChange(promoConfig.chiave, "2026-12-31")}
+              className="px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-700 hover:border-amber-500/50 text-zinc-300 hover:text-white transition"
+            >
+              31 Dicembre 2026
+            </button>
+            <button
+              type="button"
+              onClick={() => handleTextChange(promoConfig.chiave, "2027-01-01")}
+              className="px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-700 hover:border-amber-500/50 text-zinc-300 hover:text-white transition"
+            >
+              1 Gennaio 2027
+            </button>
+            <button
+              type="button"
+              onClick={() => handleTextChange(promoConfig.chiave, "2027-12-31")}
+              className="px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-700 hover:border-amber-500/50 text-zinc-300 hover:text-white transition"
+            >
+              31 Dicembre 2027
+            </button>
+          </div>
         </div>
       )}
 
@@ -148,45 +233,78 @@ export default function AdminConfigTab() {
           <p className="text-xs text-zinc-500 py-4">Nessun&apos;altra chiave di configurazione presente.</p>
         ) : (
           <div className="space-y-4 divide-y divide-zinc-800/60">
-            {otherConfigs.map((cfg) => (
-              <div key={cfg.chiave} className="pt-4 first:pt-0 space-y-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-mono text-xs font-bold text-amber-400">
-                    {cfg.chiave}
-                  </span>
-                  <button
-                    onClick={() => handleVisibilityToggle(cfg.chiave)}
-                    className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${
-                      cfg.visibile
-                        ? "bg-emerald-500/20 text-emerald-300"
-                        : "bg-zinc-800 text-zinc-500"
-                    }`}
-                  >
-                    {cfg.visibile ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
-                    {cfg.visibile ? "Visibile" : "Nascosto"}
-                  </button>
-                </div>
+            {otherConfigs.map((cfg) => {
+              const meta = CONFIG_METADATA[cfg.chiave];
 
-                {(cfg.valore || "").length > 80 ? (
-                  <textarea
-                    rows={3}
-                    value={cfg.valore || ""}
-                    onChange={(e) => handleTextChange(cfg.chiave, e.target.value)}
-                    className="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-3 text-xs text-zinc-200 focus:outline-none focus:border-amber-500 leading-relaxed"
-                  />
-                ) : (
-                  <input
-                    type="text"
-                    value={cfg.valore || ""}
-                    onChange={(e) => handleTextChange(cfg.chiave, e.target.value)}
-                    className="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-amber-500"
-                  />
-                )}
-              </div>
-            ))}
+              return (
+                <div key={cfg.chiave} className="pt-4 first:pt-0 space-y-2">
+                  <div className="flex items-start justify-between gap-3">
+                    <div>
+                      <span className="font-bold text-xs text-amber-400 block">
+                        {meta?.label || cfg.chiave}
+                      </span>
+                      {meta?.desc ? (
+                        <p className="text-[11px] text-zinc-400 mt-0.5 leading-relaxed">{meta.desc}</p>
+                      ) : (
+                        <span className="font-mono text-[10px] text-zinc-500">Chiave: {cfg.chiave}</span>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => handleVisibilityToggle(cfg.chiave)}
+                      className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] font-bold transition shrink-0 ${
+                        cfg.visibile
+                          ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                          : "bg-zinc-800 text-zinc-500 border border-zinc-700"
+                      }`}
+                    >
+                      {cfg.visibile ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+                      {cfg.visibile ? "Visibile" : "Nascosto"}
+                    </button>
+                  </div>
+
+                  {cfg.chiave === "home_banner_top_testo" && !cfg.valore?.includes("{scadenza}") && (
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/20 text-[11px] text-amber-300">
+                      <span>
+                        💡 <strong>Suggerimento:</strong> Includi <code>&#123;scadenza&#125;</code> per collegare la data dinamica della promo a questo testo.
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleTextChange(
+                            cfg.chiave,
+                            "Registrati o scala la classifica entro il {scadenza} per sbloccare subito l'accesso <b>Premium Lifetime gratuito</b> a vita!"
+                          )
+                        }
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500 text-zinc-950 font-bold hover:brightness-110 transition shrink-0"
+                      >
+                        <Sparkles className="h-3 w-3" />
+                        Usa segnaposto dinamico
+                      </button>
+                    </div>
+                  )}
+
+                  {(cfg.valore || "").length > 80 ? (
+                    <textarea
+                      rows={3}
+                      value={cfg.valore || ""}
+                      onChange={(e) => handleTextChange(cfg.chiave, e.target.value)}
+                      className="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-3 text-xs text-zinc-200 focus:outline-none focus:border-amber-500 leading-relaxed font-normal"
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      value={cfg.valore || ""}
+                      onChange={(e) => handleTextChange(cfg.chiave, e.target.value)}
+                      className="w-full rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-2 text-xs text-zinc-200 focus:outline-none focus:border-amber-500"
+                    />
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
     </div>
   );
 }
+

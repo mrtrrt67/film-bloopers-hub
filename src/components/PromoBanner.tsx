@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Sparkles, ArrowRight } from "lucide-react";
+import { formatHighlightedDateItalian } from "@/lib/utils";
 
 interface PromoBannerProps {
   titolo?: string;
@@ -13,16 +14,31 @@ interface PromoBannerProps {
 
 export default function PromoBanner({
   titolo = "PROMO SPECIALE DI LANCIO STARTUP",
-  testo = "Registrati o scala la classifica entro il {scadenza} per sbloccare subito l'accesso Premium Lifetime gratuito a vita!",
+  testo = "Registrati o scala la classifica entro il {scadenza} per sbloccare subito l'accesso <b>Premium Lifetime gratuito</b> a vita!",
   badge = "Offerta a Tempo Limitato",
-  scadenza = "31/12/2026",
+  scadenza = "2026-12-31",
   visibile = true,
 }: PromoBannerProps) {
   if (!visibile) return null;
 
-  const testoFormattato = testo
-    .replace("{scadenza}", scadenza)
-    .replace("{deadline}", scadenza);
+  const dataEvidenziata = formatHighlightedDateItalian(scadenza || "2026-12-31");
+
+  let testoFormattato =
+    testo ||
+    "Registrati o scala la classifica entro il {scadenza} per sbloccare subito l'accesso <b>Premium Lifetime gratuito</b> a vita!";
+
+  // 1. Sostituisce i segnaposto standard {scadenza} o {deadline}
+  if (testoFormattato.includes("{scadenza}") || testoFormattato.includes("{deadline}")) {
+    testoFormattato = testoFormattato
+      .replace(/\{scadenza\}/g, dataEvidenziata)
+      .replace(/\{deadline\}/g, dataEvidenziata);
+  } else {
+    // 2. Se nel testo era presente una data statica hardcoded (es. 2026-12-31 o DD/MM/YYYY), la rimpiazza con la data dinamica evidenziata
+    testoFormattato = testoFormattato.replace(
+      /\b\d{4}-\d{2}-\d{2}\b|\b\d{1,2}\/\d{1,2}\/\d{4}\b/g,
+      dataEvidenziata
+    );
+  }
 
   return (
     <div className="relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-orange-950/20 to-zinc-950 p-5 sm:p-6 shadow-xl shadow-amber-500/5 mb-8">
@@ -61,3 +77,4 @@ export default function PromoBanner({
     </div>
   );
 }
+
