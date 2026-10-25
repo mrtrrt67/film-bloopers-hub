@@ -41,8 +41,7 @@ UPDATE public.profiles
 SET punti = 0, 
     punti_premiati = 0, 
     calls_today = 0,
-    tier = 'admin',
-    is_admin = true
+    tier = 'admin'
 WHERE LOWER(email) = 'mrtrrt67@gmail.com';
 
 -- 7. Azzeramento Log di Ricerca
