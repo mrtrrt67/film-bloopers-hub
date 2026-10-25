@@ -2,6 +2,8 @@ import { MetadataRoute } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { slugify } from "@/lib/utils";
 
+export const revalidate = 3600; // Rigenerazione automatica ogni ora da Supabase
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://filmbloopers.online";
 
