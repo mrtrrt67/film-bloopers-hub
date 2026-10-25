@@ -29,11 +29,21 @@ DELETE FROM public.films
 WHERE id = 233 
    OR titolo ILIKE '%Test Import%';
 
--- 6. Azzeramento Classifiche e Punti (preserva account e abbonamenti)
+-- 6. Eliminazione utenti di test (mantiene SOLO l'admin mrtrrt67@gmail.com)
+DELETE FROM auth.users 
+WHERE LOWER(email) <> 'mrtrrt67@gmail.com';
+
+DELETE FROM public.profiles 
+WHERE LOWER(email) <> 'mrtrrt67@gmail.com';
+
+-- Reset punti e chiamate per l'admin
 UPDATE public.profiles 
 SET punti = 0, 
     punti_premiati = 0, 
-    calls_today = 0;
+    calls_today = 0,
+    tier = 'admin',
+    is_admin = true
+WHERE LOWER(email) = 'mrtrrt67@gmail.com';
 
 -- 7. Azzeramento Log di Ricerca
 DELETE FROM public.log_ricerche;
