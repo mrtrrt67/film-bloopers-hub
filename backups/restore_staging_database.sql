@@ -1,5 +1,5 @@
 -- =========================================================================
--- FILM BLOOPERS HUB - STAGING DATABASE REPLICA SCRIPT (11 TABLES)
+-- FILM BLOOPERS HUB - STAGING DATABASE REPLICA SCRIPT (11 TABLES + RLS)
 -- Paste this script into the SQL Editor of your new Supabase Staging Project
 -- =========================================================================
 
@@ -2640,19 +2640,7 @@ SELECT setval(pg_get_serial_sequence('public.log_errori_ia', 'id'), COALESCE((SE
 SELECT setval(pg_get_serial_sequence('public.statistiche_ia', 'id'), COALESCE((SELECT MAX(id) FROM public.statistiche_ia), 1));
 SELECT setval(pg_get_serial_sequence('public.storico_moderazione', 'id'), COALESCE((SELECT MAX(id) FROM public.storico_moderazione), 1));
 
--- 5. Match Production permissions (RLS disabled, public access for anon/authenticated)
-ALTER TABLE public.films DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.errori DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.profiles DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.configurazioni DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.voti_bloopers DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.suggerimenti DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.log_ricerche DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.log_accessi DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.log_errori_ia DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.statistiche_ia DISABLE ROW LEVEL SECURITY;
-ALTER TABLE public.storico_moderazione DISABLE ROW LEVEL SECURITY;
-
+-- 5. Standard PostgreSQL Grants
 GRANT USAGE ON SCHEMA public TO anon, authenticated, service_role;
 GRANT ALL ON ALL TABLES IN SCHEMA public TO anon, authenticated, service_role;
 GRANT ALL ON ALL SEQUENCES IN SCHEMA public TO anon, authenticated, service_role;
@@ -2662,4 +2650,97 @@ ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO postgres, anon,
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO postgres, anon, authenticated, service_role;
 ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON ROUTINES TO postgres, anon, authenticated, service_role;
 
--- Setup completed successfully!
+-- 6. Enable Row Level Security (RLS) on all 11 tables (Exact Mirror of Production)
+ALTER TABLE public.configurazioni ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.errori ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.films ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.log_accessi ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.log_errori_ia ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.log_ricerche ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.statistiche_ia ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.storico_moderazione ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.suggerimenti ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.voti_bloopers ENABLE ROW LEVEL SECURITY;
+
+-- 7. Exact RLS Policies from Production
+
+-- configurazioni
+CREATE POLICY "Configurazioni modificabili admin" ON public.configurazioni AS PERMISSIVE FOR ALL TO public USING ((auth.role() = 'authenticated'::text)) WITH CHECK ((auth.role() = 'authenticated'::text));
+CREATE POLICY "Configurazioni pubbliche lettura" ON public.configurazioni AS PERMISSIVE FOR SELECT TO public USING (true);
+
+-- errori
+CREATE POLICY "Aggiornamento libero errori" ON public.errori AS PERMISSIVE FOR UPDATE TO public USING (true) WITH CHECK (true);
+CREATE POLICY "Aggiornamento voti errori per utenti autenticati" ON public.errori AS PERMISSIVE FOR UPDATE TO public USING ((auth.role() = 'authenticated'::text)) WITH CHECK ((auth.role() = 'authenticated'::text));
+CREATE POLICY "Allow delete on errori" ON public.errori AS PERMISSIVE FOR DELETE TO public USING (true);
+CREATE POLICY "Eliminazione errori" ON public.errori AS PERMISSIVE FOR DELETE TO public USING ((auth.role() = 'authenticated'::text));
+CREATE POLICY "Errori pubblici" ON public.errori AS PERMISSIVE FOR SELECT TO public USING (true);
+CREATE POLICY "Inserimento errori autenticati" ON public.errori AS PERMISSIVE FOR INSERT TO public WITH CHECK ((auth.role() = 'authenticated'::text));
+CREATE POLICY "Inserimento libero errori" ON public.errori AS PERMISSIVE FOR INSERT TO public WITH CHECK (true);
+CREATE POLICY "Lettura libera errori" ON public.errori AS PERMISSIVE FOR SELECT TO public USING (true);
+CREATE POLICY "Lettura pubblica errori" ON public.errori AS PERMISSIVE FOR SELECT TO public USING (true);
+CREATE POLICY "Modifica errori" ON public.errori AS PERMISSIVE FOR UPDATE TO public USING ((auth.role() = 'authenticated'::text));
+CREATE POLICY "Solo lettura pubblica errori" ON public.errori AS PERMISSIVE FOR SELECT TO public USING (true);
+
+-- films
+CREATE POLICY "Aggiornamento libero films" ON public.films AS PERMISSIVE FOR UPDATE TO public USING (true) WITH CHECK (true);
+CREATE POLICY "Allow delete on films" ON public.films AS PERMISSIVE FOR DELETE TO public USING (true);
+CREATE POLICY "Films aggiornabili da autenticati" ON public.films AS PERMISSIVE FOR UPDATE TO public USING ((auth.role() = 'authenticated'::text));
+CREATE POLICY "Films modificabili da autenticati" ON public.films AS PERMISSIVE FOR INSERT TO public WITH CHECK ((auth.role() = 'authenticated'::text));
+CREATE POLICY "Films pubblici in lettura" ON public.films AS PERMISSIVE FOR SELECT TO public USING (true);
+CREATE POLICY "Inserimento libero films" ON public.films AS PERMISSIVE FOR INSERT TO public WITH CHECK (true);
+CREATE POLICY "Lettura libera films" ON public.films AS PERMISSIVE FOR SELECT TO public USING (true);
+CREATE POLICY "Solo lettura pubblica films" ON public.films AS PERMISSIVE FOR SELECT TO public USING (true);
+
+-- log_accessi
+CREATE POLICY "Inserimento accessi pubblico" ON public.log_accessi AS PERMISSIVE FOR INSERT TO public WITH CHECK (true);
+CREATE POLICY "Lettura accessi admin" ON public.log_accessi AS PERMISSIVE FOR SELECT TO public USING ((auth.role() = 'authenticated'::text));
+CREATE POLICY "Permetti insert a tutti in log_accessi" ON public.log_accessi AS PERMISSIVE FOR INSERT TO anon, authenticated WITH CHECK (true);
+CREATE POLICY "Permetti lettura a tutti in log_accessi" ON public.log_accessi AS PERMISSIVE FOR SELECT TO anon, authenticated USING (true);
+
+-- log_errori_ia
+CREATE POLICY "Inserimento libero log_errori_ia" ON public.log_errori_ia AS PERMISSIVE FOR INSERT TO public WITH CHECK (true);
+CREATE POLICY "Lettura libera log_errori_ia" ON public.log_errori_ia AS PERMISSIVE FOR SELECT TO public USING (true);
+CREATE POLICY "Permetti inserimento log errori a tutti" ON public.log_errori_ia AS PERMISSIVE FOR INSERT TO public WITH CHECK (true);
+CREATE POLICY "Permetti lettura log agli utenti autenticati" ON public.log_errori_ia AS PERMISSIVE FOR SELECT TO authenticated USING (true);
+
+-- log_ricerche
+CREATE POLICY "Inserimento libero log_ricerche" ON public.log_ricerche AS PERMISSIVE FOR INSERT TO public WITH CHECK (true);
+CREATE POLICY "Inserimento ricerche pubblico" ON public.log_ricerche AS PERMISSIVE FOR INSERT TO public WITH CHECK (true);
+CREATE POLICY "Lettura libera log_ricerche" ON public.log_ricerche AS PERMISSIVE FOR SELECT TO public USING (true);
+CREATE POLICY "Lettura ricerche admin" ON public.log_ricerche AS PERMISSIVE FOR SELECT TO public USING ((auth.role() = 'authenticated'::text));
+
+-- profiles
+CREATE POLICY "Inserimento profilo" ON public.profiles AS PERMISSIVE FOR INSERT TO public WITH CHECK ((auth.uid() = id));
+CREATE POLICY "Modifica proprio profilo" ON public.profiles AS PERMISSIVE FOR UPDATE TO public USING ((auth.uid() = id));
+CREATE POLICY "Profili pubblici" ON public.profiles AS PERMISSIVE FOR SELECT TO public USING (true);
+CREATE POLICY "Users can update own profile" ON public.profiles AS PERMISSIVE FOR UPDATE TO public USING ((auth.uid() = id));
+CREATE POLICY "Users can view own profile" ON public.profiles AS PERMISSIVE FOR SELECT TO public USING ((auth.uid() = id));
+
+-- statistiche_ia
+CREATE POLICY "Inserimento statistiche ia pubblico" ON public.statistiche_ia AS PERMISSIVE FOR INSERT TO public WITH CHECK (true);
+CREATE POLICY "Lettura statistiche ia admin" ON public.statistiche_ia AS PERMISSIVE FOR SELECT TO public USING ((auth.role() = 'authenticated'::text));
+CREATE POLICY "Permetti inserimento statistiche a tutti" ON public.statistiche_ia AS PERMISSIVE FOR INSERT TO public WITH CHECK (true);
+CREATE POLICY "Permetti lettura statistiche agli utenti autenticati" ON public.statistiche_ia AS PERMISSIVE FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Solo lettura pubblica statistiche_ia" ON public.statistiche_ia AS PERMISSIVE FOR SELECT TO public USING (true);
+
+-- storico_moderazione
+CREATE POLICY "Moderazione admin" ON public.storico_moderazione AS PERMISSIVE FOR ALL TO public USING ((auth.role() = 'authenticated'::text)) WITH CHECK ((auth.role() = 'authenticated'::text));
+
+-- suggerimenti
+CREATE POLICY "Admin elimina suggerimenti" ON public.suggerimenti AS PERMISSIVE FOR DELETE TO public USING ((auth.role() = 'authenticated'::text));
+CREATE POLICY "Admin legge suggerimenti" ON public.suggerimenti AS PERMISSIVE FOR SELECT TO public USING ((auth.role() = 'authenticated'::text));
+CREATE POLICY "Consenti eliminazione suggerimenti" ON public.suggerimenti AS PERMISSIVE FOR DELETE TO authenticated USING (true);
+CREATE POLICY "Consenti inserimento agli utenti autenticati" ON public.suggerimenti AS PERMISSIVE FOR INSERT TO authenticated WITH CHECK (true);
+CREATE POLICY "Consenti lettura suggerimenti" ON public.suggerimenti AS PERMISSIVE FOR SELECT TO authenticated USING (true);
+CREATE POLICY "Gestione suggerimenti" ON public.suggerimenti AS PERMISSIVE FOR ALL TO public USING ((auth.uid() = user_id)) WITH CHECK ((auth.uid() = user_id));
+CREATE POLICY "Permetti inserimento suggerimenti" ON public.suggerimenti AS PERMISSIVE FOR INSERT TO public WITH CHECK (true);
+CREATE POLICY "Permetti lettura suggerimenti admin" ON public.suggerimenti AS PERMISSIVE FOR SELECT TO public USING (true);
+
+-- voti_bloopers
+CREATE POLICY "Allow delete on voti_bloopers" ON public.voti_bloopers AS PERMISSIVE FOR DELETE TO public USING (true);
+CREATE POLICY "Gestione propri voti" ON public.voti_bloopers AS PERMISSIVE FOR ALL TO public USING ((auth.uid() = user_id)) WITH CHECK ((auth.uid() = user_id));
+CREATE POLICY "Gestione propri voti bloopers" ON public.voti_bloopers AS PERMISSIVE FOR ALL TO public USING ((auth.uid() = user_id)) WITH CHECK ((auth.uid() = user_id));
+CREATE POLICY "Voti pubblici" ON public.voti_bloopers AS PERMISSIVE FOR SELECT TO public USING (true);
+
+-- Setup completed successfully with all tables and exact production RLS policies!
