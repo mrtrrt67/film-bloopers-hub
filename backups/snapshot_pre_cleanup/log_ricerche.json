@@ -1,0 +1,1062 @@
+[
+  {
+    "id": "ca32067c-8619-4498-a424-a83e5c81baf2",
+    "termine": "gladiator",
+    "created_at": "2026-09-25T19:49:53.995298"
+  },
+  {
+    "id": "a05e405e-a1d8-4eff-9852-4c97c344e25c",
+    "termine": "Robin Hood",
+    "created_at": "2026-09-25T19:59:55.415502"
+  },
+  {
+    "id": "d418cafb-3295-43c5-89b6-01361590892b",
+    "termine": "star wars",
+    "created_at": "2026-09-25T20:09:17.981498"
+  },
+  {
+    "id": "5d7ebdcf-a4c8-4279-8236-10117128d5bf",
+    "termine": "Ronin",
+    "created_at": "2026-09-25T20:39:32.225695"
+  },
+  {
+    "id": "dc3d2a7a-3b28-452e-9c73-6375352eca78",
+    "termine": "lo squalo",
+    "created_at": "2026-09-25T21:29:45.41724"
+  },
+  {
+    "id": "42a1a753-2835-46b8-a4f1-46ab4d9286a4",
+    "termine": "Matrix",
+    "created_at": "2026-09-26T06:21:23.841306"
+  },
+  {
+    "id": "7a9906d7-919d-4a08-aaf1-45c9ec9f1e1b",
+    "termine": "star wars",
+    "created_at": "2026-09-26T06:23:16.739859"
+  },
+  {
+    "id": "a640984d-e211-48ff-99ad-cfeacee13790",
+    "termine": "Il gladiatore",
+    "created_at": "2026-09-26T06:25:20.810957"
+  },
+  {
+    "id": "c5aab23e-47fd-47ee-af2e-de14c9d49c1c",
+    "termine": "L'ultimo dei mohicani",
+    "created_at": "2026-09-26T07:35:40.506067"
+  },
+  {
+    "id": "ac9fcd19-2c16-4792-98ad-7166f9b53c50",
+    "termine": "L'ultimo dei mohicani",
+    "created_at": "2026-09-26T07:46:54.339219"
+  },
+  {
+    "id": "744dd580-f136-467f-865a-dda8d1a82db2",
+    "termine": "L'ultimo dei mohicani",
+    "created_at": "2026-09-26T07:47:44.070547"
+  },
+  {
+    "id": "f7c5f533-87ad-4b51-bf94-85fc08d0694d",
+    "termine": "Robin Hood",
+    "created_at": "2026-09-26T09:07:20.327003"
+  },
+  {
+    "id": "7c3e74b8-3fa6-4eb0-9686-335ccb9bf241",
+    "termine": "agente 007",
+    "created_at": "2026-09-26T09:23:31.582412"
+  },
+  {
+    "id": "83bf7ab5-409a-4d8d-a37a-a351eb2ca0f4",
+    "termine": "l'ultimo dei mohicani",
+    "created_at": "2026-09-26T09:30:55.76266"
+  },
+  {
+    "id": "30365c83-dae8-4608-ab1a-5fa236585b5b",
+    "termine": "robin hood",
+    "created_at": "2026-09-26T12:19:17.246382"
+  },
+  {
+    "id": "a37b3451-ee93-4cd3-a381-d9053473ebab",
+    "termine": "robin hood",
+    "created_at": "2026-09-26T12:52:01.911155"
+  },
+  {
+    "id": "4c67ee07-1809-489e-8323-d66681c46d5c",
+    "termine": "Jackie brown",
+    "created_at": "2026-09-26T14:34:49.760178"
+  },
+  {
+    "id": "149d5cc4-2559-439f-97ba-91fd093f4fa8",
+    "termine": "bullet train",
+    "created_at": "2026-09-26T15:21:12.174995"
+  },
+  {
+    "id": "240c0b63-ac07-4eef-b5d3-559d8c57260a",
+    "termine": "Rambo",
+    "created_at": "2026-09-27T21:19:31.524514"
+  },
+  {
+    "id": "ed861050-63ff-4a62-9383-1b3d2ea4dac6",
+    "termine": "lo squalo 3",
+    "created_at": "2026-09-28T06:08:38.30814"
+  },
+  {
+    "id": "e2571250-87c3-4ab0-955a-0e8adbb549dc",
+    "termine": "lo squalo",
+    "created_at": "2026-09-28T06:14:41.499145"
+  },
+  {
+    "id": "9ab9797d-3d9b-4321-8087-7360256c1e6e",
+    "termine": "interstellar",
+    "created_at": "2026-09-28T07:07:48.833228"
+  },
+  {
+    "id": "6bfa4e8a-f6a5-47c1-b888-f3a2a7989e8c",
+    "termine": "Bastardi senza gloria",
+    "created_at": "2026-09-28T08:37:51.987143"
+  },
+  {
+    "id": "1f2a3a69-34d0-40c9-88c3-0a1836eb09d3",
+    "termine": "Bastardi senza gloria",
+    "created_at": "2026-09-28T08:43:51.797594"
+  },
+  {
+    "id": "db6b2835-3a2d-4ae8-a54a-ee01b31ba600",
+    "termine": "lo squalo",
+    "created_at": "2026-09-28T09:34:14.622701"
+  },
+  {
+    "id": "f45c77a5-5f39-436a-a1fb-5ba26e34d9f5",
+    "termine": "bastardi senza gloria",
+    "created_at": "2026-09-28T10:28:17.669651"
+  },
+  {
+    "id": "a5a932d2-5727-4471-9b4d-1c78a5ae3103",
+    "termine": "bullet train",
+    "created_at": "2026-09-28T13:19:24.250727"
+  },
+  {
+    "id": "f27bdfa5-5304-4263-b555-9ace68e50e9f",
+    "termine": "zombieland",
+    "created_at": "2026-09-28T13:20:44.655166"
+  },
+  {
+    "id": "30295b82-9557-410b-bb00-aba9949de4b9",
+    "termine": "jackie brown",
+    "created_at": "2026-09-28T13:23:32.629056"
+  },
+  {
+    "id": "2e7f8d5d-ab1b-43a8-9b99-2ebb39eb1277",
+    "termine": "ronin",
+    "created_at": "2026-09-28T13:23:51.658408"
+  },
+  {
+    "id": "10007c40-83fa-4271-bbc6-82b001ab7f8c",
+    "termine": "la storia del generale custer",
+    "created_at": "2026-09-28T13:24:25.344628"
+  },
+  {
+    "id": "7d233924-9f61-4365-b447-f98160b5823c",
+    "termine": "il signore degli anelli",
+    "created_at": "2026-09-28T13:25:59.255187"
+  },
+  {
+    "id": "44f08791-96a4-4bfb-83b1-208de477e148",
+    "termine": "Le iene",
+    "created_at": "2026-09-28T17:15:01.462745"
+  },
+  {
+    "id": "ea980df4-5b01-4534-840a-ec56a3f92f7a",
+    "termine": "gladiator",
+    "created_at": "2026-09-28T17:53:04.260926"
+  },
+  {
+    "id": "01f7f335-14e7-434a-b2b2-ba842f88912e",
+    "termine": "pirati dei caraibi",
+    "created_at": "2026-09-28T18:41:27.072825"
+  },
+  {
+    "id": "5bbad7d5-71ff-4c95-bfa8-856e5d905e6f",
+    "termine": "rambo",
+    "created_at": "2026-09-29T13:26:10.676517"
+  },
+  {
+    "id": "580562d6-7f74-449e-be40-40bb6cbb487e",
+    "termine": "blade runner",
+    "created_at": "2026-09-29T13:48:24.001718"
+  },
+  {
+    "id": "7b7d9095-10c6-4f3f-844e-b00600117bf4",
+    "termine": "crocodile dundee",
+    "created_at": "2026-09-29T14:21:00.851302"
+  },
+  {
+    "id": "91f99b62-7a10-4f4f-a3b9-33c28f587189",
+    "termine": "rocky",
+    "created_at": "2026-09-29T14:48:31.639373"
+  },
+  {
+    "id": "4305dfe5-83bf-4abd-8d3e-0e5da657775d",
+    "termine": "rambo",
+    "created_at": "2026-09-29T14:53:43.463521"
+  },
+  {
+    "id": "48952b93-9866-40df-a43f-a179ed42e20d",
+    "termine": "master and commander",
+    "created_at": "2026-09-29T15:08:53.100162"
+  },
+  {
+    "id": "d891ed28-72af-462f-921e-53778c006898",
+    "termine": "master",
+    "created_at": "2026-09-29T15:09:24.616389"
+  },
+  {
+    "id": "3da3ab26-a9aa-4558-828b-b230aaecc5e8",
+    "termine": "giu la testa",
+    "created_at": "2026-09-29T16:25:49.774742"
+  },
+  {
+    "id": "59bbf9e6-951a-44b7-bf33-306b828a5fc8",
+    "termine": "altrimenti ci arrabbiamo",
+    "created_at": "2026-09-29T16:30:00.589611"
+  },
+  {
+    "id": "4f83722b-bd39-4492-a228-05af97865fa7",
+    "termine": "dune",
+    "created_at": "2026-09-29T16:32:41.556301"
+  },
+  {
+    "id": "e9334ee1-ed52-449b-8ef7-51697e50ccbb",
+    "termine": "Dune - Parte due",
+    "created_at": "2026-09-29T16:33:39.094387"
+  },
+  {
+    "id": "b53ff7da-24fe-4072-8575-5f403f432d1a",
+    "termine": "Dune",
+    "created_at": "2026-09-29T16:34:13.805262"
+  },
+  {
+    "id": "65b5a07d-903b-4757-9868-075b7d25f2c2",
+    "termine": "Mickey 17",
+    "created_at": "2026-09-29T16:35:36.016408"
+  },
+  {
+    "id": "ae811a47-f287-40db-985c-477e4db4c80a",
+    "termine": "Mickey 17",
+    "created_at": "2026-09-29T17:45:26.457264"
+  },
+  {
+    "id": "b4097e5a-3311-452d-9d7f-5db06f0d6e5f",
+    "termine": "Mickey 17",
+    "created_at": "2026-09-29T17:49:42.119298"
+  },
+  {
+    "id": "856e4206-9471-4e70-b0bd-6d0088ad2b83",
+    "termine": "Mickey 17",
+    "created_at": "2026-09-29T17:50:02.491494"
+  },
+  {
+    "id": "1758e77d-77c2-42a4-9e34-cfcf96f60705",
+    "termine": "pirati dei caraibi",
+    "created_at": "2026-09-29T17:51:54.034839"
+  },
+  {
+    "id": "48a5cf57-042b-468e-8254-6483ff384bf2",
+    "termine": "digger",
+    "created_at": "2026-09-29T18:40:41.663438"
+  },
+  {
+    "id": "511ebeeb-4b45-4136-91fa-b44c8c3e748a",
+    "termine": "Poseidon",
+    "created_at": "2026-09-30T13:27:58.703945"
+  },
+  {
+    "id": "097c44ca-b98a-4c87-ba73-b93f510f7fce",
+    "termine": "Ace Ventura",
+    "created_at": "2026-09-30T14:12:02.128251"
+  },
+  {
+    "id": "460bf42f-796d-4430-b306-5925c82480dc",
+    "termine": "Toy Story",
+    "created_at": "2026-09-30T18:28:16.315274"
+  },
+  {
+    "id": "79ebe037-b5b1-4505-8c07-e07c003a6b7c",
+    "termine": "Toy Story 2",
+    "created_at": "2026-09-30T18:28:38.126881"
+  },
+  {
+    "id": "d5e18386-3742-4a9f-b38c-762d33c89eb7",
+    "termine": "Toy Story 3",
+    "created_at": "2026-09-30T18:28:54.192482"
+  },
+  {
+    "id": "59e12f87-fc11-462f-a6b4-8dcc14736c72",
+    "termine": "Toy Story 4",
+    "created_at": "2026-09-30T18:29:22.773837"
+  },
+  {
+    "id": "01baddc2-12b8-40e9-b3ca-b5a48d1714c4",
+    "termine": "Toy Story 5",
+    "created_at": "2026-09-30T18:29:45.931269"
+  },
+  {
+    "id": "d0eea36d-ab79-401e-8204-f36c617f7150",
+    "termine": "Toy Story",
+    "created_at": "2026-09-30T18:30:54.512582"
+  },
+  {
+    "id": "e06df3f8-3553-4e3e-8788-1f89e4481911",
+    "termine": "Batman",
+    "created_at": "2026-09-30T18:34:52.003969"
+  },
+  {
+    "id": "b6682945-d517-406e-b41a-d81be70d1719",
+    "termine": "Batman",
+    "created_at": "2026-09-30T18:35:55.6973"
+  },
+  {
+    "id": "13682c19-d4bd-4b98-b568-c9ffd8234e6e",
+    "termine": "Batman",
+    "created_at": "2026-09-30T18:42:00.279422"
+  },
+  {
+    "id": "f86b8581-de82-47ca-b79e-24617687ba95",
+    "termine": "Batman",
+    "created_at": "2026-09-30T18:46:07.733508"
+  },
+  {
+    "id": "efcb26ea-2a28-4268-b025-eab7feaa3d4a",
+    "termine": "Batman",
+    "created_at": "2026-09-30T18:49:59.270589"
+  },
+  {
+    "id": "981113ed-15c3-48e2-b0de-0f647817207a",
+    "termine": "Il cavaliere oscuro",
+    "created_at": "2026-09-30T18:51:41.164808"
+  },
+  {
+    "id": "4e88a14a-9fa8-470e-98c0-5aa47d306c31",
+    "termine": "Il cavaliere oscuro  Nolan",
+    "created_at": "2026-09-30T18:55:07.757517"
+  },
+  {
+    "id": "941d7a25-6401-42b3-8a67-31fdbaaaccc2",
+    "termine": "Robin Hood",
+    "created_at": "2026-09-30T18:55:36.365209"
+  },
+  {
+    "id": "a1022e98-3179-451d-b136-5f2438850e47",
+    "termine": "Robin Hood",
+    "created_at": "2026-09-30T18:55:55.084672"
+  },
+  {
+    "id": "1b712bf8-5574-465d-b8a1-c1bf7e231f55",
+    "termine": "il cavaliere oscuro - il ritorno",
+    "created_at": "2026-09-30T18:57:38.388848"
+  },
+  {
+    "id": "538b7e86-b3ee-4be6-9f9c-88c6107621ef",
+    "termine": "batman",
+    "created_at": "2026-09-30T18:58:11.153976"
+  },
+  {
+    "id": "febcd4a1-a245-4f11-beb5-92064ec31175",
+    "termine": "toys",
+    "created_at": "2026-09-30T19:02:15.993653"
+  },
+  {
+    "id": "e8b124a1-0b78-407c-91ae-f879a8069af6",
+    "termine": "indiana jones",
+    "created_at": "2026-09-30T19:05:51.983323"
+  },
+  {
+    "id": "701d18a6-4c2f-45d1-bc3d-5e53c599011e",
+    "termine": "Lucy",
+    "created_at": "2026-09-30T19:34:51.845296"
+  },
+  {
+    "id": "b5b6ab74-015a-4bfc-b56e-0843ee360f1e",
+    "termine": "truman show",
+    "created_at": "2026-09-30T19:53:06.082155"
+  },
+  {
+    "id": "02e11347-aa31-4012-90f5-26b99f2388bf",
+    "termine": "2001 odissea nello spazio",
+    "created_at": "2026-09-30T19:56:05.299364"
+  },
+  {
+    "id": "a8acb78b-9ce2-4bb3-b204-4dcd33c7b6a8",
+    "termine": "Digger",
+    "created_at": "2026-10-03T07:26:51.087452"
+  },
+  {
+    "id": "8131f202-ba9a-4433-b5de-0c080b61dd20",
+    "termine": "Digger",
+    "created_at": "2026-10-03T07:27:35.433804"
+  },
+  {
+    "id": "4744dd0f-ace7-461e-a2c6-3fa7e7958e3d",
+    "termine": "il patriota",
+    "created_at": "2026-10-03T07:28:06.55635"
+  },
+  {
+    "id": "c1c15e98-673a-4c7b-ad97-f435dd0c86c8",
+    "termine": "digger",
+    "created_at": "2026-10-03T07:31:52.147396"
+  },
+  {
+    "id": "4407e988-f228-4198-8a20-d31b281934ff",
+    "termine": "digger",
+    "created_at": "2026-10-03T07:34:11.598398"
+  },
+  {
+    "id": "14a012d7-005c-40fb-8ff3-f81da559a826",
+    "termine": "digger",
+    "created_at": "2026-10-03T07:38:04.889929"
+  },
+  {
+    "id": "23b54dd0-5f93-47f1-a446-e60e0dd68ecc",
+    "termine": "il momento di uccidere",
+    "created_at": "2026-10-03T07:50:51.036537"
+  },
+  {
+    "id": "bab6d36c-a00e-4061-a440-67aa1165bf06",
+    "termine": "digger",
+    "created_at": "2026-10-03T08:02:02.294467"
+  },
+  {
+    "id": "60537c66-96eb-4457-9c6e-bc142a977a8c",
+    "termine": "Marty Supreme",
+    "created_at": "2026-10-03T13:16:01.746146"
+  },
+  {
+    "id": "a5c517d7-c85e-4169-9d4e-06c0d9a954bb",
+    "termine": "non è un paese per vecchi",
+    "created_at": "2026-10-03T13:23:12.945304"
+  },
+  {
+    "id": "a8a69e57-f488-4d97-99fc-b6ac691658ea",
+    "termine": "full metal jacket",
+    "created_at": "2026-10-03T13:27:15.739694"
+  },
+  {
+    "id": "9cd66ba0-e736-4370-821b-2a3703d92229",
+    "termine": "il patriota",
+    "created_at": "2026-10-03T15:00:30.873856"
+  },
+  {
+    "id": "3308a2f7-68ca-48ca-8dd0-7e7f1ffca61a",
+    "termine": "indipendence day",
+    "created_at": "2026-10-03T15:02:25.046256"
+  },
+  {
+    "id": "2f24da64-5b1f-4f66-9af9-b25dadbb3cd0",
+    "termine": "independence day",
+    "created_at": "2026-10-03T15:02:52.95787"
+  },
+  {
+    "id": "8d7601bf-46b9-43fa-a7b8-2f21977cb30f",
+    "termine": "Marty Supreme",
+    "created_at": "2026-10-03T15:56:31.602588"
+  },
+  {
+    "id": "50f8544f-f107-4470-9916-11ba20dfabe9",
+    "termine": "pirati dei caraibi",
+    "created_at": "2026-10-03T17:18:23.707326"
+  },
+  {
+    "id": "c911fa05-eb8a-483a-b7b7-2545b44d800b",
+    "termine": "pirati dei caraibi",
+    "created_at": "2026-10-04T09:56:00.271466"
+  },
+  {
+    "id": "3692a50d-ab16-486b-acf3-f3a825f8da50",
+    "termine": "Il primo re",
+    "created_at": "2026-10-05T17:14:10.773988"
+  },
+  {
+    "id": "8cc3e2da-c0fe-47d2-902b-75ce7cfba422",
+    "termine": "Il primo re",
+    "created_at": "2026-10-05T17:17:25.982066"
+  },
+  {
+    "id": "41778968-4610-4e4d-b3a3-c4ad946b8e30",
+    "termine": "Il primo re",
+    "created_at": "2026-10-05T17:20:05.33149"
+  },
+  {
+    "id": "8565152e-0a39-4dcb-8d7a-67c17cfdb8a3",
+    "termine": "il primo re",
+    "created_at": "2026-10-05T17:20:22.592715"
+  },
+  {
+    "id": "cf09b647-0c3b-4c6e-9ce4-599125e7115c",
+    "termine": "The untouchables",
+    "created_at": "2026-10-06T17:18:47.789601"
+  },
+  {
+    "id": "32815328-00ee-4eff-988c-85a5b1230648",
+    "termine": "gli intoccabili",
+    "created_at": "2026-10-06T17:20:47.89113"
+  },
+  {
+    "id": "c487cc7d-7cc8-4b90-a1a4-328c4ff811a5",
+    "termine": "the untouchables",
+    "created_at": "2026-10-06T17:47:52.199052"
+  },
+  {
+    "id": "a8758339-c9cf-4959-b478-02c5c5b87ce5",
+    "termine": "the untouchables",
+    "created_at": "2026-10-06T18:42:10.734293"
+  },
+  {
+    "id": "c3a4579d-2845-48f4-b91e-5be311824bbf",
+    "termine": "king kong",
+    "created_at": "2026-10-06T18:49:33.312196"
+  },
+  {
+    "id": "175a7adf-6c55-4441-9764-eb42780fa1f2",
+    "termine": "king kong",
+    "created_at": "2026-10-06T18:53:24.776879"
+  },
+  {
+    "id": "3afe0ff7-891e-450a-929e-ef51f0717772",
+    "termine": "king kong",
+    "created_at": "2026-10-06T18:57:39.572849"
+  },
+  {
+    "id": "a1a1bda2-769d-4964-a992-38da05dc4ab4",
+    "termine": "king kong",
+    "created_at": "2026-10-06T19:00:32.185366"
+  },
+  {
+    "id": "e9df3e5a-6f13-4f92-9991-140f6eb89f0e",
+    "termine": "king kong",
+    "created_at": "2026-10-06T19:08:18.083758"
+  },
+  {
+    "id": "4004c6a5-c2cb-43db-af6f-55712069bf30",
+    "termine": "king kong",
+    "created_at": "2026-10-06T19:12:24.89618"
+  },
+  {
+    "id": "f401a759-8bbd-4b6f-8e72-715a6e2d0ac4",
+    "termine": "Lo Hobbit",
+    "created_at": "2026-10-09T15:04:11.481"
+  },
+  {
+    "id": "e69d64ff-3d62-4f1a-a075-03f80dbb52a3",
+    "termine": "domani avvenne",
+    "created_at": "2026-10-09T15:06:04.936067"
+  },
+  {
+    "id": "4db70c75-4db2-474e-858f-25c668cb68c6",
+    "termine": "always",
+    "created_at": "2026-10-09T15:11:04.35683"
+  },
+  {
+    "id": "14c0a1d8-67cd-4946-bd02-f0ba0374f826",
+    "termine": "rocky",
+    "created_at": "2026-10-09T15:13:32.513525"
+  },
+  {
+    "id": "da65f945-ae57-4e4e-aaf7-0fb34b64cc77",
+    "termine": "Harry ti presento Sally",
+    "created_at": "2026-10-09T15:26:01.675775"
+  },
+  {
+    "id": "494e19dc-7894-4e92-b0f4-f51ab58140d7",
+    "termine": "il tempo delle mele",
+    "created_at": "2026-10-09T15:46:25.110858"
+  },
+  {
+    "id": "959b0f2c-87ef-4283-bc33-9a6e41e68b88",
+    "termine": "L'avvocato del diavolo",
+    "created_at": "2026-10-09T16:27:46.918144"
+  },
+  {
+    "id": "4271d589-5c5b-46ab-9626-7080aea2f60d",
+    "termine": "L'avvocato del diavolo",
+    "created_at": "2026-10-09T16:32:12.144496"
+  },
+  {
+    "id": "12a8abb5-119b-45b6-9b2b-9fe7d2d72740",
+    "termine": "mad max",
+    "created_at": "2026-10-09T18:13:33.153555"
+  },
+  {
+    "id": "4e80b749-d0da-4cc1-97e9-6a50a754a809",
+    "termine": "mad max",
+    "created_at": "2026-10-09T19:00:42.698661"
+  },
+  {
+    "id": "e7d0a818-24c8-4762-8d06-19b4faa7b575",
+    "termine": "furiosa",
+    "created_at": "2026-10-09T19:01:08.167087"
+  },
+  {
+    "id": "de017b47-7ca7-42f3-87d3-97fd38135d4b",
+    "termine": "furiosa",
+    "created_at": "2026-10-09T19:04:54.174233"
+  },
+  {
+    "id": "30e776c3-f0fd-4c2c-8835-9c1ac739fd25",
+    "termine": "Rambo",
+    "created_at": "2026-10-09T19:12:21.666223"
+  },
+  {
+    "id": "9cfcebd8-202e-4fad-8f72-c07feda283cd",
+    "termine": "lo squalo",
+    "created_at": "2026-10-09T19:15:57.21441"
+  },
+  {
+    "id": "93157bd5-d231-4cf6-b68a-c6f80c1c9b51",
+    "termine": "lo squalo",
+    "created_at": "2026-10-09T19:22:09.53736"
+  },
+  {
+    "id": "f9d9e857-fdd7-4373-a39b-ca3c0c8c0b6e",
+    "termine": "lo squalo",
+    "created_at": "2026-10-09T19:22:24.691384"
+  },
+  {
+    "id": "a1d7c070-04fb-4dd2-b994-5501ccd92db5",
+    "termine": "lo squalo",
+    "created_at": "2026-10-09T19:28:09.465797"
+  },
+  {
+    "id": "b6f93487-1834-4701-ace9-26d99e241f9f",
+    "termine": "lo squalo",
+    "created_at": "2026-10-09T19:28:21.55181"
+  },
+  {
+    "id": "177784d3-1adf-4b33-8fc7-9329d718d89f",
+    "termine": "lo squalo",
+    "created_at": "2026-10-09T19:28:56.170871"
+  },
+  {
+    "id": "862b6696-1f6a-4710-9281-fc23a8c42653",
+    "termine": "lo squalo",
+    "created_at": "2026-10-09T19:29:03.848007"
+  },
+  {
+    "id": "a77e22a6-aec1-437b-ac71-57ae43239985",
+    "termine": "lo squalo",
+    "created_at": "2026-10-09T19:31:54.617987"
+  },
+  {
+    "id": "58f53c93-1754-4765-8b76-4559567b96cd",
+    "termine": "lo squalo",
+    "created_at": "2026-10-09T19:32:03.265632"
+  },
+  {
+    "id": "7affd536-2bec-44c2-a319-f112655d708b",
+    "termine": "lo squalo",
+    "created_at": "2026-10-09T19:38:43.229283"
+  },
+  {
+    "id": "9bdb7d06-e33c-43ea-b518-594244d8bd83",
+    "termine": "lo squalo",
+    "created_at": "2026-10-09T19:38:50.496008"
+  },
+  {
+    "id": "9c60cf6e-6e78-4311-8305-ef7b17b1722b",
+    "termine": "lo squalo",
+    "created_at": "2026-10-09T19:39:12.204558"
+  },
+  {
+    "id": "1d38ac1d-f72d-4830-83b1-6f653e82fc25",
+    "termine": "lo squalo",
+    "created_at": "2026-10-09T19:43:38.096439"
+  },
+  {
+    "id": "424d8e11-73c1-4e8c-94a9-39a61335122d",
+    "termine": "lo squalo",
+    "created_at": "2026-10-09T19:44:33.545491"
+  },
+  {
+    "id": "7a92d7fe-30e0-41a8-859b-0e20d90b409f",
+    "termine": "lo hobbit",
+    "created_at": "2026-10-09T19:52:46.559238"
+  },
+  {
+    "id": "26f4626c-6357-4e78-9000-10a1b1515e72",
+    "termine": "pirati dei caraibi",
+    "created_at": "2026-10-09T20:06:55.660888"
+  },
+  {
+    "id": "1123f18b-e82a-4721-897b-5f78e2612427",
+    "termine": "giorno da cani",
+    "created_at": "2026-10-09T21:17:05.735593"
+  },
+  {
+    "id": "8b98858c-1595-414f-aeb3-733c4c2a808f",
+    "termine": "giorno da cani",
+    "created_at": "2026-10-09T21:19:16.191917"
+  },
+  {
+    "id": "dfa6d6e6-a87c-4f55-9816-aaf1035259dd",
+    "termine": "soldato blu",
+    "created_at": "2026-10-09T21:22:22.963676"
+  },
+  {
+    "id": "0d6093f2-0fd6-4955-a3a0-154bc6ae707f",
+    "termine": "Hunger Games",
+    "created_at": "2026-10-11T16:25:10.325331"
+  },
+  {
+    "id": "588ed040-ca80-43a0-8a07-e2be4c9d3657",
+    "termine": "hunger games",
+    "created_at": "2026-10-11T16:35:14.512896"
+  },
+  {
+    "id": "7b082647-ca2d-4c06-8f36-595cd6e2c67c",
+    "termine": "Rambo",
+    "created_at": "2026-10-11T16:55:32.32607"
+  },
+  {
+    "id": "b76b0e05-f405-4276-8c32-5005e313c9f9",
+    "termine": "I minions",
+    "created_at": "2026-10-11T16:57:34.470171"
+  },
+  {
+    "id": "65fe5733-95ab-4ac1-9bfe-0f7e164c5afc",
+    "termine": "minions",
+    "created_at": "2026-10-11T16:59:29.585577"
+  },
+  {
+    "id": "2c900bc5-68c4-4464-8027-b96b4ae761fd",
+    "termine": "Cattivissimo me",
+    "created_at": "2026-10-11T17:00:01.831376"
+  },
+  {
+    "id": "d2e25cf0-fb2c-4bcc-8067-df27e8b2878d",
+    "termine": "cattivissimo",
+    "created_at": "2026-10-11T17:00:39.469848"
+  },
+  {
+    "id": "2ff9c7f1-fa80-4e93-8773-4bf480b1ce93",
+    "termine": "cattivissimo me",
+    "created_at": "2026-10-11T17:01:04.986335"
+  },
+  {
+    "id": "9a7287ea-5ab4-4e71-9f7f-8ca92348b51f",
+    "termine": "cattivissimo me",
+    "created_at": "2026-10-11T17:01:13.65496"
+  },
+  {
+    "id": "9a9fa350-868d-40bd-89ab-494744b739cb",
+    "termine": "il padrino",
+    "created_at": "2026-10-13T15:43:54.527534"
+  },
+  {
+    "id": "b9e085a8-4274-4992-a6c9-c0b6d67d2d8c",
+    "termine": "le origini di moby dick",
+    "created_at": "2026-10-17T15:11:22.917939"
+  },
+  {
+    "id": "4c13b031-9830-49bf-a66c-ba19ecbdd128",
+    "termine": "moby dick",
+    "created_at": "2026-10-17T17:02:55.353158"
+  },
+  {
+    "id": "820773e3-0c68-4680-93ae-b5a0bd41f597",
+    "termine": "Rambo",
+    "created_at": "2026-10-17T17:37:30.374696"
+  },
+  {
+    "id": "d3069e94-86c9-43ef-9b17-c413e6ab0679",
+    "termine": "Rocky",
+    "created_at": "2026-10-17T17:37:45.093949"
+  },
+  {
+    "id": "745e86a4-4d99-4fd5-958b-cd3c092d454f",
+    "termine": "Prisoners",
+    "created_at": "2026-10-17T17:44:36.498369"
+  },
+  {
+    "id": "60e12127-577b-43f5-bdb4-5b6cc2b03627",
+    "termine": "Rambo",
+    "created_at": "2026-10-17T22:47:58.526391"
+  },
+  {
+    "id": "4d8ba48f-817a-4ce8-bf70-422e32f8b655",
+    "termine": "La leggenda del pianista sull'oceano",
+    "created_at": "2026-10-17T23:10:52.737667"
+  },
+  {
+    "id": "38552a74-7bfb-4704-bf74-1eebc2f4581f",
+    "termine": "la leggenda del pianista sull'oceano",
+    "created_at": "2026-10-17T23:29:09.9648"
+  },
+  {
+    "id": "5b6f5053-5edd-46b9-a43c-d4be2ccc8d11",
+    "termine": "Spider-Man: Brand New Day",
+    "created_at": "2026-10-17T23:56:44.211551"
+  },
+  {
+    "id": "ec081e85-23a1-4d3f-a025-ef113a646c0f",
+    "termine": "il padrino",
+    "created_at": "2026-10-17T23:58:04.961767"
+  },
+  {
+    "id": "1c670ccc-5484-4a2f-af91-d6d687ba570c",
+    "termine": "l'avvocato del diavolo",
+    "created_at": "2026-10-18T00:17:29.604065"
+  },
+  {
+    "id": "1d725983-84bf-43b7-ad41-01f2f37bd80b",
+    "termine": "Love Happens",
+    "created_at": "2026-10-18T00:56:47.031975"
+  },
+  {
+    "id": "a8042089-071c-473a-ace1-5890e8a584ef",
+    "termine": "book of boba fett",
+    "created_at": "2026-10-18T00:57:29.107095"
+  },
+  {
+    "id": "1307b4ef-22de-46f3-a39f-b036df4b2f6b",
+    "termine": "book of boba fett",
+    "created_at": "2026-10-18T00:57:33.20056"
+  },
+  {
+    "id": "794459be-8bba-4613-86d2-de77ba7dcbc5",
+    "termine": "book of boba fett",
+    "created_at": "2026-10-18T00:57:34.701786"
+  },
+  {
+    "id": "da41d6ce-bcf7-4afa-8ac8-4731a92e0f3c",
+    "termine": "the book of boba fett",
+    "created_at": "2026-10-18T01:12:17.893304"
+  },
+  {
+    "id": "4d7581c2-5c64-421e-b017-ab4d1067733b",
+    "termine": "spartacus",
+    "created_at": "2026-10-18T02:02:40.870464"
+  },
+  {
+    "id": "f0635761-4d4c-46a1-8ab6-f3a2a3299c73",
+    "termine": "quo vadis",
+    "created_at": "2026-10-18T02:02:58.62842"
+  },
+  {
+    "id": "d1719926-5526-4fb1-a8d6-3cd30f5e0189",
+    "termine": "satantango",
+    "created_at": "2026-10-18T13:30:04.039666"
+  },
+  {
+    "id": "d6754bf7-2768-47e3-84ad-b53449251431",
+    "termine": "Spartacus",
+    "created_at": "2026-10-18T13:31:14.570962"
+  },
+  {
+    "id": "3ab78bc4-9fb2-45fe-bc8a-e313353818b6",
+    "termine": "Braveheart",
+    "created_at": "2026-10-18T13:33:34.330948"
+  },
+  {
+    "id": "ac338c46-7060-45cc-85ba-1334dc1b1397",
+    "termine": "l'ultimo samurai",
+    "created_at": "2026-10-21T20:26:45.212711"
+  },
+  {
+    "id": "4b990d7b-316a-4882-b530-06679d8ed5be",
+    "termine": "pulp fiction",
+    "created_at": "2026-10-21T20:28:56.302429"
+  },
+  {
+    "id": "46e70d1f-849c-44b8-9bcb-84b9b31c5625",
+    "termine": "Mamma ho perso l'aereo",
+    "created_at": "2026-10-23T13:13:52.793817"
+  },
+  {
+    "id": "b1314f7e-7a48-4949-a030-ffd82dcbdedb",
+    "termine": "Mamma ho perso l'aereo",
+    "created_at": "2026-10-23T13:16:43.39742"
+  },
+  {
+    "id": "b8852f4b-343c-4f40-9736-712def50fa8a",
+    "termine": "test search query",
+    "created_at": "2026-10-24T17:47:24.661656"
+  },
+  {
+    "id": "70d788f4-32f1-489e-883a-9abc310d91d0",
+    "termine": "ult",
+    "created_at": "2026-10-24T18:50:59.725286"
+  },
+  {
+    "id": "72dfb8f7-b402-4dc7-98e4-bc03912a8f49",
+    "termine": "ulti",
+    "created_at": "2026-10-24T18:51:00.941994"
+  },
+  {
+    "id": "0eee8266-5674-4933-858c-44539f621456",
+    "termine": "lu",
+    "created_at": "2026-10-24T19:42:29.751348"
+  },
+  {
+    "id": "d0962dfa-3eed-4ee1-abd1-5f1cef51c6a2",
+    "termine": "lucy",
+    "created_at": "2026-10-24T19:42:30.335113"
+  },
+  {
+    "id": "5a9d9a0e-1c2a-44ea-9930-9f46db006691",
+    "termine": "ta",
+    "created_at": "2026-10-24T21:22:06.267574"
+  },
+  {
+    "id": "43fd7e8c-d98d-4461-a0d8-da44b71bd5b1",
+    "termine": "tango",
+    "created_at": "2026-10-24T21:22:07.173264"
+  },
+  {
+    "id": "b8098c23-1968-487b-a90d-18eafdbb4a2c",
+    "termine": "tango e",
+    "created_at": "2026-10-24T21:22:08.643782"
+  },
+  {
+    "id": "5c42ea08-9590-4a29-8d20-5ac6fa71acaf",
+    "termine": "tango e",
+    "created_at": "2026-10-24T21:22:12.820863"
+  },
+  {
+    "id": "b03f8b55-3c60-4c02-b33b-f8a036c28d84",
+    "termine": "tango",
+    "created_at": "2026-10-24T21:22:14.083609"
+  },
+  {
+    "id": "8ae39837-0cbb-42d6-84ae-f0bad49ed65e",
+    "termine": "in",
+    "created_at": "2026-10-24T21:22:40.262411"
+  },
+  {
+    "id": "7fea76fc-5c74-4754-aa59-693389a84e0d",
+    "termine": "indep",
+    "created_at": "2026-10-24T21:22:40.520845"
+  },
+  {
+    "id": "fb1d35ee-5cce-4471-a915-2dce12211293",
+    "termine": "indepe",
+    "created_at": "2026-10-24T21:22:41.263719"
+  },
+  {
+    "id": "04f05bec-0947-4a4e-8ff7-e9624f6797d4",
+    "termine": "independe",
+    "created_at": "2026-10-24T21:22:41.995092"
+  },
+  {
+    "id": "ad9dc27a-048c-44ab-9da3-a4d70cef3c8a",
+    "termine": "independence",
+    "created_at": "2026-10-24T21:22:43.413327"
+  },
+  {
+    "id": "65b0c7b4-edf7-40a3-b977-fd532cd30d00",
+    "termine": "l'",
+    "created_at": "2026-10-25T08:33:57.494863"
+  },
+  {
+    "id": "1a518dba-215d-4e40-97b6-cf230427c604",
+    "termine": "l'eso",
+    "created_at": "2026-10-25T08:33:58.068145"
+  },
+  {
+    "id": "9e4eee1d-de5f-47d8-90f9-dc83b811fb10",
+    "termine": "l'esor",
+    "created_at": "2026-10-25T08:33:58.248218"
+  },
+  {
+    "id": "fafb6a4a-244f-4057-a352-e9bc9d63930b",
+    "termine": "l'esor",
+    "created_at": "2026-10-25T08:33:59.20275"
+  },
+  {
+    "id": "dffad70e-7d81-4693-93ba-e86484a42ba0",
+    "termine": "Ma",
+    "created_at": "2026-10-25T10:15:59.292424"
+  },
+  {
+    "id": "c129e899-1bc6-4f91-b753-9dc9ff19c6ec",
+    "termine": "Matr",
+    "created_at": "2026-10-25T10:15:59.984614"
+  },
+  {
+    "id": "95762463-f8ab-4ade-a8d8-ddf03d34d0fe",
+    "termine": "Matri",
+    "created_at": "2026-10-25T10:16:00.473775"
+  },
+  {
+    "id": "a7b9d25e-a1df-435f-a122-c595b2b9fe36",
+    "termine": "Sa",
+    "created_at": "2026-10-25T10:16:17.498318"
+  },
+  {
+    "id": "0072b596-1df2-40cd-a538-256888744416",
+    "termine": "Sat",
+    "created_at": "2026-10-25T10:16:17.954667"
+  },
+  {
+    "id": "8c8c41bf-16d7-4cad-8503-f7e0294611f1",
+    "termine": "Sata",
+    "created_at": "2026-10-25T10:16:18.826037"
+  },
+  {
+    "id": "bb6882fb-622a-4554-b2ff-939a284b60de",
+    "termine": "Satan",
+    "created_at": "2026-10-25T10:16:24.146001"
+  },
+  {
+    "id": "867320b3-0890-44ad-afff-7549453d29cd",
+    "termine": "Satant",
+    "created_at": "2026-10-25T10:16:24.753854"
+  },
+  {
+    "id": "4e540e42-35e9-408d-b59b-8e0537c83ba1",
+    "termine": "Satanta",
+    "created_at": "2026-10-25T10:16:25.464006"
+  },
+  {
+    "id": "8d0182d6-2d62-4ecf-be07-a4522edda032",
+    "termine": "ha",
+    "created_at": "2026-10-25T12:31:06.186048"
+  },
+  {
+    "id": "a2404e1e-3f8a-4621-a57e-3a119ed43050",
+    "termine": "hallo",
+    "created_at": "2026-10-25T12:31:06.895348"
+  },
+  {
+    "id": "58526371-9d30-4ecc-b03b-550e4bc531a3",
+    "termine": "hallo",
+    "created_at": "2026-10-25T12:31:07.955805"
+  },
+  {
+    "id": "b2f81f8e-ca2b-47cf-8428-f21d8007d59d",
+    "termine": "hallow",
+    "created_at": "2026-10-25T12:31:09.958625"
+  },
+  {
+    "id": "653cf090-36f7-42f8-b9ab-cb96c95789a0",
+    "termine": "hallowe",
+    "created_at": "2026-10-25T12:31:12.996325"
+  },
+  {
+    "id": "09568192-4e8a-4e10-862c-4656357eee4c",
+    "termine": "hallowee",
+    "created_at": "2026-10-25T12:31:15.014764"
+  },
+  {
+    "id": "0d69591c-089b-484c-9ab0-1108e64442a3",
+    "termine": "halloween",
+    "created_at": "2026-10-25T12:31:18.875974"
+  },
+  {
+    "id": "37bb7322-22f2-4471-9bf6-884dbe0cb569",
+    "termine": "it",
+    "created_at": "2026-10-25T12:35:03.657517"
+  },
+  {
+    "id": "561bc9f9-0e48-4fca-8d8a-a64e171e4e6f",
+    "termine": "it",
+    "created_at": "2026-10-25T12:35:09.973613"
+  }
+]

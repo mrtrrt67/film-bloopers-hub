@@ -1,0 +1,127 @@
+[
+  {
+    "chiave": "home_promo_int_titolo",
+    "valore": "Promo Startup attiva: registrati gratis a vita!",
+    "visibile": true
+  },
+  {
+    "chiave": "home_promo_interna",
+    "valore": "Approfitta della promozione di lancio: registrati ora per ottenere l'accesso Premium Lifetime gratuito. I pagamenti e gli abbonamenti a pagamenti partiranno solo al termine dell'offerta promozionale!!",
+    "visibile": true
+  },
+  {
+    "chiave": "promo_button_text",
+    "valore": "💎 Listino Piani post-lancio",
+    "visibile": true
+  },
+  {
+    "chiave": "promo_card_text",
+    "valore": "Approfitta della promozione di lancio: registrati ora per ottenere l'accesso <b>Premium Lifetime gratuito</b>. I pagamenti e gli abbonamenti a pagamento partiranno solo al termine dell'offerta promozionale!!",
+    "visibile": true
+  },
+  {
+    "chiave": "promo_card_title",
+    "valore": "Promo Startup attiva: Registrati gratis a vita!",
+    "visibile": true
+  },
+  {
+    "chiave": "soglia_punti_lifetime",
+    "valore": "1000",
+    "visibile": true
+  },
+  {
+    "chiave": "soglia_punti_mensile",
+    "valore": "100",
+    "visibile": true
+  },
+  {
+    "chiave": "promo_lifetime_deadline",
+    "valore": "2027-01-01",
+    "visibile": true
+  },
+  {
+    "chiave": "classifica_banner_titolo",
+    "valore": "Come funziona il sistema di punti e premi?",
+    "visibile": true
+  },
+  {
+    "chiave": "classifica_testo_1",
+    "valore": "contribuisci segnalando nuovi errori o facendo validare le tue segnalazioni dall'amministratore.",
+    "visibile": true
+  },
+  {
+    "chiave": "classifica_testo_2",
+    "valore": "⭐ Premio Mensile (Ogni {soglia_mensile} punti): Ogni volta che accumuli {soglia_mensile} punti, sblocchi automaticamente 1 mese di abbonamento Premium gratuito.",
+    "visibile": true
+  },
+  {
+    "chiave": "classifica_testo_3",
+    "valore": "👑 Premio Lifetime ({soglia_lifetime} punti): Raggiungi la vetta della community arrivando a {soglia_lifetime} punti per sbloccare l'accesso Lifetime gratuito a vita!",
+    "visibile": true
+  },
+  {
+    "chiave": "classifica_titolo",
+    "valore": "Classifica Cacciatori di Bloopers",
+    "visibile": true
+  },
+  {
+    "chiave": "footer_testo_amazon",
+    "valore": "In qualità di Affiliato Amazon, riceviamo un guadagno dagli acquisti idonei.",
+    "visibile": true
+  },
+  {
+    "chiave": "footer_testo_principale",
+    "valore": "FilmBloopers Hub — Il database intelligente degli errori cinematografici | P.IVA: 12345678901 | Sede Legale: Via Roma 1, Torino | Contatti: supporto@filmbloopers.it",
+    "visibile": true
+  },
+  {
+    "chiave": "home_archivio",
+    "valore": "Inizia la scoperta: vai su Esplora e Cerca nel menu a sinistra, inserisci un titolo o una saga e premi Invio per esplorare o generare nuovi contenuti.",
+    "visibile": true
+  },
+  {
+    "chiave": "home_banner_top_badge",
+    "valore": "Offerta a Tempo Limitato",
+    "visibile": true
+  },
+  {
+    "chiave": "home_banner_top_testo",
+    "valore": "Registrati o scala la classifica entro il 2026-12-31 per sbloccare subito l'accesso <b>Premium Lifetime gratuito</b> a vita!",
+    "visibile": true
+  },
+  {
+    "chiave": "home_banner_top_titolo",
+    "valore": "PROMO SPECIALE DI LANCIO STARTUP",
+    "visibile": true
+  },
+  {
+    "chiave": "home_header_sottotitolo",
+    "valore": "Esplora, scopri e cataloga in tempo reale i bloopers, le sviste e i dettagli nascosti della storia del cinema.",
+    "visibile": true
+  },
+  {
+    "chiave": "home_header_titolo",
+    "valore": "Archivio Errori e Incongruenze Cinematografiche",
+    "visibile": true
+  },
+  {
+    "chiave": "home_inizia_subito",
+    "valore": "usa il menu a sinistra per andare su Esplora e Cerca. Se il film non è ancora catalogato, la nostra intelligenza artificiale lo analizzerà in tempo reale per te!",
+    "visibile": true
+  },
+  {
+    "chiave": "home_main_p1",
+    "valore": "Quante volte, guardando un film, ti sei detto: \"Questo errore lo sapevo già!\" oppure \"Possibile che non ci avessi mai fatto caso prima?\". Questo progetto nasce dalla passione per il cinema vissuto fotogramma per fotogramma, raccogliendo i piccoli e grandi scivoloni, i bloopers e le incongruenze che popolano la storia della settima arte.",
+    "visibile": true
+  },
+  {
+    "chiave": "home_main_p2",
+    "valore": "Dalle sviste storiche più clamorose agli errori di raccordo che fanno sorridere, ogni scheda è un viaggio dentro il set per riscoprire i tuoi film preferiti con occhi nuovi, unendo i titoli cult che tutti ricordiamo a scoperte del tutto inedite.",
+    "visibile": true
+  },
+  {
+    "chiave": "home_main_titolo",
+    "valore": "Errori, sviste e ciak falsi nella storia del cinema: dai classici che tutti conosciamo alle sorprese più inaspettate",
+    "visibile": true
+  }
+]

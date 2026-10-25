@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sliders, Save, Check, Calendar, Eye, EyeOff, Sparkles } from "lucide-react";
+import { Sliders, Save, Check, Calendar, Eye, EyeOff, Sparkles, Trash2 } from "lucide-react";
 import { formatDateItalian } from "@/lib/utils";
 
 const CONFIG_METADATA: Record<string, { label: string; desc?: string }> = {
@@ -59,6 +59,26 @@ export default function AdminConfigTab() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [cleaning, setCleaning] = useState(false);
+
+  const handleExecuteProductionCleanup = async () => {
+    if (!confirm("ATTENZIONE: Sei sicuro di voler azzerare tutti i dati di test (suggerimenti, voti, contestazioni, punti classifiche e log ricerche)? I dati storici sono già salvati nei backup.")) return;
+    try {
+      setCleaning(true);
+      const res = await fetch("/api/admin/cleanup", { method: "POST" });
+      const data = await res.json();
+      if (res.ok) {
+        alert(data.message || "Pulizia completata con successo!");
+        window.location.reload();
+      } else {
+        alert("Errore pulizia: " + (data.error || "Errore sconosciuto"));
+      }
+    } catch (e: any) {
+      alert("Errore di rete: " + e.message);
+    } finally {
+      setCleaning(false);
+    }
+  };
 
   const fetchConfigs = async () => {
     try {
@@ -303,6 +323,29 @@ export default function AdminConfigTab() {
             })}
           </div>
         )}
+      </div>
+
+      {/* SEZIONE MANUTENZIONE PRODUZIONE: RESET DATI DI TEST */}
+      <div className="rounded-3xl border-2 border-rose-500/30 bg-gradient-to-r from-rose-950/20 via-zinc-900 to-zinc-950 p-6 space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <h3 className="text-base font-black text-rose-400 flex items-center gap-2">
+              <Trash2 className="h-4 w-4" />
+              Manutenzione Produzione: Reset Dati di Test & Classifiche
+            </h3>
+            <p className="text-xs text-zinc-300 leading-relaxed max-w-2xl">
+              Azzera tutti i dati di test generati durante lo sviluppo: cancella i suggerimenti di prova, i voti e le contestazioni, azzera le classifiche (punti), elimina le segnalazioni in attesa di moderazione e svuota la cronologia delle ricerche.
+            </p>
+          </div>
+          <button
+            onClick={handleExecuteProductionCleanup}
+            disabled={cleaning}
+            className="shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs transition shadow-lg shadow-rose-600/20 active:scale-95 disabled:opacity-50"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+            <span>{cleaning ? "Pulizia in corso..." : "Esegui Pulizia Produzione"}</span>
+          </button>
+        </div>
       </div>
     </div>
   );

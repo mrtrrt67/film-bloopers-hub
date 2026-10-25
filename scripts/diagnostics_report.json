@@ -90,8 +90,8 @@
     "issues": []
   },
   "git": {
-    "branch": "main",
-    "status": "M src/components/AuthModal.tsx\n M src/components/admin/AdminUsersTab.tsx",
+    "branch": "staging",
+    "status": "M src/components/admin/AdminConfigTab.tsx\n?? backups/\n?? src/app/api/admin/cleanup/",
     "issues": []
   },
   "typecheck": {

@@ -1,0 +1,149 @@
+[
+  {
+    "id": "4cad1e5d-f5a2-49f0-8efd-0368ac3892a5",
+    "user_id": "395053ac-5b98-4f6d-8c5b-8ce96c956d5d",
+    "errore_id": 691,
+    "tipo": "conferma",
+    "motivo": null
+  },
+  {
+    "id": "004364fd-f2fe-4a17-bd9b-4b44c4414e29",
+    "user_id": "395053ac-5b98-4f6d-8c5b-8ce96c956d5d",
+    "errore_id": 689,
+    "tipo": "contestazione",
+    "motivo": null
+  },
+  {
+    "id": "af88dc8b-e930-43ec-a6df-e671645aea89",
+    "user_id": "395053ac-5b98-4f6d-8c5b-8ce96c956d5d",
+    "errore_id": 692,
+    "tipo": "contestazione",
+    "motivo": null
+  },
+  {
+    "id": "9fa52568-201e-453e-a89f-8624d0e9b3d3",
+    "user_id": "395053ac-5b98-4f6d-8c5b-8ce96c956d5d",
+    "errore_id": 690,
+    "tipo": "conferma",
+    "motivo": null
+  },
+  {
+    "id": "74b7cd8b-2287-47ef-9d93-949400543ae7",
+    "user_id": "395053ac-5b98-4f6d-8c5b-8ce96c956d5d",
+    "errore_id": 353,
+    "tipo": "conferma",
+    "motivo": null
+  },
+  {
+    "id": "7296d828-a2b1-43de-9cdc-bb101b759a73",
+    "user_id": "395053ac-5b98-4f6d-8c5b-8ce96c956d5d",
+    "errore_id": 693,
+    "tipo": "contestazione",
+    "motivo": null
+  },
+  {
+    "id": "56fccd42-2c25-484a-86f2-ff3450e2fee2",
+    "user_id": "b1f688dc-7e17-4bc5-b763-2972e2116564",
+    "errore_id": 75,
+    "tipo": "conferma",
+    "motivo": null
+  },
+  {
+    "id": "efa1ebd9-b8ac-4d4d-a9ec-c8105a2b5390",
+    "user_id": "b1f688dc-7e17-4bc5-b763-2972e2116564",
+    "errore_id": 9,
+    "tipo": "conferma",
+    "motivo": null
+  },
+  {
+    "id": "d46e661f-21db-4dcd-a72e-86f1b2bf59e8",
+    "user_id": "db79edc0-2cfc-4a99-a596-98152b916896",
+    "errore_id": 509,
+    "tipo": "contestazione",
+    "motivo": null
+  },
+  {
+    "id": "a2e464e3-dd55-4e46-b54f-3c6ea194e78d",
+    "user_id": "b1f688dc-7e17-4bc5-b763-2972e2116564",
+    "errore_id": 514,
+    "tipo": "conferma",
+    "motivo": null
+  },
+  {
+    "id": "81024dfe-d6ba-43cc-968f-cc884df98ddc",
+    "user_id": "b1f688dc-7e17-4bc5-b763-2972e2116564",
+    "errore_id": 355,
+    "tipo": "conferma",
+    "motivo": null
+  },
+  {
+    "id": "1860f22b-29fd-4e67-89fb-2c302baab12b",
+    "user_id": "b1f688dc-7e17-4bc5-b763-2972e2116564",
+    "errore_id": 357,
+    "tipo": "conferma",
+    "motivo": null
+  },
+  {
+    "id": "a996c615-fc2a-401a-b924-6a0463f50de1",
+    "user_id": "b1f688dc-7e17-4bc5-b763-2972e2116564",
+    "errore_id": 511,
+    "tipo": "contestazione",
+    "motivo": null
+  },
+  {
+    "id": "fe34b6e6-b6a1-4d1b-8881-0b8a0205aa7a",
+    "user_id": "b1f688dc-7e17-4bc5-b763-2972e2116564",
+    "errore_id": 353,
+    "tipo": "conferma",
+    "motivo": null
+  },
+  {
+    "id": "45988264-cba2-47c3-9e83-748e5d4037b0",
+    "user_id": "36472b60-f606-46ca-b835-aab9c29a5113",
+    "errore_id": 602,
+    "tipo": "conferma",
+    "motivo": null
+  },
+  {
+    "id": "cf54cd59-c116-4358-82b5-00034fa55e7f",
+    "user_id": "36472b60-f606-46ca-b835-aab9c29a5113",
+    "errore_id": 603,
+    "tipo": "contestazione",
+    "motivo": "buuuuuu"
+  },
+  {
+    "id": "90524264-1a09-4216-87e2-079112fe7081",
+    "user_id": "b1f688dc-7e17-4bc5-b763-2972e2116564",
+    "errore_id": 755,
+    "tipo": "conferma",
+    "motivo": null
+  },
+  {
+    "id": "48b6ab65-9a00-4aea-92ef-1040372b1c13",
+    "user_id": "b1f688dc-7e17-4bc5-b763-2972e2116564",
+    "errore_id": 315,
+    "tipo": "contestazione",
+    "motivo": "lo so stronzo"
+  },
+  {
+    "id": "f7d12ad2-7b56-4734-8589-522b40378c43",
+    "user_id": "b1f688dc-7e17-4bc5-b763-2972e2116564",
+    "errore_id": 967,
+    "tipo": "contestazione",
+    "motivo": null
+  },
+  {
+    "id": "c3075698-ee61-4561-ac1c-28cdb5994323",
+    "user_id": "b1f688dc-7e17-4bc5-b763-2972e2116564",
+    "errore_id": 1005,
+    "tipo": "contestazione",
+    "motivo": null
+  },
+  {
+    "id": "5d3df56f-1a3c-4163-a0f6-02b37626d394",
+    "user_id": "b1f688dc-7e17-4bc5-b763-2972e2116564",
+    "errore_id": 482,
+    "tipo": "contestazione",
+    "motivo": "dfhfhhdfhdfdhf"
+  }
+]

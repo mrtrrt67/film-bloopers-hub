@@ -1,0 +1,51 @@
+[
+  {
+    "id": "d3d00516-64c2-476f-b727-9a488a568024",
+    "user_id": "b1f688dc-7e17-4bc5-b763-2972e2116564",
+    "email": "mrtrrt67@gmail.com",
+    "messaggio": "suggerimento 1",
+    "created_at": "2026-09-26T09:48:59.981293+00:00"
+  },
+  {
+    "id": "147544a5-595f-414d-83c8-5b0d9b8c874f",
+    "user_id": "b1f688dc-7e17-4bc5-b763-2972e2116564",
+    "email": "mrtrrt67@gmail.com",
+    "messaggio": "kmsafkljhsfklsdf",
+    "created_at": "2026-09-26T11:29:19.468441+00:00"
+  },
+  {
+    "id": "54b4bfa3-ea10-4a93-905f-311849221b11",
+    "user_id": "b1f688dc-7e17-4bc5-b763-2972e2116564",
+    "email": "mrtrrt67@gmail.com",
+    "messaggio": "suggerimento",
+    "created_at": "2026-09-26T14:20:26.17603+00:00"
+  },
+  {
+    "id": "53ee4a79-324a-4281-89c2-32fac5978b62",
+    "user_id": "36472b60-f606-46ca-b835-aab9c29a5113",
+    "email": "lrscrm73@gmail.com",
+    "messaggio": "oriva scrittura",
+    "created_at": "2026-09-28T07:09:29.605352+00:00"
+  },
+  {
+    "id": "ac4b6b1b-39e0-44ec-8359-1abdb96b3c78",
+    "user_id": "db79edc0-2cfc-4a99-a596-98152b916896",
+    "email": "mrtrrt@libero.it",
+    "messaggio": "prova free",
+    "created_at": "2026-10-03T08:22:40.805506+00:00"
+  },
+  {
+    "id": "b936c549-b03e-4e59-a4c2-f1fafab57485",
+    "user_id": "b1f688dc-7e17-4bc5-b763-2972e2116564",
+    "email": "mrtrrt67@gmail.com",
+    "messaggio": "suggerimento 1 test",
+    "created_at": "2026-10-17T17:43:29.697388+00:00"
+  },
+  {
+    "id": "0280fe13-3fc7-4587-9d27-7226e9abd739",
+    "user_id": "b1f688dc-7e17-4bc5-b763-2972e2116564",
+    "email": "mrtrrt67@gmail.com",
+    "messaggio": "[Nuova funzionalità] gsdafgsafkas",
+    "created_at": "2026-10-24T20:46:50.820293+00:00"
+  }
+]
