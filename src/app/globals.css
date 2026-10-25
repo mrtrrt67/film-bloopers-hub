@@ -1,8 +1,9 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #09090b;
+  --foreground: #f4f4f5;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -12,15 +13,76 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background-color: #09090b !important;
+  color-scheme: dark;
 }
 
 body {
-  background: var(--background);
+  background-color: #09090b !important;
+  background: #09090b !important;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  color-scheme: dark;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+/* ==========================================================================
+   OTTIMIZZAZIONE COLORI DI SFONDO SPECIFICA PER SMARTPHONE (max-width: 768px)
+   Elimina completamente lo sfondo grigio sbiadito sui browser mobile, 
+   garantendo un contrasto cinema profondo e testo perfettamente leggibile.
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* 1. Sfondo base solido per il canvas mobile */
+  html,
+  body {
+    background-color: #09090b !important;
+    background: #09090b !important;
+    color-scheme: dark;
+  }
+
+  /* 2. Banner Promo su smartphone: profondo nero ossidiana con sfumatura ambra e oro, testo nitidissimo */
+  .promo-banner-card,
+  [class*="from-amber-950/40"] {
+    background: linear-gradient(135deg, #18120a 0%, #110e0c 45%, #09090b 100%) !important;
+    border-color: rgba(245, 158, 11, 0.45) !important;
+    box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.9), 0 0 12px rgba(245, 158, 11, 0.12) !important;
+  }
+
+  /* 3. Hero Section su smartphone */
+  [class*="from-zinc-900/90"] {
+    background: linear-gradient(180deg, #131317 0%, #09090b 100%) !important;
+    border-color: rgba(39, 39, 42, 0.9) !important;
+  }
+
+  /* 4. Tutte le card, sezioni e riquadri semitrasparenti su smartphone:
+     sostituisce la trasparenza (che sui display smartphone si compenetra producendo grigio slavato)
+     con un solido nero antracite profondo cinema (#121216) */
+  [class*="bg-zinc-900/40"],
+  [class*="bg-zinc-900/60"],
+  [class*="bg-zinc-900/80"],
+  [class*="bg-zinc-900/50"],
+  [class*="bg-zinc-950/60"],
+  [class*="bg-zinc-900/30"] {
+    background-color: #121216 !important;
+    border-color: rgba(39, 39, 42, 0.9) !important;
+  }
+
+  /* 5. Card piani su smartphone */
+  [class*="from-purple-950/30"],
+  [class*="from-purple-950/40"] {
+    background: linear-gradient(180deg, #170f1e 0%, #101014 100%) !important;
+  }
+
+  /* 6. Barra di navigazione mobile e menu a tendina */
+  header {
+    background-color: rgba(9, 9, 11, 0.96) !important;
+    border-bottom-color: rgba(39, 39, 42, 0.9) !important;
+  }
+
+  /* 7. Evita velature lattescenti o grigie dovute a filtri blur su browser mobile */
+  .backdrop-blur-xl,
+  .backdrop-blur-2xl,
+  .backdrop-blur-md {
+    background-color: rgba(9, 9, 11, 0.97) !important;
+  }
 }

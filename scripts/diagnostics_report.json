@@ -91,7 +91,7 @@
   },
   "git": {
     "branch": "main",
-    "status": "M scripts/diagnostics_report.json\n M src/app/api/admin/moderation/route.ts\n M src/app/suggerimenti/page.tsx\n M src/components/admin/AdminModerationTab.tsx\n M src/components/admin/AdminSuggestionsTab.tsx",
+    "status": "M src/app/globals.css\n M src/app/layout.tsx\n M src/components/PromoBanner.tsx",
     "issues": []
   },
   "typecheck": {

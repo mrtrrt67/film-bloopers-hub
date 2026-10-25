@@ -41,7 +41,7 @@ export default function PromoBanner({
   }
 
   return (
-    <div className="relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-orange-950/20 to-zinc-950 p-5 sm:p-6 shadow-xl shadow-amber-500/5 mb-8">
+    <div className="promo-banner-card relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-orange-950/20 to-zinc-950 p-5 sm:p-6 shadow-xl shadow-amber-500/5 mb-8">
       {/* Glow decorative element */}
       <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-amber-500/10 blur-2xl pointer-events-none" />
 
