@@ -60,6 +60,14 @@ export const metadata: Metadata = {
     siteName: "FilmBloopers Hub",
     locale: "it_IT",
     type: "website",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "FilmBloopers Hub - L'Archivio degli Errori nei Film",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -67,6 +75,7 @@ export const metadata: Metadata = {
     description:
       "Tutti i bloopers, errori di scena e curiosità del cinema italiano e internazionale al minuto esatto.",
     creator: "@FilmBloopersHub",
+    images: ["/og-image.jpg"],
   },
   robots: {
     index: true,
