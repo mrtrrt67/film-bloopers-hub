@@ -164,15 +164,15 @@ export default function Navbar() {
                   ) : null}
                 </div>
 
-                {/* Pulsante Disdici / Gestisci Abbonamento (1 Clic) se abbonato */}
+                {/* Pulsante rapido Gestione Abbonamento per utenti attivi */}
                 {(userProfile?.tipo_abbonamento === "mensile" || userProfile?.tipo_abbonamento === "annuale") && (
                   <button
                     onClick={handleManageSubscription}
                     disabled={openingPortal}
-                    className="flex items-center gap-1 rounded-lg border border-purple-500/40 bg-purple-500/10 px-2.5 py-1.5 text-xs font-semibold text-purple-300 hover:bg-purple-500/20 transition-all shadow-sm"
+                    className="flex items-center gap-1 rounded-lg border border-purple-500/30 bg-purple-500/10 px-2.5 py-1.5 text-xs font-medium text-purple-300 hover:bg-purple-500/20 hover:text-purple-200 transition-all shadow-sm"
                     title="Disdici quando vuoi con 1 clic o gestisci il metodo di pagamento nel portale Stripe"
                   >
-                    <span>{openingPortal ? "Apertura..." : "Gestisci / Disdici"}</span>
+                    <span>{openingPortal ? "..." : "Disdici / Gestisci"}</span>
                   </button>
                 )}
 

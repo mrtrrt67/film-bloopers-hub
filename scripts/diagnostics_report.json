@@ -42,7 +42,7 @@
         "count": 7
       },
       "log_ricerche": {
-        "count": 194
+        "count": 203
       }
     },
     "issues": []
@@ -91,7 +91,7 @@
   },
   "git": {
     "branch": "main",
-    "status": "M src/app/api/admin/moderation/route.ts\n M src/app/api/admin/stats/route.ts\n M src/app/api/admin/users/route.ts\n M src/app/api/bloopers/generate/route.ts\n M src/app/api/bloopers/vote/route.ts\n M src/app/api/movies/import/route.ts\n M src/app/api/stripe/checkout/route.ts\n M src/app/api/stripe/webhook/route.ts\n M src/app/api/suggestions/route.ts\n M src/app/classifica/page.tsx\n M src/app/pricing/page.tsx\n M src/app/suggerimenti/page.tsx\n M src/components/BlooperItem.tsx\n M src/components/Footer.tsx\n M src/components/Navbar.tsx\n M src/components/admin/AdminModerationTab.tsx\n M src/components/admin/AdminSuggestionsTab.tsx\n M src/components/admin/AdminUsersTab.tsx\n M src/lib/types.ts\n M src/lib/utils.ts\nD  src/middleware.ts\n?? scripts/\n?? src/app/api/stripe/portal/\n?? src/lib/rewards.ts\n?? src/proxy.ts",
+    "status": "M src/app/pricing/page.tsx\n M src/components/Navbar.tsx",
     "issues": []
   },
   "typecheck": {
