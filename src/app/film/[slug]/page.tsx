@@ -90,8 +90,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const countDesc = bloopers?.length
     ? `Scopri ${bloopers.length} bloopers verificati al minuto esatto.`
     : "Scopri tutti i bloopers e le curiosità del film.";
-  const description = `${countDesc} Errori di montaggio, troupe visibile e anacronismi in "${film.titolo}"${film.regista ? ` di ${film.regista}` : ""}. ${film.trama?.slice(0, 130) || ""}`.trim();
-  const imageUrl = film.backdrop_url || film.poster_url || "/icon.svg";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://filmbloopers.online";
+  const imageUrl = film.backdrop_url || film.poster_url || `${siteUrl}/og-image.jpg`;
 
   return {
     title,
