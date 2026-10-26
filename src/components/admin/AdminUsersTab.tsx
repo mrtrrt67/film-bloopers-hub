@@ -1,13 +1,24 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Users, Shield, RefreshCw, Trash2, Save, Calendar, Search } from "lucide-react";
+import { Users, Shield, RefreshCw, Trash2, Save, Calendar, Search, CheckCircle, XCircle, AlertTriangle, X } from "lucide-react";
 
 export default function AdminUsersTab() {
   const [profiles, setProfiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingId, setSavingId] = useState<string | null>(null);
   const [filterQuery, setFilterQuery] = useState("");
+  const [toast, setToast] = useState<{
+    type: "success" | "error" | "info";
+    message: string;
+  } | null>(null);
+
+  const showToast = (type: "success" | "error" | "info", message: string) => {
+    setToast({ type, message });
+    setTimeout(() => {
+      setToast((current) => (current?.message === message ? null : current));
+    }, 4500);
+  };
 
   const fetchProfiles = async () => {
     try {
@@ -31,20 +42,27 @@ export default function AdminUsersTab() {
   const handleUpdateUser = async (profile: any) => {
     try {
       setSavingId(profile.id);
+      const isFree = profile.tier === "free";
       const res = await fetch("/api/admin/users", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           id: profile.id,
           tier: profile.tier,
-          tipo_abbonamento: profile.tipo_abbonamento || profile.subscription_type,
-          data_scadenza: profile.data_scadenza || profile.expires_at,
+          tipo_abbonamento: isFree ? "nessuno" : (profile.tipo_abbonamento || profile.subscription_type || "mensile"),
+          data_scadenza: isFree ? null : (profile.data_scadenza || profile.expires_at || null),
           calls_today: profile.calls_today,
         }),
       });
-      if (!res.ok) alert("Errore durante il salvataggio utente");
-    } catch (err) {
+      const json = await res.json().catch(() => ({}));
+      if (res.ok) {
+        showToast("success", `Utente ${profile.email || profile.username} aggiornato con successo (Tier: ${profile.tier})!`);
+      } else {
+        showToast("error", json.error || "Errore durante il salvataggio utente");
+      }
+    } catch (err: any) {
       console.error(err);
+      showToast("error", "Errore di connessione: " + err.message);
     } finally {
       setSavingId(null);
     }
@@ -61,9 +79,13 @@ export default function AdminUsersTab() {
         setProfiles((prev) =>
           prev.map((p) => (p.id === id ? { ...p, calls_today: 0 } : p))
         );
+        showToast("info", "Chiamate giornaliere azzerate a 0.");
+      } else {
+        showToast("error", "Impossibile azzerare le chiamate.");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      showToast("error", "Errore di rete: " + err.message);
     }
   };
 
@@ -73,9 +95,14 @@ export default function AdminUsersTab() {
       const res = await fetch(`/api/admin/users?id=${id}`, { method: "DELETE" });
       if (res.ok) {
         setProfiles((prev) => prev.filter((p) => p.id !== id));
+        showToast("info", `Profilo ${email} eliminato con successo.`);
+      } else {
+        const json = await res.json().catch(() => ({}));
+        showToast("error", json.error || "Errore eliminazione profilo.");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
+      showToast("error", "Errore di connessione: " + err.message);
     }
   };
 
@@ -86,7 +113,37 @@ export default function AdminUsersTab() {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Toast Notifiche In-App */}
+      {toast && (
+        <div className="fixed top-20 right-4 sm:right-8 z-50 max-w-md animate-in fade-in slide-in-from-top-3 duration-300">
+          <div
+            className={`flex items-start gap-3 p-4 rounded-2xl shadow-2xl backdrop-blur-xl border ${
+              toast.type === "success"
+                ? "bg-zinc-950/95 border-emerald-500/50 text-emerald-200 shadow-emerald-950/40"
+                : toast.type === "error"
+                ? "bg-zinc-950/95 border-rose-500/50 text-rose-200 shadow-rose-950/40"
+                : "bg-zinc-950/95 border-amber-500/50 text-amber-200 shadow-amber-950/40"
+            }`}
+          >
+            <div className="mt-0.5 shrink-0">
+              {toast.type === "success" && <CheckCircle className="h-5 w-5 text-emerald-400" />}
+              {toast.type === "error" && <XCircle className="h-5 w-5 text-rose-400" />}
+              {toast.type === "info" && <AlertTriangle className="h-5 w-5 text-amber-400" />}
+            </div>
+            <div className="flex-1 text-xs font-semibold leading-relaxed">
+              {toast.message}
+            </div>
+            <button
+              onClick={() => setToast(null)}
+              className="shrink-0 text-zinc-400 hover:text-white transition p-1"
+              aria-label="Chiudi notifica"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 p-5 rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-xl">
         <div>
           <h3 className="text-base font-black text-white flex items-center gap-2">
@@ -168,7 +225,44 @@ export default function AdminUsersTab() {
                               onChange={(e) => {
                                 const val = e.target.value;
                                 setProfiles((prev) =>
-                                  prev.map((p) => (p.id === profile.id ? { ...p, tier: val } : p))
+                                  prev.map((p) => {
+                                    if (p.id !== profile.id) return p;
+                                    if (val === "free") {
+                                      return {
+                                        ...p,
+                                        tier: "free",
+                                        tipo_abbonamento: "nessuno",
+                                        subscription_type: "nessuno",
+                                        data_scadenza: null,
+                                        expires_at: null,
+                                        is_expired: false,
+                                      };
+                                    } else if (val === "premium") {
+                                      const nextYear = new Date();
+                                      nextYear.setFullYear(nextYear.getFullYear() + 1);
+                                      const nextYearStr = nextYear.toISOString().slice(0, 10);
+                                      return {
+                                        ...p,
+                                        tier: "premium",
+                                        tipo_abbonamento: p.tipo_abbonamento === "nessuno" || !p.tipo_abbonamento ? "mensile" : p.tipo_abbonamento,
+                                        subscription_type: p.subscription_type === "nessuno" || !p.subscription_type ? "mensile" : p.subscription_type,
+                                        data_scadenza: p.data_scadenza || nextYearStr,
+                                        expires_at: p.expires_at || nextYearStr,
+                                        is_expired: false,
+                                      };
+                                    } else if (val === "admin") {
+                                      return {
+                                        ...p,
+                                        tier: "admin",
+                                        tipo_abbonamento: "lifetime",
+                                        subscription_type: "lifetime",
+                                        data_scadenza: null,
+                                        expires_at: null,
+                                        is_admin: true,
+                                      };
+                                    }
+                                    return { ...p, tier: val };
+                                  })
                                 );
                               }}
                               className={`rounded-lg bg-zinc-950 border px-2 py-1 text-xs font-bold focus:outline-none ${

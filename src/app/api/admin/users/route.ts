@@ -107,12 +107,36 @@ export async function PATCH(request: Request) {
     }
     if (tier !== undefined) {
       updatePayload.tier = tier;
+      if (tier === "free") {
+        updatePayload.tipo_abbonamento = "nessuno";
+        updatePayload.subscription_type = "nessuno";
+        updatePayload.data_scadenza = null;
+        updatePayload.expires_at = null;
+      } else if (tier === "admin") {
+        updatePayload.is_admin = true;
+        updatePayload.tier = "admin";
+        updatePayload.tipo_abbonamento = "lifetime";
+        updatePayload.subscription_type = "lifetime";
+      } else if (tier === "premium") {
+        // Se non specificato, default a mensile con 1 anno di scadenza
+        if (!tipo_abbonamento || tipo_abbonamento === "nessuno") {
+          updatePayload.tipo_abbonamento = "mensile";
+          updatePayload.subscription_type = "mensile";
+        }
+        if (!data_scadenza) {
+          const nextYear = new Date();
+          nextYear.setFullYear(nextYear.getFullYear() + 1);
+          const nextYearStr = nextYear.toISOString().slice(0, 10);
+          updatePayload.data_scadenza = nextYearStr;
+          updatePayload.expires_at = `${nextYearStr}T23:59:59Z`;
+        }
+      }
     }
-    if (tipo_abbonamento !== undefined) {
+    if (tipo_abbonamento !== undefined && tier !== "free") {
       updatePayload.tipo_abbonamento = tipo_abbonamento;
       updatePayload.subscription_type = tipo_abbonamento;
     }
-    if (data_scadenza !== undefined) {
+    if (data_scadenza !== undefined && tier !== "free") {
       updatePayload.data_scadenza = data_scadenza || null;
       updatePayload.expires_at = data_scadenza ? `${data_scadenza}T23:59:59Z` : null;
     }

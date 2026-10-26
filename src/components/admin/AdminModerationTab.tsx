@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AlertTriangle, CheckCircle, XCircle, Trash2, Edit3, Shield, Award } from "lucide-react";
+import { AlertTriangle, CheckCircle, XCircle, Trash2, Edit3, Shield, Award, X } from "lucide-react";
 
 export default function AdminModerationTab() {
   const [subTab, setSubTab] = useState<"pending" | "contests" | "corrections" | "approved">("pending");
@@ -21,6 +21,17 @@ export default function AdminModerationTab() {
   const [loading, setLoading] = useState(true);
   const [pointsMap, setPointsMap] = useState<Record<string, number>>({});
   const [contestEditMap, setContestEditMap] = useState<Record<string, { minuto: string; descrizione: string; points: number }>>({});
+  const [toast, setToast] = useState<{
+    type: "success" | "error" | "info";
+    message: string;
+  } | null>(null);
+
+  const showToast = (type: "success" | "error" | "info", message: string) => {
+    setToast({ type, message });
+    setTimeout(() => {
+      setToast((current) => (current?.message === message ? null : current));
+    }, 4500);
+  };
 
   const fetchModerationData = async () => {
     try {
@@ -58,16 +69,16 @@ export default function AdminModerationTab() {
       });
       const json = await res.json();
       if (res.ok) {
-        alert(json.message || "Blooper approvato con successo e punti assegnati!");
+        showToast("success", json.message || "Blooper approvato con successo e punti assegnati!");
         setData((prev) => ({
           ...prev,
           pending: prev.pending.filter((b) => b.id !== blooper.id),
         }));
       } else {
-        alert("Errore approvazione: " + (json.error || "Impossibile approvare"));
+        showToast("error", "Errore approvazione: " + (json.error || "Impossibile approvare"));
       }
     } catch (err: any) {
-      alert("Errore di rete: " + err.message);
+      showToast("error", "Errore di rete: " + err.message);
     }
   };
 
@@ -81,16 +92,16 @@ export default function AdminModerationTab() {
       });
       const json = await res.json();
       if (res.ok) {
-        alert(json.message || "Segnalazione rifiutata ed eliminata.");
+        showToast("info", json.message || "Segnalazione rifiutata ed eliminata.");
         setData((prev) => ({
           ...prev,
           pending: prev.pending.filter((b) => b.id !== blooperId),
         }));
       } else {
-        alert("Errore rifiuto: " + (json.error || "Impossibile eliminare"));
+        showToast("error", "Errore rifiuto: " + (json.error || "Impossibile eliminare"));
       }
     } catch (err: any) {
-      alert("Errore di rete: " + err.message);
+      showToast("error", "Errore di rete: " + err.message);
     }
   };
 
@@ -119,7 +130,7 @@ export default function AdminModerationTab() {
       });
       const json = await res.json();
       if (res.ok) {
-        alert(json.message || `Contestazione accettata: blooper corretto e ${edit.points} punti assegnati al segnalatore!`);
+        showToast("success", json.message || `Contestazione accettata: blooper corretto e ${edit.points} punti assegnati al segnalatore!`);
         setData((prev) => ({
           ...prev,
           contestazioni: prev.contestazioni.filter((c) => c.id !== contest.id),
@@ -138,10 +149,10 @@ export default function AdminModerationTab() {
           ],
         }));
       } else {
-        alert("Errore salvataggio correzione: " + (json.error || "Operazione non riuscita"));
+        showToast("error", "Errore salvataggio correzione: " + (json.error || "Operazione non riuscita"));
       }
     } catch (err: any) {
-      alert("Errore di rete: " + err.message);
+      showToast("error", "Errore di rete: " + err.message);
     }
   };
 
@@ -168,7 +179,7 @@ export default function AdminModerationTab() {
       });
       const json = await res.json();
       if (res.ok) {
-        alert(json.message || `Blooper errato eliminato dall'archivio e ${pts} punti assegnati!`);
+        showToast("success", json.message || `Blooper errato eliminato dall'archivio e ${pts} punti assegnati!`);
         setData((prev) => ({
           ...prev,
           contestazioni: prev.contestazioni.filter((c) => c.id !== contest.id),
@@ -182,10 +193,10 @@ export default function AdminModerationTab() {
           ],
         }));
       } else {
-        alert("Errore eliminazione: " + (json.error || "Operazione non riuscita"));
+        showToast("error", "Errore eliminazione: " + (json.error || "Operazione non riuscita"));
       }
     } catch (err: any) {
-      alert("Errore di rete: " + err.message);
+      showToast("error", "Errore di rete: " + err.message);
     }
   };
 
@@ -201,16 +212,16 @@ export default function AdminModerationTab() {
       });
       const json = await res.json();
       if (res.ok) {
-        alert(json.message || "Contestazione respinta: blooper confermato e contestazione archiviata.");
+        showToast("info", json.message || "Contestazione respinta: blooper confermato e contestazione archiviata.");
         setData((prev) => ({
           ...prev,
           contestazioni: prev.contestazioni.filter((c) => c.id !== contestId),
         }));
       } else {
-        alert("Errore archiviazione: " + (json.error || "Operazione non riuscita"));
+        showToast("error", "Errore archiviazione: " + (json.error || "Operazione non riuscita"));
       }
     } catch (err: any) {
-      alert("Errore di rete: " + err.message);
+      showToast("error", "Errore di rete: " + err.message);
     }
   };
 
@@ -224,16 +235,16 @@ export default function AdminModerationTab() {
       });
       const json = await res.json();
       if (res.ok) {
-        alert(json.message || "Blooper eliminato dall'archivio.");
+        showToast("info", json.message || "Blooper eliminato dall'archivio.");
         setData((prev) => ({
           ...prev,
           approved: prev.approved.filter((a) => a.id !== blooperId),
         }));
       } else {
-        alert("Errore eliminazione: " + (json.error || "Operazione non riuscita"));
+        showToast("error", "Errore eliminazione: " + (json.error || "Operazione non riuscita"));
       }
     } catch (err: any) {
-      alert("Errore di rete: " + err.message);
+      showToast("error", "Errore di rete: " + err.message);
     }
   };
 
@@ -254,14 +265,17 @@ export default function AdminModerationTab() {
       });
       if (res.ok) {
         const resJson = await res.json();
-        alert(resJson.message || "Correzione approvata e punti assegnati!");
+        showToast("success", resJson.message || "Correzione approvata e punti assegnati!");
         setData((prev) => ({
           ...prev,
           corrections: (prev.corrections || []).filter((c) => c.id !== corr.id),
         }));
+      } else {
+        const resJson = await res.json().catch(() => ({}));
+        showToast("error", resJson.error || "Errore durante l'approvazione");
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      showToast("error", "Errore di rete: " + err.message);
     }
   };
 
@@ -277,13 +291,17 @@ export default function AdminModerationTab() {
         }),
       });
       if (res.ok) {
+        showToast("info", "Correzione rifiutata ed eliminata.");
         setData((prev) => ({
           ...prev,
           corrections: (prev.corrections || []).filter((c) => c.id !== corrId),
         }));
+      } else {
+        const resJson = await res.json().catch(() => ({}));
+        showToast("error", resJson.error || "Errore durante il rifiuto");
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      showToast("error", "Errore di rete: " + err.message);
     }
   };
 
@@ -296,7 +314,37 @@ export default function AdminModerationTab() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 relative">
+      {/* Toast Notifiche In-App Moderazione */}
+      {toast && (
+        <div className="fixed top-20 right-4 sm:right-8 z-50 max-w-md animate-in fade-in slide-in-from-top-3 duration-300">
+          <div
+            className={`flex items-start gap-3 p-4 rounded-2xl shadow-2xl backdrop-blur-xl border ${
+              toast.type === "success"
+                ? "bg-zinc-950/95 border-emerald-500/50 text-emerald-200 shadow-emerald-950/40"
+                : toast.type === "error"
+                ? "bg-zinc-950/95 border-rose-500/50 text-rose-200 shadow-rose-950/40"
+                : "bg-zinc-950/95 border-amber-500/50 text-amber-200 shadow-amber-950/40"
+            }`}
+          >
+            <div className="mt-0.5 shrink-0">
+              {toast.type === "success" && <CheckCircle className="h-5 w-5 text-emerald-400" />}
+              {toast.type === "error" && <XCircle className="h-5 w-5 text-rose-400" />}
+              {toast.type === "info" && <AlertTriangle className="h-5 w-5 text-amber-400" />}
+            </div>
+            <div className="flex-1 text-xs font-semibold leading-relaxed">
+              {toast.message}
+            </div>
+            <button
+              onClick={() => setToast(null)}
+              className="shrink-0 text-zinc-400 hover:text-white transition p-1"
+              aria-label="Chiudi notifica"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
       {/* HEADER TABS */}
       <div className="flex items-center gap-2 border-b border-zinc-800 pb-3 overflow-x-auto">
         <button
