@@ -32,15 +32,23 @@ export default function AdminModerationTab() {
     title: string;
     message: string;
     confirmLabel?: string;
+    variant?: "danger" | "warning";
     onConfirm: () => void;
   } | null>(null);
 
-  const openConfirm = (title: string, message: string, onConfirm: () => void, confirmLabel = "Conferma ed Elimina") => {
+  const openConfirm = (
+    title: string,
+    message: string,
+    onConfirm: () => void,
+    confirmLabel = "Conferma ed Elimina",
+    variant: "danger" | "warning" = "danger"
+  ) => {
     setConfirmModal({
       isOpen: true,
       title,
       message,
       confirmLabel,
+      variant,
       onConfirm: () => {
         setConfirmModal(null);
         onConfirm();
@@ -258,38 +266,10 @@ export default function AdminModerationTab() {
     }
   };
 
-  const handleDeleteApproved = async (blooperId: string | number) => {
-    openConfirm(
-      "Elimina Blooper Approvato",
-      "Eliminare definitivamente questo blooper dall'archivio e dal catalogo pubblico?",
-      async () => {
-        try {
-          const res = await fetch("/api/admin/moderation", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "delete_approved", blooper_id: blooperId }),
-          });
-          const json = await res.json();
-          if (res.ok) {
-            showToast("info", json.message || "Blooper eliminato dall'archivio.");
-            setData((prev) => ({
-              ...prev,
-              approved: prev.approved.filter((a) => a.id !== blooperId),
-            }));
-          } else {
-            showToast("error", "Errore eliminazione: " + (json.error || "Operazione non riuscita"));
-          }
-        } catch (err: any) {
-          showToast("error", "Errore di rete: " + err.message);
-        }
-      }
-    );
-  };
-
   const handleDeleteResolvedContest = async (contestId: string | number) => {
     openConfirm(
-      "Rimuovi da Archivio",
-      "Rimuovere definitivamente questa voce dall'archivio delle contestazioni risolte?",
+      "Rimuovi Contestazione dallo Storico",
+      "Vuoi rimuovere questa contestazione dallo storico delle risolte?\n\nIl blooper nel film rimarrà regolarmente pubblicato e visibile nel catalogo.",
       async () => {
         try {
           const res = await fetch("/api/admin/moderation", {
@@ -302,7 +282,7 @@ export default function AdminModerationTab() {
           });
           const json = await res.json();
           if (res.ok) {
-            showToast("info", json.message || "Contestazione rimossa dall'archivio.");
+            showToast("info", json.message || "Contestazione rimossa dallo storico.");
             setData((prev) => ({
               ...prev,
               resolved_contests: (prev.resolved_contests || []).filter((rc) => rc.id !== contestId),
@@ -313,14 +293,16 @@ export default function AdminModerationTab() {
         } catch (err: any) {
           showToast("error", "Errore di rete: " + err.message);
         }
-      }
+      },
+      "Rimuovi Solo Contestazione",
+      "warning"
     );
   };
 
   const handleClearAllResolvedContests = async () => {
     openConfirm(
-      "Svuota Archivio Risolti",
-      "Sei sicuro di voler eliminare TUTTE le voci storiche dall'archivio delle contestazioni risolte? Questa azione è irreversibile.",
+      "Svuota Storico Contestazioni",
+      "Vuoi svuotare tutte le contestazioni risolte dallo storico?\n\nTutti i bloopers nei rispettivi film rimarranno intatti e pubblicati nel catalogo.",
       async () => {
         try {
           const res = await fetch("/api/admin/moderation", {
@@ -330,7 +312,7 @@ export default function AdminModerationTab() {
           });
           const json = await res.json();
           if (res.ok) {
-            showToast("success", json.message || "Archivio contestazioni svuotato con successo.");
+            showToast("success", json.message || "Storico contestazioni svuotato con successo.");
             setData((prev) => ({
               ...prev,
               resolved_contests: [],
@@ -341,7 +323,9 @@ export default function AdminModerationTab() {
         } catch (err: any) {
           showToast("error", "Errore di rete: " + err.message);
         }
-      }
+      },
+      "Svuota Solo Contestazioni",
+      "warning"
     );
   };
 
@@ -494,7 +478,7 @@ export default function AdminModerationTab() {
           }`}
         >
           <CheckCircle className="h-3.5 w-3.5" />
-          Archivio Approvati ({data.approved.length + (data.resolved_contests?.length || 0)})
+          Contestazioni Risolte ({data.resolved_contests?.length || 0})
         </button>
       </div>
 
@@ -820,29 +804,44 @@ export default function AdminModerationTab() {
         </div>
       )}
 
-      {/* 4. ARCHIVIO APPROVATI & CONTESTAZIONI RISOLTE */}
+      {/* 4. ARCHIVIO CONTESTAZIONI RISOLTE */}
       {subTab === "approved" && (
-        <div className="space-y-6">
-          {/* Sotto-sezione: Contestazioni & Correzioni Risolte */}
+        <div className="space-y-5">
+          {/* Banner Esplicativo Rassicurante */}
+          <div className="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200 flex items-start gap-3">
+            <span className="text-base mt-0.5">ℹ️</span>
+            <div className="space-y-1">
+              <strong className="text-amber-300">Archivio Storico Contestazioni Risolte</strong>
+              <p className="text-zinc-300">
+                In questa sezione consulti lo storico delle contestazioni e correzioni della community già verificate e approvate.
+              </p>
+              <p className="text-emerald-400 font-semibold pt-0.5">
+                🛡️ La rimozione da questo elenco cancella <u>SOLO</u> la riga della contestazione dallo storico: il blooper del film rimane pubblicato e intatto al 100% nel catalogo pubblico.
+              </p>
+            </div>
+          </div>
+
+          {/* Elenco Contestazioni Risolte */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-2">
                 <CheckCircle className="h-4 w-4" />
-                Contestazioni & Correzioni Risolte ({data.resolved_contests?.length || 0})
+                Contestazioni Risolte ({data.resolved_contests?.length || 0})
               </h3>
               {data.resolved_contests && data.resolved_contests.length > 0 && (
                 <button
                   onClick={handleClearAllResolvedContests}
-                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold text-rose-400 hover:text-white bg-rose-500/10 hover:bg-rose-600 transition active:scale-95 border border-rose-500/20"
-                  title="Elimina tutte le voci dell'archivio contestazioni"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold text-amber-300 hover:text-white bg-amber-500/10 hover:bg-amber-600 transition active:scale-95 border border-amber-500/20"
+                  title="Svuota lo storico delle contestazioni risolte (i bloopers nei film restano intatti)"
                 >
-                  <Trash2 className="h-3 w-3" />
-                  <span>Svuota Archivio</span>
+                  <Trash2 className="h-3.5 w-3.5" />
+                  <span>Svuota Storico Contestazioni</span>
                 </button>
               )}
             </div>
+
             {(!data.resolved_contests || data.resolved_contests.length === 0) ? (
-              <div className="py-6 text-center text-zinc-500 text-xs rounded-xl border border-zinc-800 bg-zinc-900/40">
+              <div className="py-8 text-center text-zinc-500 text-xs rounded-xl border border-zinc-800 bg-zinc-900/40">
                 Nessuna contestazione archiviata come risolta.
               </div>
             ) : (
@@ -856,7 +855,7 @@ export default function AdminModerationTab() {
                       <span className="font-bold text-white">🎬 {rc.errori?.films?.titolo || "Film"}</span>
                       <span className="font-mono text-zinc-500 text-[11px]">({rc.errori?.films?.anno || "N/D"})</span>
                       <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40">
-                        {rc.tipo === "blooper_falso_risolto" ? "🗑️ Blooper Fake Eliminato" : "✅ Correzione Approvata"}
+                        {rc.tipo === "blooper_falso_risolto" ? "🗑️ Blooper Fake Rimosso" : "✅ Correzione Approvata"}
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
@@ -865,10 +864,11 @@ export default function AdminModerationTab() {
                       </span>
                       <button
                         onClick={() => handleDeleteResolvedContest(rc.id)}
-                        className="p-1 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-500/15 transition"
-                        title="Rimuovi definitivamente da archivio"
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg text-zinc-400 hover:text-amber-300 hover:bg-amber-500/15 transition text-[11px] border border-transparent hover:border-amber-500/30"
+                        title="Rimuovi solo contestazione dallo storico (il blooper resta nel catalogo)"
                       >
                         <Trash2 className="h-3.5 w-3.5" />
+                        <span className="hidden sm:inline text-[10px] font-medium">Rimuovi dallo Storico</span>
                       </button>
                     </div>
                   </div>
@@ -876,7 +876,7 @@ export default function AdminModerationTab() {
                   <div className="text-xs text-zinc-300 space-y-1">
                     <p><strong className="text-zinc-400">Segnalazione/Motivo:</strong> {rc.motivo || "Nessun motivo specificato"}</p>
                     {rc.errori?.descrizione && (
-                      <p className="text-[11px] text-zinc-400"><strong className="text-zinc-500">Blooper nel catalogo:</strong> {rc.errori.descrizione}</p>
+                      <p className="text-[11px] text-zinc-400"><strong className="text-zinc-500">Blooper attivo nel catalogo:</strong> {rc.errori.descrizione}</p>
                     )}
                   </div>
 
@@ -886,44 +886,6 @@ export default function AdminModerationTab() {
                     </span>
                     <span className="text-emerald-400 font-mono font-bold">Punti accreditati ✓</span>
                   </div>
-                </div>
-              ))
-            )}
-          </div>
-
-          {/* Sotto-sezione: Bloopers Approvati nel Catalogo */}
-          <div className="space-y-3 pt-4 border-t border-zinc-800">
-            <h3 className="text-xs font-black uppercase tracking-wider text-zinc-400 flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-emerald-400" />
-              Bloopers Approvati nel Catalogo ({data.approved.length})
-            </h3>
-            {data.approved.length === 0 ? (
-              <div className="py-6 text-center text-zinc-500 text-xs rounded-xl border border-zinc-800 bg-zinc-900/40">
-                Nessun blooper inserito dagli utenti attualmente in archivio.
-              </div>
-            ) : (
-              data.approved.map((appItem) => (
-                <div
-                  key={appItem.id}
-                  className="flex items-start justify-between gap-4 rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 hover:border-zinc-700 transition"
-                >
-                  <div className="space-y-1 text-xs flex-1">
-                    <div className="flex items-center gap-2 font-bold text-white">
-                      <span>🎬 {appItem.films?.titolo || "Film"}</span>
-                      <span className="font-mono text-amber-400">⏱️ {appItem.minuto}</span>
-                      <span className="text-[10px] text-zinc-500 font-normal">
-                        Da: {appItem.inserito_da || "Utente"}
-                      </span>
-                    </div>
-                    <p className="text-zinc-300 text-xs">{appItem.descrizione}</p>
-                  </div>
-                  <button
-                    onClick={() => handleDeleteApproved(appItem.id)}
-                    className="p-1.5 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition shrink-0"
-                    title="Elimina blooper dall'archivio"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
                 </div>
               ))
             )}
@@ -938,6 +900,7 @@ export default function AdminModerationTab() {
           title={confirmModal.title}
           message={confirmModal.message}
           confirmLabel={confirmModal.confirmLabel}
+          variant={confirmModal.variant}
           onConfirm={confirmModal.onConfirm}
           onCancel={() => setConfirmModal(null)}
         />
