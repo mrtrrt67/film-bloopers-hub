@@ -208,20 +208,21 @@ export default async function HomePage() {
 
       {/* Sezione Film in Evidenza */}
       <div className="mb-16">
-        <div className="flex items-end justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 mb-6">
           <div>
-            <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">
+            <span className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
               Esplora i Titoli
             </span>
-            <h2 className="text-2xl font-black text-white tracking-tight mt-0.5">
+            <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-0.5 leading-tight">
               Pellicole con Bloopers da Non Perdere
             </h2>
           </div>
           <Link
             href="/esplora"
-            className="flex items-center gap-1 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors shrink-0 self-start sm:self-auto py-1"
           >
-            Vedi tutti ({countFilms || 0}) <ArrowRight className="h-3.5 w-3.5" />
+            <span>Vedi tutti ({countFilms || 0})</span>
+            <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
 
@@ -241,15 +242,22 @@ export default async function HomePage() {
       {/* Ultimi Bloopers Aggiunti Feed */}
       {recentBloopers.length > 0 && (
         <div className="mb-16">
-          <div className="flex items-end justify-between mb-6">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 mb-6">
             <div>
-              <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">
+              <span className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
                 Ultime Novità
               </span>
-              <h2 className="text-2xl font-black text-white tracking-tight mt-0.5">
+              <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-0.5 leading-tight">
                 Bloopers Rilevati di Recente
               </h2>
             </div>
+            <Link
+              href="/esplora"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors shrink-0 self-start sm:self-auto py-1"
+            >
+              <span>Esplora tutti i bloopers</span>
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
