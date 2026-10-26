@@ -55,7 +55,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Accesso non autorizzato" }, { status: 403 });
     }
 
-    const adminDb = createAdminClient();
+    const adminDb = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
     const { film_id, all, action, updateCast } = await request.json();
 
     // 1. Aggiornamento in massa del CAST mancante

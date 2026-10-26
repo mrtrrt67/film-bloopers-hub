@@ -48,33 +48,41 @@ export default function AdminModerationTab() {
           points: pts,
         }),
       });
+      const json = await res.json();
       if (res.ok) {
+        alert(json.message || "Blooper approvato con successo e punti assegnati!");
         setData((prev) => ({
           ...prev,
           pending: prev.pending.filter((b) => b.id !== blooper.id),
         }));
+      } else {
+        alert("Errore approvazione: " + (json.error || "Impossibile approvare"));
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      alert("Errore di rete: " + err.message);
     }
   };
 
   const handleReject = async (blooperId: number | string) => {
-    if (!confirm("Sei sicuro di voler rifiutare ed eliminare questo blooper?")) return;
+    if (!confirm("Sei sicuro di voler rifiutare ed eliminare questa segnalazione?")) return;
     try {
       const res = await fetch("/api/admin/moderation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "reject", blooper_id: blooperId }),
       });
+      const json = await res.json();
       if (res.ok) {
+        alert(json.message || "Segnalazione rifiutata ed eliminata.");
         setData((prev) => ({
           ...prev,
           pending: prev.pending.filter((b) => b.id !== blooperId),
         }));
+      } else {
+        alert("Errore rifiuto: " + (json.error || "Impossibile eliminare"));
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      alert("Errore di rete: " + err.message);
     }
   };
 
@@ -99,19 +107,23 @@ export default function AdminModerationTab() {
           points: edit.points,
         }),
       });
+      const json = await res.json();
       if (res.ok) {
+        alert(json.message || "Contestazione accettata: blooper corretto e punti assegnati al segnalatore!");
         setData((prev) => ({
           ...prev,
           contestazioni: prev.contestazioni.filter((c) => c.id !== contest.id),
         }));
+      } else {
+        alert("Errore salvataggio correzione: " + (json.error || "Operazione non riuscita"));
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      alert("Errore di rete: " + err.message);
     }
   };
 
   const handleDeleteContestedBlooper = async (contest: any) => {
-    if (!confirm("Eliminare definitivamente questo blooper e la contestazione associata?")) return;
+    if (!confirm("Eliminare definitivamente questo blooper errato e chiudere la contestazione?")) return;
     try {
       const res = await fetch("/api/admin/moderation", {
         method: "POST",
@@ -122,14 +134,18 @@ export default function AdminModerationTab() {
           contestazione_id: contest.id,
         }),
       });
+      const json = await res.json();
       if (res.ok) {
+        alert(json.message || "Blooper errato eliminato dall'archivio.");
         setData((prev) => ({
           ...prev,
           contestazioni: prev.contestazioni.filter((c) => c.id !== contest.id),
         }));
+      } else {
+        alert("Errore eliminazione: " + (json.error || "Operazione non riuscita"));
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      alert("Errore di rete: " + err.message);
     }
   };
 
@@ -143,33 +159,41 @@ export default function AdminModerationTab() {
           contestazione_id: contestId,
         }),
       });
+      const json = await res.json();
       if (res.ok) {
+        alert(json.message || "Contestazione respinta: blooper confermato e contestazione archiviata.");
         setData((prev) => ({
           ...prev,
           contestazioni: prev.contestazioni.filter((c) => c.id !== contestId),
         }));
+      } else {
+        alert("Errore archiviazione: " + (json.error || "Operazione non riuscita"));
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      alert("Errore di rete: " + err.message);
     }
   };
 
   const handleDeleteApproved = async (blooperId: string | number) => {
-    if (!confirm("Eliminare definitivamente questo blooper dall'archivio?")) return;
+    if (!confirm("Eliminare definitivamente questo blooper dall'archivio pubblico?")) return;
     try {
       const res = await fetch("/api/admin/moderation", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ action: "delete_approved", blooper_id: blooperId }),
       });
+      const json = await res.json();
       if (res.ok) {
+        alert(json.message || "Blooper eliminato dall'archivio.");
         setData((prev) => ({
           ...prev,
           approved: prev.approved.filter((a) => a.id !== blooperId),
         }));
+      } else {
+        alert("Errore eliminazione: " + (json.error || "Operazione non riuscita"));
       }
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      alert("Errore di rete: " + err.message);
     }
   };
 
@@ -287,9 +311,14 @@ export default function AdminModerationTab() {
       {/* 1. SEGNALAZIONI IN ATTESA */}
       {subTab === "pending" && (
         <div className="space-y-4">
+          <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-200 flex items-center gap-2">
+            <span>ℹ️</span>
+            <span><strong>Nuovi Bloopers in Attesa:</strong> Segnalazioni inviate dalla community dai form delle schede film. Clicca su <strong>Approva</strong> per pubblicarle nel catalogo e accreditare i punti, o <strong>Rifiuta</strong> per scartarle.</span>
+          </div>
+
           {data.pending.length === 0 ? (
             <div className="py-12 text-center text-zinc-500 text-xs rounded-2xl border border-zinc-800 bg-zinc-900/40">
-              Nessuna segnalazione in attesa di moderazione 🎉
+              Nessuna nuova segnalazione in attesa di approvazione 🎉
             </div>
           ) : (
             data.pending.map((blooper) => {
@@ -372,6 +401,18 @@ export default function AdminModerationTab() {
       {/* 2. CONTESTAZIONI COMMUNITY */}
       {subTab === "contests" && (
         <div className="space-y-4">
+          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-200 flex items-start gap-2">
+            <span className="text-base leading-none">⚠️</span>
+            <div className="space-y-1">
+              <p><strong>Bloopers Contestati dalla Community:</strong> Bloopers già pubblicati che un utente registrato ritiene errati o inesatti (es. minuto sbagliato, anacronismo inesistente).</p>
+              <p className="text-[11px] text-zinc-300">
+                • <strong>Accetta & Correggi:</strong> Salva il minuto/descrizione corretti, assegna i punti all&apos;utente e archivia la contestazione.<br />
+                • <strong>Elimina Blooper Errato:</strong> Elimina definitivamente il blooper dal catalogo se la segnalazione era totalmente errata.<br />
+                • <strong>Respingi Contestazione:</strong> La contestazione era infondata: mantieni il blooper invariato e rimuovi la contestazione.
+              </p>
+            </div>
+          </div>
+
           {data.contestazioni.length === 0 ? (
             <div className="py-12 text-center text-zinc-500 text-xs rounded-2xl border border-zinc-800 bg-zinc-900/40">
               Nessuna contestazione attiva dalla community 🎉
@@ -438,7 +479,7 @@ export default function AdminModerationTab() {
 
                     <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-zinc-800">
                       <div className="flex items-center gap-1.5 text-xs text-zinc-400">
-                        <span>Punti al segnalatore:</span>
+                        <span>Punti al contestatore:</span>
                         <input
                           type="number"
                           value={currentEdit.points}
@@ -452,24 +493,30 @@ export default function AdminModerationTab() {
                         />
                       </div>
 
-                      <div className="flex items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
                         <button
                           onClick={() => handleSaveContestCorrection(c)}
-                          className="px-3 py-1.5 rounded-lg bg-emerald-500 text-zinc-950 font-bold text-xs hover:brightness-110 transition"
+                          title="Accetta la contestazione: salva le modifiche al blooper, accredita i punti e archivia la contestazione"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500 text-zinc-950 font-bold text-xs hover:brightness-110 active:scale-95 transition shadow-sm"
                         >
-                          Salva Correzione
+                          <CheckCircle className="h-3.5 w-3.5" />
+                          <span>Accetta & Correggi (+{currentEdit.points}pt)</span>
                         </button>
                         <button
                           onClick={() => handleDeleteContestedBlooper(c)}
-                          className="px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 font-bold text-xs hover:bg-rose-500 hover:text-zinc-950 transition"
+                          title="Elimina definitivamente questo blooper dall'archivio e chiudi la contestazione"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/30 font-bold text-xs hover:bg-rose-500 hover:text-zinc-950 active:scale-95 transition"
                         >
-                          Elimina Blooper
+                          <Trash2 className="h-3.5 w-3.5" />
+                          <span>Elimina Blooper Errato</span>
                         </button>
                         <button
                           onClick={() => handleIgnoreContest(c.id)}
-                          className="px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 font-bold text-xs hover:text-white transition"
+                          title="La contestazione è infondata: mantieni il blooper invariato ed elimina solo la contestazione"
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 border border-zinc-700 font-bold text-xs hover:text-white hover:bg-zinc-700 active:scale-95 transition"
                         >
-                          Ignora
+                          <XCircle className="h-3.5 w-3.5" />
+                          <span>Respingi Contestazione</span>
                         </button>
                       </div>
                     </div>

@@ -13,7 +13,7 @@ export async function GET() {
       return NextResponse.json({ error: "Accesso non autorizzato" }, { status: 403 });
     }
 
-    const adminDb = createAdminClient();
+    const adminDb = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
     const { data, error } = await adminDb
       .from("configurazioni")
       .select("*")
@@ -44,7 +44,7 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Formato non valido, atteso array 'items'" }, { status: 400 });
     }
 
-    const adminDb = createAdminClient();
+    const adminDb = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
     for (const item of items) {
       if (item.chiave) {
         const { error: updErr } = await adminDb

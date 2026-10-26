@@ -139,7 +139,7 @@ export async function POST(request: Request) {
     const contestazioni = (voti || []).filter((v: any) => v.tipo === "contestazione").length;
 
     // Sincronizza i contatori direttamente nella tabella errori con privilegi admin per RLS
-    const adminDb = createAdminClient();
+    const adminDb = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
     const { error: updateErr } = await adminDb
       .from("errori")
       .update({

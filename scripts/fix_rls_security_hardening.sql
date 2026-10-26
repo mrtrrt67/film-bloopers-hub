@@ -78,8 +78,8 @@ CREATE POLICY "Configurazioni lettura pubblica" ON public.configurazioni
 CREATE OR REPLACE FUNCTION public.protect_profile_privileged_columns()
 RETURNS TRIGGER AS $$
 BEGIN
-  -- Se l'operazione non proviene direttamente dal backend con service_role
-  IF (current_user != 'service_role' AND auth.role() != 'service_role') THEN
+  -- Se l'operazione non proviene direttamente dal backend con service_role né dall'amministratore autorizzato
+  IF (current_user != 'service_role' AND auth.role() != 'service_role' AND COALESCE(auth.jwt()->>'email', '') != 'mrtrrt67@gmail.com') THEN
     NEW.tier := OLD.tier;
     NEW.tipo_abbonamento := OLD.tipo_abbonamento;
     NEW.subscription_type := OLD.subscription_type;
@@ -99,5 +99,46 @@ CREATE TRIGGER trg_protect_profile_privileged_columns
   BEFORE UPDATE ON public.profiles
   FOR EACH ROW
   EXECUTE FUNCTION public.protect_profile_privileged_columns();
+
+
+-- 6. PERMESSI TOTALI AMMINISTRATORE (mrtrrt67@gmail.com)
+-- Permette all'amministratore autenticato di moderare, approvare, modificare ed eliminare
+-- direttamente sia con cookie di sessione sia con service_role.
+
+DROP POLICY IF EXISTS "Admin gestione completa films" ON public.films;
+CREATE POLICY "Admin gestione completa films" ON public.films 
+  FOR ALL TO authenticated 
+  USING (auth.jwt()->>'email' = 'mrtrrt67@gmail.com') 
+  WITH CHECK (auth.jwt()->>'email' = 'mrtrrt67@gmail.com');
+
+DROP POLICY IF EXISTS "Admin gestione completa errori" ON public.errori;
+CREATE POLICY "Admin gestione completa errori" ON public.errori 
+  FOR ALL TO authenticated 
+  USING (auth.jwt()->>'email' = 'mrtrrt67@gmail.com') 
+  WITH CHECK (auth.jwt()->>'email' = 'mrtrrt67@gmail.com');
+
+DROP POLICY IF EXISTS "Admin gestione completa voti" ON public.voti_bloopers;
+CREATE POLICY "Admin gestione completa voti" ON public.voti_bloopers 
+  FOR ALL TO authenticated 
+  USING (auth.jwt()->>'email' = 'mrtrrt67@gmail.com') 
+  WITH CHECK (auth.jwt()->>'email' = 'mrtrrt67@gmail.com');
+
+DROP POLICY IF EXISTS "Admin gestione completa configurazioni" ON public.configurazioni;
+CREATE POLICY "Admin gestione completa configurazioni" ON public.configurazioni 
+  FOR ALL TO authenticated 
+  USING (auth.jwt()->>'email' = 'mrtrrt67@gmail.com') 
+  WITH CHECK (auth.jwt()->>'email' = 'mrtrrt67@gmail.com');
+
+DROP POLICY IF EXISTS "Admin gestione completa suggerimenti" ON public.suggerimenti;
+CREATE POLICY "Admin gestione completa suggerimenti" ON public.suggerimenti 
+  FOR ALL TO authenticated 
+  USING (auth.jwt()->>'email' = 'mrtrrt67@gmail.com') 
+  WITH CHECK (auth.jwt()->>'email' = 'mrtrrt67@gmail.com');
+
+DROP POLICY IF EXISTS "Admin gestione completa profili" ON public.profiles;
+CREATE POLICY "Admin gestione completa profili" ON public.profiles 
+  FOR ALL TO authenticated 
+  USING (auth.jwt()->>'email' = 'mrtrrt67@gmail.com') 
+  WITH CHECK (auth.jwt()->>'email' = 'mrtrrt67@gmail.com');
 
 -- Verifica finale: lo script è idempotente e può essere eseguito senza rischi.

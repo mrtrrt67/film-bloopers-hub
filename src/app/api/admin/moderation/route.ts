@@ -13,7 +13,7 @@ export async function GET() {
       return NextResponse.json({ error: "Accesso non autorizzato" }, { status: 403 });
     }
 
-    const adminDb = createAdminClient();
+    const adminDb = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
 
     // 1. Bloopers in attesa di approvazione
     const { data: pendingBloopers } = await adminDb
@@ -122,7 +122,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Accesso non autorizzato" }, { status: 403 });
     }
 
-    const adminDb = createAdminClient();
+    const adminDb = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
     const body = await request.json();
     const { action, blooper_id, contestazione_id, suggestion_id, points, userId, userEmail, minuto, descrizione } = body;
 

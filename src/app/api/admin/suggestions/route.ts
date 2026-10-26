@@ -12,7 +12,7 @@ export async function GET() {
       return NextResponse.json({ error: "Accesso non autorizzato" }, { status: 403 });
     }
 
-    const adminDb = createAdminClient();
+    const adminDb = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
     const { data, error } = await adminDb
       .from("suggerimenti")
       .select("*")
@@ -42,7 +42,7 @@ export async function DELETE(request: Request) {
 
     if (!id) return NextResponse.json({ error: "ID mancante" }, { status: 400 });
 
-    const adminDb = createAdminClient();
+    const adminDb = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
     const { error } = await adminDb.from("suggerimenti").delete().eq("id", id);
     if (error) throw error;
 

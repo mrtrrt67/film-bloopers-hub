@@ -66,7 +66,7 @@ export async function PATCH(request: Request) {
     if (poster_url !== undefined) updatePayload.poster_url = poster_url || null;
     if (attori !== undefined) updatePayload.attori = attori;
 
-    const adminClient = createAdminClient();
+    const adminClient = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
     const { data, error } = await adminClient
       .from("films")
       .update(updatePayload)
@@ -101,7 +101,7 @@ export async function DELETE(request: Request) {
     }
 
     const filmId = parseInt(idParam, 10);
-    const adminClient = createAdminClient();
+    const adminClient = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
 
     // 1. Elimina prima i voti/contestazioni legati agli errori di questo film
     const { data: erroriFilm } = await adminClient

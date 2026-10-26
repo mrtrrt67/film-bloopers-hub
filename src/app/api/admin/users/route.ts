@@ -19,7 +19,7 @@ export async function GET() {
 
     if (error) throw error;
 
-    const adminDb = createAdminClient();
+    const adminDb = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
     const today = new Date().toISOString().slice(0, 10);
 
     const profiles = await Promise.all(
@@ -117,7 +117,7 @@ export async function PATCH(request: Request) {
       updatePayload.expires_at = data_scadenza ? `${data_scadenza}T23:59:59Z` : null;
     }
 
-    const adminDb = createAdminClient();
+    const adminDb = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
     const { data, error } = await adminDb
       .from("profiles")
       .update(updatePayload)
@@ -151,7 +151,7 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "ID mancante" }, { status: 400 });
     }
 
-    const adminDb = createAdminClient();
+    const adminDb = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
     const { error } = await adminDb.from("profiles").delete().eq("id", id);
     if (error) throw error;
 
