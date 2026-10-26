@@ -20,15 +20,16 @@ export async function GET() {
     const notifications: any[] = [];
 
     // 2. Controllo se esiste tabella notifiche_utenti
-    try {
-      const { data: dbNotifs, error: notifErr } = await supabase
-        .from("notifiche_utenti")
-        .select("*")
-        .eq("user_id", user.id)
-        .eq("letta", false)
-        .order("created_at", { ascending: false });
+    const { data: dbNotifs, error: notifErr } = await supabase
+      .from("notifiche_utenti")
+      .select("*")
+      .eq("user_id", user.id)
+      .eq("letta", false)
+      .order("created_at", { ascending: false });
 
-      if (!notifErr && dbNotifs && dbNotifs.length > 0) {
+    // Se la tabella notifiche_utenti ESISTE (nessun errore di tabella inesistente)
+    if (!notifErr) {
+      if (dbNotifs && dbNotifs.length > 0) {
         for (const n of dbNotifs) {
           notifications.push({
             id: `db_${n.id}`,
@@ -42,11 +43,11 @@ export async function GET() {
           });
         }
       }
-    } catch {
-      // Tabella non ancora creata, fallback trasparente su voti_bloopers
+      // Se la tabella esiste ed è gestita, ritorna solo quelle non lette da notifiche_utenti (senza duplicare da voti_bloopers)
+      return NextResponse.json({ notifications });
     }
 
-    // 3. Fallback / Integrazione: Recupera contestazioni risolte da voti_bloopers
+    // 3. Fallback UNICAMENTE se la tabella notifiche_utenti NON esiste ancora
     const { data: resolvedContests, error: votiErr } = await supabase
       .from("voti_bloopers")
       .select("id, tipo, motivo, created_at, errore_id, errori(minuto, descrizione, films(titolo, anno, id))")
@@ -57,30 +58,26 @@ export async function GET() {
 
     if (!votiErr && resolvedContests) {
       for (const rc of resolvedContests) {
-        // Evita duplicati se già presente da dbNotifs
-        const exists = notifications.some((n) => n.id.includes(rc.id));
-        if (!exists) {
-          const isFakeBlooper = rc.tipo === "blooper_falso_risolto";
-          const filmTitolo = (rc as any)?.errori?.films?.titolo || "Film nel Catalogo";
-          const filmAnno = (rc as any)?.errori?.films?.anno ? ` (${(rc as any).errori.films.anno})` : "";
-          const minuto = (rc as any)?.errori?.minuto ? ` al minuto ${(rc as any).errori.minuto}` : "";
+        const isFakeBlooper = rc.tipo === "blooper_falso_risolto";
+        const filmTitolo = (rc as any)?.errori?.films?.titolo || "Film nel Catalogo";
+        const filmAnno = (rc as any)?.errori?.films?.anno ? ` (${(rc as any).errori.films.anno})` : "";
+        const minuto = (rc as any)?.errori?.minuto ? ` al minuto ${(rc as any).errori.minuto}` : "";
 
-          notifications.push({
-            id: `vote_${rc.id}`,
-            tipo: rc.tipo,
-            titolo: isFakeBlooper
-              ? "Blooper Errato Smascherato!"
-              : "Contestazione Approvata dall'Admin!",
-            messaggio: isFakeBlooper
-              ? `L'amministratore ha verificato ed eliminato il blooper errato in "${filmTitolo}${filmAnno}" che avevi contestato.`
-              : `La tua correzione per "${filmTitolo}${filmAnno}"${minuto} è stata approvata e inserita nel catalogo ufficiale!`,
-            film_titolo: `${filmTitolo}${filmAnno}`,
-            motivo: rc.motivo || "",
-            punti: 10,
-            created_at: rc.created_at,
-            current_user_points: profile?.punti || 0,
-          });
-        }
+        notifications.push({
+          id: `vote_${rc.id}`,
+          tipo: rc.tipo,
+          titolo: isFakeBlooper
+            ? "Blooper Errato Smascherato!"
+            : "Contestazione Approvata dall'Admin!",
+          messaggio: isFakeBlooper
+            ? `L'amministratore ha verificato ed eliminato il blooper errato in "${filmTitolo}${filmAnno}" che avevi contestato.`
+            : `La tua correzione per "${filmTitolo}${filmAnno}"${minuto} è stata approvata e inserita nel catalogo ufficiale!`,
+          film_titolo: `${filmTitolo}${filmAnno}`,
+          motivo: rc.motivo || "",
+          punti: 10,
+          created_at: rc.created_at,
+          current_user_points: profile?.punti || 0,
+        });
       }
     }
 

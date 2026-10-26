@@ -38,9 +38,26 @@ export default function RewardCelebrationBanner() {
         });
 
         if (isMounted && unread.length > 0) {
-          // Prende la più recente non ancora vista
-          setActiveNotification(unread[0]);
+          const notif = unread[0];
+          setActiveNotification(notif);
           setIsVisible(true);
+
+          // Segna subito come visto sia in localStorage che sul server: compare una volta sola!
+          try {
+            localStorage.setItem(`fbh_seen_reward_${notif.id}`, "true");
+          } catch (e) {
+            console.error(e);
+          }
+
+          try {
+            fetch("/api/user/notifications", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ id: notif.id }),
+            });
+          } catch (e) {
+            console.error(e);
+          }
         }
       } catch (err) {
         console.error("Errore verifica notifiche premi:", err);
@@ -54,30 +71,8 @@ export default function RewardCelebrationBanner() {
     };
   }, []);
 
-  const handleDismiss = async () => {
-    if (!activeNotification) return;
-
-    const notifId = activeNotification.id;
+  const handleDismiss = () => {
     setIsVisible(false);
-
-    // Salva subito in localStorage per non ripresentarla mai più su questo dispositivo
-    try {
-      localStorage.setItem(`fbh_seen_reward_${notifId}`, "true");
-    } catch (e) {
-      console.error(e);
-    }
-
-    // Comunica al server di contrassegnarla come letta
-    try {
-      await fetch("/api/user/notifications", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: notifId }),
-      });
-    } catch (e) {
-      console.error(e);
-    }
-
     setTimeout(() => {
       setActiveNotification(null);
     }, 400);
