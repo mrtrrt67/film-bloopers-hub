@@ -18,8 +18,7 @@ import { createClient } from "@/lib/supabase/server";
 import { Film, Blooper, MovieTrivia } from "@/lib/types";
 import BlooperItem from "@/components/BlooperItem";
 import { getAmazonSearchUrl, getYouTubeSearchUrl } from "@/lib/utils";
-import BloopersSection from "./BloopersSection";
-import TriviaSection from "@/components/TriviaSection";
+import FilmContentSwitcher from "@/components/FilmContentSwitcher";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -420,11 +419,12 @@ export default async function FilmDetailPage({ params }: PageProps) {
                 </div>
               </div>
 
-              {/* Sezione Interattiva Bloopers (Client Component) */}
-              <BloopersSection film={film} initialBloopers={bloopers} />
-
-              {/* Sezione Interattiva Curiosità & Retroscena (Client Component) */}
-              <TriviaSection film={film} initialTrivia={trivia} />
+              {/* Sezione Switcher Interattiva: Bloopers & Curiosità (Client Component) */}
+              <FilmContentSwitcher
+                film={film}
+                initialBloopers={bloopers}
+                initialTrivia={trivia}
+              />
             </div>
           </div>
         </div>

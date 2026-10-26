@@ -161,7 +161,7 @@ export async function POST(request: Request) {
       inserito_da: emailInserimento,
       provenienza: "ia",
       likes: 0,
-      ordine: idx + 1,
+      ordine: (existingTrivia?.length || 0) + idx + 1,
     }));
 
     const { data: inserted, error: insertErr } = await adminDb

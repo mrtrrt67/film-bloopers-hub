@@ -23,6 +23,7 @@ import { createClient } from "@/lib/supabase/client";
 interface TriviaSectionProps {
   film: FilmType;
   initialTrivia: MovieTrivia[];
+  onTriviaUpdate?: (trivia: MovieTrivia[]) => void;
 }
 
 const CATEGORIES: TriviaCategoria[] = [
@@ -44,7 +45,7 @@ const CATEGORY_COLORS: Record<string, { bg: string; text: string; border: string
   "Citazioni & Easter Egg": { bg: "bg-rose-500/10", text: "text-rose-400", border: "border-rose-500/30" },
 };
 
-export default function TriviaSection({ film, initialTrivia }: TriviaSectionProps) {
+export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: TriviaSectionProps) {
   const [triviaList, setTriviaList] = useState<MovieTrivia[]>(initialTrivia);
   const [selectedCategory, setSelectedCategory] = useState<string>("Tutte");
   const [user, setUser] = useState<any>(null);
@@ -102,7 +103,11 @@ export default function TriviaSection({ film, initialTrivia }: TriviaSectionProp
 
       const data = await res.json();
       if (res.ok && data.trivia && data.trivia.length > 0) {
-        setTriviaList((prev) => [...prev, ...data.trivia]);
+        setTriviaList((prev) => {
+          const next = [...prev, ...data.trivia];
+          onTriviaUpdate?.(next);
+          return next;
+        });
       } else {
         alert(data.error || "Impossibile recuperare nuove curiosità al momento.");
       }
@@ -185,7 +190,11 @@ export default function TriviaSection({ film, initialTrivia }: TriviaSectionProp
       if (res.ok) {
         setSubmitMessage(data.message || "Curiosità inviata con successo!");
         if (data.trivia?.approvato) {
-          setTriviaList((prev) => [data.trivia, ...prev]);
+          setTriviaList((prev) => {
+            const next = [data.trivia, ...prev];
+            onTriviaUpdate?.(next);
+            return next;
+          });
         }
         setTimeout(() => {
           setShowSubmitModal(false);
@@ -211,7 +220,7 @@ export default function TriviaSection({ film, initialTrivia }: TriviaSectionProp
     : triviaList.filter((t) => t.categoria === selectedCategory);
 
   return (
-    <section className="mt-12 rounded-3xl border border-zinc-800/80 bg-zinc-950/70 p-6 sm:p-8 backdrop-blur-md shadow-2xl">
+    <section className="mt-2 rounded-3xl border border-zinc-800/80 bg-zinc-950/70 p-6 sm:p-8 backdrop-blur-md shadow-2xl">
       {/* Header Sezione Curiosità */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800/80 pb-6">
         <div>
@@ -249,7 +258,7 @@ export default function TriviaSection({ film, initialTrivia }: TriviaSectionProp
             className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 px-4 py-2 text-xs font-bold text-zinc-950 transition-all shadow-lg shadow-amber-500/10 active:scale-95 disabled:opacity-50"
           >
             <Sparkles className={`h-4 w-4 ${generating ? "animate-spin" : ""}`} />
-            {generating ? "Ricerca in corso..." : "Genera Curiosità IA"}
+            {generating ? "Ricerca aneddoti..." : triviaList.length > 0 ? "Aggiungi altre con IA" : "Genera Curiosità IA"}
           </button>
         </div>
       </div>
@@ -294,7 +303,8 @@ export default function TriviaSection({ film, initialTrivia }: TriviaSectionProp
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
           {filteredTrivia.map((item, index) => {
             const colors = CATEGORY_COLORS[item.categoria] || {
               bg: "bg-zinc-800/60",
@@ -385,7 +395,29 @@ export default function TriviaSection({ film, initialTrivia }: TriviaSectionProp
             );
           })}
         </div>
-      )}
+
+        {/* Banner On-Demand per scoprire e aggiungere altri aneddoti */}
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-between gap-4 p-5 rounded-2xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-sm">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-400">
+              <Sparkles className="h-5 w-5" />
+            </div>
+            <div>
+              <h4 className="text-sm font-bold text-white">Vuoi scoprire altri aneddoti esclusivi?</h4>
+              <p className="text-xs text-zinc-400">L&apos;IA cercherà altri retroscena cinematografici verificati senza ripetere quelli già mostrati.</p>
+            </div>
+          </div>
+          <button
+            onClick={handleGenerateTrivia}
+            disabled={generating}
+            className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 px-5 py-2.5 text-xs font-bold text-zinc-950 transition-all shadow-md shadow-amber-500/10 active:scale-95 disabled:opacity-50 whitespace-nowrap"
+          >
+            <Sparkles className={`h-4 w-4 ${generating ? "animate-spin" : ""}`} />
+            {generating ? "Ricerca in corso..." : "Aggiungi altre curiosità"}
+          </button>
+        </div>
+      </>
+    )}
 
       {/* Modal Proponi Curiosità */}
       {showSubmitModal && (

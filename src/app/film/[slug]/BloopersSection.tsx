@@ -10,9 +10,10 @@ import { createClient } from "@/lib/supabase/client";
 interface BloopersSectionProps {
   film: Film;
   initialBloopers: Blooper[];
+  onBloopersUpdate?: (bloopers: Blooper[]) => void;
 }
 
-export default function BloopersSection({ film, initialBloopers }: BloopersSectionProps) {
+export default function BloopersSection({ film, initialBloopers, onBloopersUpdate }: BloopersSectionProps) {
   const [bloopers, setBloopers] = useState<Blooper[]>(initialBloopers);
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
@@ -68,7 +69,11 @@ export default function BloopersSection({ film, initialBloopers }: BloopersSecti
 
       const data = await res.json();
       if (res.ok && data.bloopers) {
-        setBloopers((prev) => [...prev, ...data.bloopers]);
+        setBloopers((prev) => {
+          const next = [...prev, ...data.bloopers];
+          onBloopersUpdate?.(next);
+          return next;
+        });
       } else {
         alert(data.error || "Impossibile generare bloopers con l'IA al momento.");
       }
@@ -135,7 +140,7 @@ export default function BloopersSection({ film, initialBloopers }: BloopersSecti
   );
 
   return (
-    <div className="mt-8">
+    <div className="mt-2">
       {/* Header Sezione */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-800">
         <div>
