@@ -5,10 +5,17 @@ import { AlertTriangle, CheckCircle, XCircle, Trash2, Edit3, Shield, Award } fro
 
 export default function AdminModerationTab() {
   const [subTab, setSubTab] = useState<"pending" | "contests" | "corrections" | "approved">("pending");
-  const [data, setData] = useState<{ pending: any[]; contestazioni: any[]; approved: any[]; corrections: any[] }>({
+  const [data, setData] = useState<{
+    pending: any[];
+    contestazioni: any[];
+    approved: any[];
+    resolved_contests: any[];
+    corrections: any[];
+  }>({
     pending: [],
     contestazioni: [],
     approved: [],
+    resolved_contests: [],
     corrections: [],
   });
   const [loading, setLoading] = useState(true);
@@ -116,6 +123,19 @@ export default function AdminModerationTab() {
         setData((prev) => ({
           ...prev,
           contestazioni: prev.contestazioni.filter((c) => c.id !== contest.id),
+          resolved_contests: [
+            {
+              ...contest,
+              tipo: "contestazione_risolta",
+              errori: {
+                ...contest.errori,
+                minuto: edit.minuto,
+                descrizione: edit.descrizione,
+              },
+              created_at: new Date().toISOString(),
+            },
+            ...(prev.resolved_contests || []),
+          ],
         }));
       } else {
         alert("Errore salvataggio correzione: " + (json.error || "Operazione non riuscita"));
@@ -152,6 +172,14 @@ export default function AdminModerationTab() {
         setData((prev) => ({
           ...prev,
           contestazioni: prev.contestazioni.filter((c) => c.id !== contest.id),
+          resolved_contests: [
+            {
+              ...contest,
+              tipo: "blooper_falso_risolto",
+              created_at: new Date().toISOString(),
+            },
+            ...(prev.resolved_contests || []),
+          ],
         }));
       } else {
         alert("Errore eliminazione: " + (json.error || "Operazione non riuscita"));
@@ -316,7 +344,7 @@ export default function AdminModerationTab() {
           }`}
         >
           <CheckCircle className="h-3.5 w-3.5" />
-          Archivio Approvati ({data.approved.length})
+          Archivio Approvati ({data.approved.length + (data.resolved_contests?.length || 0)})
         </button>
       </div>
 
@@ -642,39 +670,93 @@ export default function AdminModerationTab() {
         </div>
       )}
 
-      {/* 4. ARCHIVIO APPROVATI */}
+      {/* 4. ARCHIVIO APPROVATI & CONTESTAZIONI RISOLTE */}
       {subTab === "approved" && (
-        <div className="space-y-3">
-          {data.approved.length === 0 ? (
-            <div className="py-12 text-center text-zinc-500 text-xs rounded-2xl border border-zinc-800 bg-zinc-900/40">
-              Nessun blooper approvato dagli utenti in archivio.
-            </div>
-          ) : (
-            data.approved.map((appItem) => (
-              <div
-                key={appItem.id}
-                className="flex items-start justify-between gap-4 rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 hover:border-zinc-700 transition"
-              >
-                <div className="space-y-1 text-xs flex-1">
-                  <div className="flex items-center gap-2 font-bold text-white">
-                    <span>🎬 {appItem.films?.titolo || "Film"}</span>
-                    <span className="font-mono text-amber-400">⏱️ {appItem.minuto}</span>
-                    <span className="text-[10px] text-zinc-500 font-normal">
-                      Da: {appItem.inserito_da || "Utente"}
+        <div className="space-y-6">
+          {/* Sotto-sezione: Contestazioni & Correzioni Risolte */}
+          <div className="space-y-3">
+            <h3 className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-2">
+              <CheckCircle className="h-4 w-4" />
+              Contestazioni & Correzioni Risolte ({data.resolved_contests?.length || 0})
+            </h3>
+            {(!data.resolved_contests || data.resolved_contests.length === 0) ? (
+              <div className="py-6 text-center text-zinc-500 text-xs rounded-xl border border-zinc-800 bg-zinc-900/40">
+                Nessuna contestazione archiviata come risolta.
+              </div>
+            ) : (
+              data.resolved_contests.map((rc) => (
+                <div
+                  key={rc.id}
+                  className="rounded-xl border border-emerald-500/30 bg-emerald-950/10 p-4 space-y-2 hover:border-emerald-500/50 transition"
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div className="flex items-center gap-2">
+                      <span className="font-bold text-white">🎬 {rc.errori?.films?.titolo || "Film"}</span>
+                      <span className="font-mono text-zinc-500 text-[11px]">({rc.errori?.films?.anno || "N/D"})</span>
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40">
+                        {rc.tipo === "blooper_falso_risolto" ? "🗑️ Blooper Fake Eliminato" : "✅ Correzione Approvata"}
+                      </span>
+                    </div>
+                    <span className="text-[11px] text-zinc-500 font-mono">
+                      {rc.created_at ? rc.created_at.slice(0, 16).replace("T", " ") : ""}
                     </span>
                   </div>
-                  <p className="text-zinc-300 text-xs">{appItem.descrizione}</p>
+
+                  <div className="text-xs text-zinc-300 space-y-1">
+                    <p><strong className="text-zinc-400">Segnalazione/Motivo:</strong> {rc.motivo || "Nessun motivo specificato"}</p>
+                    {rc.errori?.descrizione && (
+                      <p className="text-[11px] text-zinc-400"><strong className="text-zinc-500">Blooper nel catalogo:</strong> {rc.errori.descrizione}</p>
+                    )}
+                  </div>
+
+                  <div className="pt-1 text-[11px] text-zinc-400 flex items-center justify-between border-t border-zinc-800/60">
+                    <span>
+                      Risolto per conto di: <strong className="text-amber-400">{rc.user_handle || "Utente"}</strong>
+                    </span>
+                    <span className="text-emerald-400 font-mono font-bold">Punti accreditati ✓</span>
+                  </div>
                 </div>
-                <button
-                  onClick={() => handleDeleteApproved(appItem.id)}
-                  className="p-1.5 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition shrink-0"
-                  title="Elimina blooper dall'archivio"
-                >
-                  <Trash2 className="h-4 w-4" />
-                </button>
+              ))
+            )}
+          </div>
+
+          {/* Sotto-sezione: Bloopers Approvati nel Catalogo */}
+          <div className="space-y-3 pt-4 border-t border-zinc-800">
+            <h3 className="text-xs font-black uppercase tracking-wider text-zinc-400 flex items-center gap-2">
+              <CheckCircle className="h-4 w-4 text-emerald-400" />
+              Bloopers Approvati nel Catalogo ({data.approved.length})
+            </h3>
+            {data.approved.length === 0 ? (
+              <div className="py-6 text-center text-zinc-500 text-xs rounded-xl border border-zinc-800 bg-zinc-900/40">
+                Nessun blooper inserito dagli utenti attualmente in archivio.
               </div>
-            ))
-          )}
+            ) : (
+              data.approved.map((appItem) => (
+                <div
+                  key={appItem.id}
+                  className="flex items-start justify-between gap-4 rounded-xl border border-zinc-800 bg-zinc-900/60 p-4 hover:border-zinc-700 transition"
+                >
+                  <div className="space-y-1 text-xs flex-1">
+                    <div className="flex items-center gap-2 font-bold text-white">
+                      <span>🎬 {appItem.films?.titolo || "Film"}</span>
+                      <span className="font-mono text-amber-400">⏱️ {appItem.minuto}</span>
+                      <span className="text-[10px] text-zinc-500 font-normal">
+                        Da: {appItem.inserito_da || "Utente"}
+                      </span>
+                    </div>
+                    <p className="text-zinc-300 text-xs">{appItem.descrizione}</p>
+                  </div>
+                  <button
+                    onClick={() => handleDeleteApproved(appItem.id)}
+                    className="p-1.5 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition shrink-0"
+                    title="Elimina blooper dall'archivio"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </button>
+                </div>
+              ))
+            )}
+          </div>
         </div>
       )}
     </div>

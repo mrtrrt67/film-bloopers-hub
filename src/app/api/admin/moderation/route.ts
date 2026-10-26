@@ -152,6 +152,27 @@ export async function GET() {
       .order("creato_il", { ascending: false })
       .limit(50);
 
+    // 3b. Archivio contestazioni e correzioni risolte
+    const { data: rawResolvedContests } = await adminDb
+      .from("voti_bloopers")
+      .select("*, errori(*, films(titolo, anno, id))")
+      .in("tipo", ["contestazione_risolta", "blooper_falso_risolto"])
+      .order("created_at", { ascending: false })
+      .limit(50);
+
+    const enrichedResolvedContests = (rawResolvedContests || []).map((c: any) => {
+      const p = c.user_id ? allProfiles?.find((prof: any) => prof.id === c.user_id) : null;
+      const isAdmin = isUserAdmin(p, null, adminEmail);
+      const handle = p?.email ? `@${p.email.split("@")[0]}` : (p?.username ? `@${p.username}` : "Utente Registrato");
+      return {
+        ...c,
+        user_email: p?.email || null,
+        user_handle: handle,
+        user_tier: p?.tier || (isAdmin ? "admin" : "free"),
+        is_admin: !!isAdmin,
+      };
+    });
+
     // 4. Correzioni blooper inviate dal modulo suggerimenti
     const { data: rawCorrections } = await adminDb
       .from("suggerimenti")
@@ -185,6 +206,7 @@ export async function GET() {
       pending: enrichedPending,
       contestazioni: enrichedContestazioni,
       approved: approvedUserBloopers || [],
+      resolved_contests: enrichedResolvedContests,
       corrections: pendingCorrections,
     });
   } catch (err: any) {
@@ -246,9 +268,9 @@ export async function POST(request: Request) {
     }
 
     if (action === "correct_contestation") {
-      // 1. Rimuovi contestazione risolta
+      // 1. Archivia contestazione come risolta nell'archivio storico
       if (contestazione_id) {
-        await adminDb.from("voti_bloopers").delete().eq("id", contestazione_id);
+        await adminDb.from("voti_bloopers").update({ tipo: "contestazione_risolta" }).eq("id", contestazione_id);
       }
 
       // 2. Aggiorna blooper con la correzione e ricalcola i contatori
@@ -261,7 +283,7 @@ export async function POST(request: Request) {
         const conferme = (voti || []).filter((v: any) => v.tipo === "conferma").length;
         const contestazioni = (voti || []).filter((v: any) => v.tipo === "contestazione").length;
 
-        const updateData: Record<string, any> = { conferme, contestazioni };
+        const updateData: Record<string, any> = { conferme, contestazioni, provenienza: "utente" };
         if (minuto) updateData.minuto = minuto;
         if (descrizione) updateData.descrizione = descrizione;
         await adminDb.from("errori").update(updateData).eq("id", blooper_id);
