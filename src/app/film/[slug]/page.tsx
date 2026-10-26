@@ -90,6 +90,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const countDesc = bloopers?.length
     ? `Scopri ${bloopers.length} bloopers verificati al minuto esatto.`
     : "Scopri tutti i bloopers e le curiosità del film.";
+  const description = `${countDesc} ${film.trama ? film.trama.slice(0, 160) + "..." : ""}`.trim();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://filmbloopers.online";
   const imageUrl = film.backdrop_url || film.poster_url || `${siteUrl}/og-image.jpg`;
 
@@ -287,7 +288,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
                 <a
                   href={amazonUrl}
                   target="_blank"
-                  rel="noopener noreferrer"
+                  rel="sponsored noopener noreferrer"
                   className="w-full flex items-center justify-center gap-2 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-amber-500/50 py-2.5 px-4 text-xs font-bold text-zinc-200 transition-all shadow-md group"
                 >
                   <ShoppingCart className="h-4 w-4 text-amber-400 group-hover:scale-110 transition-transform" />

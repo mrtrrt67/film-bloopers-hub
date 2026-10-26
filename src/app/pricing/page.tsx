@@ -1,13 +1,18 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { Check, Sparkles, Zap, Shield, ArrowRight, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { Check, Sparkles, Zap, Shield, ArrowRight, ShieldCheck, CheckCircle2, PartyPopper, AlertCircle } from "lucide-react";
 import { PRICING_PLANS } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/client";
 import AuthModal from "@/components/AuthModal";
 
-export default function PricingPage() {
+function PricingContent() {
+  const searchParams = useSearchParams();
+  const isSuccess = searchParams.get("success") === "true";
+  const isCanceled = searchParams.get("canceled") === "true";
+
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [openingPortal, setOpeningPortal] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -87,6 +92,31 @@ export default function PricingPage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
+      {/* Banner Successo Post-Checkout Stripe */}
+      {isSuccess && (
+        <div className="mb-8 rounded-2xl border border-emerald-500/50 bg-emerald-950/40 p-5 flex items-start gap-4 shadow-xl animate-in fade-in slide-in-from-top-4">
+          <div className="p-2 rounded-xl bg-emerald-500/20 text-emerald-400 shrink-0">
+            <PartyPopper className="h-6 w-6" />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-emerald-300">
+              Pagamento completato con successo! 🎉
+            </h3>
+            <p className="text-xs text-zinc-300 mt-1 leading-relaxed">
+              Il tuo account è ora abilitato con accesso Premium completo. Puoi utilizzare l&apos;IA senza limiti, votare i bloopers e scalare la classifica!
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Banner Annullamento Checkout */}
+      {isCanceled && (
+        <div className="mb-8 rounded-2xl border border-zinc-700 bg-zinc-900/80 p-4 flex items-center gap-3 text-xs text-zinc-300">
+          <AlertCircle className="h-5 w-5 text-zinc-400 shrink-0" />
+          <span>Procedura di checkout annullata. Nessun addebito è stato effettuato sul tuo metodo di pagamento.</span>
+        </div>
+      )}
+
       {/* Intestazione */}
       <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-10">
         <span className="rounded-full bg-amber-500/10 border border-amber-500/30 px-3.5 py-1 text-xs font-bold text-amber-400 mb-3">
@@ -125,7 +155,7 @@ export default function PricingPage() {
       )}
 
       {/* Grid Piani */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-stretch">
         {PRICING_PLANS.map((plan) => {
           const isPromo = plan.id === "lifetime-promo";
           const isAnnuale = plan.id === "annuale";
@@ -261,5 +291,19 @@ export default function PricingPage() {
         onClose={() => setAuthModalOpen(false)}
       />
     </div>
+  );
+}
+
+export default function PricingPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 text-center text-zinc-500">
+          Caricamento piani...
+        </div>
+      }
+    >
+      <PricingContent />
+    </Suspense>
   );
 }

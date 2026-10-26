@@ -23,8 +23,15 @@ export async function POST(request: Request) {
     const isUserAdmin = user && user.email && user.email.toLowerCase() === adminEmail;
     const today = new Date().toISOString().slice(0, 10);
 
-    // 1. Verifica quota per utenti non admin
-    if (user && !isUserAdmin) {
+    // 1. Verifica autenticazione e quota
+    if (!user) {
+      return NextResponse.json(
+        { error: "È necessario accedere con il proprio account gratuito per generare nuovi bloopers con l'IA (15 generazioni/giorno incluse)." },
+        { status: 401 }
+      );
+    }
+
+    if (!isUserAdmin) {
       const { data: profile } = await supabase
         .from("profiles")
         .select("*")

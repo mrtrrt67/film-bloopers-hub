@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Sparkles, PlusCircle, AlertCircle, Filter, Send } from "lucide-react";
 import { Film, Blooper, BlooperCategoria } from "@/lib/types";
 import BlooperItem from "@/components/BlooperItem";
+import AuthModal from "@/components/AuthModal";
 import { createClient } from "@/lib/supabase/client";
 
 interface BloopersSectionProps {
@@ -17,6 +18,7 @@ export default function BloopersSection({ film, initialBloopers }: BloopersSecti
   const [generating, setGenerating] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("Tutte");
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
 
   // Form segnalazione manuale
   const [minuto, setMinuto] = useState("");
@@ -33,6 +35,10 @@ export default function BloopersSection({ film, initialBloopers }: BloopersSecti
 
   // Generazione bloopers con Gemini
   const handleGenerateWithAI = async () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
     setGenerating(true);
     try {
       const res = await fetch("/api/bloopers/generate", {
@@ -144,7 +150,13 @@ export default function BloopersSection({ film, initialBloopers }: BloopersSecti
           </button>
 
           <button
-            onClick={() => setShowSubmitModal(true)}
+            onClick={() => {
+              if (!user) {
+                setShowAuthModal(true);
+              } else {
+                setShowSubmitModal(true);
+              }
+            }}
             className="flex items-center gap-1.5 rounded-xl border border-zinc-700 bg-zinc-800/80 hover:bg-zinc-800 px-3.5 py-2 text-xs font-bold text-zinc-200 transition-colors"
           >
             <PlusCircle className="h-4 w-4 text-amber-400" />
@@ -281,6 +293,12 @@ export default function BloopersSection({ film, initialBloopers }: BloopersSecti
           </div>
         </div>
       )}
+
+      {/* Modale Autenticazione per visitatori ospiti */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+      />
     </div>
   );
 }

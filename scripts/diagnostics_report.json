@@ -27,22 +27,22 @@
         "count": 219
       },
       "errori": {
-        "count": 1002
+        "count": 975
       },
       "profiles": {
-        "count": 5
+        "count": 1
       },
       "configurazioni": {
         "count": 25
       },
       "voti_bloopers": {
-        "count": 21
+        "count": 0
       },
       "suggerimenti": {
-        "count": 7
+        "count": 0
       },
       "log_ricerche": {
-        "count": 212
+        "count": 5
       }
     },
     "issues": []
@@ -91,7 +91,7 @@
   },
   "git": {
     "branch": "staging",
-    "status": "M src/components/admin/AdminConfigTab.tsx\n?? backups/\n?? src/app/api/admin/cleanup/",
+    "status": "M backups/restore_staging_database.sql\n M scripts/diagnostics_report.json\n M scripts/generate_restore_sql.cjs\n M src/app/api/bloopers/generate/route.ts\n M src/app/api/track-visit/route.ts\n M src/app/classifica/page.tsx\n M src/app/film/[slug]/BloopersSection.tsx\n M src/app/film/[slug]/page.tsx\n M src/app/pricing/page.tsx\n M src/components/BlooperItem.tsx\n M src/lib/supabase/admin.ts\n M src/lib/utils.ts\n?? scripts/fix_rls_security_hardening.sql",
     "issues": []
   },
   "typecheck": {

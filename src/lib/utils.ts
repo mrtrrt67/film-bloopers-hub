@@ -158,7 +158,7 @@ export function replacePlaceholders(text: string, vars: Record<string, string | 
 }
 
 export function getAmazonSearchUrl(titolo: string, anno?: string | number | null, tag?: string): string {
-  const affiliateTag = tag || process.env.NEXT_PUBLIC_AMAZON_TAG || process.env.AMAZON_AFFILIATE_TAG || "cineblp196704-21";
+  const affiliateTag = tag || process.env.NEXT_PUBLIC_AMAZON_TAG || process.env.AMAZON_AFFILIATE_TAG || "filmbloopers-21";
   const query = encodeURIComponent(`${titolo} ${anno || ""}`.trim());
   return `https://www.amazon.it/s?k=${query}&tag=${affiliateTag}`;
 }

@@ -245,33 +245,35 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
           </span>
         </div>
 
-        {/* Pulsanti Voto */}
+        {/* Pulsanti Voto (Touch Target Ottimizzato per Smartphone) */}
         <div className="flex items-center gap-2">
           <button
+            type="button"
             onClick={() => handleVote("conferma")}
             disabled={loading}
-            className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1 font-semibold text-xs transition-colors ${
+            className={`flex items-center gap-1.5 rounded-lg border min-h-[38px] sm:min-h-[32px] px-3 sm:px-2.5 py-1.5 sm:py-1 font-semibold text-xs transition-all touch-manipulation active:scale-95 ${
               votoUtente === "conferma"
                 ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-sm shadow-emerald-500/20"
                 : "border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:text-emerald-400"
             }`}
             title="Conferma errore (👍)"
           >
-            <ThumbsUp className="h-3.5 w-3.5" />
+            <ThumbsUp className="h-4 w-4 sm:h-3.5 sm:sm-3.5 text-emerald-400" />
             <span>{conferme}</span>
           </button>
 
           <button
+            type="button"
             onClick={handleDislikeButtonClick}
             disabled={loading}
-            className={`flex items-center gap-1.5 rounded-lg border px-2.5 py-1 font-semibold text-xs transition-colors ${
+            className={`flex items-center gap-1.5 rounded-lg border min-h-[38px] sm:min-h-[32px] px-3 sm:px-2.5 py-1.5 sm:py-1 font-semibold text-xs transition-all touch-manipulation active:scale-95 ${
               votoUtente === "contestazione"
                 ? "bg-rose-500/20 text-rose-300 border-rose-500/50 shadow-sm shadow-rose-500/20"
                 : "border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:text-rose-400"
             }`}
             title="Contesta errore (👎)"
           >
-            <ThumbsDown className="h-3.5 w-3.5" />
+            <ThumbsDown className="h-4 w-4 sm:h-3.5 sm:sm-3.5 text-rose-400" />
             <span>{contestazioni}</span>
           </button>
         </div>

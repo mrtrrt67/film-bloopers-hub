@@ -8,7 +8,7 @@ export async function POST() {
     const { data: { user } } = await supabase.auth.getUser();
 
     const adminDb = createAdminClient();
-    const tipo = user?.email || "ospite";
+    const tipo = user ? `utente_${user.id.slice(0, 8)}` : "ospite";
 
     await adminDb.from("log_accessi").insert({ tipo });
     return NextResponse.json({ ok: true });

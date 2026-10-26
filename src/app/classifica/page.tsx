@@ -123,20 +123,26 @@ export default async function ClassificaPage() {
                 </div>
 
                 {/* Utente */}
-                <div className="col-span-6 sm:col-span-5 flex items-center gap-2 truncate">
-                  <span className="text-zinc-200">
-                    {isCurrentUser ? (
-                      <>
-                        <strong className="text-amber-400 font-bold">{formatPublicAuthor(p.email, "utente")}</strong>{" "}
-                        <span className="text-[10px] rounded bg-amber-500/20 text-amber-300 font-bold px-1.5 py-0.5">
-                          (Tu)
+                <div className="col-span-6 sm:col-span-5 flex flex-col justify-center truncate">
+                  <div className="flex items-center gap-2 truncate">
+                    <span className="text-zinc-200 truncate">
+                      {isCurrentUser ? (
+                        <>
+                          <strong className="text-amber-400 font-bold">{formatPublicAuthor(p.email, "utente")}</strong>{" "}
+                          <span className="text-[10px] rounded bg-amber-500/20 text-amber-300 font-bold px-1.5 py-0.5">
+                            (Tu)
+                          </span>
+                        </>
+                      ) : (
+                        <span className="font-medium text-zinc-300">
+                          {formatPublicAuthor(p.email, "utente")}
                         </span>
-                      </>
-                    ) : (
-                      <span className="font-medium text-zinc-300">
-                        {formatPublicAuthor(p.email, "utente")}
-                      </span>
-                    )}
+                      )}
+                    </span>
+                  </div>
+                  {/* Punti visibili su mobile */}
+                  <span className="sm:hidden text-[11px] font-mono font-bold text-amber-400/90 mt-0.5">
+                    {p.punti || 0} pt
                   </span>
                 </div>
 
