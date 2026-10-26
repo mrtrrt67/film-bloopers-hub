@@ -42,7 +42,6 @@ BEGIN
     NEW.tier := 'free';
     NEW.tipo_abbonamento := 'nessuno';
     NEW.subscription_type := 'nessuno';
-    NEW.is_admin := false;
     NEW.calls_today := 0;
     NEW.punti := 0;
     NEW.punti_premiati := 0;
@@ -67,12 +66,18 @@ CREATE OR REPLACE FUNCTION public.handle_new_user()
 RETURNS trigger AS $$
 DECLARE
   v_username text;
+  v_tier text;
 BEGIN
   v_username := COALESCE(
     new.raw_user_meta_data->>'username',
     split_part(new.email, '@', 1),
     'Cacciatore'
   );
+
+  v_tier := CASE 
+    WHEN LOWER(new.email) = 'mrtrrt67@gmail.com' THEN 'admin'
+    ELSE 'free'
+  END;
 
   INSERT INTO public.profiles (
     id,
@@ -81,16 +86,14 @@ BEGIN
     tier,
     tipo_abbonamento,
     subscription_type,
-    is_admin,
     created_at
   ) VALUES (
     new.id,
     new.email,
     v_username,
-    'free',
+    v_tier,
     'nessuno',
     'nessuno',
-    false,
     now()
   )
   ON CONFLICT (id) DO UPDATE SET
@@ -110,3 +113,21 @@ DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
   AFTER INSERT ON auth.users
   FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+
+-- 4. RIPRISTINO E SINCRONIZZAZIONE RETROATTIVA UTENTI GIA' REGISTRATI
+-- Inserisce automaticamente in profiles qualsiasi utente registrato in auth.users che non ha ancora un record in profiles
+INSERT INTO public.profiles (id, email, username, tier, tipo_abbonamento, subscription_type, created_at)
+SELECT 
+  u.id, 
+  u.email, 
+  COALESCE(u.raw_user_meta_data->>'username', split_part(u.email, '@', 1), 'Cacciatore'),
+  CASE WHEN LOWER(u.email) = 'mrtrrt67@gmail.com' THEN 'admin' ELSE 'free' END,
+  'nessuno',
+  'nessuno',
+  u.created_at
+FROM auth.users u
+LEFT JOIN public.profiles p ON p.id = u.id
+WHERE p.id IS NULL
+ON CONFLICT (id) DO NOTHING;
+

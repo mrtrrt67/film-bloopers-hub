@@ -122,7 +122,7 @@ export default function AuthModal({
           email.split("@")[0] ||
           "Cacciatore";
 
-        const { error } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
           email: email.trim(),
           password,
           options: {
@@ -134,11 +134,41 @@ export default function AuthModal({
 
         if (error) throw error;
 
-        setSuccessMsg("Registrazione completata! Controlla la tua email per verificare l'account.");
-        setTimeout(() => {
-          onClose();
-          if (onSuccess) onSuccess();
-        }, 2000);
+        // Fallback proattivo: crea o aggiorna il profilo se non ancora creato dal trigger DB
+        if (data.user) {
+          try {
+            await supabase.from("profiles").upsert(
+              {
+                id: data.user.id,
+                email: data.user.email,
+                username: cleanUsername,
+                tier: data.user.email?.toLowerCase() === "mrtrrt67@gmail.com" ? "admin" : "free",
+                tipo_abbonamento: "nessuno",
+                subscription_type: "nessuno",
+              },
+              { onConflict: "id" }
+            );
+          } catch (_) {
+            // Se gestito dal trigger o da RLS, procedi senza bloccare
+          }
+        }
+
+        if (data.session) {
+          setSuccessMsg("Registrazione completata! Accesso in corso...");
+          setTimeout(() => {
+            onClose();
+            if (onSuccess) onSuccess();
+            window.location.reload();
+          }, 800);
+        } else {
+          setSuccessMsg(
+            "Registrazione completata con successo! Puoi ora effettuare il login con le tue credenziali (oppure verifica l'email se richiesta)."
+          );
+          setTimeout(() => {
+            setMode("login");
+            setSuccessMsg(null);
+          }, 2500);
+        }
       } else if (mode === "forgot") {
         const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
           redirectTo: `${window.location.origin}/auth/reset-password`,

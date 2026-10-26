@@ -54,40 +54,57 @@ export default function Navbar() {
 
   // Carica utente e profilo
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }: { data: any }) => {
+    const syncUserProfile = async (u: any) => {
+      if (!u) {
+        setUserProfile(null);
+        return;
+      }
+      try {
+        const { data: p } = await supabase
+          .from("profiles")
+          .select("tier, tipo_abbonamento, punti")
+          .eq("id", u.id)
+          .maybeSingle();
+
+        if (p) {
+          setUserProfile(p);
+        } else {
+          // Auto-heal: crea profilo se mancante
+          const cleanUsername =
+            u.user_metadata?.username ||
+            u.email?.split("@")[0] ||
+            "Cacciatore";
+          const initialTier =
+            u.email?.toLowerCase() === adminEmail ? "admin" : "free";
+
+          await supabase.from("profiles").upsert(
+            {
+              id: u.id,
+              email: u.email,
+              username: cleanUsername,
+              tier: initialTier,
+              tipo_abbonamento: "nessuno",
+              subscription_type: "nessuno",
+            },
+            { onConflict: "id" }
+          );
+          setUserProfile({ tier: initialTier, tipo_abbonamento: "nessuno", punti: 0 });
+        }
+      } catch (e) {
+        console.error("Errore caricamento/auto-heal profilo:", e);
+      }
+    };
+
+    supabase.auth.getUser().then(({ data }: { data: any }) => {
       const u = data?.user || null;
       setUser(u);
-      if (u) {
-        try {
-          const { data: p } = await supabase
-            .from("profiles")
-            .select("tier, tipo_abbonamento, punti")
-            .eq("id", u.id)
-            .maybeSingle();
-          if (p) setUserProfile(p);
-        } catch (e) {
-          console.error(e);
-        }
-      }
+      syncUserProfile(u);
     });
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(async (_event: any, session: any) => {
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
       const u = session?.user || null;
       setUser(u);
-      if (u) {
-        try {
-          const { data: p } = await supabase
-            .from("profiles")
-            .select("tier, tipo_abbonamento, punti")
-            .eq("id", u.id)
-            .maybeSingle();
-          if (p) setUserProfile(p);
-        } catch (e) {
-          console.error(e);
-        }
-      } else {
-        setUserProfile(null);
-      }
+      syncUserProfile(u);
     });
 
     return () => {
