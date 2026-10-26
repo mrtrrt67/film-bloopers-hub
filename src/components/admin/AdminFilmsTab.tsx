@@ -32,6 +32,8 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   // Azioni bulk
   const [updatingAllPosters, setUpdatingAllPosters] = useState(false);
   const [updatingAllCast, setUpdatingAllCast] = useState(false);
+  const [populatingTrivia, setPopulatingTrivia] = useState(false);
+  const [missingTriviaCount, setMissingTriviaCount] = useState<number | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
 
   const [confirmModal, setConfirmModal] = useState<{
@@ -85,8 +87,21 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     }
   };
 
+  const fetchMissingTriviaStats = async () => {
+    try {
+      const res = await fetch("/api/admin/trivia-batch");
+      if (res.ok) {
+        const data = await res.json();
+        setMissingTriviaCount(typeof data.missingTriviaCount === "number" ? data.missingTriviaCount : null);
+      }
+    } catch (err) {
+      console.error("Errore statistiche curiosità mancanti:", err);
+    }
+  };
+
   useEffect(() => {
     fetchFilms();
+    fetchMissingTriviaStats();
   }, []);
 
   // Mappa di frequenza dei poster per rilevare duplicati
@@ -185,6 +200,44 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
         }
       },
       "Avvia Recupero Cast",
+      "warning"
+    );
+  };
+
+  // Popola curiosità 5 alla volta con IA
+  const handleBatchPopulateTrivia = async () => {
+    openConfirm(
+      "⚡ Popola Curiosità con IA (5 Film)",
+      "Avviare la generazione automatica con Gemini per 5 film che non hanno ancora curiosità? Verranno generate 3 curiosità e aneddoti verificati per ciascuna pellicola.",
+      async () => {
+        try {
+          setPopulatingTrivia(true);
+          setActionMessage(null);
+          const res = await fetch("/api/admin/trivia-batch", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ limit: 5 }),
+          });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            const processed = data.processedCount || 0;
+            const generated = data.totalTriviaGenerated || 0;
+            const remaining = data.remainingFilmsWithoutTrivia ?? 0;
+            setMissingTriviaCount(remaining);
+            setActionMessage(
+              `✨ IA completata: generate ${generated} curiosità per ${processed} film! (${remaining} film ancora senza curiosità)`
+            );
+          } else {
+            setActionMessage(`❌ ${data.error || "Errore durante la generazione curiosità"}`);
+          }
+        } catch (err) {
+          console.error(err);
+          setActionMessage("❌ Errore di connessione durante la generazione curiosità");
+        } finally {
+          setPopulatingTrivia(false);
+        }
+      },
+      "Avvia Generazione 5 Film",
       "warning"
     );
   };
@@ -356,6 +409,20 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
           >
             <Users className={`h-3.5 w-3.5 ${updatingAllCast ? "animate-spin" : ""}`} />
             <span>Recupera Cast Mancante ({missingCastCount})</span>
+          </button>
+
+          <button
+            onClick={handleBatchPopulateTrivia}
+            disabled={populatingTrivia || missingTriviaCount === 0}
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-md shadow-amber-500/10"
+            title="Genera curiosità con IA per 5 film che non ne hanno ancora"
+          >
+            <Sparkles className={`h-3.5 w-3.5 ${populatingTrivia ? "animate-spin" : ""}`} />
+            <span>
+              {populatingTrivia
+                ? "Generazione 5 film in corso..."
+                : `⚡ Popola Curiosità (5 film)${missingTriviaCount !== null ? ` [${missingTriviaCount}]` : ""}`}
+            </span>
           </button>
         </div>
       </div>
