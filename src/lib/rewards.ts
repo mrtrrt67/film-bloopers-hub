@@ -37,7 +37,7 @@ export async function checkAndAwardPointRewards(
     // A. Controllo soglia Lifetime (10.000 pt per default)
     if (newTotalPoints >= sogliaLifetime) {
       if (currentTier !== "premium" || currentSub !== "lifetime") {
-        await supabase
+        const { data: updA, error: errA } = await supabase
           .from("profiles")
           .update({
             punti: newTotalPoints,
@@ -45,7 +45,16 @@ export async function checkAndAwardPointRewards(
             tipo_abbonamento: "lifetime",
             data_scadenza: null,
           })
-          .eq("id", profileId);
+          .eq("id", profileId)
+          .select();
+
+        if (errA) {
+          console.error("Errore aggiornamento lifetime in profiles:", errA);
+          return { success: false, error: errA.message };
+        }
+        if (!updA || updA.length === 0) {
+          return { success: false, error: "Aggiornamento bloccato dalle policy di sicurezza (RLS)" };
+        }
 
         return {
           success: true,
@@ -55,8 +64,8 @@ export async function checkAndAwardPointRewards(
       }
     }
 
-    // B. Controllo soglia Mensile (ogni 50 pt per default con accumulo)
-    if (newTotalPoints >= sogliaMensile) {
+    // B. Controllo soglia Mensile (ogni 50 pt per default con accumulo, solo per utenti non-lifetime)
+    if (currentSub !== "lifetime" && newTotalPoints >= sogliaMensile) {
       const mesiSpettanti = Math.floor(newTotalPoints / sogliaMensile);
 
       if (mesiSpettanti > mesiGiaAccreditati) {
@@ -70,16 +79,25 @@ export async function checkAndAwardPointRewards(
         baseDate.setDate(baseDate.getDate() + 30 * diffMesi);
         const nuovaScadenza = baseDate.toISOString().slice(0, 10);
 
-        await supabase
+        const { data: updB, error: errB } = await supabase
           .from("profiles")
           .update({
             punti: newTotalPoints,
             tier: "premium",
-            tipo_abbonamento: currentSub === "lifetime" ? "lifetime" : "mensile",
-            data_scadenza: currentSub === "lifetime" ? null : nuovaScadenza,
+            tipo_abbonamento: "mensile",
+            data_scadenza: nuovaScadenza,
             mesi_accreditati: mesiSpettanti,
           })
-          .eq("id", profileId);
+          .eq("id", profileId)
+          .select();
+
+        if (errB) {
+          console.error("Errore aggiornamento premio mensile in profiles:", errB);
+          return { success: false, error: errB.message };
+        }
+        if (!updB || updB.length === 0) {
+          return { success: false, error: "Aggiornamento bloccato dalle policy di sicurezza (RLS)" };
+        }
 
         return {
           success: true,
@@ -91,11 +109,21 @@ export async function checkAndAwardPointRewards(
       }
     }
 
-    // Se non sblocca nuovi premi, aggiorna semplicemente il saldo punti
-    await supabase
+    // Se non sblocca nuovi premi o se è già lifetime, aggiorna semplicemente il saldo punti
+    const { data: updPoints, error: errPoints } = await supabase
       .from("profiles")
       .update({ punti: newTotalPoints })
-      .eq("id", profileId);
+      .eq("id", profileId)
+      .select();
+
+    if (errPoints) {
+      console.error("Errore aggiornamento punti in profiles:", errPoints);
+      return { success: false, error: errPoints.message };
+    }
+    if (!updPoints || updPoints.length === 0) {
+      console.error("Nessun profilo modificato per ID:", profileId);
+      return { success: false, error: "Nessun record aggiornato in profiles (possibile blocco RLS)" };
+    }
 
     return { success: true, unlocked: null };
   } catch (err: any) {

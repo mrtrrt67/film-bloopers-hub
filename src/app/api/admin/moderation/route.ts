@@ -102,6 +102,7 @@ export async function GET() {
       const isDoublePoints = !!isPriority;
       return {
         ...b,
+        user_id: p?.id || null,
         user_tier: p?.tier || (isAdmin ? "premium" : "free"),
         user_sub: p?.tipo_abbonamento || (isAdmin ? "lifetime" : "nessuno"),
         is_admin: !!isAdmin,
@@ -224,7 +225,11 @@ export async function POST(request: Request) {
         const resReward = await checkAndAwardPointRewards(adminDb, targetProfile.id, newTotal);
         if (resReward?.message) {
           rewardMsg = ` (${resReward.message})`;
+        } else if (resReward?.error) {
+          rewardMsg = ` (⚠️ Attenzione errore salvataggio punti: ${resReward.error})`;
         }
+      } else {
+        rewardMsg = ` (⚠️ Profilo non trovato per l'utente "${userEmail || "anonimo"}")`;
       }
 
       const userTag = targetProfile?.email ? `@${targetProfile.email.split("@")[0]}` : (userEmail || "utente");
@@ -233,6 +238,23 @@ export async function POST(request: Request) {
         : `Blooper approvato e ${awardedPts} pt assegnati a ${userTag}!${rewardMsg}`;
 
       return NextResponse.json({ success: true, message: msg });
+    }
+
+    if (action === "sync_admin_points") {
+      const targetProfile = await resolveProfile(adminDb, null, adminEmail);
+      if (!targetProfile) {
+        return NextResponse.json({ error: "Profilo admin non trovato" }, { status: 404 });
+      }
+      const ptsToAdd = points ? parseInt(String(points), 10) : 20;
+      const newTotal = (targetProfile.punti || 0) + ptsToAdd;
+      const resReward = await checkAndAwardPointRewards(adminDb, targetProfile.id, newTotal);
+      if (!resReward.success) {
+        return NextResponse.json({ error: resReward.error || "Errore aggiornamento punti" }, { status: 500 });
+      }
+      return NextResponse.json({ 
+        success: true, 
+        message: `Sincronizzazione completata: accreditati ${ptsToAdd} pt a ${targetProfile.email}! Nuovo totale: ${newTotal} pt.` 
+      });
     }
 
     if (action === "reject") {
