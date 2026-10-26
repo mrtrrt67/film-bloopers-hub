@@ -259,6 +259,29 @@ export async function POST(request: Request) {
         ? `Blooper approvato! Assegnati ${awardedPts} pt a ${userTag} (Raddoppiati per Amministratore / Piano Annuale)${rewardMsg}`
         : `Blooper approvato e ${awardedPts} pt assegnati a ${userTag}!${rewardMsg}`;
 
+      // Inserimento notifica celebrativa per l'utente che ha inviato il blooper
+      if (targetProfile) {
+        try {
+          const { data: bData } = await adminDb
+            .from("errori")
+            .select("films(titolo, anno)")
+            .eq("id", blooper_id)
+            .maybeSingle();
+          const filmTitolo = (bData as any)?.films?.titolo || "un film";
+          await adminDb.from("notifiche_utenti").insert({
+            user_id: targetProfile.id,
+            tipo: "blooper_approvato",
+            titolo: "Nuovo Blooper Approvato!",
+            messaggio: `Il tuo blooper per "${filmTitolo}" è stato verificato ed è ora online nel catalogo! Ti sono stati accreditati ${awardedPts} punti.`,
+            punti: awardedPts,
+            film_titolo: filmTitolo,
+            letta: false,
+          });
+        } catch {
+          // Fallback
+        }
+      }
+
       return NextResponse.json({ success: true, message: msg });
     }
 
