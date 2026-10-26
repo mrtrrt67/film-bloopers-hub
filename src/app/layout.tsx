@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     template: "%s | FilmBloopers Hub",
   },
   description:
-    "Scopri oltre 1.000 bloopers, errori di montaggio, ciak imperfetti, anacronismi storici e troupe visibili al minuto esatto nei film più famosi della storia del cinema. Archivio verificato e gratuito.",
+    "Scopri oltre 1.000 bloopers, errori di montaggio, anacronismi e troupe visibile al minuto esatto nei film più celebri. Archivio verificato e gratuito.",
   keywords: [
     "bloopers film",
     "errori film",

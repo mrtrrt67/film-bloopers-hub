@@ -90,7 +90,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const countDesc = bloopers?.length
     ? `Scopri ${bloopers.length} bloopers verificati al minuto esatto.`
     : "Scopri tutti i bloopers e le curiosità del film.";
-  const description = `${countDesc} ${film.trama ? film.trama.slice(0, 160) + "..." : ""}`.trim();
+  const maxTramaLen = Math.max(0, 155 - countDesc.length - 5);
+  const tramaSnippet = film.trama && maxTramaLen > 20 ? ` ${film.trama.slice(0, maxTramaLen).trim()}...` : "";
+  const description = `${countDesc}${tramaSnippet}`.slice(0, 158).trim();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://filmbloopers.online";
   const imageUrl = film.backdrop_url || film.poster_url || `${siteUrl}/og-image.jpg`;
 

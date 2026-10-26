@@ -1,19 +1,60 @@
-async function check() {
-  const res = await fetch('https://filmbloopers.online');
-  const html = await res.text();
-  
-  const ogImage = html.match(/<meta[^>]+property=["']og:image["'][^>]*>/i);
-  const twitterImage = html.match(/<meta[^>]+name=["']twitter:image["'][^>]*>/i);
-  const canonical = html.match(/<link[^>]+rel=["']canonical["'][^>]*>/i);
-  const jsonLd = html.match(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi);
-  
-  console.log('OG Image tag:', ogImage ? ogImage[0] : 'None');
-  console.log('Twitter Image tag:', twitterImage ? twitterImage[0] : 'None');
-  console.log('Canonical tag:', canonical ? canonical[0] : 'None');
-  console.log('JSON-LD scripts found:', jsonLd ? jsonLd.length : 0);
-  if (jsonLd) {
-    jsonLd.forEach((s, i) => console.log(`Script ${i+1}:`, s.slice(0, 150) + '...'));
+const fs = require('fs');
+const path = require('path');
+
+async function checkLive() {
+  try {
+    const res = await fetch('https://filmbloopers.online');
+    const html = await res.text();
+    const descMatch = html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']*)["']/i) ||
+                      html.match(/<meta[^>]+content=["']([^"']*)["'][^>]+name=["']description["']/i);
+    if (descMatch) {
+      console.log('--- LIVE https://filmbloopers.online ---');
+      console.log('Current Meta Description:', descMatch[1]);
+      console.log('Length:', descMatch[1].length, 'characters');
+      console.log('Bing Status:', descMatch[1].length >= 25 && descMatch[1].length <= 160 ? '✅ PASSED' : '❌ FAILED (Too Long/Short)');
+    } else {
+      console.log('No meta description found on live site!');
+    }
+  } catch (e) {
+    console.error('Fetch error:', e.message);
   }
 }
 
-check();
+function auditLocal() {
+  console.log('\n--- AUDIT DEI FILE LOCALI IN SRC/APP ---');
+  const files = [
+    'src/app/layout.tsx',
+    'src/app/classifica/page.tsx',
+    'src/app/pricing/layout.tsx',
+    'src/app/esplora/layout.tsx',
+    'src/app/suggerimenti/layout.tsx',
+    'src/app/privacy/page.tsx',
+    'src/app/termini/page.tsx',
+    'src/app/cookie/page.tsx',
+    'src/app/note-legali/page.tsx',
+    'src/app/film/[slug]/page.tsx'
+  ];
+
+  for (const f of files) {
+    if (!fs.existsSync(f)) continue;
+    const content = fs.readFileSync(f, 'utf-8');
+    const matches = content.match(/description:\s*["'`]([\s\S]*?)["'`]/g);
+    if (matches) {
+      for (const m of matches) {
+        const val = m.replace(/^description:\s*["'`]/, '').replace(/["'`]$/, '').trim();
+        if (val.length > 0 && !val.includes('${')) {
+          const ok = val.length >= 25 && val.length <= 160;
+          console.log(`${f}: [len: ${val.length}] ${ok ? '✅ OK' : '❌ ERR (Must be 25-160)'}`);
+          console.log('   Text: "' + val + '"');
+        }
+      }
+    }
+  }
+}
+
+async function run() {
+  await checkLive();
+  auditLocal();
+}
+
+run();
