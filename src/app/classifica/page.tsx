@@ -38,12 +38,25 @@ export default async function ClassificaPage() {
   const t2 = replacePlaceholders(t2Raw, { soglia_mensile: sogliaMensile });
   const t3 = replacePlaceholders(t3Raw, { soglia_lifetime: sogliaLifetime });
 
-  // 2. Recupero classifica utenti
-  const { data: profiles } = await supabase
+  // 2. Recupero classifica utenti (escludendo l'amministratore)
+  const adminEmail = (process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL || "mrtrrt67@gmail.com").toLowerCase();
+  const isAdminUser = user?.email?.toLowerCase() === adminEmail;
+
+  const { data: rawProfiles } = await supabase
     .from("profiles")
-    .select("id, email, punti, tier, tipo_abbonamento")
+    .select("id, email, username, punti, tier, tipo_abbonamento, is_admin")
     .order("punti", { ascending: false })
-    .limit(30);
+    .limit(50);
+
+  // L'amministratore non concorre alla classifica pubblica della community
+  const profiles = (rawProfiles || [])
+    .filter((p: any) => {
+      if (p.is_admin === true) return false;
+      if (p.email && p.email.toLowerCase() === adminEmail) return false;
+      if (p.username && p.username.toLowerCase() === adminEmail.split("@")[0].toLowerCase()) return false;
+      return true;
+    })
+    .slice(0, 30);
 
   const userProfile = (profiles as any[])?.find((p: any) => p.id === user?.id);
 
@@ -59,6 +72,19 @@ export default async function ClassificaPage() {
           Segnala errori cinematografici verificati, ottieni conferme dalla community e scala la classifica per sbloccare l&apos;accesso Premium gratuito.
         </p>
       </div>
+
+      {/* Avviso Admin: escluso dalla classifica pubblica */}
+      {isAdminUser && (
+        <div className="mb-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-300 flex items-center gap-3 shadow-lg">
+          <Shield className="h-5 w-5 shrink-0 text-amber-400" />
+          <div>
+            <p className="font-bold text-amber-200">Account Amministratore</p>
+            <p className="text-zinc-300 text-[11px] mt-0.5">
+              Sei autenticato come amministratore ({user?.email}). Il tuo profilo è escluso dalla classifica pubblica per garantire la trasparenza e la leale competizione tra gli utenti della community.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Regole & Premi Box */}
       <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-950/20 via-zinc-900/60 to-zinc-950 p-6 mb-10 shadow-xl">
@@ -92,12 +118,17 @@ export default async function ClassificaPage() {
         </div>
 
         <div className="divide-y divide-zinc-800/60">
-          {(profiles || []).map((p: any, idx: number) => {
-            const rank = idx + 1;
-            const isCurrentUser = user && p.id === user.id;
-            const rankInfo = getRankInfo(p.punti || 0, p.tier, p.tipo_abbonamento, sogliaMensile, sogliaLifetime);
+          {profiles.length === 0 ? (
+            <div className="py-12 text-center text-zinc-500 text-sm">
+              Nessun utente ha ancora accumulato punti. Segnala un blooper per essere il primo in classifica!
+            </div>
+          ) : (
+            profiles.map((p: any, idx: number) => {
+              const rank = idx + 1;
+              const isCurrentUser = user && p.id === user.id;
+              const rankInfo = getRankInfo(p.punti || 0, p.tier, p.tipo_abbonamento, sogliaMensile, sogliaLifetime);
 
-            return (
+              return (
               <div
                 key={p.id}
                 className={`grid grid-cols-12 items-center px-6 py-4 text-sm transition-colors ${
@@ -165,7 +196,7 @@ export default async function ClassificaPage() {
                 </div>
               </div>
             );
-          })}
+          }))}
         </div>
       </div>
     </div>

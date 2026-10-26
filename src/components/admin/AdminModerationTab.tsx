@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AlertTriangle, CheckCircle, XCircle, Trash2, Edit3, Shield, Award, Sparkles } from "lucide-react";
+import { AlertTriangle, CheckCircle, XCircle, Trash2, Edit3, Shield, Award } from "lucide-react";
 
 export default function AdminModerationTab() {
   const [subTab, setSubTab] = useState<"pending" | "contests" | "corrections" | "approved">("pending");
@@ -12,7 +12,6 @@ export default function AdminModerationTab() {
     corrections: [],
   });
   const [loading, setLoading] = useState(true);
-  const [syncingAdmin, setSyncingAdmin] = useState(false);
   const [pointsMap, setPointsMap] = useState<Record<string, number>>({});
   const [contestEditMap, setContestEditMap] = useState<Record<string, { minuto: string; descrizione: string; points: number }>>({});
 
@@ -34,31 +33,6 @@ export default function AdminModerationTab() {
   useEffect(() => {
     fetchModerationData();
   }, []);
-
-  const handleSyncAdminPoints = async () => {
-    try {
-      setSyncingAdmin(true);
-      const res = await fetch("/api/admin/moderation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "sync_admin_points",
-          points: 20,
-        }),
-      });
-      const json = await res.json();
-      if (res.ok) {
-        alert(json.message);
-        await fetchModerationData();
-      } else {
-        alert("Errore sincronizzazione: " + (json.error || "Operazione fallita"));
-      }
-    } catch (err: any) {
-      alert("Errore di rete: " + err.message);
-    } finally {
-      setSyncingAdmin(false);
-    }
-  };
 
   const handleApprove = async (blooper: any) => {
     const defaultPts = blooper.is_double_points ? 20 : 10;
@@ -295,66 +269,54 @@ export default function AdminModerationTab() {
 
   return (
     <div className="space-y-6">
-      {/* HEADER TABS & ACTIONS */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 pb-3">
-        <div className="flex items-center gap-2 overflow-x-auto">
-          <button
-            onClick={() => setSubTab("pending")}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-              subTab === "pending"
-                ? "bg-amber-500 text-zinc-950 shadow-md"
-                : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
-            }`}
-          >
-            <AlertTriangle className="h-3.5 w-3.5" />
-            In Attesa ({data.pending.length})
-          </button>
-          <button
-            onClick={() => setSubTab("contests")}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-              subTab === "contests"
-                ? "bg-amber-500 text-zinc-950 shadow-md"
-                : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
-            }`}
-          >
-            <XCircle className="h-3.5 w-3.5" />
-            Contestazioni ({data.contestazioni.length})
-          </button>
-          <button
-            onClick={() => setSubTab("corrections")}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-              subTab === "corrections"
-                ? "bg-amber-500 text-zinc-950 shadow-md"
-                : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
-            }`}
-          >
-            <Award className="h-3.5 w-3.5" />
-            Correzioni Community ({data.corrections?.length || 0})
-            {(data.corrections?.length || 0) > 0 && (
-              <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-pulse ml-0.5" />
-            )}
-          </button>
-          <button
-            onClick={() => setSubTab("approved")}
-            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-              subTab === "approved"
-                ? "bg-amber-500 text-zinc-950 shadow-md"
-                : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
-            }`}
-          >
-            <CheckCircle className="h-3.5 w-3.5" />
-            Archivio Approvati ({data.approved.length})
-          </button>
-        </div>
-
+      {/* HEADER TABS */}
+      <div className="flex items-center gap-2 border-b border-zinc-800 pb-3 overflow-x-auto">
         <button
-          onClick={handleSyncAdminPoints}
-          disabled={syncingAdmin}
-          title="Recupera i 20 punti per il blooper precedentemente approvato e aggiorna il totale in classifica"
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 font-bold text-xs hover:bg-amber-500 hover:text-zinc-950 transition active:scale-95 whitespace-nowrap shadow-sm disabled:opacity-50"
+          onClick={() => setSubTab("pending")}
+          className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            subTab === "pending"
+              ? "bg-amber-500 text-zinc-950 shadow-md"
+              : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+          }`}
         >
-          <Sparkles className="h-3.5 w-3.5" />
-          <span>{syncingAdmin ? "Sincronizzazione in corso..." : "⚡ Sincronizza +20pt Admin"}</span>
+          <AlertTriangle className="h-3.5 w-3.5" />
+          In Attesa ({data.pending.length})
+        </button>
+        <button
+          onClick={() => setSubTab("contests")}
+          className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            subTab === "contests"
+              ? "bg-amber-500 text-zinc-950 shadow-md"
+              : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+          }`}
+        >
+          <XCircle className="h-3.5 w-3.5" />
+          Contestazioni ({data.contestazioni.length})
+        </button>
+        <button
+          onClick={() => setSubTab("corrections")}
+          className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            subTab === "corrections"
+              ? "bg-amber-500 text-zinc-950 shadow-md"
+              : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+          }`}
+        >
+          <Award className="h-3.5 w-3.5" />
+          Correzioni Community ({data.corrections?.length || 0})
+          {(data.corrections?.length || 0) > 0 && (
+            <span className="flex h-2 w-2 rounded-full bg-amber-400 animate-pulse ml-0.5" />
+          )}
+        </button>
+        <button
+          onClick={() => setSubTab("approved")}
+          className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            subTab === "approved"
+              ? "bg-amber-500 text-zinc-950 shadow-md"
+              : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+          }`}
+        >
+          <CheckCircle className="h-3.5 w-3.5" />
+          Archivio Approvati ({data.approved.length})
         </button>
       </div>
 
