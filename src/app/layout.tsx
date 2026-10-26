@@ -4,6 +4,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AccessTracker from "@/components/AccessTracker";
 import PwaInstallPrompt from "@/components/PwaInstallPrompt";
+import RewardCelebrationBanner from "@/components/RewardCelebrationBanner";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -122,6 +123,7 @@ export default function RootLayout({
         <AccessTracker />
         <PwaInstallPrompt />
         <Navbar />
+        <RewardCelebrationBanner />
         <main className="flex-1">{children}</main>
         <Footer />
       </body>

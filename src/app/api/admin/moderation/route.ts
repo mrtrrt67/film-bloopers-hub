@@ -300,14 +300,53 @@ export async function POST(request: Request) {
         const resReward = await checkAndAwardPointRewards(adminDb, targetProfile.id, newTotal);
         rewardMsg = ` Assegnati ${finalPts} pt a ${targetProfile.email ? `@${targetProfile.email.split("@")[0]}` : "chi ha corretto"}!`;
         if (resReward?.message) rewardMsg += ` (${resReward.message})`;
+
+        // Inserimento notifica celebrativa per l'utente
+        try {
+          let filmTitolo = "un film";
+          if (blooper_id) {
+            const { data: bData } = await adminDb
+              .from("errori")
+              .select("films(titolo, anno)")
+              .eq("id", blooper_id)
+              .maybeSingle();
+            if ((bData as any)?.films?.titolo) {
+              filmTitolo = `${(bData as any).films.titolo}${(bData as any).films.anno ? ` (${(bData as any).films.anno})` : ""}`;
+            }
+          }
+          await adminDb.from("notifiche_utenti").insert({
+            user_id: targetProfile.id,
+            tipo: "contestazione_approvata",
+            titolo: "Contestazione Approvata dall'Admin!",
+            messaggio: `La tua correzione per "${filmTitolo}" è stata verificata e approvata! Ti sono stati accreditati ${finalPts} punti.`,
+            punti: finalPts,
+            film_titolo: filmTitolo,
+            letta: false,
+          });
+        } catch {
+          // Fallback gestito da voti_bloopers
+        }
       }
 
       return NextResponse.json({ success: true, message: `Correzione salvata e contestazione risolta!${rewardMsg}` });
     }
 
     if (action === "delete_blooper") {
+      let filmTitolo = "un film";
+      if (blooper_id) {
+        const { data: bData } = await adminDb
+          .from("errori")
+          .select("films(titolo, anno)")
+          .eq("id", blooper_id)
+          .maybeSingle();
+        if ((bData as any)?.films?.titolo) {
+          filmTitolo = `${(bData as any).films.titolo}${(bData as any).films.anno ? ` (${(bData as any).films.anno})` : ""}`;
+        }
+      }
+
+      // Conserva la contestazione come risolta anziché cancellarla, così finisce nell'archivio e l'utente riceve la notifica
       if (contestazione_id) {
-        await adminDb.from("voti_bloopers").delete().eq("id", contestazione_id);
+        await adminDb.from("voti_bloopers").update({ tipo: "blooper_falso_risolto" }).eq("id", contestazione_id);
       }
       if (blooper_id) {
         await adminDb.from("errori").delete().eq("id", blooper_id);
@@ -324,6 +363,21 @@ export async function POST(request: Request) {
         const resReward = await checkAndAwardPointRewards(adminDb, targetProfile.id, newTotal);
         rewardMsg = ` Assegnati ${finalPts} pt a ${targetProfile.email ? `@${targetProfile.email.split("@")[0]}` : "chi ha smascherato l'errore"}!`;
         if (resReward?.message) rewardMsg += ` (${resReward.message})`;
+
+        // Inserimento notifica celebrativa per l'utente
+        try {
+          await adminDb.from("notifiche_utenti").insert({
+            user_id: targetProfile.id,
+            tipo: "blooper_falso_risolto",
+            titolo: "Blooper Errato Smascherato!",
+            messaggio: `Hai smascherato con successo un errore infondato in "${filmTitolo}". Il blooper è stato rimosso dal catalogo e hai guadagnato ${finalPts} punti!`,
+            punti: finalPts,
+            film_titolo: filmTitolo,
+            letta: false,
+          });
+        } catch {
+          // Fallback gestito da voti_bloopers
+        }
       }
 
       return NextResponse.json({ 
