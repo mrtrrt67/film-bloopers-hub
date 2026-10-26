@@ -15,10 +15,11 @@ import {
   Share2
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { Film, Blooper } from "@/lib/types";
+import { Film, Blooper, MovieTrivia } from "@/lib/types";
 import BlooperItem from "@/components/BlooperItem";
 import { getAmazonSearchUrl, getYouTubeSearchUrl } from "@/lib/utils";
 import BloopersSection from "./BloopersSection";
+import TriviaSection from "@/components/TriviaSection";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -40,13 +41,26 @@ async function getFilmData(slug: string) {
       .maybeSingle();
 
     if (byId) {
-      const { data: bloopers } = await supabase
-        .from("errori")
-        .select("*, voti_bloopers(tipo, user_id)")
-        .eq("film_id", byId.id)
-        .eq("approvato", true);
+      const [bloopersRes, triviaRes] = await Promise.all([
+        supabase
+          .from("errori")
+          .select("*, voti_bloopers(tipo, user_id)")
+          .eq("film_id", byId.id)
+          .eq("approvato", true),
+        supabase
+          .from("movie_trivia")
+          .select("*")
+          .eq("film_id", byId.id)
+          .eq("approvato", true)
+          .order("ordine", { ascending: true })
+          .order("created_at", { ascending: false }),
+      ]);
 
-      return { film: byId as Film, bloopers: (bloopers || []) as any[] };
+      return {
+        film: byId as Film,
+        bloopers: (bloopersRes.data || []) as any[],
+        trivia: (triviaRes.data || []) as MovieTrivia[],
+      };
     }
   }
 
@@ -61,13 +75,26 @@ async function getFilmData(slug: string) {
       .maybeSingle();
 
     if (byTitle) {
-      const { data: bloopers } = await supabase
-        .from("errori")
-        .select("*, voti_bloopers(tipo, user_id)")
-        .eq("film_id", byTitle.id)
-        .eq("approvato", true);
+      const [bloopersRes, triviaRes] = await Promise.all([
+        supabase
+          .from("errori")
+          .select("*, voti_bloopers(tipo, user_id)")
+          .eq("film_id", byTitle.id)
+          .eq("approvato", true),
+        supabase
+          .from("movie_trivia")
+          .select("*")
+          .eq("film_id", byTitle.id)
+          .eq("approvato", true)
+          .order("ordine", { ascending: true })
+          .order("created_at", { ascending: false }),
+      ]);
 
-      return { film: byTitle as Film, bloopers: (bloopers || []) as any[] };
+      return {
+        film: byTitle as Film,
+        bloopers: (bloopersRes.data || []) as any[],
+        trivia: (triviaRes.data || []) as MovieTrivia[],
+      };
     }
   }
 
@@ -85,11 +112,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const { film, bloopers } = data;
+  const { film, bloopers, trivia } = data;
   const title = `${film.titolo} (${film.anno || "N/D"}) — Bloopers, Errori di Scena e Curiosità`;
-  const countDesc = bloopers?.length
-    ? `Scopri ${bloopers.length} bloopers verificati al minuto esatto.`
-    : "Scopri tutti i bloopers e le curiosità del film.";
+  
+  const countParts: string[] = [];
+  if (bloopers?.length) countParts.push(`${bloopers.length} bloopers`);
+  if (trivia?.length) countParts.push(`${trivia.length} curiosità e retroscena`);
+
+  const countDesc = countParts.length > 0
+    ? `Scopri ${countParts.join(" e ")} verificati.`
+    : "Scopri tutti i bloopers, le curiosità e i retroscena del film.";
+
   const maxTramaLen = Math.max(0, 155 - countDesc.length - 5);
   const tramaSnippet = film.trama && maxTramaLen > 20 ? ` ${film.trama.slice(0, maxTramaLen).trim()}...` : "";
   const description = `${countDesc}${tramaSnippet}`.slice(0, 158).trim();
@@ -103,6 +136,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       `bloopers ${film.titolo}`,
       `errori film ${film.titolo}`,
       `curiosità ${film.titolo}`,
+      `aneddoti ${film.titolo}`,
+      `retroscena ${film.titolo}`,
+      `dietro le quinte ${film.titolo}`,
       `errori di scena ${film.titolo}`,
       film.regista ? `film ${film.regista}` : "",
       film.genere || "",
@@ -146,7 +182,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { film, bloopers: rawBloopers } = data;
+  const { film, bloopers: rawBloopers, trivia = [] } = data;
 
   // Normalizza i bloopers calcolando conferme, contestazioni e voto dell'utente autenticato
   const bloopers: Blooper[] = rawBloopers.map((b: any) => {
@@ -224,7 +260,22 @@ export default async function FilmDetailPage({ params }: PageProps) {
         }
       : null;
 
-  const schemasToRender = [jsonLdMovie, jsonLdBreadcrumbs, jsonLdBloopers].filter(Boolean);
+  const jsonLdTrivia =
+    trivia.length > 0
+      ? {
+          "@context": "https://schema.org",
+          "@type": "ItemList",
+          name: `Curiosità e Retroscena di ${film.titolo}`,
+          itemListElement: trivia.map((t, idx) => ({
+            "@type": "ListItem",
+            position: idx + 1,
+            name: t.titolo,
+            description: t.descrizione,
+          })),
+        }
+      : null;
+
+  const schemasToRender = [jsonLdMovie, jsonLdBreadcrumbs, jsonLdBloopers, jsonLdTrivia].filter(Boolean);
 
   return (
     <>
@@ -371,6 +422,9 @@ export default async function FilmDetailPage({ params }: PageProps) {
 
               {/* Sezione Interattiva Bloopers (Client Component) */}
               <BloopersSection film={film} initialBloopers={bloopers} />
+
+              {/* Sezione Interattiva Curiosità & Retroscena (Client Component) */}
+              <TriviaSection film={film} initialTrivia={trivia} />
             </div>
           </div>
         </div>

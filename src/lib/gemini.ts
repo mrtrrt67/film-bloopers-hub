@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import { BlooperCategoria } from "./types";
+import { BlooperCategoria, TriviaCategoria } from "./types";
 
 const DEFAULT_MODELS = [
   "gemini-3.5-flash",
@@ -209,3 +209,182 @@ FORMATO OUTPUT:
       : "Nessun nuovo blooper trovato per questa pellicola.",
   };
 }
+
+export interface GeneratedTrivia {
+  categoria: TriviaCategoria;
+  titolo: string;
+  descrizione: string;
+  fonte?: string;
+}
+
+export interface GenerateTriviaResult {
+  trivia: GeneratedTrivia[];
+  modelUsed?: string;
+  executionTimeSec?: number;
+  errorsLog: Array<{ model: string; error: string }>;
+  error?: string;
+}
+
+export async function generateTriviaForMovie(params: {
+  titolo: string;
+  anno?: string | number | null;
+  regista?: string | null;
+  attori?: string | null;
+  trama?: string | null;
+  triviaEsistenti?: string[];
+}): Promise<GenerateTriviaResult> {
+  const ai = getGeminiClient();
+  if (!ai) {
+    console.warn("GEMINI_API_KEY non configurata nelle variabili d'ambiente");
+    return {
+      trivia: [],
+      errorsLog: [],
+      error:
+        "Chiave GEMINI_API_KEY non trovata nelle Environment Variables di Vercel. Aggiungi GEMINI_API_KEY nella dashboard di Vercel per abilitare la generazione.",
+    };
+  }
+
+  const { titolo, anno, regista, attori, trama, triviaEsistenti = [] } = params;
+
+  const esclusioneText =
+    triviaEsistenti.length > 0
+      ? `\nCURIOSITÀ GIÀ REGISTRATE (NON RIPETERE QUESTE O FATTI IDENTICI):\n${triviaEsistenti
+          .slice(0, 15)
+          .map((e) => `- ${e.slice(0, 120)}`)
+          .join("\n")}`
+      : "";
+
+  const prompt = `Sei un enciclopedico e appassionato storico del cinema, specializzato in aneddoti di backstage, retroscena di produzione, curiosità sul casting, easter egg e segreti dal set cinematografico.
+
+DATI UFFICIALI DEL FILM:
+- Titolo: "${titolo}" (${anno || "N/D"})
+- Regia: ${regista || "N/D"}
+- Cast: ${attori || "N/D"}
+- Sinossi: ${trama || "N/D"}
+${esclusioneText}
+
+COMPITO:
+Trova tra 5 e 8 curiosità, retroscena, aneddoti memorabili o segreti di produzione concreti e verificati su questo film.
+
+Le categorie ammesse sono ESCLUSIVAMENTE:
+1. "Curiosità & Retroscena"
+2. "Aneddoti dal set"
+3. "Casting & Scelte"
+4. "Segreti di produzione"
+5. "Effetti speciali & Trucco"
+6. "Citazioni & Easter Egg"
+
+REGOLE TASSATIVE:
+- Restituisci ESCLUSIVAMENTE un array JSON valido, senza testo introduttivo né blocchi o commenti aggiuntivi al di fuori del JSON.
+- "titolo": un titolo breve, incisivo e accattivante (4-10 parole).
+- "descrizione": spiegazione dettagliata, coinvolgente e in italiano corretto (2-4 frasi appassionanti che raccontano il retroscena reale).
+- "fonte": fonte indicativa o contesto (es. "Intervista al regista", "Making-of ufficiale", "Commento audio DVD", "Autobiografia dell'attore").
+
+FORMATO OUTPUT:
+[
+  {
+    "categoria": "Aneddoti dal set",
+    "titolo": "L'improvvisazione memorabile durante la scena madre",
+    "descrizione": "Durante le riprese della celebre sequenza, l'attore protagonista ha improvvisato la battuta iconica cogliendo di sorpresa l'intero cast. Il regista decise sul momento di tenere quel ciak nel montaggio finale.",
+    "fonte": "Making-of ufficiale"
+  }
+]`;
+
+  const errorsLog: Array<{ model: string; error: string }> = [];
+
+  // 1. Prova prima con i modelli prioritari
+  for (const model of DEFAULT_MODELS) {
+    try {
+      const t0 = performance.now();
+      const response = await ai.models.generateContent({
+        model,
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          temperature: 0.2,
+        },
+      });
+      const t1 = performance.now();
+      const executionTimeSec = Number(((t1 - t0) / 1000).toFixed(2));
+
+      const text = response.text?.trim() || "";
+      if (!text) continue;
+
+      const jsonMatch = text.match(/\[[\s\S]*\]/);
+      const cleanJson = jsonMatch ? jsonMatch[0] : text;
+
+      const parsed = JSON.parse(cleanJson) as GeneratedTrivia[];
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return {
+          trivia: parsed.map((item) => ({
+            categoria: (item.categoria as TriviaCategoria) || "Curiosità & Retroscena",
+            titolo: item.titolo || "Curiosità dal set",
+            descrizione: item.descrizione || "",
+            fonte: item.fonte || "Dietro le quinte",
+          })),
+          modelUsed: model,
+          executionTimeSec,
+          errorsLog,
+        };
+      }
+    } catch (err: any) {
+      console.error(`Errore Gemini trivia con modello ${model}:`, err);
+      errorsLog.push({ model, error: err?.message || String(err) });
+      continue;
+    }
+  }
+
+  // 2. Se tutti i modelli di default hanno fallito, interroga dinamicamente i modelli abilitati sulla chiave
+  const discoveredModels = await getAvailableModels(ai);
+  const remainingModels = discoveredModels.filter((m) => !DEFAULT_MODELS.includes(m));
+
+  for (const model of remainingModels) {
+    try {
+      const t0 = performance.now();
+      const response = await ai.models.generateContent({
+        model,
+        contents: prompt,
+        config: {
+          responseMimeType: "application/json",
+          temperature: 0.2,
+        },
+      });
+      const t1 = performance.now();
+      const executionTimeSec = Number(((t1 - t0) / 1000).toFixed(2));
+
+      const text = response.text?.trim() || "";
+      if (!text) continue;
+
+      const jsonMatch = text.match(/\[[\s\S]*\]/);
+      const cleanJson = jsonMatch ? jsonMatch[0] : text;
+
+      const parsed = JSON.parse(cleanJson) as GeneratedTrivia[];
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return {
+          trivia: parsed.map((item) => ({
+            categoria: (item.categoria as TriviaCategoria) || "Curiosità & Retroscena",
+            titolo: item.titolo || "Curiosità dal set",
+            descrizione: item.descrizione || "",
+            fonte: item.fonte || "Dietro le quinte",
+          })),
+          modelUsed: model,
+          executionTimeSec,
+          errorsLog,
+        };
+      }
+    } catch (err: any) {
+      console.error(`Errore Gemini trivia con modello dinamico ${model}:`, err);
+      errorsLog.push({ model, error: err?.message || String(err) });
+      continue;
+    }
+  }
+
+  return {
+    trivia: [],
+    errorsLog,
+    error: errorsLog.length > 0
+      ? `Errore durante la chiamata Gemini: ${errorsLog[0].error}`
+      : "Nessuna curiosità trovata per questa pellicola.",
+  };
+}
+

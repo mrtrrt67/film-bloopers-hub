@@ -40,6 +40,30 @@ export interface Blooper {
   voto_utente?: "conferma" | "contestazione" | null;
 }
 
+export type TriviaCategoria =
+  | "Curiosità & Retroscena"
+  | "Aneddoti dal set"
+  | "Casting & Scelte"
+  | "Segreti di produzione"
+  | "Effetti speciali & Trucco"
+  | "Citazioni & Easter Egg"
+  | string;
+
+export interface MovieTrivia {
+  id: string;
+  film_id: string | number;
+  categoria: TriviaCategoria;
+  titolo: string;
+  descrizione: string;
+  fonte?: string | null;
+  approvato: boolean;
+  inserito_da?: string | null;
+  provenienza?: "ia" | "utente";
+  likes?: number;
+  ordine?: number;
+  created_at?: string;
+}
+
 export interface Profile {
   id: string;
   email: string;
