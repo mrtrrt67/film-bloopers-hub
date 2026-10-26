@@ -30,10 +30,40 @@ export async function GET(request: Request) {
 
     req = req.order("titolo", { ascending: true });
 
-    const { data, error } = await req;
-    if (error) throw error;
+    const hasServiceKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+    const db = hasServiceKey ? createAdminClient() : supabase;
 
-    return NextResponse.json({ films: data || [] });
+    const [filmsRes, triviaRes, bloopersRes] = await Promise.all([
+      req,
+      db.from("movie_trivia").select("film_id"),
+      db.from("errori").select("film_id"),
+    ]);
+
+    if (filmsRes.error) throw filmsRes.error;
+
+    const triviaCountMap: Record<number, number> = {};
+    for (const t of triviaRes.data || []) {
+      triviaCountMap[Number(t.film_id)] = (triviaCountMap[Number(t.film_id)] || 0) + 1;
+    }
+
+    const bloopersCountMap: Record<number, number> = {};
+    for (const b of bloopersRes.data || []) {
+      bloopersCountMap[Number(b.film_id)] = (bloopersCountMap[Number(b.film_id)] || 0) + 1;
+    }
+
+    let films = (filmsRes.data || []).map((film: any) => ({
+      ...film,
+      trivia_count: triviaCountMap[Number(film.id)] || 0,
+      bloopers_count: bloopersCountMap[Number(film.id)] || 0,
+    }));
+
+    if (filter === "with_trivia") {
+      films = films.filter((f: any) => f.trivia_count > 0);
+    } else if (filter === "missing_trivia") {
+      films = films.filter((f: any) => f.trivia_count === 0);
+    }
+
+    return NextResponse.json({ films });
   } catch (err: any) {
     console.error("Errore recupero archivio film:", err);
     return NextResponse.json({ error: err.message || "Errore film" }, { status: 500 });

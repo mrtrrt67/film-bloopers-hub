@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { 
   Film, 
   Search, 
@@ -17,6 +18,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { normalizePosterUrl } from "@/lib/tmdb";
+import { slugify } from "@/lib/utils";
 import ConfirmModal from "@/components/ConfirmModal";
 
 interface AdminFilmsTabProps {
@@ -125,6 +127,12 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     }
 
     // 2. Filtro categoria
+    if (filterType === "with_trivia") {
+      return (f.trivia_count || 0) > 0;
+    }
+    if (filterType === "missing_trivia") {
+      return !f.trivia_count || f.trivia_count === 0;
+    }
     if (filterType === "missing_poster") {
       return !f.poster_url || f.poster_url.trim() === "";
     }
@@ -227,6 +235,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
             setActionMessage(
               `✨ IA completata: generate ${generated} curiosità per ${processed} film! (${remaining} film ancora senza curiosità)`
             );
+            await fetchFilms();
           } else {
             setActionMessage(`❌ ${data.error || "Errore durante la generazione curiosità"}`);
           }
@@ -374,6 +383,8 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     }
   };
 
+  const withTriviaCount = films.filter((f) => (f.trivia_count || 0) > 0).length;
+  const missingTriviaFilmCount = films.filter((f) => !f.trivia_count || f.trivia_count === 0).length;
   const missingPostersCount = films.filter((f) => !f.poster_url || f.poster_url.trim() === "").length;
   const missingCastCount = films.filter((f) => !f.attori || f.attori.trim() === "" || f.attori === "N/D").length;
   const duplicatePostersCount = films.filter((f) => f.poster_url && posterFrequency[f.poster_url] > 1).length;
@@ -459,6 +470,27 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
             }`}
           >
             Tutti ({films.length})
+          </button>
+          <button
+            onClick={() => setFilterType("with_trivia")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap flex items-center gap-1.5 ${
+              filterType === "with_trivia"
+                ? "bg-amber-500 text-zinc-950"
+                : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+            }`}
+          >
+            <Sparkles className="h-3 w-3" />
+            <span>Con Curiosità ({withTriviaCount})</span>
+          </button>
+          <button
+            onClick={() => setFilterType("missing_trivia")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap ${
+              filterType === "missing_trivia"
+                ? "bg-amber-500 text-zinc-950"
+                : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+            }`}
+          >
+            Senza Curiosità ({missingTriviaFilmCount})
           </button>
           <button
             onClick={() => setFilterType("missing_poster")}
@@ -554,8 +586,23 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                       <strong>Cast:</strong> {film.attori || "N/D"}
                     </p>
 
-                    {/* Badge diagnostici */}
-                    <div className="flex flex-wrap gap-1 pt-1">
+                    {/* Badge diagnostici e contenuti */}
+                    <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
+                      {(film.trivia_count || 0) > 0 ? (
+                        <span className="rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-bold px-1.5 py-0.5 flex items-center gap-1">
+                          <Sparkles className="h-2.5 w-2.5" />
+                          {film.trivia_count} Curiosità
+                        </span>
+                      ) : (
+                        <span className="rounded bg-zinc-800/80 text-zinc-500 border border-zinc-800 text-[9px] font-medium px-1.5 py-0.5">
+                          0 Curiosità
+                        </span>
+                      )}
+
+                      <span className="rounded bg-zinc-800 text-zinc-300 text-[9px] font-medium px-1.5 py-0.5">
+                        🎬 {film.bloopers_count || 0} Blooper
+                      </span>
+
                       {isMissingPoster && (
                         <span className="rounded bg-rose-500/20 text-rose-300 text-[9px] font-bold px-1.5 py-0.5">
                           Senza Poster
@@ -579,6 +626,15 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                 <div className="flex items-center justify-between pt-3 mt-3 border-t border-zinc-800/60 text-xs">
                   <span className="text-[10px] text-zinc-500 font-mono">ID: {film.id}</span>
                   <div className="flex items-center gap-1.5">
+                    <Link
+                      href={`/film/${slugify(film.titolo, film.anno)}-${film.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-1 rounded-lg text-zinc-400 hover:text-amber-400 hover:bg-zinc-800 transition"
+                      title="Apri scheda film sul sito in una nuova scheda"
+                    >
+                      <ExternalLink className="h-3.5 w-3.5" />
+                    </Link>
                     <button
                       onClick={() => openEditModal(film)}
                       className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-amber-500 hover:text-zinc-950 text-zinc-200 font-bold transition text-[11px]"
