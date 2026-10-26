@@ -109,6 +109,16 @@ export async function POST(request: Request) {
         const { trivia, modelUsed, executionTimeSec, error: genError } = genResult;
 
         if (genError || !trivia || trivia.length === 0) {
+          try {
+            await db.from("log_errori_ia").insert({
+              utente: user?.email || "admin",
+              film: film.titolo,
+              modello: modelUsed || "gemini",
+              operazione: "Generazione Curiosità (Batch)",
+              errore_dettaglio: genError || "Nessuna curiosità generata",
+            });
+          } catch {}
+
           results.push({
             film_id: film.id,
             titolo: film.titolo,
@@ -168,6 +178,16 @@ export async function POST(request: Request) {
           }
         }
       } catch (err: any) {
+        try {
+          await db.from("log_errori_ia").insert({
+            utente: user?.email || "admin",
+            film: film.titolo,
+            modello: "gemini",
+            operazione: "Generazione Curiosità (Batch)",
+            errore_dettaglio: err.message || "Errore imprevisto",
+          });
+        } catch {}
+
         results.push({
           film_id: film.id,
           titolo: film.titolo,
