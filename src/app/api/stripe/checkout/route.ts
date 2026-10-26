@@ -33,10 +33,15 @@ export async function POST(request: Request) {
 
     let priceId = process.env[plan.priceIdEnv];
     if (!priceId) {
-      if (plan.id === "mensile") priceId = process.env.STRIPE_PRICE_MONTHLY || process.env.STRIPE_PRICE_MENSILE;
-      if (plan.id === "annuale") priceId = process.env.STRIPE_PRICE_YEARLY || process.env.STRIPE_PRICE_ANNUALE;
-      if (plan.id === "lifetime-promo") priceId = process.env.STRIPE_PRICE_PROMO || process.env.STRIPE_PRICE_LIFETIME_PROMO;
-      if (plan.id === "lifetime-standard") priceId = process.env.STRIPE_PRICE_LIFETIME || process.env.STRIPE_PRICE_LIFETIME_STANDARD;
+      if (plan.id === "mensile") priceId = process.env.STRIPE_PRICE_MENSILE || process.env.STRIPE_PRICE_MONTHLY;
+      if (plan.id === "annuale") priceId = process.env.STRIPE_PRICE_ANNUALE || process.env.STRIPE_PRICE_YEARLY;
+      if (plan.id === "lifetime-promo") priceId = process.env.STRIPE_PRICE_LIFETIME_PROMO || process.env.STRIPE_PRICE_PROMO;
+      if (plan.id === "lifetime-standard") priceId = process.env.STRIPE_PRICE_LIFETIME_STANDARD || process.env.STRIPE_PRICE_LIFETIME;
+    }
+
+    // Se per l'annuale è presente il vecchio price ID Stripe da 9,99€ (o assente), mappa al nuovo price ufficiale da 5,99€
+    if (plan.id === "annuale" && (!priceId || priceId === "price_1URqXC6dphUuH9QPHaBaJ8lw")) {
+      priceId = "price_1UUqUz6dphUuH9QP9toeRU8a";
     }
 
     if (!priceId) {
