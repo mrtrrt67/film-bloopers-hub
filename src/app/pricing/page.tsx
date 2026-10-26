@@ -167,7 +167,7 @@ function PricingContent() {
           return (
             <div
               key={plan.id}
-              className={`relative flex flex-col justify-between rounded-2xl p-5 xl:p-4.5 2xl:p-6 transition-all ${
+              className={`relative flex flex-col justify-between rounded-2xl p-5 xl:p-4 2xl:p-6 transition-all ${
                 isPromo
                   ? "border-2 border-amber-500 bg-gradient-to-b from-amber-950/40 via-zinc-900 to-zinc-950 shadow-2xl shadow-amber-500/10 scale-[1.02]"
                   : isAnnuale
@@ -188,21 +188,21 @@ function PricingContent() {
               )}
 
               <div>
-                <div className="flex items-center justify-between mb-1">
-                  <h3 className="text-base font-bold text-white">{plan.name}</h3>
+                <div className="flex items-center justify-between mb-1 gap-1">
+                  <h3 className="text-sm sm:text-base font-bold text-white truncate">{plan.name}</h3>
                   {isCurrentPlan && (
-                    <span className="rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5 whitespace-nowrap">
+                    <span className="rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5 whitespace-nowrap shrink-0">
                       Attivo
                     </span>
                   )}
                 </div>
                 <p className="text-xs text-zinc-400 min-h-[36px] mb-4">{plan.description}</p>
 
-                <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 mb-5">
-                  <span className="text-2xl 2xl:text-3xl font-black text-white whitespace-nowrap tracking-tight">
+                <div className="flex items-baseline flex-nowrap gap-1.5 mb-5 whitespace-nowrap">
+                  <span className="text-xl sm:text-2xl xl:text-[1.35rem] 2xl:text-2xl font-black text-white whitespace-nowrap tracking-tight shrink-0">
                     {plan.price.replace(/\s+/g, "\u00A0")}
                   </span>
-                  <span className="text-xs text-zinc-400 font-medium whitespace-nowrap">
+                  <span className="text-[11px] 2xl:text-xs text-zinc-400 font-medium whitespace-nowrap shrink-0">
                     / {plan.period}
                   </span>
                 </div>

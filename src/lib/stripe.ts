@@ -23,7 +23,7 @@ export const PRICING_PLANS: PlanConfig[] = [
     id: "free",
     name: "Free",
     price: "0,00 €",
-    period: "Per sempre",
+    period: "per sempre",
     description: "Ideale per curiosi e appassionati occasionali di cinema.",
     isSubscription: false,
     priceIdEnv: "",
@@ -56,7 +56,7 @@ export const PRICING_PLANS: PlanConfig[] = [
   {
     id: "annuale",
     name: "Annuale",
-    price: "9,99 €",
+    price: "5,99 €",
     period: "all'anno",
     description: "Il piano più conveniente per i veri cacciatori di bloopers.",
     popular: true,
@@ -64,7 +64,7 @@ export const PRICING_PLANS: PlanConfig[] = [
     priceIdEnv: "STRIPE_PRICE_ANNUALE",
     features: [
       { name: "Tutto ciò che è incluso nel Mensile", included: true },
-      { name: "2 mesi gratis rispetto al mensile", included: true },
+      { name: "Sconto 50% rispetto al mensile (meno di 0,50€/mese)", included: true },
       { name: "Ricerche e generazioni IA illimitate", included: true },
       { name: "Punti doppi per le segnalazioni", included: true },
       { name: "Supporto prioritario", included: true },
