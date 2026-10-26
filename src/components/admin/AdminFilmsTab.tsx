@@ -392,7 +392,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   return (
     <div className="space-y-6">
       {/* BARRA SUPERIORE: AZIONI VELOCI & CONTEGGI */}
-      <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4 p-5 rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-xl">
+      <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 p-5 rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-xl">
         <div>
           <h3 className="text-base font-black text-white flex items-center gap-2">
             <Film className="h-5 w-5 text-amber-400" />
@@ -403,29 +403,31 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex items-center gap-2 shrink-0 overflow-x-auto max-w-full pb-1 xl:pb-0">
           <button
             onClick={handleUpdateAllPosters}
             disabled={updatingAllPosters || missingPostersCount === 0}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-amber-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-amber-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 whitespace-nowrap shrink-0"
+            title="Recupera tutte le locandine mancanti da TMDB"
           >
             <ImageIcon className={`h-3.5 w-3.5 ${updatingAllPosters ? "animate-spin" : ""}`} />
-            <span>Recupera Locandine Mancanti ({missingPostersCount})</span>
+            <span>Locandine Mancanti ({missingPostersCount})</span>
           </button>
 
           <button
             onClick={handleUpdateAllCast}
             disabled={updatingAllCast || missingCastCount === 0}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-200 border border-zinc-700 hover:text-white hover:bg-zinc-700 active:scale-95 transition disabled:opacity-50"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-200 border border-zinc-700 hover:text-white hover:bg-zinc-700 active:scale-95 transition disabled:opacity-50 whitespace-nowrap shrink-0"
+            title="Recupera il cast mancante da TMDB"
           >
             <Users className={`h-3.5 w-3.5 ${updatingAllCast ? "animate-spin" : ""}`} />
-            <span>Recupera Cast Mancante ({missingCastCount})</span>
+            <span>Cast Mancante ({missingCastCount})</span>
           </button>
 
           <button
             onClick={handleBatchPopulateTrivia}
             disabled={populatingTrivia || missingTriviaCount === 0}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-md shadow-amber-500/10"
+            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-md shadow-amber-500/10 whitespace-nowrap shrink-0"
             title="Genera curiosità con IA per 5 film che non ne hanno ancora"
           >
             <Sparkles className={`h-3.5 w-3.5 ${populatingTrivia ? "animate-spin" : ""}`} />
