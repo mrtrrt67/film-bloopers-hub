@@ -17,7 +17,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Il più grande archivio italiano di errori, anacronismi, sviste di montaggio e ciak falsi nella storia del cinema. Esplora le pellicole celebri e scopri cosa è sfuggito ai registi.
+              Il più grande archivio italiano di bloopers, errori di montaggio, curiosità dal set e aneddoti di backstage nella storia del cinema. Esplora le pellicole celebri e scopri cosa è sfuggito ai registi.
             </p>
             <div className="flex flex-wrap gap-2 pt-1">
               <span className="inline-flex items-center gap-1 rounded-md bg-zinc-900 border border-zinc-800 px-2 py-1 text-[10px] font-bold text-zinc-300">

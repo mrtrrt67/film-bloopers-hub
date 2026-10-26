@@ -126,10 +126,10 @@ export default function EsploraPage() {
             Catalogo Cinematografico
           </span>
           <h1 className="text-3xl font-black text-white tracking-tight mt-1">
-            Esplora Film & Cerca Bloopers
+            Esplora Film, Bloopers & Curiosità
           </h1>
           <p className="text-sm text-zinc-400 mt-1 max-w-2xl">
-            Cerca tra le pellicole già analizzate nella community o digita qualsiasi titolo per importarlo all'istante dall'enciclopedia ufficiale TMDB.
+            Cerca tra le pellicole già analizzate nella community o digita qualsiasi titolo per scoprire bloopers verificati, retroscena dal set e aneddoti esclusivi.
           </p>
         </div>
 
@@ -144,7 +144,7 @@ export default function EsploraPage() {
             }`}
           >
             <Database className="h-3.5 w-3.5" />
-            Archivio Bloopers ({filteredDbFilms.length})
+            Catalogo Film ({filteredDbFilms.length})
           </button>
           <button
             onClick={() => setActiveTab("tmdb")}

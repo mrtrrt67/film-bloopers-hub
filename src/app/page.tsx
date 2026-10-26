@@ -68,6 +68,11 @@ export default async function HomePage() {
     .select("*", { count: "exact", head: true })
     .eq("approvato", true);
 
+  const { count: countTrivia } = await supabase
+    .from("movie_trivia")
+    .select("*", { count: "exact", head: true })
+    .eq("approvato", true);
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://filmbloopers.online";
 
   const jsonLdWebsite = {
@@ -147,15 +152,15 @@ export default async function HomePage() {
         <div className="mx-auto max-w-3xl">
           <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-amber-500/30 px-4 py-1.5 text-xs font-black text-amber-400 mb-6">
             <Flame className="h-4 w-4" />
-            <span>L&apos;Archivio Ufficiale di Bloopers Cinematografici</span>
+            <span>L&apos;Archivio Ufficiale di Bloopers, Curiosità & Retroscena del Cinema</span>
           </div>
 
           <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-[1.1] mb-6">
-            Errori, Sviste e Ciak Falsi nella Storia del Cinema
+            Bloopers, Errori e Curiosità nella Storia del Cinema
           </h1>
 
           <p className="text-base sm:text-lg text-zinc-300 leading-relaxed font-normal mb-8">
-            Microfoni che spuntano dall&apos;inquadratura, orologi da polso nell&apos;antica Roma e oggetti che cambiano posizione tra un ciak e l&apos;altro: scopri i bloopers più incredibili sfuggiti al montaggio finale.
+            Microfoni nell&apos;inquadratura, oggetti che cambiano posizione, aneddoti esclusivi di backstage e segreti di produzione: scopri gli errori più clamorosi e le curiosità più affascinanti sfuggiti al montaggio finale.
           </p>
 
           {/* Search CTA Box */}
@@ -189,10 +194,10 @@ export default async function HomePage() {
           </div>
           <div>
             <div className="text-2xl sm:text-3xl font-black text-amber-400 font-mono">
-              {countBloopers || 1400}+
+              {((countBloopers || 1000) + (countTrivia || 0))}+
             </div>
             <div className="text-xs text-zinc-500 font-medium uppercase tracking-wider mt-0.5">
-              Bloopers Documentati
+              Bloopers & Curiosità
             </div>
           </div>
           <div className="col-span-2 sm:col-span-1">
@@ -214,7 +219,7 @@ export default async function HomePage() {
               Esplora i Titoli
             </span>
             <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-0.5 leading-tight">
-              Pellicole con Bloopers da Non Perdere
+              Pellicole con Bloopers e Curiosità da Non Perdere
             </h2>
           </div>
           <Link
@@ -282,7 +287,7 @@ export default async function HomePage() {
       <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-8 sm:p-12 text-center">
         <h2 className="text-2xl font-black text-white mb-2">Come Funziona FilmBloopers Hub?</h2>
         <p className="text-sm text-zinc-400 max-w-xl mx-auto mb-10">
-          Unisciti alla prima community italiana dedicata all&apos;analisi millimetrica dei ciak errati.
+          Unisciti alla prima community italiana dedicata all&apos;analisi dei ciak errati e ai retroscena del cinema.
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
@@ -300,9 +305,9 @@ export default async function HomePage() {
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/10 text-orange-400 font-black text-base mb-4">
               2
             </div>
-            <h3 className="text-base font-bold text-white mb-1.5">Analisi Bloopers con IA</h3>
+            <h3 className="text-base font-bold text-white mb-1.5">Bloopers & Curiosità con l&apos;IA</h3>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Il nostro motore Google Gemini analizza la scena indicando il minuto esatto, la tipologia di errore e la descrizione del ciak falso.
+              Il nostro motore Google Gemini individua gli errori al minuto esatto ed estrae aneddoti esclusivi di backstage, segreti di produzione ed easter egg.
             </p>
           </div>
 
@@ -312,7 +317,7 @@ export default async function HomePage() {
             </div>
             <h3 className="text-base font-bold text-white mb-1.5">Vota, Scala la Classifica & Vinci</h3>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Conferma o contesta i bloopers, accumula punti e sblocca l&apos;accesso Premium gratuito a vita per i migliori cacciatori della community.
+              Conferma o contesta i bloopers, lascia like agli aneddoti, accumula punti e sblocca l&apos;accesso Premium gratuito a vita per i migliori cacciatori.
             </p>
           </div>
         </div>

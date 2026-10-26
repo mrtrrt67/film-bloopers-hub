@@ -25,14 +25,17 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://filmbloopers.online"),
   title: {
-    default: "FilmBloopers Hub | Il Portale Italiano degli Errori nei Film",
+    default: "FilmBloopers Hub | Bloopers, Errori di Scena & Curiosità nei Film",
     template: "%s | FilmBloopers Hub",
   },
   description:
-    "Scopri oltre 1.000 bloopers, errori di montaggio, anacronismi e troupe visibile al minuto esatto nei film più celebri. Archivio verificato e gratuito.",
+    "Scopri oltre 1.000 bloopers, curiosità dal set, aneddoti di backstage ed errori di montaggio al minuto esatto nei film più celebri. Archivio verificato e gratuito.",
   keywords: [
     "bloopers film",
     "errori film",
+    "curiosità film",
+    "aneddoti dal set",
+    "retroscena cinema",
     "errori nei film famosi",
     "ciak falsi",
     "anacronismi cinema",
@@ -55,9 +58,9 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "FilmBloopers Hub | Il Portale Italiano degli Errori nei Film",
+    title: "FilmBloopers Hub | Bloopers, Errori di Scena & Curiosità nei Film",
     description:
-      "Scopri oltre 1.000 bloopers, errori di scena e curiosità nei capolavori del cinema. Cerca per titolo o anno e trova l'errore al minuto esatto.",
+      "Scopri oltre 1.000 bloopers, errori di scena, aneddoti dal set e curiosità di backstage nei capolavori del cinema.",
     url: "https://filmbloopers.online",
     siteName: "FilmBloopers Hub",
     locale: "it_IT",
