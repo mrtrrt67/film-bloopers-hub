@@ -3,6 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateTriviaForMovie } from "@/lib/gemini";
 
+export const maxDuration = 60;
+export const dynamic = "force-dynamic";
+
 export async function GET() {
   try {
     const supabase = await createClient();
@@ -106,7 +109,24 @@ export async function POST(request: Request) {
           triviaEsistenti: [],
         });
 
-        const { trivia, modelUsed, executionTimeSec, error: genError } = genResult;
+        const { trivia, modelUsed, executionTimeSec, error: genError, errorsLog } = genResult;
+
+        // Traccia ogni eventuale errore per modello in log_errori_ia
+        if (errorsLog && errorsLog.length > 0) {
+          for (const errItem of errorsLog) {
+            try {
+              await db.from("log_errori_ia").insert({
+                utente: user?.email || "admin",
+                film: film.titolo,
+                modello: errItem.model,
+                operazione: "Generazione Curiosità (Batch)",
+                errore_dettaglio: errItem.error,
+              });
+            } catch (e) {
+              console.error("Errore salvataggio log_errori_ia:", e);
+            }
+          }
+        }
 
         if (genError || !trivia || trivia.length === 0) {
           try {

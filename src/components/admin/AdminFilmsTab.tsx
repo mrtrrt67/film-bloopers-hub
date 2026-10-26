@@ -35,6 +35,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   const [updatingAllPosters, setUpdatingAllPosters] = useState(false);
   const [updatingAllCast, setUpdatingAllCast] = useState(false);
   const [populatingTrivia, setPopulatingTrivia] = useState(false);
+  const [populatingProgress, setPopulatingProgress] = useState<string | null>(null);
   const [missingTriviaCount, setMissingTriviaCount] = useState<number | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
 
@@ -212,38 +213,70 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     );
   };
 
-  // Popola curiosità 5 alla volta con IA
+  // Popola curiosità 5 alla volta con IA (in modo sequenziale con progresso in tempo reale)
   const handleBatchPopulateTrivia = async () => {
     openConfirm(
       "⚡ Popola Curiosità con IA (5 Film)",
-      "Avviare la generazione automatica con Gemini per 5 film che non hanno ancora curiosità? Verranno generate 3 curiosità e aneddoti verificati per ciascuna pellicola.",
+      "Avviare la generazione automatica con Gemini per 5 film che non hanno ancora curiosità? Verranno generate 3 curiosità e aneddoti verificati per ciascuna pellicola con avanzamento in tempo reale.",
       async () => {
+        setPopulatingTrivia(true);
+        setActionMessage(null);
+        let totalProcessed = 0;
+        let totalGenerated = 0;
+        let lastRemaining = missingTriviaCount ?? 0;
+        let lastError: string | null = null;
+
         try {
-          setPopulatingTrivia(true);
-          setActionMessage(null);
-          const res = await fetch("/api/admin/trivia-batch", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ limit: 5 }),
-          });
-          const data = await res.json();
-          if (res.ok && data.success) {
-            const processed = data.processedCount || 0;
-            const generated = data.totalTriviaGenerated || 0;
-            const remaining = data.remainingFilmsWithoutTrivia ?? 0;
-            setMissingTriviaCount(remaining);
+          // Eseguiamo 5 chiamate (limit: 1) in sequenza per eliminare qualsiasi rischio di timeout Vercel
+          for (let step = 1; step <= 5; step++) {
+            setPopulatingProgress(`Film ${step}/5 in elaborazione...`);
+            const res = await fetch("/api/admin/trivia-batch", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ limit: 1 }),
+            });
+
+            if (!res.ok) {
+              const errJson = await res.json().catch(() => ({}));
+              lastError = errJson.error || `Errore HTTP ${res.status}`;
+              break;
+            }
+
+            const data = await res.json();
+            if (!data.success) {
+              lastError = data.error || "Generazione non riuscita";
+              break;
+            }
+
+            if (data.processedCount === 0) {
+              // Tutti i film del catalogo sono completati
+              lastRemaining = 0;
+              setMissingTriviaCount(0);
+              break;
+            }
+
+            totalProcessed += data.processedCount || 0;
+            totalGenerated += data.totalTriviaGenerated || 0;
+            if (typeof data.remainingFilmsWithoutTrivia === "number") {
+              lastRemaining = data.remainingFilmsWithoutTrivia;
+              setMissingTriviaCount(data.remainingFilmsWithoutTrivia);
+            }
+          }
+
+          if (totalProcessed > 0) {
             setActionMessage(
-              `✨ IA completata: generate ${generated} curiosità per ${processed} film! (${remaining} film ancora senza curiosità)`
+              `✨ IA completata con successo: generate ${totalGenerated} curiosità su ${totalProcessed} film! (${lastRemaining} film ancora senza curiosità)`
             );
             await fetchFilms();
-          } else {
-            setActionMessage(`❌ ${data.error || "Errore durante la generazione curiosità"}`);
+          } else if (lastError) {
+            setActionMessage(`❌ ${lastError}`);
           }
-        } catch (err) {
-          console.error(err);
-          setActionMessage("❌ Errore di connessione durante la generazione curiosità");
+        } catch (err: any) {
+          console.error("Errore generazione batch curiosità:", err);
+          setActionMessage(`❌ Errore durante la generazione: ${err?.message || "Connessione interrotta"}`);
         } finally {
           setPopulatingTrivia(false);
+          setPopulatingProgress(null);
         }
       },
       "Avvia Generazione 5 Film",
@@ -433,7 +466,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
             <Sparkles className={`h-3.5 w-3.5 ${populatingTrivia ? "animate-spin" : ""}`} />
             <span>
               {populatingTrivia
-                ? "Generazione 5 film in corso..."
+                ? (populatingProgress || "Generazione 5 film...")
                 : `⚡ Popola Curiosità (5 film)${missingTriviaCount !== null ? ` [${missingTriviaCount}]` : ""}`}
             </span>
           </button>
