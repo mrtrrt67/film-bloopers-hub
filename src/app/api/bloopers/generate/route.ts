@@ -186,6 +186,19 @@ export async function POST(request: Request) {
         insertErr = null;
       } else {
         insertErr = resUser.error || insertErr;
+
+        // Fallback di resilienza: se RLS blocca approvato = true, riprova con approvato = false
+        if (insertErr && (insertErr.code === "42501" || insertErr.message?.toLowerCase().includes("row-level security"))) {
+          const fallbackDaInserire = daInserire.map((d) => ({ ...d, approvato: false }));
+          const resFallback = await supabase
+            .from("errori")
+            .insert(fallbackDaInserire)
+            .select();
+          if (!resFallback.error && resFallback.data) {
+            inserted = resFallback.data;
+            insertErr = null;
+          }
+        }
       }
     }
 

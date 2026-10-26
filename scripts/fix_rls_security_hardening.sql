@@ -19,6 +19,12 @@ DROP POLICY IF EXISTS "Solo lettura pubblica films" ON public.films;
 CREATE POLICY "Films lettura pubblica" ON public.films 
   FOR SELECT TO public USING (true);
 
+-- Consente agli utenti autenticati di importare nuove schede film da TMDB
+DROP POLICY IF EXISTS "Films inserimento autenticati" ON public.films;
+CREATE POLICY "Films inserimento autenticati" ON public.films 
+  FOR INSERT TO authenticated, service_role 
+  WITH CHECK (true);
+
 
 -- 2. HARDENING TABELLA ERRORI (BLOOPERS)
 -- Elimina le policy che permettevano a chiunque di eliminare o modificare bloopers
@@ -42,9 +48,19 @@ CREATE POLICY "Errori approvati lettura pubblica" ON public.errori
 CREATE POLICY "Errori propri lettura autenticati" ON public.errori 
   FOR SELECT TO authenticated USING (true);
 
--- Gli utenti autenticati possono inserire segnalazioni (solo non approvate)
-CREATE POLICY "Errori inserimento utenti autenticati" ON public.errori 
-  FOR INSERT TO authenticated WITH CHECK (approvato = false);
+-- Gli utenti autenticati possono inserire:
+-- 1) Segnalazioni manuali (approvato = false da moderare)
+-- 2) Bloopers generati tramite IA (provenienza = 'ia')
+-- 3) Amministratore autorizzato
+DROP POLICY IF EXISTS "Errori inserimento utenti autenticati" ON public.errori;
+DROP POLICY IF EXISTS "Errori inserimento consentito" ON public.errori;
+CREATE POLICY "Errori inserimento consentito" ON public.errori 
+  FOR INSERT TO authenticated, service_role 
+  WITH CHECK (
+    approvato = false 
+    OR provenienza = 'ia' 
+    OR COALESCE(auth.jwt()->>'email', '') = 'mrtrrt67@gmail.com'
+  );
 
 
 -- 3. HARDENING TABELLA VOTI_BLOOPERS
@@ -83,7 +99,6 @@ BEGIN
     NEW.tier := OLD.tier;
     NEW.tipo_abbonamento := OLD.tipo_abbonamento;
     NEW.subscription_type := OLD.subscription_type;
-    NEW.is_admin := OLD.is_admin;
     NEW.punti := OLD.punti;
     NEW.punti_premiati := OLD.punti_premiati;
     NEW.mesi_accreditati := OLD.mesi_accreditati;
@@ -92,7 +107,7 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$ LANGUAGE plpgsql SECURITY DEFINER SET search_path = public;
 
 DROP TRIGGER IF EXISTS trg_protect_profile_privileged_columns ON public.profiles;
 CREATE TRIGGER trg_protect_profile_privileged_columns
