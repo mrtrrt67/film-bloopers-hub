@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { checkAndAwardPointRewards } from "@/lib/rewards";
 
 export async function GET() {
@@ -12,15 +13,17 @@ export async function GET() {
       return NextResponse.json({ error: "Accesso non autorizzato" }, { status: 403 });
     }
 
+    const adminDb = createAdminClient();
+
     // 1. Bloopers in attesa di approvazione
-    const { data: pendingBloopers } = await supabase
+    const { data: pendingBloopers } = await adminDb
       .from("errori")
       .select("*, films(titolo, anno, id)")
       .eq("approvato", false)
       .order("creato_il", { ascending: false });
 
     // Recupera profili degli autori per evidenziare priorità e punti doppi
-    const { data: allProfiles } = await supabase
+    const { data: allProfiles } = await adminDb
       .from("profiles")
       .select("id, email, tier, tipo_abbonamento, punti");
 
@@ -55,14 +58,14 @@ export async function GET() {
     });
 
     // 2. Contestazioni attive
-    const { data: contestazioni } = await supabase
+    const { data: contestazioni } = await adminDb
       .from("voti_bloopers")
       .select("*, errori(*, films(titolo, anno, id))")
       .eq("tipo", "contestazione")
       .not("motivo", "is", null);
 
     // 3. Archivio bloopers approvati dagli utenti
-    const { data: approvedUserBloopers } = await supabase
+    const { data: approvedUserBloopers } = await adminDb
       .from("errori")
       .select("*, films(titolo, anno, id)")
       .eq("approvato", true)
@@ -71,7 +74,7 @@ export async function GET() {
       .limit(50);
 
     // 4. Correzioni blooper inviate dal modulo suggerimenti (solo utenti registrati che partecipano alla classifica)
-    const { data: rawCorrections } = await supabase
+    const { data: rawCorrections } = await adminDb
       .from("suggerimenti")
       .select("*")
       .ilike("messaggio", "%[Correzione blooper]%")
@@ -119,17 +122,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Accesso non autorizzato" }, { status: 403 });
     }
 
+    const adminDb = createAdminClient();
     const body = await request.json();
     const { action, blooper_id, contestazione_id, suggestion_id, points, userId, userEmail, minuto, descrizione } = body;
 
     if (action === "approve") {
       // 1. Approva blooper
-      await supabase.from("errori").update({ approvato: true }).eq("id", blooper_id);
+      await adminDb.from("errori").update({ approvato: true }).eq("id", blooper_id);
 
       // 2. Assegna punti se l'utente è registrato e applica moltiplicatore 2x se annuale/lifetime
       let targetProfile = null;
       if (userEmail) {
-        let query = supabase.from("profiles").select("*");
+        let query = adminDb.from("profiles").select("*");
         if (userEmail.includes("@")) {
           query = query.eq("email", userEmail.trim());
         } else {
@@ -139,7 +143,7 @@ export async function POST(request: Request) {
         const { data: p } = await query.maybeSingle();
         targetProfile = p;
       } else if (userId) {
-        const { data: p } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
+        const { data: p } = await adminDb.from("profiles").select("*").eq("id", userId).maybeSingle();
         targetProfile = p;
       }
 
@@ -155,7 +159,7 @@ export async function POST(request: Request) {
         }
 
         const newTotal = (targetProfile.punti || 0) + awardedPts;
-        const resReward = await checkAndAwardPointRewards(supabase, targetProfile.id, newTotal);
+        const resReward = await checkAndAwardPointRewards(adminDb, targetProfile.id, newTotal);
         if (resReward?.message) {
           rewardMsg = ` (${resReward.message})`;
         }
@@ -169,19 +173,19 @@ export async function POST(request: Request) {
     }
 
     if (action === "reject") {
-      await supabase.from("errori").delete().eq("id", blooper_id);
+      await adminDb.from("errori").delete().eq("id", blooper_id);
       return NextResponse.json({ success: true, message: "Segnalazione rifiutata ed eliminata." });
     }
 
     if (action === "correct_contestation") {
       // 1. Rimuovi contestazione risolta
       if (contestazione_id) {
-        await supabase.from("voti_bloopers").delete().eq("id", contestazione_id);
+        await adminDb.from("voti_bloopers").delete().eq("id", contestazione_id);
       }
 
       // 2. Aggiorna blooper con la correzione e ricalcola i contatori
       if (blooper_id) {
-        const { data: voti } = await supabase
+        const { data: voti } = await adminDb
           .from("voti_bloopers")
           .select("tipo")
           .eq("errore_id", blooper_id);
@@ -192,16 +196,16 @@ export async function POST(request: Request) {
         const updateData: Record<string, any> = { conferme, contestazioni };
         if (minuto) updateData.minuto = minuto;
         if (descrizione) updateData.descrizione = descrizione;
-        await supabase.from("errori").update(updateData).eq("id", blooper_id);
+        await adminDb.from("errori").update(updateData).eq("id", blooper_id);
       }
 
       // 3. Assegna punti se previsti
       if (userId && points) {
-        const { data: profile } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
+        const { data: profile } = await adminDb.from("profiles").select("*").eq("id", userId).maybeSingle();
         if (profile) {
           const isDouble = profile.tipo_abbonamento === "annuale" || profile.tipo_abbonamento === "lifetime";
           const finalPts = isDouble ? parseInt(String(points), 10) * 2 : parseInt(String(points), 10);
-          await checkAndAwardPointRewards(supabase, profile.id, (profile.punti || 0) + finalPts);
+          await checkAndAwardPointRewards(adminDb, profile.id, (profile.punti || 0) + finalPts);
         }
       }
 
@@ -210,10 +214,10 @@ export async function POST(request: Request) {
 
     if (action === "delete_blooper") {
       if (contestazione_id) {
-        await supabase.from("voti_bloopers").delete().eq("id", contestazione_id);
+        await adminDb.from("voti_bloopers").delete().eq("id", contestazione_id);
       }
       if (blooper_id) {
-        await supabase.from("errori").delete().eq("id", blooper_id);
+        await adminDb.from("errori").delete().eq("id", blooper_id);
       }
       return NextResponse.json({ success: true, message: "Blooper eliminato definitivamente." });
     }
@@ -221,7 +225,7 @@ export async function POST(request: Request) {
     if (action === "ignore_contestation") {
       let bId = blooper_id;
       if (!bId && contestazione_id) {
-        const { data: cData } = await supabase
+        const { data: cData } = await adminDb
           .from("voti_bloopers")
           .select("errore_id")
           .eq("id", contestazione_id)
@@ -230,18 +234,18 @@ export async function POST(request: Request) {
       }
 
       if (contestazione_id) {
-        await supabase.from("voti_bloopers").delete().eq("id", contestazione_id);
+        await adminDb.from("voti_bloopers").delete().eq("id", contestazione_id);
       }
 
       if (bId) {
-        const { data: voti } = await supabase
+        const { data: voti } = await adminDb
           .from("voti_bloopers")
           .select("tipo")
           .eq("errore_id", bId);
 
         const conferme = (voti || []).filter((v: any) => v.tipo === "conferma").length;
         const contestazioni = (voti || []).filter((v: any) => v.tipo === "contestazione").length;
-        await supabase.from("errori").update({ conferme, contestazioni }).eq("id", bId);
+        await adminDb.from("errori").update({ conferme, contestazioni }).eq("id", bId);
       }
 
       return NextResponse.json({ success: true, message: "Contestazione ignorata ed archiviata." });
@@ -249,7 +253,7 @@ export async function POST(request: Request) {
 
     if (action === "delete_approved") {
       if (blooper_id) {
-        await supabase.from("errori").delete().eq("id", blooper_id);
+        await adminDb.from("errori").delete().eq("id", blooper_id);
       }
       return NextResponse.json({ success: true, message: "Blooper eliminato dall'archivio." });
     }
@@ -257,11 +261,11 @@ export async function POST(request: Request) {
     if (action === "approve_suggestion_correction") {
       let targetProfile = null;
       if (userId) {
-        const { data: p } = await supabase.from("profiles").select("*").eq("id", userId).maybeSingle();
+        const { data: p } = await adminDb.from("profiles").select("*").eq("id", userId).maybeSingle();
         targetProfile = p;
       }
       if (!targetProfile && userEmail) {
-        let query = supabase.from("profiles").select("*");
+        let query = adminDb.from("profiles").select("*");
         if (userEmail.includes("@")) {
           query = query.eq("email", userEmail.trim());
         } else {
@@ -283,8 +287,8 @@ export async function POST(request: Request) {
         }
 
         const newTotal = (targetProfile.punti || 0) + awardedPts;
-        await supabase.from("profiles").update({ punti: newTotal }).eq("id", targetProfile.id);
-        const resReward = await checkAndAwardPointRewards(supabase, targetProfile.id, newTotal);
+        await adminDb.from("profiles").update({ punti: newTotal }).eq("id", targetProfile.id);
+        const resReward = await checkAndAwardPointRewards(adminDb, targetProfile.id, newTotal);
         if (resReward?.message) {
           rewardMsg = ` (${resReward.message})`;
         }
@@ -292,7 +296,7 @@ export async function POST(request: Request) {
 
       // Rimuovi la segnalazione approvata dalla coda dei suggerimenti
       if (suggestion_id) {
-        await supabase.from("suggerimenti").delete().eq("id", suggestion_id);
+        await adminDb.from("suggerimenti").delete().eq("id", suggestion_id);
       }
 
       const msg = isDouble
@@ -304,7 +308,7 @@ export async function POST(request: Request) {
 
     if (action === "reject_suggestion_correction") {
       if (suggestion_id) {
-        await supabase.from("suggerimenti").delete().eq("id", suggestion_id);
+        await adminDb.from("suggerimenti").delete().eq("id", suggestion_id);
       }
       return NextResponse.json({ success: true, message: "Correzione rifiutata ed eliminata dalla moderazione." });
     }

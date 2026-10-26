@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function GET() {
   try {
@@ -12,7 +13,8 @@ export async function GET() {
       return NextResponse.json({ error: "Accesso non autorizzato" }, { status: 403 });
     }
 
-    const { data, error } = await supabase
+    const adminDb = createAdminClient();
+    const { data, error } = await adminDb
       .from("configurazioni")
       .select("*")
       .order("chiave", { ascending: true });
@@ -42,9 +44,10 @@ export async function PATCH(request: Request) {
       return NextResponse.json({ error: "Formato non valido, atteso array 'items'" }, { status: 400 });
     }
 
+    const adminDb = createAdminClient();
     for (const item of items) {
       if (item.chiave) {
-        const { error: updErr } = await supabase
+        const { error: updErr } = await adminDb
           .from("configurazioni")
           .update({
             valore: item.valore,

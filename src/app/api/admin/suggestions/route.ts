@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function GET() {
   try {
@@ -11,7 +12,8 @@ export async function GET() {
       return NextResponse.json({ error: "Accesso non autorizzato" }, { status: 403 });
     }
 
-    const { data, error } = await supabase
+    const adminDb = createAdminClient();
+    const { data, error } = await adminDb
       .from("suggerimenti")
       .select("*")
       .order("created_at", { ascending: false });
@@ -40,7 +42,8 @@ export async function DELETE(request: Request) {
 
     if (!id) return NextResponse.json({ error: "ID mancante" }, { status: 400 });
 
-    const { error } = await supabase.from("suggerimenti").delete().eq("id", id);
+    const adminDb = createAdminClient();
+    const { error } = await adminDb.from("suggerimenti").delete().eq("id", id);
     if (error) throw error;
 
     return NextResponse.json({ success: true, deletedId: id });

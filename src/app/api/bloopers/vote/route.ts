@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function POST(request: Request) {
   try {
@@ -137,8 +138,9 @@ export async function POST(request: Request) {
     const conferme = (voti || []).filter((v: any) => v.tipo === "conferma").length;
     const contestazioni = (voti || []).filter((v: any) => v.tipo === "contestazione").length;
 
-    // Sincronizza i contatori direttamente nella tabella errori
-    const { error: updateErr } = await supabase
+    // Sincronizza i contatori direttamente nella tabella errori con privilegi admin per RLS
+    const adminDb = createAdminClient();
+    const { error: updateErr } = await adminDb
       .from("errori")
       .update({
         conferme,

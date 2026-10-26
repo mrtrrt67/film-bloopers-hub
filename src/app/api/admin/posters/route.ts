@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { fetchPosterForMovie, fetchDetailsForMovie } from "@/lib/tmdb";
 
 export async function GET() {
@@ -54,11 +55,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Accesso non autorizzato" }, { status: 403 });
     }
 
+    const adminDb = createAdminClient();
     const { film_id, all, action, updateCast } = await request.json();
 
     // 1. Aggiornamento in massa del CAST mancante
     if (action === "bulk_cast" || (all && action === "cast")) {
-      const { data: missingCastFilms } = await supabase
+      const { data: missingCastFilms } = await adminDb
         .from("films")
         .select("id, titolo, anno, attori, regista")
         .or("attori.is.null,attori.eq.");
@@ -71,7 +73,7 @@ export async function POST(request: Request) {
           if (!film.regista || film.regista === "N/D") {
             if (details.regista && details.regista !== "N/D") up.regista = details.regista;
           }
-          await supabase.from("films").update(up).eq("id", film.id);
+          await adminDb.from("films").update(up).eq("id", film.id);
           updatedFilms.push({ id: film.id, titolo: film.titolo, attori: details.attori });
         }
       }
@@ -85,7 +87,7 @@ export async function POST(request: Request) {
 
     // 2. Aggiornamento cast per SINGOLO film
     if (film_id && action === "cast") {
-      const { data: film } = await supabase
+      const { data: film } = await adminDb
         .from("films")
         .select("id, titolo, anno, regista")
         .eq("id", film_id)
@@ -99,7 +101,7 @@ export async function POST(request: Request) {
         if (!film.regista || film.regista === "N/D") {
           if (details.regista && details.regista !== "N/D") up.regista = details.regista;
         }
-        await supabase.from("films").update(up).eq("id", film.id);
+        await adminDb.from("films").update(up).eq("id", film.id);
         return NextResponse.json({ success: true, attori: details.attori });
       }
 
@@ -108,7 +110,7 @@ export async function POST(request: Request) {
 
     // 3. Aggiornamento in massa delle LOCANDINE
     if (all) {
-      const { data: missingFilms } = await supabase
+      const { data: missingFilms } = await adminDb
         .from("films")
         .select("id, titolo, anno, poster_url, attori, regista")
         .or("poster_url.is.null,poster_url.eq.");
@@ -130,7 +132,7 @@ export async function POST(request: Request) {
             }
           }
 
-          await supabase.from("films").update(updateData).eq("id", film.id);
+          await adminDb.from("films").update(updateData).eq("id", film.id);
           updatedFilms.push({ id: film.id, titolo: film.titolo, poster_url: result.poster_url });
         }
       }
@@ -144,7 +146,7 @@ export async function POST(request: Request) {
 
     // 4. Aggiornamento singola locandina
     if (film_id) {
-      const { data: film } = await supabase
+      const { data: film } = await adminDb
         .from("films")
         .select("id, titolo, anno")
         .eq("id", film_id)
@@ -156,7 +158,7 @@ export async function POST(request: Request) {
 
       const result = await fetchPosterForMovie(film.titolo, film.anno);
       if (result.poster_url) {
-        await supabase
+        await adminDb
           .from("films")
           .update({ poster_url: result.poster_url })
           .eq("id", film.id);
