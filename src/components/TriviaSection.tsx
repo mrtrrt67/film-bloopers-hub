@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { Film as FilmType, MovieTrivia, TriviaCategoria } from "@/lib/types";
 import AuthModal from "@/components/AuthModal";
+import ConfirmModal from "@/components/ConfirmModal";
 import { createClient } from "@/lib/supabase/client";
 
 interface TriviaSectionProps {
@@ -52,6 +53,7 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
   const [generating, setGenerating] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSubmitModal, setShowSubmitModal] = useState(false);
+  const [alertModal, setAlertModal] = useState<{ title: string; message: string; variant?: "danger" | "warning" | "info" } | null>(null);
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [likedIds, setLikedIds] = useState<Set<string>>(new Set());
 
@@ -109,11 +111,19 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
           return next;
         });
       } else {
-        alert(data.error || "Impossibile recuperare nuove curiosità al momento.");
+        setAlertModal({
+          title: "Generazione Curiosità",
+          message: data.error || "Impossibile recuperare nuove curiosità al momento.",
+          variant: "warning",
+        });
       }
     } catch (err) {
       console.error(err);
-      alert("Si è verificato un errore di connessione.");
+      setAlertModal({
+        title: "Errore di connessione",
+        message: "Si è verificato un problema di rete durante la generazione.",
+        variant: "danger",
+      });
     } finally {
       setGenerating(false);
     }
@@ -166,7 +176,11 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
     }
 
     if (!formTitolo.trim() || !formDescrizione.trim()) {
-      alert("Compila titolo e descrizione.");
+      setAlertModal({
+        title: "Dati mancanti",
+        message: "Compila sia il titolo che la descrizione della curiosità.",
+        variant: "warning",
+      });
       return;
     }
 
@@ -204,11 +218,19 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
           setFormFonte("");
         }, 2200);
       } else {
-        alert(data.error || "Errore durante l'invio.");
+        setAlertModal({
+          title: "Invio Curiosità",
+          message: data.error || "Errore durante l'invio della proposta.",
+          variant: "warning",
+        });
       }
     } catch (err) {
       console.error(err);
-      alert("Errore di connessione.");
+      setAlertModal({
+        title: "Errore di connessione",
+        message: "Si è verificato un errore di connessione durante l'invio.",
+        variant: "danger",
+      });
     } finally {
       setSubmitting(false);
     }
@@ -532,6 +554,17 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
       <AuthModal
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
+      />
+
+      {/* Cinematic Modal al posto di alert nativo */}
+      <ConfirmModal
+        isOpen={Boolean(alertModal)}
+        title={alertModal?.title}
+        message={alertModal?.message || ""}
+        confirmLabel="Ho capito"
+        variant={alertModal?.variant || "warning"}
+        onConfirm={() => setAlertModal(null)}
+        onCancel={() => setAlertModal(null)}
       />
     </section>
   );

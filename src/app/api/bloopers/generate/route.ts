@@ -6,7 +6,8 @@ import { generateBloopersForMovie } from "@/lib/gemini";
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
-    const adminDb = createAdminClient();
+    const hasServiceKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+    const adminDb = hasServiceKey ? createAdminClient() : supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     const body = await request.json();
@@ -163,15 +164,35 @@ export async function POST(request: Request) {
       provenienza: "ia",
     }));
 
-    const { data: inserted, error: insertErr } = await adminDb
-      .from("errori")
-      .insert(daInserire)
-      .select();
+    let inserted = null;
+    let insertErr = null;
+
+    if (hasServiceKey) {
+      const resAdmin = await adminDb
+        .from("errori")
+        .insert(daInserire)
+        .select();
+      inserted = resAdmin.data;
+      insertErr = resAdmin.error;
+    }
+
+    if (!inserted || insertErr) {
+      const resUser = await supabase
+        .from("errori")
+        .insert(daInserire)
+        .select();
+      if (!resUser.error && resUser.data) {
+        inserted = resUser.data;
+        insertErr = null;
+      } else {
+        insertErr = resUser.error || insertErr;
+      }
+    }
 
     if (insertErr) {
       console.error("Errore inserimento bloopers:", insertErr);
       return NextResponse.json(
-        { error: "Errore durante il salvataggio dei bloopers nel database." },
+        { error: insertErr.message || "Errore durante il salvataggio dei bloopers nel database." },
         { status: 500 }
       );
     }

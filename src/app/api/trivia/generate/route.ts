@@ -6,7 +6,8 @@ import { generateTriviaForMovie } from "@/lib/gemini";
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
-    const adminDb = createAdminClient();
+    const hasServiceKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+    const adminDb = hasServiceKey ? createAdminClient() : supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     const body = await request.json();
@@ -164,15 +165,37 @@ export async function POST(request: Request) {
       ordine: (existingTrivia?.length || 0) + idx + 1,
     }));
 
-    const { data: inserted, error: insertErr } = await adminDb
-      .from("movie_trivia")
-      .insert(daInserire)
-      .select();
+    let inserted = null;
+    let insertErr = null;
+
+    // 1. Prova prima con l'adminDb se la chiave service role è presente
+    if (hasServiceKey) {
+      const resAdmin = await adminDb
+        .from("movie_trivia")
+        .insert(daInserire)
+        .select();
+      inserted = resAdmin.data;
+      insertErr = resAdmin.error;
+    }
+
+    // 2. Se service role non c'è o ha dato errore RLS, usa il client dell'utente autenticato (con JWT valido)
+    if (!inserted || insertErr) {
+      const resUser = await supabase
+        .from("movie_trivia")
+        .insert(daInserire)
+        .select();
+      if (!resUser.error && resUser.data) {
+        inserted = resUser.data;
+        insertErr = null;
+      } else {
+        insertErr = resUser.error || insertErr;
+      }
+    }
 
     if (insertErr) {
       console.error("Errore inserimento curiosità:", insertErr);
       return NextResponse.json(
-        { error: "Errore durante il salvataggio delle curiosità nel database." },
+        { error: insertErr.message || "Errore durante il salvataggio delle curiosità nel database." },
         { status: 500 }
       );
     }
