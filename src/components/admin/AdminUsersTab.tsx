@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Users, Shield, RefreshCw, Trash2, Save, Calendar, Search, CheckCircle, XCircle, AlertTriangle, X } from "lucide-react";
+import ConfirmModal from "@/components/ConfirmModal";
 
 export default function AdminUsersTab() {
   const [profiles, setProfiles] = useState<any[]>([]);
@@ -12,6 +13,25 @@ export default function AdminUsersTab() {
     type: "success" | "error" | "info";
     message: string;
   } | null>(null);
+
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  } | null>(null);
+
+  const openConfirm = (title: string, message: string, onConfirm: () => void) => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => {
+        setConfirmModal(null);
+        onConfirm();
+      },
+    });
+  };
 
   const showToast = (type: "success" | "error" | "info", message: string) => {
     setToast({ type, message });
@@ -90,20 +110,25 @@ export default function AdminUsersTab() {
   };
 
   const handleDeleteUser = async (id: string, email: string) => {
-    if (!confirm(`Sei sicuro di voler eliminare l'utente ${email}?`)) return;
-    try {
-      const res = await fetch(`/api/admin/users?id=${id}`, { method: "DELETE" });
-      if (res.ok) {
-        setProfiles((prev) => prev.filter((p) => p.id !== id));
-        showToast("info", `Profilo ${email} eliminato con successo.`);
-      } else {
-        const json = await res.json().catch(() => ({}));
-        showToast("error", json.error || "Errore eliminazione profilo.");
+    openConfirm(
+      "Elimina Profilo Utente",
+      `Sei sicuro di voler eliminare definitivamente il profilo di ${email}? Questa operazione non può essere annullata.`,
+      async () => {
+        try {
+          const res = await fetch(`/api/admin/users?id=${id}`, { method: "DELETE" });
+          if (res.ok) {
+            setProfiles((prev) => prev.filter((p) => p.id !== id));
+            showToast("info", `Profilo ${email} eliminato con successo.`);
+          } else {
+            const json = await res.json().catch(() => ({}));
+            showToast("error", json.error || "Errore eliminazione profilo.");
+          }
+        } catch (err: any) {
+          console.error(err);
+          showToast("error", "Errore di connessione: " + err.message);
+        }
       }
-    } catch (err: any) {
-      console.error(err);
-      showToast("error", "Errore di connessione: " + err.message);
-    }
+    );
   };
 
   const filtered = profiles.filter((p) => {
@@ -415,6 +440,16 @@ export default function AdminUsersTab() {
             </table>
           </div>
         </div>
+      )}
+
+      {confirmModal && (
+        <ConfirmModal
+          isOpen={confirmModal.isOpen}
+          title={confirmModal.title}
+          message={confirmModal.message}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
       )}
     </div>
   );

@@ -445,6 +445,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: true, message: "Blooper eliminato dall'archivio." });
     }
 
+    if (action === "delete_resolved_contest") {
+      if (contestazione_id) {
+        await adminDb.from("voti_bloopers").delete().eq("id", contestazione_id);
+      }
+      return NextResponse.json({ success: true, message: "Contestazione rimossa dall'archivio." });
+    }
+
+    if (action === "clear_resolved_contests") {
+      await adminDb.from("voti_bloopers").delete().in("tipo", ["contestazione_risolta", "blooper_falso_risolto"]);
+      return NextResponse.json({ success: true, message: "Archivio contestazioni risolte svuotato con successo." });
+    }
+
     if (action === "approve_suggestion_correction") {
       const targetProfile = await resolveProfile(adminDb, userId, userEmail);
       let rewardMsg = "";

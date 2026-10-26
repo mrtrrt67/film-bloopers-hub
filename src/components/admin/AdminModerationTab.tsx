@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { AlertTriangle, CheckCircle, XCircle, Trash2, Edit3, Shield, Award, X } from "lucide-react";
+import ConfirmModal from "@/components/ConfirmModal";
 
 export default function AdminModerationTab() {
   const [subTab, setSubTab] = useState<"pending" | "contests" | "corrections" | "approved">("pending");
@@ -25,6 +26,27 @@ export default function AdminModerationTab() {
     type: "success" | "error" | "info";
     message: string;
   } | null>(null);
+
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    confirmLabel?: string;
+    onConfirm: () => void;
+  } | null>(null);
+
+  const openConfirm = (title: string, message: string, onConfirm: () => void, confirmLabel = "Conferma ed Elimina") => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      confirmLabel,
+      onConfirm: () => {
+        setConfirmModal(null);
+        onConfirm();
+      },
+    });
+  };
 
   const showToast = (type: "success" | "error" | "info", message: string) => {
     setToast({ type, message });
@@ -83,26 +105,31 @@ export default function AdminModerationTab() {
   };
 
   const handleReject = async (blooperId: number | string) => {
-    if (!confirm("Sei sicuro di voler rifiutare ed eliminare questa segnalazione?")) return;
-    try {
-      const res = await fetch("/api/admin/moderation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "reject", blooper_id: blooperId }),
-      });
-      const json = await res.json();
-      if (res.ok) {
-        showToast("info", json.message || "Segnalazione rifiutata ed eliminata.");
-        setData((prev) => ({
-          ...prev,
-          pending: prev.pending.filter((b) => b.id !== blooperId),
-        }));
-      } else {
-        showToast("error", "Errore rifiuto: " + (json.error || "Impossibile eliminare"));
+    openConfirm(
+      "Rifiuta Segnalazione",
+      "Sei sicuro di voler rifiutare ed eliminare definitivamente questa segnalazione blooper?",
+      async () => {
+        try {
+          const res = await fetch("/api/admin/moderation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "reject", blooper_id: blooperId }),
+          });
+          const json = await res.json();
+          if (res.ok) {
+            showToast("info", json.message || "Segnalazione rifiutata ed eliminata.");
+            setData((prev) => ({
+              ...prev,
+              pending: prev.pending.filter((b) => b.id !== blooperId),
+            }));
+          } else {
+            showToast("error", "Errore rifiuto: " + (json.error || "Impossibile eliminare"));
+          }
+        } catch (err: any) {
+          showToast("error", "Errore di rete: " + err.message);
+        }
       }
-    } catch (err: any) {
-      showToast("error", "Errore di rete: " + err.message);
-    }
+    );
   };
 
   const handleSaveContestCorrection = async (contest: any) => {
@@ -163,41 +190,47 @@ export default function AdminModerationTab() {
     };
     const pts = edit.points;
     const authorName = contest.user_handle || (contest.user_email ? `@${contest.user_email.split("@")[0]}` : "all'utente che ha smascherato l'errore");
-    if (!confirm(`Eliminare definitivamente questo blooper errato dal catalogo ed assegnare ${pts} punti a ${authorName} per averlo smascherato?`)) return;
-    try {
-      const res = await fetch("/api/admin/moderation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "delete_blooper",
-          blooper_id: contest.errore_id,
-          contestazione_id: contest.id,
-          userId: contest.user_id,
-          userEmail: contest.user_email,
-          points: pts,
-        }),
-      });
-      const json = await res.json();
-      if (res.ok) {
-        showToast("success", json.message || `Blooper errato eliminato dall'archivio e ${pts} punti assegnati!`);
-        setData((prev) => ({
-          ...prev,
-          contestazioni: prev.contestazioni.filter((c) => c.id !== contest.id),
-          resolved_contests: [
-            {
-              ...contest,
-              tipo: "blooper_falso_risolto",
-              created_at: new Date().toISOString(),
-            },
-            ...(prev.resolved_contests || []),
-          ],
-        }));
-      } else {
-        showToast("error", "Errore eliminazione: " + (json.error || "Operazione non riuscita"));
+    
+    openConfirm(
+      "Elimina Blooper Errato",
+      `Eliminare definitivamente questo blooper errato dal catalogo ed assegnare ${pts} punti a ${authorName} per averlo smascherato?`,
+      async () => {
+        try {
+          const res = await fetch("/api/admin/moderation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "delete_blooper",
+              blooper_id: contest.errore_id,
+              contestazione_id: contest.id,
+              userId: contest.user_id,
+              userEmail: contest.user_email,
+              points: pts,
+            }),
+          });
+          const json = await res.json();
+          if (res.ok) {
+            showToast("success", json.message || `Blooper errato eliminato dall'archivio e ${pts} punti assegnati!`);
+            setData((prev) => ({
+              ...prev,
+              contestazioni: prev.contestazioni.filter((c) => c.id !== contest.id),
+              resolved_contests: [
+                {
+                  ...contest,
+                  tipo: "blooper_falso_risolto",
+                  created_at: new Date().toISOString(),
+                },
+                ...(prev.resolved_contests || []),
+              ],
+            }));
+          } else {
+            showToast("error", "Errore eliminazione: " + (json.error || "Operazione non riuscita"));
+          }
+        } catch (err: any) {
+          showToast("error", "Errore di rete: " + err.message);
+        }
       }
-    } catch (err: any) {
-      showToast("error", "Errore di rete: " + err.message);
-    }
+    );
   };
 
   const handleIgnoreContest = async (contestId: string | number) => {
@@ -226,26 +259,90 @@ export default function AdminModerationTab() {
   };
 
   const handleDeleteApproved = async (blooperId: string | number) => {
-    if (!confirm("Eliminare definitivamente questo blooper dall'archivio pubblico?")) return;
-    try {
-      const res = await fetch("/api/admin/moderation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "delete_approved", blooper_id: blooperId }),
-      });
-      const json = await res.json();
-      if (res.ok) {
-        showToast("info", json.message || "Blooper eliminato dall'archivio.");
-        setData((prev) => ({
-          ...prev,
-          approved: prev.approved.filter((a) => a.id !== blooperId),
-        }));
-      } else {
-        showToast("error", "Errore eliminazione: " + (json.error || "Operazione non riuscita"));
+    openConfirm(
+      "Elimina Blooper Approvato",
+      "Eliminare definitivamente questo blooper dall'archivio e dal catalogo pubblico?",
+      async () => {
+        try {
+          const res = await fetch("/api/admin/moderation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "delete_approved", blooper_id: blooperId }),
+          });
+          const json = await res.json();
+          if (res.ok) {
+            showToast("info", json.message || "Blooper eliminato dall'archivio.");
+            setData((prev) => ({
+              ...prev,
+              approved: prev.approved.filter((a) => a.id !== blooperId),
+            }));
+          } else {
+            showToast("error", "Errore eliminazione: " + (json.error || "Operazione non riuscita"));
+          }
+        } catch (err: any) {
+          showToast("error", "Errore di rete: " + err.message);
+        }
       }
-    } catch (err: any) {
-      showToast("error", "Errore di rete: " + err.message);
-    }
+    );
+  };
+
+  const handleDeleteResolvedContest = async (contestId: string | number) => {
+    openConfirm(
+      "Rimuovi da Archivio",
+      "Rimuovere definitivamente questa voce dall'archivio delle contestazioni risolte?",
+      async () => {
+        try {
+          const res = await fetch("/api/admin/moderation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "delete_resolved_contest",
+              contestazione_id: contestId,
+            }),
+          });
+          const json = await res.json();
+          if (res.ok) {
+            showToast("info", json.message || "Contestazione rimossa dall'archivio.");
+            setData((prev) => ({
+              ...prev,
+              resolved_contests: (prev.resolved_contests || []).filter((rc) => rc.id !== contestId),
+            }));
+          } else {
+            showToast("error", "Errore eliminazione: " + (json.error || "Operazione non riuscita"));
+          }
+        } catch (err: any) {
+          showToast("error", "Errore di rete: " + err.message);
+        }
+      }
+    );
+  };
+
+  const handleClearAllResolvedContests = async () => {
+    openConfirm(
+      "Svuota Archivio Risolti",
+      "Sei sicuro di voler eliminare TUTTE le voci storiche dall'archivio delle contestazioni risolte? Questa azione è irreversibile.",
+      async () => {
+        try {
+          const res = await fetch("/api/admin/moderation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "clear_resolved_contests" }),
+          });
+          const json = await res.json();
+          if (res.ok) {
+            showToast("success", json.message || "Archivio contestazioni svuotato con successo.");
+            setData((prev) => ({
+              ...prev,
+              resolved_contests: [],
+            }));
+          } else {
+            showToast("error", "Errore svuotamento: " + (json.error || "Operazione non riuscita"));
+          }
+        } catch (err: any) {
+          showToast("error", "Errore di rete: " + err.message);
+        }
+      }
+    );
   };
 
   const handleApproveCorrection = async (corr: any) => {
@@ -280,29 +377,34 @@ export default function AdminModerationTab() {
   };
 
   const handleRejectCorrection = async (corrId: string | number) => {
-    if (!confirm("Rifiutare ed eliminare questa correzione?")) return;
-    try {
-      const res = await fetch("/api/admin/moderation", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "reject_suggestion_correction",
-          suggestion_id: corrId,
-        }),
-      });
-      if (res.ok) {
-        showToast("info", "Correzione rifiutata ed eliminata.");
-        setData((prev) => ({
-          ...prev,
-          corrections: (prev.corrections || []).filter((c) => c.id !== corrId),
-        }));
-      } else {
-        const resJson = await res.json().catch(() => ({}));
-        showToast("error", resJson.error || "Errore durante il rifiuto");
+    openConfirm(
+      "Rifiuta Correzione",
+      "Rifiutare ed eliminare definitivamente questa correzione inviata dalla community?",
+      async () => {
+        try {
+          const res = await fetch("/api/admin/moderation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              action: "reject_suggestion_correction",
+              suggestion_id: corrId,
+            }),
+          });
+          if (res.ok) {
+            showToast("info", "Correzione rifiutata ed eliminata.");
+            setData((prev) => ({
+              ...prev,
+              corrections: (prev.corrections || []).filter((c) => c.id !== corrId),
+            }));
+          } else {
+            const resJson = await res.json().catch(() => ({}));
+            showToast("error", resJson.error || "Errore durante il rifiuto");
+          }
+        } catch (err: any) {
+          showToast("error", "Errore di rete: " + err.message);
+        }
       }
-    } catch (err: any) {
-      showToast("error", "Errore di rete: " + err.message);
-    }
+    );
   };
 
   if (loading) {
@@ -723,10 +825,22 @@ export default function AdminModerationTab() {
         <div className="space-y-6">
           {/* Sotto-sezione: Contestazioni & Correzioni Risolte */}
           <div className="space-y-3">
-            <h3 className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-2">
-              <CheckCircle className="h-4 w-4" />
-              Contestazioni & Correzioni Risolte ({data.resolved_contests?.length || 0})
-            </h3>
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-2">
+                <CheckCircle className="h-4 w-4" />
+                Contestazioni & Correzioni Risolte ({data.resolved_contests?.length || 0})
+              </h3>
+              {data.resolved_contests && data.resolved_contests.length > 0 && (
+                <button
+                  onClick={handleClearAllResolvedContests}
+                  className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold text-rose-400 hover:text-white bg-rose-500/10 hover:bg-rose-600 transition active:scale-95 border border-rose-500/20"
+                  title="Elimina tutte le voci dell'archivio contestazioni"
+                >
+                  <Trash2 className="h-3 w-3" />
+                  <span>Svuota Archivio</span>
+                </button>
+              )}
+            </div>
             {(!data.resolved_contests || data.resolved_contests.length === 0) ? (
               <div className="py-6 text-center text-zinc-500 text-xs rounded-xl border border-zinc-800 bg-zinc-900/40">
                 Nessuna contestazione archiviata come risolta.
@@ -735,7 +849,7 @@ export default function AdminModerationTab() {
               data.resolved_contests.map((rc) => (
                 <div
                   key={rc.id}
-                  className="rounded-xl border border-emerald-500/30 bg-emerald-950/10 p-4 space-y-2 hover:border-emerald-500/50 transition"
+                  className="rounded-xl border border-emerald-500/30 bg-emerald-950/10 p-4 space-y-2 hover:border-emerald-500/50 transition relative group"
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                     <div className="flex items-center gap-2">
@@ -745,9 +859,18 @@ export default function AdminModerationTab() {
                         {rc.tipo === "blooper_falso_risolto" ? "🗑️ Blooper Fake Eliminato" : "✅ Correzione Approvata"}
                       </span>
                     </div>
-                    <span className="text-[11px] text-zinc-500 font-mono">
-                      {rc.created_at ? rc.created_at.slice(0, 16).replace("T", " ") : ""}
-                    </span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[11px] text-zinc-500 font-mono">
+                        {rc.created_at ? rc.created_at.slice(0, 16).replace("T", " ") : ""}
+                      </span>
+                      <button
+                        onClick={() => handleDeleteResolvedContest(rc.id)}
+                        className="p-1 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-500/15 transition"
+                        title="Rimuovi definitivamente da archivio"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
                   </div>
 
                   <div className="text-xs text-zinc-300 space-y-1">
@@ -806,6 +929,18 @@ export default function AdminModerationTab() {
             )}
           </div>
         </div>
+      )}
+
+      {/* Modale di Conferma Eliminazione in stile App */}
+      {confirmModal && (
+        <ConfirmModal
+          isOpen={confirmModal.isOpen}
+          title={confirmModal.title}
+          message={confirmModal.message}
+          confirmLabel={confirmModal.confirmLabel}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
       )}
     </div>
   );

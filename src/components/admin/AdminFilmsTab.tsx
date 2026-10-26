@@ -17,6 +17,7 @@ import {
   Sparkles
 } from "lucide-react";
 import { normalizePosterUrl } from "@/lib/tmdb";
+import ConfirmModal from "@/components/ConfirmModal";
 
 interface AdminFilmsTabProps {
   initialFilter?: string;
@@ -32,6 +33,29 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   const [updatingAllPosters, setUpdatingAllPosters] = useState(false);
   const [updatingAllCast, setUpdatingAllCast] = useState(false);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
+
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    confirmLabel?: string;
+    variant?: "danger" | "warning";
+    onConfirm: () => void;
+  } | null>(null);
+
+  const openConfirm = (title: string, message: string, onConfirm: () => void, confirmLabel = "Conferma", variant: "danger" | "warning" = "danger") => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      confirmLabel,
+      variant,
+      onConfirm: () => {
+        setConfirmModal(null);
+        onConfirm();
+      },
+    });
+  };
 
   // Modal Modifica Film
   const [editingFilm, setEditingFilm] = useState<any | null>(null);
@@ -101,54 +125,68 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
 
   // Aggiorna tutte le locandine mancanti
   const handleUpdateAllPosters = async () => {
-    if (!confirm("Avviare la ricerca automatica TMDB per tutte le locandine mancanti?")) return;
-    try {
-      setUpdatingAllPosters(true);
-      setActionMessage(null);
-      const res = await fetch("/api/admin/posters", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ all: true }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setActionMessage(`✅ Recuperate con successo ${data.updatedCount} locandine da TMDB!`);
-        await fetchFilms();
-      } else {
-        alert(data.error || "Errore aggiornamento locandine");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Errore di connessione");
-    } finally {
-      setUpdatingAllPosters(false);
-    }
+    openConfirm(
+      "Ricerca Automatica Locandine",
+      "Avviare la ricerca automatica TMDB per tutte le locandine mancanti?",
+      async () => {
+        try {
+          setUpdatingAllPosters(true);
+          setActionMessage(null);
+          const res = await fetch("/api/admin/posters", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ all: true }),
+          });
+          const data = await res.json();
+          if (res.ok) {
+            setActionMessage(`✅ Recuperate con successo ${data.updatedCount} locandine da TMDB!`);
+            await fetchFilms();
+          } else {
+            setActionMessage(`❌ ${data.error || "Errore aggiornamento locandine"}`);
+          }
+        } catch (err) {
+          console.error(err);
+          setActionMessage("❌ Errore di connessione");
+        } finally {
+          setUpdatingAllPosters(false);
+        }
+      },
+      "Avvia Ricerca TMDB",
+      "warning"
+    );
   };
 
   // Aggiorna tutto il cast mancante
   const handleUpdateAllCast = async () => {
-    if (!confirm("Avviare la ricerca automatica TMDB per tutti i film con cast vuoto?")) return;
-    try {
-      setUpdatingAllCast(true);
-      setActionMessage(null);
-      const res = await fetch("/api/admin/posters", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "bulk_cast" }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setActionMessage(`✅ Recuperato con successo il cast per ${data.updatedCount} film!`);
-        await fetchFilms();
-      } else {
-        alert(data.error || "Errore aggiornamento cast");
-      }
-    } catch (err) {
-      console.error(err);
-      alert("Errore di connessione");
-    } finally {
-      setUpdatingAllCast(false);
-    }
+    openConfirm(
+      "Recupero Cast TMDB",
+      "Avviare la ricerca automatica TMDB per tutti i film con cast vuoto?",
+      async () => {
+        try {
+          setUpdatingAllCast(true);
+          setActionMessage(null);
+          const res = await fetch("/api/admin/posters", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action: "bulk_cast" }),
+          });
+          const data = await res.json();
+          if (res.ok) {
+            setActionMessage(`✅ Recuperato con successo il cast per ${data.updatedCount} film!`);
+            await fetchFilms();
+          } else {
+            setActionMessage(`❌ ${data.error || "Errore aggiornamento cast"}`);
+          }
+        } catch (err) {
+          console.error(err);
+          setActionMessage("❌ Errore di connessione");
+        } finally {
+          setUpdatingAllCast(false);
+        }
+      },
+      "Avvia Recupero Cast",
+      "warning"
+    );
   };
 
   // Stato per spiegazione RLS se la cancellazione è bloccata
@@ -158,29 +196,32 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
 
   // Elimina film
   const handleDeleteFilm = async (film: any) => {
-    if (!confirm(`Sei sicuro di voler eliminare definitivamente il film "${film.titolo}" (${film.anno}) e tutti i suoi bloopers?`)) {
-      return;
-    }
-    try {
-      setDeletingId(film.id);
-      const res = await fetch(`/api/admin/films?id=${film.id}`, { method: "DELETE" });
-      const data = await res.json();
-      if (res.ok && data.success) {
-        setFilms((prev) => prev.filter((item) => item.id !== film.id));
-        setActionMessage(`🗑️ Film "${film.titolo}" eliminato con successo dal database.`);
-      } else {
-        if (data.requiresRlsPolicy) {
-          setRlsModalOpen(true);
-        } else {
-          alert(data.error || "Errore durante l'eliminazione.");
+    openConfirm(
+      "Elimina Film e Bloopers",
+      `Sei sicuro di voler eliminare definitivamente il film "${film.titolo}" (${film.anno}) e tutti i suoi bloopers associati? Questa operazione è irreversibile.`,
+      async () => {
+        try {
+          setDeletingId(film.id);
+          const res = await fetch(`/api/admin/films?id=${film.id}`, { method: "DELETE" });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            setFilms((prev) => prev.filter((item) => item.id !== film.id));
+            setActionMessage(`🗑️ Film "${film.titolo}" eliminato con successo dal database.`);
+          } else {
+            if (data.requiresRlsPolicy) {
+              setRlsModalOpen(true);
+            } else {
+              setActionMessage(`❌ ${data.error || "Errore durante l'eliminazione."}`);
+            }
+          }
+        } catch (err) {
+          console.error(err);
+          setActionMessage("❌ Errore di connessione.");
+        } finally {
+          setDeletingId(null);
         }
       }
-    } catch (err) {
-      console.error(err);
-      alert("Errore di connessione.");
-    } finally {
-      setDeletingId(null);
-    }
+    );
   };
 
   const copySqlToClipboard = () => {
@@ -271,7 +312,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
         setFilms((prev) => prev.map((f) => (f.id === json.film.id ? json.film : f)));
         setEditingFilm(null);
       } else {
-        alert("Errore salvataggio modifiche film.");
+        setActionMessage("❌ Errore salvataggio modifiche film.");
       }
     } catch (err) {
       console.error(err);
@@ -828,6 +869,18 @@ CREATE POLICY "Allow delete on voti_bloopers" ON voti_bloopers FOR DELETE USING 
             </div>
           </div>
         </div>
+      )}
+
+      {confirmModal && (
+        <ConfirmModal
+          isOpen={confirmModal.isOpen}
+          title={confirmModal.title}
+          message={confirmModal.message}
+          confirmLabel={confirmModal.confirmLabel}
+          variant={confirmModal.variant}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
       )}
     </div>
   );

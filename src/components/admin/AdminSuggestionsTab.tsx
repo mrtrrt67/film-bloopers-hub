@@ -2,10 +2,29 @@
 
 import { useState, useEffect } from "react";
 import { MessageSquare, Trash2, Mail, Calendar } from "lucide-react";
+import ConfirmModal from "@/components/ConfirmModal";
 
 export default function AdminSuggestionsTab() {
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  } | null>(null);
+
+  const openConfirm = (title: string, message: string, onConfirm: () => void) => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => {
+        setConfirmModal(null);
+        onConfirm();
+      },
+    });
+  };
 
   const fetchSuggestions = async () => {
     try {
@@ -27,15 +46,20 @@ export default function AdminSuggestionsTab() {
   }, []);
 
   const handleDelete = async (id: number | string) => {
-    if (!confirm("Eliminare questo feedback?")) return;
-    try {
-      const res = await fetch(`/api/admin/suggestions?id=${id}`, { method: "DELETE" });
-      if (res.ok) {
-        setSuggestions((prev) => prev.filter((s) => s.id !== id));
+    openConfirm(
+      "Elimina Feedback",
+      "Sei sicuro di voler eliminare definitivamente questo suggerimento?",
+      async () => {
+        try {
+          const res = await fetch(`/api/admin/suggestions?id=${id}`, { method: "DELETE" });
+          if (res.ok) {
+            setSuggestions((prev) => prev.filter((s) => s.id !== id));
+          }
+        } catch (err) {
+          console.error(err);
+        }
       }
-    } catch (err) {
-      console.error(err);
-    }
+    );
   };
 
   if (loading) {
@@ -122,6 +146,16 @@ export default function AdminSuggestionsTab() {
               );
             })}
         </div>
+      )}
+
+      {confirmModal && (
+        <ConfirmModal
+          isOpen={confirmModal.isOpen}
+          title={confirmModal.title}
+          message={confirmModal.message}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
       )}
     </div>
   );

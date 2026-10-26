@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Sliders, Save, Check, Calendar, Eye, EyeOff, Sparkles, Trash2 } from "lucide-react";
 import { formatDateItalian } from "@/lib/utils";
+import ConfirmModal from "@/components/ConfirmModal";
 
 const CONFIG_METADATA: Record<string, { label: string; desc?: string }> = {
   home_banner_top_testo: {
@@ -60,24 +61,50 @@ export default function AdminConfigTab() {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [cleaning, setCleaning] = useState(false);
+  const [cleanFeedback, setCleanFeedback] = useState<string | null>(null);
+
+  const [confirmModal, setConfirmModal] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  } | null>(null);
+
+  const openConfirm = (title: string, message: string, onConfirm: () => void) => {
+    setConfirmModal({
+      isOpen: true,
+      title,
+      message,
+      onConfirm: () => {
+        setConfirmModal(null);
+        onConfirm();
+      },
+    });
+  };
 
   const handleExecuteProductionCleanup = async () => {
-    if (!confirm("ATTENZIONE: Sei sicuro di voler azzerare tutti i dati di test (suggerimenti, voti, contestazioni, punti classifiche e log ricerche)? I dati storici sono già salvati nei backup.")) return;
-    try {
-      setCleaning(true);
-      const res = await fetch("/api/admin/cleanup", { method: "POST" });
-      const data = await res.json();
-      if (res.ok) {
-        alert(data.message || "Pulizia completata con successo!");
-        window.location.reload();
-      } else {
-        alert("Errore pulizia: " + (data.error || "Errore sconosciuto"));
+    openConfirm(
+      "Reset Dati di Test Produzione",
+      "ATTENZIONE: Sei sicuro di voler azzerare tutti i dati di test (suggerimenti, voti, contestazioni, punti classifiche e log ricerche)? Questa operazione non tocca film né bloopers.",
+      async () => {
+        try {
+          setCleaning(true);
+          setCleanFeedback(null);
+          const res = await fetch("/api/admin/cleanup", { method: "POST" });
+          const data = await res.json();
+          if (res.ok) {
+            setCleanFeedback("✅ " + (data.message || "Pulizia completata con successo!"));
+            setTimeout(() => window.location.reload(), 1500);
+          } else {
+            setCleanFeedback("❌ Errore pulizia: " + (data.error || "Errore sconosciuto"));
+          }
+        } catch (e: any) {
+          setCleanFeedback("❌ Errore di rete: " + e.message);
+        } finally {
+          setCleaning(false);
+        }
       }
-    } catch (e: any) {
-      alert("Errore di rete: " + e.message);
-    } finally {
-      setCleaning(false);
-    }
+    );
   };
 
   const fetchConfigs = async () => {
@@ -124,7 +151,7 @@ export default function AdminConfigTab() {
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 3000);
       } else {
-        alert("Errore salvataggio configurazioni");
+        setCleanFeedback("❌ Errore salvataggio configurazioni");
       }
     } catch (err) {
       console.error(err);
@@ -346,7 +373,22 @@ export default function AdminConfigTab() {
             <span>{cleaning ? "Pulizia in corso..." : "Esegui Pulizia Produzione"}</span>
           </button>
         </div>
+        {cleanFeedback && (
+          <div className="p-3 rounded-xl bg-zinc-950 border border-zinc-800 text-xs font-bold text-zinc-200 mt-2">
+            {cleanFeedback}
+          </div>
+        )}
       </div>
+
+      {confirmModal && (
+        <ConfirmModal
+          isOpen={confirmModal.isOpen}
+          title={confirmModal.title}
+          message={confirmModal.message}
+          onConfirm={confirmModal.onConfirm}
+          onCancel={() => setConfirmModal(null)}
+        />
+      )}
     </div>
   );
 }
