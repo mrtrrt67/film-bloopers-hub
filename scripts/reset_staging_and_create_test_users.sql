@@ -45,7 +45,9 @@ BEGIN
     created_at,
     updated_at,
     confirmation_token,
-    recovery_token
+    recovery_token,
+    email_change_token_new,
+    email_change
   ) VALUES (
     '00000000-0000-0000-0000-000000000000',
     free_uid,
@@ -58,6 +60,8 @@ BEGIN
     '{"username":"utente_free"}',
     now(),
     now(),
+    '',
+    '',
     '',
     ''
   );
@@ -136,7 +140,9 @@ BEGIN
     created_at,
     updated_at,
     confirmation_token,
-    recovery_token
+    recovery_token,
+    email_change_token_new,
+    email_change
   ) VALUES (
     '00000000-0000-0000-0000-000000000000',
     prem_uid,
@@ -149,6 +155,8 @@ BEGIN
     '{"username":"utente_premium"}',
     now(),
     now(),
+    '',
+    '',
     '',
     ''
   );
