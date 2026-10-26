@@ -203,7 +203,7 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
               <span>Ricompensa per segnalazione valida:</span>
             </div>
             <p className="text-[11px] text-zinc-300 leading-normal">
-              Se la tua contestazione corregge il blooper oppure <strong className="text-white">smaschera un errore inesistente</strong> portando alla sua rimozione, lo staff ti accredita <strong className="text-amber-300">+10 Punti</strong> (<strong className="text-amber-300">+20 Punti 2x</strong> con Piano Annuale/Lifetime) per scalare la classifica e sbloccare mesi Premium gratuiti!
+              Se la tua contestazione corregge il blooper oppure <strong className="text-white">smaschera un errore inesistente</strong> portando alla sua rimozione, lo staff ti accredita <strong className="text-amber-300">+10 Punti</strong> (<strong className="text-amber-300">+20 Punti 2x</strong> con Piano Annuale, Lifetime o Amministratore) per scalare la classifica e sbloccare mesi Premium gratuiti!
             </p>
           </div>
 

@@ -82,7 +82,8 @@ export default function SuggerimentiPage() {
     ? `@${user.user_metadata.username}`
     : (user?.email ? formatPublicAuthor(user.email) : "Utente");
 
-  const isDoublePoints = profile && (profile.tipo_abbonamento === "annuale" || profile.tipo_abbonamento === "lifetime");
+  const isAdmin = user?.email && (user.email.toLowerCase() === "mrtrrt67@gmail.com" || user.email.toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "").toLowerCase());
+  const isDoublePoints = isAdmin || (profile && (profile.tipo_abbonamento === "annuale" || profile.tipo_abbonamento === "lifetime"));
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -171,7 +172,7 @@ export default function SuggerimentiPage() {
               </div>
               <div>
                 <h4 className="text-xs font-black uppercase text-amber-400 tracking-wider">
-                  ⚡ Supporto Prioritario Attivo ({profile.tipo_abbonamento === "annuale" ? "Piano Annuale" : "Piano Lifetime"})
+                  ⚡ Supporto Prioritario Attivo ({isAdmin ? "Amministratore" : (profile?.tipo_abbonamento === "annuale" ? "Piano Annuale" : "Piano Lifetime")})
                 </h4>
                 <p className="text-[11px] text-zinc-300 mt-0.5 leading-normal">
                   Il tuo abbonamento include l&apos;assistenza prioritaria e il raddoppio dei punti in classifica: la tua richiesta verrà evidenziata in cima alla coda di moderazione!

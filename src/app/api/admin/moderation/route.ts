@@ -3,6 +3,58 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { checkAndAwardPointRewards } from "@/lib/rewards";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+function isUserAdmin(profile: any, emailOrHandle?: string | null, adminEmailParam?: string): boolean {
+  const adminEmail = (adminEmailParam || process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL || "mrtrrt67@gmail.com").toLowerCase();
+  if (profile?.is_admin === true) return true;
+  if (profile?.email && profile.email.toLowerCase() === adminEmail) return true;
+  if (profile?.username && profile.username.toLowerCase() === adminEmail.split("@")[0].toLowerCase()) return true;
+  if (emailOrHandle) {
+    const clean = emailOrHandle.replace(/^@/, "").toLowerCase().trim();
+    if (clean === adminEmail || clean === adminEmail.split("@")[0].toLowerCase()) return true;
+  }
+  return false;
+}
+
+function hasDoublePoints(profile: any, emailOrHandle?: string | null, adminEmailParam?: string): boolean {
+  // L'amministratore riceve SEMPRE priorità massima e punti doppi 2x
+  if (isUserAdmin(profile, emailOrHandle, adminEmailParam)) return true;
+  return profile?.tipo_abbonamento === "annuale" || profile?.tipo_abbonamento === "lifetime";
+}
+
+async function resolveProfile(adminDb: any, userId?: string | null, userEmailOrHandle?: string | null) {
+  if (userId) {
+    const { data: p } = await adminDb.from("profiles").select("*").eq("id", userId).maybeSingle();
+    if (p) return p;
+  }
+  if (!userEmailOrHandle) return null;
+
+  const raw = userEmailOrHandle.trim();
+  const clean = raw.replace(/^@/, "").trim().toLowerCase();
+
+  // 1. Email esatta (se contiene @ e un dominio)
+  if (raw.includes("@") && raw.includes(".") && !raw.startsWith("@")) {
+    const { data: p } = await adminDb.from("profiles").select("*").eq("email", raw.toLowerCase()).maybeSingle();
+    if (p) return p;
+  }
+
+  // 2. Cerca per username
+  const { data: pUser } = await adminDb.from("profiles").select("*").ilike("username", clean).maybeSingle();
+  if (pUser) return pUser;
+
+  // 3. Cerca per prefisso email (es. mrtrrt67@%)
+  const { data: pPrefix } = await adminDb.from("profiles").select("*").ilike("email", `${clean}@%`).maybeSingle();
+  if (pPrefix) return pPrefix;
+
+  // 4. Fallback per raw email
+  const { data: pRaw } = await adminDb.from("profiles").select("*").eq("email", raw).maybeSingle();
+  if (pRaw) return pRaw;
+
+  return null;
+}
+
 export async function GET() {
   try {
     const supabase = await createClient();
@@ -25,32 +77,40 @@ export async function GET() {
     // Recupera profili degli autori per evidenziare priorità e punti doppi
     const { data: allProfiles } = await adminDb
       .from("profiles")
-      .select("id, email, tier, tipo_abbonamento, punti");
+      .select("id, email, username, tier, tipo_abbonamento, is_admin, punti");
 
     const profilesByHandleOrEmail: Record<string, any> = {};
     (allProfiles || []).forEach((p: any) => {
       if (p.email) {
-        profilesByHandleOrEmail[p.email.toLowerCase()] = p;
-        const handle = `@${p.email.split("@")[0].toLowerCase()}`;
-        profilesByHandleOrEmail[handle] = p;
+        const em = p.email.toLowerCase();
+        profilesByHandleOrEmail[em] = p;
+        profilesByHandleOrEmail[`@${em.split("@")[0]}`] = p;
+        profilesByHandleOrEmail[em.split("@")[0]] = p;
+      }
+      if (p.username) {
+        const un = p.username.toLowerCase();
+        profilesByHandleOrEmail[un] = p;
+        profilesByHandleOrEmail[`@${un}`] = p;
       }
     });
 
     const enrichedPending = (pendingBloopers || []).map((b: any) => {
-      const key = b.inserito_da ? b.inserito_da.toLowerCase() : "";
+      const key = b.inserito_da ? b.inserito_da.toLowerCase().trim() : "";
       const p = key ? profilesByHandleOrEmail[key] : null;
-      const isPriority = p && (p.tipo_abbonamento === "annuale" || p.tipo_abbonamento === "lifetime");
-      const isDoublePoints = isPriority;
+      const isAdmin = isUserAdmin(p, key, adminEmail);
+      const isPriority = isAdmin || hasDoublePoints(p, key, adminEmail);
+      const isDoublePoints = !!isPriority;
       return {
         ...b,
-        user_tier: p?.tier || "free",
-        user_sub: p?.tipo_abbonamento || "nessuno",
+        user_tier: p?.tier || (isAdmin ? "premium" : "free"),
+        user_sub: p?.tipo_abbonamento || (isAdmin ? "lifetime" : "nessuno"),
+        is_admin: !!isAdmin,
         is_priority: !!isPriority,
-        is_double_points: !!isDoublePoints,
+        is_double_points: isDoublePoints,
       };
     });
 
-    // Ordina mettendo le segnalazioni prioritarie (Annuale/Lifetime) in cima
+    // Ordina mettendo le segnalazioni prioritarie (Admin/Annuale/Lifetime) in cima
     enrichedPending.sort((a: any, b: any) => {
       if (a.is_priority && !b.is_priority) return -1;
       if (!a.is_priority && b.is_priority) return 1;
@@ -66,15 +126,17 @@ export async function GET() {
 
     const enrichedContestazioni = (rawContestazioni || []).map((c: any) => {
       const p = c.user_id ? allProfiles?.find((prof: any) => prof.id === c.user_id) : null;
-      const isPriority = p && (p.tipo_abbonamento === "annuale" || p.tipo_abbonamento === "lifetime");
+      const isAdmin = isUserAdmin(p, null, adminEmail);
+      const isPriority = isAdmin || hasDoublePoints(p, null, adminEmail);
       const handle = p?.email ? `@${p.email.split("@")[0]}` : "Utente Registrato";
       return {
         ...c,
         user_email: p?.email || null,
         user_handle: handle,
-        user_tier: p?.tier || "free",
-        user_sub: p?.tipo_abbonamento || "nessuno",
+        user_tier: p?.tier || (isAdmin ? "premium" : "free"),
+        user_sub: p?.tipo_abbonamento || (isAdmin ? "lifetime" : "nessuno"),
         user_points: p?.punti || 0,
+        is_admin: !!isAdmin,
         is_priority: !!isPriority,
         is_double_points: !!isPriority,
       };
@@ -89,7 +151,7 @@ export async function GET() {
       .order("creato_il", { ascending: false })
       .limit(50);
 
-    // 4. Correzioni blooper inviate dal modulo suggerimenti (solo utenti registrati che partecipano alla classifica)
+    // 4. Correzioni blooper inviate dal modulo suggerimenti
     const { data: rawCorrections } = await adminDb
       .from("suggerimenti")
       .select("*")
@@ -100,17 +162,19 @@ export async function GET() {
     const pendingCorrections = (rawCorrections || [])
       .filter((s: any) => !s.messaggio?.includes("[APPROVATO]") && !s.messaggio?.includes("[RIFIUTATO]"))
       .map((s: any) => {
-        const key = s.email ? s.email.toLowerCase() : "";
+        const key = s.email ? s.email.toLowerCase().trim() : "";
         const p = (s.user_id && allProfiles?.find((prof: any) => prof.id === s.user_id)) || (key ? profilesByHandleOrEmail[key] : null);
-        const isPriority = p && (p.tipo_abbonamento === "annuale" || p.tipo_abbonamento === "lifetime");
+        const isAdmin = isUserAdmin(p, key, adminEmail);
+        const isPriority = isAdmin || hasDoublePoints(p, key, adminEmail);
         const handle = p?.email ? `@${p.email.split("@")[0]}` : (s.email ? `@${s.email.split("@")[0]}` : "Utente");
         return {
           ...s,
           user_id: s.user_id || p?.id || null,
           user_handle: handle,
-          user_tier: p?.tier || "free",
-          user_sub: p?.tipo_abbonamento || "nessuno",
+          user_tier: p?.tier || (isAdmin ? "premium" : "free"),
+          user_sub: p?.tipo_abbonamento || (isAdmin ? "lifetime" : "nessuno"),
           user_points: p?.punti || 0,
+          is_admin: !!isAdmin,
           is_priority: !!isPriority,
           is_double_points: !!isPriority,
         };
@@ -146,34 +210,16 @@ export async function POST(request: Request) {
       // 1. Approva blooper
       await adminDb.from("errori").update({ approvato: true }).eq("id", blooper_id);
 
-      // 2. Assegna punti se l'utente è registrato e applica moltiplicatore 2x se annuale/lifetime
-      let targetProfile = null;
-      if (userEmail) {
-        let query = adminDb.from("profiles").select("*");
-        if (userEmail.includes("@")) {
-          query = query.eq("email", userEmail.trim());
-        } else {
-          const clean = userEmail.replace(/^@/, "").trim();
-          query = query.ilike("email", `${clean}@%`);
-        }
-        const { data: p } = await query.maybeSingle();
-        targetProfile = p;
-      } else if (userId) {
-        const { data: p } = await adminDb.from("profiles").select("*").eq("id", userId).maybeSingle();
-        targetProfile = p;
+      // 2. Risolvi profilo utente
+      const targetProfile = await resolveProfile(adminDb, userId, userEmail);
+      const isDouble = hasDoublePoints(targetProfile, userEmail, adminEmail);
+      let awardedPts = points ? parseInt(String(points), 10) : (isDouble ? 20 : 10);
+      if (isDouble && awardedPts === 10) {
+        awardedPts = 20;
       }
 
-      let awardedPts = points ? parseInt(String(points), 10) : 10;
-      let isDouble = false;
       let rewardMsg = "";
-
       if (targetProfile) {
-        if (targetProfile.tipo_abbonamento === "annuale" || targetProfile.tipo_abbonamento === "lifetime") {
-          // Se non è stato specificato manualmente un punteggio custom, raddoppia i 10 punti base a 20
-          awardedPts = points ? parseInt(String(points), 10) : 20;
-          isDouble = true;
-        }
-
         const newTotal = (targetProfile.punti || 0) + awardedPts;
         const resReward = await checkAndAwardPointRewards(adminDb, targetProfile.id, newTotal);
         if (resReward?.message) {
@@ -181,9 +227,10 @@ export async function POST(request: Request) {
         }
       }
 
+      const userTag = targetProfile?.email ? `@${targetProfile.email.split("@")[0]}` : (userEmail || "utente");
       const msg = isDouble
-        ? `Blooper approvato! Assegnati ${awardedPts} pt (Raddoppiati per Piano Annuale/Lifetime)${rewardMsg}`
-        : `Blooper approvato e ${awardedPts} pt assegnati!${rewardMsg}`;
+        ? `Blooper approvato! Assegnati ${awardedPts} pt a ${userTag} (Raddoppiati per Amministratore / Piano Annuale)${rewardMsg}`
+        : `Blooper approvato e ${awardedPts} pt assegnati a ${userTag}!${rewardMsg}`;
 
       return NextResponse.json({ success: true, message: msg });
     }
@@ -215,27 +262,11 @@ export async function POST(request: Request) {
         await adminDb.from("errori").update(updateData).eq("id", blooper_id);
       }
 
-      // 3. Assegna punti se previsti
+      // 3. Assegna punti al correttore
+      const targetProfile = await resolveProfile(adminDb, userId, userEmail);
       let rewardMsg = "";
-      let targetProfile = null;
-      if (userId) {
-        const { data: p } = await adminDb.from("profiles").select("*").eq("id", userId).maybeSingle();
-        targetProfile = p;
-      }
-      if (!targetProfile && userEmail) {
-        let query = adminDb.from("profiles").select("*");
-        if (userEmail.includes("@")) {
-          query = query.eq("email", userEmail.trim());
-        } else {
-          const clean = userEmail.replace(/^@/, "").trim();
-          query = query.ilike("email", `${clean}@%`);
-        }
-        const { data: p } = await query.maybeSingle();
-        targetProfile = p;
-      }
-
       if (targetProfile) {
-        const isDouble = targetProfile.tipo_abbonamento === "annuale" || targetProfile.tipo_abbonamento === "lifetime";
+        const isDouble = hasDoublePoints(targetProfile, userEmail, adminEmail);
         let basePts = points ? parseInt(String(points), 10) : (isDouble ? 20 : 10);
         const finalPts = isDouble && basePts === 10 ? 20 : basePts;
         const newTotal = (targetProfile.punti || 0) + finalPts;
@@ -256,26 +287,10 @@ export async function POST(request: Request) {
       }
 
       // Assegna punti al segnalatore della contestazione per aver smascherato il fake blooper
+      const targetProfile = await resolveProfile(adminDb, userId, userEmail);
       let rewardMsg = "";
-      let targetProfile = null;
-      if (userId) {
-        const { data: p } = await adminDb.from("profiles").select("*").eq("id", userId).maybeSingle();
-        targetProfile = p;
-      }
-      if (!targetProfile && userEmail) {
-        let query = adminDb.from("profiles").select("*");
-        if (userEmail.includes("@")) {
-          query = query.eq("email", userEmail.trim());
-        } else {
-          const clean = userEmail.replace(/^@/, "").trim();
-          query = query.ilike("email", `${clean}@%`);
-        }
-        const { data: p } = await query.maybeSingle();
-        targetProfile = p;
-      }
-
       if (targetProfile) {
-        const isDouble = targetProfile.tipo_abbonamento === "annuale" || targetProfile.tipo_abbonamento === "lifetime";
+        const isDouble = hasDoublePoints(targetProfile, userEmail, adminEmail);
         let basePts = points ? parseInt(String(points), 10) : (isDouble ? 20 : 10);
         const finalPts = isDouble && basePts === 10 ? 20 : basePts;
         const newTotal = (targetProfile.punti || 0) + finalPts;
@@ -327,48 +342,28 @@ export async function POST(request: Request) {
     }
 
     if (action === "approve_suggestion_correction") {
-      let targetProfile = null;
-      if (userId) {
-        const { data: p } = await adminDb.from("profiles").select("*").eq("id", userId).maybeSingle();
-        targetProfile = p;
-      }
-      if (!targetProfile && userEmail) {
-        let query = adminDb.from("profiles").select("*");
-        if (userEmail.includes("@")) {
-          query = query.eq("email", userEmail.trim());
-        } else {
-          const clean = userEmail.replace(/^@/, "").trim();
-          query = query.ilike("email", `${clean}@%`);
-        }
-        const { data: p } = await query.maybeSingle();
-        targetProfile = p;
-      }
-
-      let awardedPts = points ? parseInt(String(points), 10) : 10;
-      let isDouble = false;
+      const targetProfile = await resolveProfile(adminDb, userId, userEmail);
       let rewardMsg = "";
+      let awardedPts = 10;
+      let isDouble = false;
 
       if (targetProfile) {
-        if (targetProfile.tipo_abbonamento === "annuale" || targetProfile.tipo_abbonamento === "lifetime") {
-          awardedPts = points ? parseInt(String(points), 10) : 20;
-          isDouble = true;
-        }
-
+        isDouble = hasDoublePoints(targetProfile, userEmail, adminEmail);
+        let basePts = points ? parseInt(String(points), 10) : (isDouble ? 20 : 10);
+        awardedPts = isDouble && basePts === 10 ? 20 : basePts;
         const newTotal = (targetProfile.punti || 0) + awardedPts;
-        await adminDb.from("profiles").update({ punti: newTotal }).eq("id", targetProfile.id);
         const resReward = await checkAndAwardPointRewards(adminDb, targetProfile.id, newTotal);
         if (resReward?.message) {
           rewardMsg = ` (${resReward.message})`;
         }
       }
 
-      // Rimuovi la segnalazione approvata dalla coda dei suggerimenti
       if (suggestion_id) {
         await adminDb.from("suggerimenti").delete().eq("id", suggestion_id);
       }
 
       const msg = isDouble
-        ? `Correzione approvata! Assegnati ${awardedPts} pt (Raddoppiati per Piano Annuale/Lifetime)${rewardMsg}`
+        ? `Correzione approvata! Assegnati ${awardedPts} pt (Raddoppiati per Amministratore / Piano Annuale)${rewardMsg}`
         : `Correzione approvata e ${awardedPts} pt assegnati alla classifica!${rewardMsg}`;
 
       return NextResponse.json({ success: true, message: msg });

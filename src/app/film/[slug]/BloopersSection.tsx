@@ -263,7 +263,7 @@ export default function BloopersSection({ film, initialBloopers }: BloopersSecti
                   </div>
                   <p className="text-zinc-400 text-[10px] leading-tight">
                     Ad ogni blooper approvato ricevi 10 punti. 
-                    <strong className="text-amber-300"> +20 Punti (2x)</strong> per membri con Piano Annuale o Lifetime!
+                    <strong className="text-amber-300"> +20 Punti (2x)</strong> per membri con Piano Annuale, Lifetime o Amministratore!
                   </p>
                 </div>
 
@@ -287,7 +287,7 @@ export default function BloopersSection({ film, initialBloopers }: BloopersSecti
                   Segnalazione inviata con successo! 🎉
                 </h4>
                 <p className="text-xs text-zinc-300 max-w-sm mx-auto leading-relaxed">
-                  La tua segnalazione è stata inviata alla moderazione. Appena verificata e approvata dallo staff, riceverai <strong className="text-amber-300">{profile?.tipo_abbonamento === "annuale" || profile?.tipo_abbonamento === "lifetime" ? "+20 Punti (Punti 2x Piano Annuale/Lifetime!)" : "+10 Punti"}</strong> direttamente sul tuo profilo per scalare la classifica!
+                  La tua segnalazione è stata inviata alla moderazione. Appena verificata e approvata dallo staff, riceverai <strong className="text-amber-300">{((user?.email && (user.email.toLowerCase() === "mrtrrt67@gmail.com" || user.email.toLowerCase() === (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "").toLowerCase())) || profile?.tipo_abbonamento === "annuale" || profile?.tipo_abbonamento === "lifetime") ? "+20 Punti (Punti 2x Raddoppiati!)" : "+10 Punti"}</strong> direttamente sul tuo profilo per scalare la classifica!
                 </p>
                 <button
                   type="button"

@@ -3,6 +3,9 @@ import { Trophy, Award, Crown, Star, Sparkles, Shield, User } from "lucide-react
 import { createClient } from "@/lib/supabase/server";
 import { formatPublicAuthor, getRankInfo, replacePlaceholders } from "@/lib/utils";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export const metadata: Metadata = {
   title: "Classifica Cacciatori di Bloopers | FilmBloopers Hub",
   description: "Guarda chi sono i migliori cercatori di bloopers della community. Segnala errori, guadagna punti e sblocca l'abbonamento Premium gratuito a vita!",

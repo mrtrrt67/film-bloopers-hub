@@ -345,7 +345,7 @@ export default function AdminModerationTab() {
                 >
                   {blooper.is_priority && (
                     <div className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/20 border border-amber-500/40 px-2.5 py-0.5 text-[10px] font-black uppercase text-amber-300">
-                      ⚡ Segnalazione Prioritaria • Piano {blooper.user_sub} (Punti Doppi)
+                      ⚡ Segnalazione Prioritaria • {blooper.is_admin ? "Amministratore" : `Piano ${blooper.user_sub}`} (Punti Doppi 2x)
                     </div>
                   )}
 
@@ -452,7 +452,7 @@ export default function AdminModerationTab() {
                       </span>
                       {c.is_double_points && (
                         <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold">
-                          ⚡ 2x Punti (Abbonato)
+                          ⚡ 2x Punti ({c.is_admin ? "Amministratore" : "Abbonato"})
                         </span>
                       )}
                     </div>
