@@ -53,7 +53,7 @@ export default function FilmContentSwitcher({
   return (
     <div className="mt-8 flex flex-col">
       {/* Selector Tabs in Primo Piano */}
-      <div className="sticky top-20 z-30 mb-6 p-1.5 rounded-2xl bg-zinc-950/90 border border-zinc-800 shadow-2xl backdrop-blur-xl">
+      <div className="mb-6 p-1.5 rounded-2xl bg-zinc-950/90 border border-zinc-800 shadow-xl backdrop-blur-md">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <div className="flex items-center gap-1.5 w-full sm:w-auto">
             {/* Tab Bloopers */}
