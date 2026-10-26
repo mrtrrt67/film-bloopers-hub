@@ -58,11 +58,27 @@ export async function GET() {
     });
 
     // 2. Contestazioni attive
-    const { data: contestazioni } = await adminDb
+    const { data: rawContestazioni } = await adminDb
       .from("voti_bloopers")
       .select("*, errori(*, films(titolo, anno, id))")
       .eq("tipo", "contestazione")
       .not("motivo", "is", null);
+
+    const enrichedContestazioni = (rawContestazioni || []).map((c: any) => {
+      const p = c.user_id ? allProfiles?.find((prof: any) => prof.id === c.user_id) : null;
+      const isPriority = p && (p.tipo_abbonamento === "annuale" || p.tipo_abbonamento === "lifetime");
+      const handle = p?.email ? `@${p.email.split("@")[0]}` : "Utente Registrato";
+      return {
+        ...c,
+        user_email: p?.email || null,
+        user_handle: handle,
+        user_tier: p?.tier || "free",
+        user_sub: p?.tipo_abbonamento || "nessuno",
+        user_points: p?.punti || 0,
+        is_priority: !!isPriority,
+        is_double_points: !!isPriority,
+      };
+    });
 
     // 3. Archivio bloopers approvati dagli utenti
     const { data: approvedUserBloopers } = await adminDb
@@ -102,7 +118,7 @@ export async function GET() {
 
     return NextResponse.json({
       pending: enrichedPending,
-      contestazioni: contestazioni || [],
+      contestazioni: enrichedContestazioni,
       approved: approvedUserBloopers || [],
       corrections: pendingCorrections,
     });
@@ -200,16 +216,35 @@ export async function POST(request: Request) {
       }
 
       // 3. Assegna punti se previsti
-      if (userId && points) {
-        const { data: profile } = await adminDb.from("profiles").select("*").eq("id", userId).maybeSingle();
-        if (profile) {
-          const isDouble = profile.tipo_abbonamento === "annuale" || profile.tipo_abbonamento === "lifetime";
-          const finalPts = isDouble ? parseInt(String(points), 10) * 2 : parseInt(String(points), 10);
-          await checkAndAwardPointRewards(adminDb, profile.id, (profile.punti || 0) + finalPts);
+      let rewardMsg = "";
+      let targetProfile = null;
+      if (userId) {
+        const { data: p } = await adminDb.from("profiles").select("*").eq("id", userId).maybeSingle();
+        targetProfile = p;
+      }
+      if (!targetProfile && userEmail) {
+        let query = adminDb.from("profiles").select("*");
+        if (userEmail.includes("@")) {
+          query = query.eq("email", userEmail.trim());
+        } else {
+          const clean = userEmail.replace(/^@/, "").trim();
+          query = query.ilike("email", `${clean}@%`);
         }
+        const { data: p } = await query.maybeSingle();
+        targetProfile = p;
       }
 
-      return NextResponse.json({ success: true, message: "Correzione salvata e contestazione risolta!" });
+      if (targetProfile) {
+        const isDouble = targetProfile.tipo_abbonamento === "annuale" || targetProfile.tipo_abbonamento === "lifetime";
+        let basePts = points ? parseInt(String(points), 10) : (isDouble ? 20 : 10);
+        const finalPts = isDouble && basePts === 10 ? 20 : basePts;
+        const newTotal = (targetProfile.punti || 0) + finalPts;
+        const resReward = await checkAndAwardPointRewards(adminDb, targetProfile.id, newTotal);
+        rewardMsg = ` Assegnati ${finalPts} pt a ${targetProfile.email ? `@${targetProfile.email.split("@")[0]}` : "chi ha corretto"}!`;
+        if (resReward?.message) rewardMsg += ` (${resReward.message})`;
+      }
+
+      return NextResponse.json({ success: true, message: `Correzione salvata e contestazione risolta!${rewardMsg}` });
     }
 
     if (action === "delete_blooper") {
@@ -219,7 +254,40 @@ export async function POST(request: Request) {
       if (blooper_id) {
         await adminDb.from("errori").delete().eq("id", blooper_id);
       }
-      return NextResponse.json({ success: true, message: "Blooper eliminato definitivamente." });
+
+      // Assegna punti al segnalatore della contestazione per aver smascherato il fake blooper
+      let rewardMsg = "";
+      let targetProfile = null;
+      if (userId) {
+        const { data: p } = await adminDb.from("profiles").select("*").eq("id", userId).maybeSingle();
+        targetProfile = p;
+      }
+      if (!targetProfile && userEmail) {
+        let query = adminDb.from("profiles").select("*");
+        if (userEmail.includes("@")) {
+          query = query.eq("email", userEmail.trim());
+        } else {
+          const clean = userEmail.replace(/^@/, "").trim();
+          query = query.ilike("email", `${clean}@%`);
+        }
+        const { data: p } = await query.maybeSingle();
+        targetProfile = p;
+      }
+
+      if (targetProfile) {
+        const isDouble = targetProfile.tipo_abbonamento === "annuale" || targetProfile.tipo_abbonamento === "lifetime";
+        let basePts = points ? parseInt(String(points), 10) : (isDouble ? 20 : 10);
+        const finalPts = isDouble && basePts === 10 ? 20 : basePts;
+        const newTotal = (targetProfile.punti || 0) + finalPts;
+        const resReward = await checkAndAwardPointRewards(adminDb, targetProfile.id, newTotal);
+        rewardMsg = ` Assegnati ${finalPts} pt a ${targetProfile.email ? `@${targetProfile.email.split("@")[0]}` : "chi ha smascherato l'errore"}!`;
+        if (resReward?.message) rewardMsg += ` (${resReward.message})`;
+      }
+
+      return NextResponse.json({ 
+        success: true, 
+        message: `Blooper errato eliminato definitivamente dall'archivio.${rewardMsg}` 
+      });
     }
 
     if (action === "ignore_contestation") {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sparkles, PlusCircle, AlertCircle, Filter, Send } from "lucide-react";
+import { Sparkles, PlusCircle, AlertCircle, Filter, Send, Trophy, CheckCircle } from "lucide-react";
 import { Film, Blooper, BlooperCategoria } from "@/lib/types";
 import BlooperItem from "@/components/BlooperItem";
 import AuthModal from "@/components/AuthModal";
@@ -15,6 +15,7 @@ interface BloopersSectionProps {
 export default function BloopersSection({ film, initialBloopers }: BloopersSectionProps) {
   const [bloopers, setBloopers] = useState<Blooper[]>(initialBloopers);
   const [user, setUser] = useState<any>(null);
+  const [profile, setProfile] = useState<any>(null);
   const [generating, setGenerating] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>("Tutte");
   const [showSubmitModal, setShowSubmitModal] = useState(false);
@@ -30,7 +31,18 @@ export default function BloopersSection({ film, initialBloopers }: BloopersSecti
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }: { data: any }) => setUser(data?.user || null));
+    supabase.auth.getUser().then(async ({ data }: { data: any }) => {
+      const u = data?.user || null;
+      setUser(u);
+      if (u) {
+        const { data: prof } = await supabase
+          .from("profiles")
+          .select("tier, tipo_abbonamento, punti")
+          .eq("id", u.id)
+          .maybeSingle();
+        if (prof) setProfile(prof);
+      }
+    });
   }, []);
 
   // Generazione bloopers con Gemini
@@ -218,14 +230,75 @@ export default function BloopersSection({ film, initialBloopers }: BloopersSecti
       {showSubmitModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
           <div className="w-full max-w-lg rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl">
-            <h3 className="text-lg font-black text-white mb-1">✍️ Invia Segnalazione Blooper</h3>
-            <p className="text-xs text-zinc-400 mb-4">
-              La tua segnalazione verrà esaminata dal moderatore. Una volta approvata, guadagnerai punti per scalare la classifica!
-            </p>
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-lg font-black text-white flex items-center gap-2">
+                <span>✍️ Segnala un Nuovo Blooper</span>
+              </h3>
+              <button
+                type="button"
+                onClick={() => setShowSubmitModal(false)}
+                className="text-zinc-400 hover:text-white text-xs px-2 py-1 rounded-lg hover:bg-zinc-800 transition"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Box Trasparenza Punti & Premi */}
+            <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-950/30 via-zinc-900 to-zinc-950 p-4 mb-4 text-xs space-y-2.5 shadow-md">
+              <div className="flex items-center justify-between">
+                <span className="font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5 text-[11px]">
+                  <Trophy className="h-3.5 w-3.5" /> Come e quanti punti ricevi:
+                </span>
+                {profile && (
+                  <span className="text-[11px] font-bold text-zinc-300">
+                    I tuoi punti: <strong className="text-amber-400">{profile.punti || 0} pt</strong>
+                  </span>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-zinc-300">
+                <div className="p-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800/80">
+                  <div className="font-bold text-white flex items-center gap-1 mb-1">
+                    <span className="text-emerald-400">🎯 +10 Punti</span> per approvazione
+                  </div>
+                  <p className="text-zinc-400 text-[10px] leading-tight">
+                    Ad ogni blooper approvato ricevi 10 punti. 
+                    <strong className="text-amber-300"> +20 Punti (2x)</strong> per membri con Piano Annuale o Lifetime!
+                  </p>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800/80">
+                  <div className="font-bold text-white flex items-center gap-1 mb-1">
+                    <span className="text-amber-400">🎁 Mesi Premium Gratis</span>
+                  </div>
+                  <p className="text-zinc-400 text-[10px] leading-tight">
+                    Ogni <strong className="text-white">50 punti</strong> accumulati sblocchi in automatico <strong className="text-amber-300">1 mese di Premium gratuito</strong>. A 10.000 punti sblocchi il <strong className="text-amber-300">Lifetime a vita!</strong>
+                  </p>
+                </div>
+              </div>
+            </div>
 
             {submitSuccess ? (
-              <div className="py-8 text-center text-emerald-400 font-bold text-sm">
-                Segnalazione inviata con successo alla moderazione! 🎉
+              <div className="py-6 text-center space-y-3 animate-in fade-in">
+                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 mx-auto">
+                  <CheckCircle className="h-6 w-6" />
+                </div>
+                <h4 className="text-base font-bold text-emerald-400">
+                  Segnalazione inviata con successo! 🎉
+                </h4>
+                <p className="text-xs text-zinc-300 max-w-sm mx-auto leading-relaxed">
+                  La tua segnalazione è stata inviata alla moderazione. Appena verificata e approvata dallo staff, riceverai <strong className="text-amber-300">{profile?.tipo_abbonamento === "annuale" || profile?.tipo_abbonamento === "lifetime" ? "+20 Punti (Punti 2x Piano Annuale/Lifetime!)" : "+10 Punti"}</strong> direttamente sul tuo profilo per scalare la classifica!
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSubmitSuccess(false);
+                    setShowSubmitModal(false);
+                  }}
+                  className="mt-2 px-4 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 text-white transition"
+                >
+                  Chiudi
+                </button>
               </div>
             ) : (
               <form onSubmit={handleSubmitReport} className="space-y-4">

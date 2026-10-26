@@ -181,35 +181,47 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
 
       {/* Box Inserimento Motivazione Contestazione (Dislike) */}
       {showContestForm && (
-        <div className="mb-4 rounded-xl border border-rose-500/40 bg-rose-500/10 p-3.5 space-y-2.5 animate-in fade-in">
+        <div className="mb-4 rounded-xl border border-rose-500/40 bg-zinc-950 p-4 space-y-3 animate-in fade-in shadow-lg">
           <div className="flex items-center justify-between text-xs font-bold text-rose-300">
             <span className="flex items-center gap-1.5">
-              <AlertTriangle className="h-3.5 w-3.5 text-rose-400" />
+              <AlertTriangle className="h-4 w-4 text-rose-400" />
               Motiva la contestazione dell&apos;errore
             </span>
             <button
               type="button"
               onClick={() => setShowContestForm(false)}
-              className="text-zinc-400 hover:text-white text-xs"
+              className="text-zinc-400 hover:text-white text-xs px-2 py-0.5 rounded hover:bg-zinc-800 transition"
             >
               ✕ Chiudi
             </button>
           </div>
-          <p className="text-[11px] text-zinc-300 leading-normal">
-            Spiega brevemente perché ritieni questo errore non attendibile (es. è giustificato dalla trama, minuto errato, effetto speciale intenzionale, ecc.):
+
+          {/* Banner Punti & Ricompensa */}
+          <div className="p-2.5 rounded-xl bg-gradient-to-r from-amber-950/40 via-zinc-900 to-zinc-950 border border-amber-500/30 text-xs space-y-1">
+            <div className="flex items-center gap-1.5 text-amber-400 font-bold text-[11px]">
+              <Sparkles className="h-3.5 w-3.5" />
+              <span>Ricompensa per segnalazione valida:</span>
+            </div>
+            <p className="text-[11px] text-zinc-300 leading-normal">
+              Se la tua contestazione corregge il blooper oppure <strong className="text-white">smaschera un errore inesistente</strong> portando alla sua rimozione, lo staff ti accredita <strong className="text-amber-300">+10 Punti</strong> (<strong className="text-amber-300">+20 Punti 2x</strong> con Piano Annuale/Lifetime) per scalare la classifica e sbloccare mesi Premium gratuiti!
+            </p>
+          </div>
+
+          <p className="text-[11px] text-zinc-400 leading-normal">
+            Spiega brevemente perché ritieni questo errore non attendibile (es. minuto errato, effetto speciale intenzionale, anacronismo inesistente, ecc.):
           </p>
           <textarea
             value={contestReason}
             onChange={(e) => setContestReason(e.target.value)}
-            placeholder="Scrivi qui la motivazione del dislike..."
+            placeholder="Scrivi qui la motivazione del dislike / contestazione..."
             rows={2}
-            className="w-full rounded-lg bg-zinc-950 border border-zinc-700 p-2 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-rose-400"
+            className="w-full rounded-lg bg-zinc-900 border border-zinc-700 p-2.5 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-rose-400"
           />
           <div className="flex items-center justify-end gap-2 pt-1">
             <button
               type="button"
               onClick={() => setShowContestForm(false)}
-              className="px-2.5 py-1 rounded-lg text-xs font-medium text-zinc-400 hover:text-white bg-zinc-800/80 transition"
+              className="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-white bg-zinc-800 transition"
             >
               Annulla
             </button>
@@ -228,7 +240,7 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
                 }
               }}
               disabled={loading}
-              className="px-3 py-1 rounded-lg text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 transition shadow disabled:opacity-50"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 transition shadow disabled:opacity-50"
             >
               Invia Contestazione (👎)
             </button>

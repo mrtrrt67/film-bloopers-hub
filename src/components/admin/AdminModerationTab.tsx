@@ -87,10 +87,11 @@ export default function AdminModerationTab() {
   };
 
   const handleSaveContestCorrection = async (contest: any) => {
+    const defaultPts = contest.is_double_points ? 20 : 10;
     const edit = contestEditMap[contest.id] || {
       minuto: contest.errori?.minuto || "",
       descrizione: contest.errori?.descrizione || "",
-      points: 10,
+      points: defaultPts,
     };
 
     try {
@@ -102,6 +103,7 @@ export default function AdminModerationTab() {
           blooper_id: contest.errore_id,
           contestazione_id: contest.id,
           userId: contest.user_id,
+          userEmail: contest.user_email,
           minuto: edit.minuto,
           descrizione: edit.descrizione,
           points: edit.points,
@@ -109,7 +111,7 @@ export default function AdminModerationTab() {
       });
       const json = await res.json();
       if (res.ok) {
-        alert(json.message || "Contestazione accettata: blooper corretto e punti assegnati al segnalatore!");
+        alert(json.message || `Contestazione accettata: blooper corretto e ${edit.points} punti assegnati al segnalatore!`);
         setData((prev) => ({
           ...prev,
           contestazioni: prev.contestazioni.filter((c) => c.id !== contest.id),
@@ -123,7 +125,13 @@ export default function AdminModerationTab() {
   };
 
   const handleDeleteContestedBlooper = async (contest: any) => {
-    if (!confirm("Eliminare definitivamente questo blooper errato e chiudere la contestazione?")) return;
+    const defaultPts = contest.is_double_points ? 20 : 10;
+    const edit = contestEditMap[contest.id] || {
+      points: defaultPts,
+    };
+    const pts = edit.points;
+    const authorName = contest.user_handle || (contest.user_email ? `@${contest.user_email.split("@")[0]}` : "all'utente che ha smascherato l'errore");
+    if (!confirm(`Eliminare definitivamente questo blooper errato dal catalogo ed assegnare ${pts} punti a ${authorName} per averlo smascherato?`)) return;
     try {
       const res = await fetch("/api/admin/moderation", {
         method: "POST",
@@ -132,11 +140,14 @@ export default function AdminModerationTab() {
           action: "delete_blooper",
           blooper_id: contest.errore_id,
           contestazione_id: contest.id,
+          userId: contest.user_id,
+          userEmail: contest.user_email,
+          points: pts,
         }),
       });
       const json = await res.json();
       if (res.ok) {
-        alert(json.message || "Blooper errato eliminato dall'archivio.");
+        alert(json.message || `Blooper errato eliminato dall'archivio e ${pts} punti assegnati!`);
         setData((prev) => ({
           ...prev,
           contestazioni: prev.contestazioni.filter((c) => c.id !== contest.id),
@@ -407,8 +418,8 @@ export default function AdminModerationTab() {
               <p><strong>Bloopers Contestati dalla Community:</strong> Bloopers già pubblicati che un utente registrato ritiene errati o inesatti (es. minuto sbagliato, anacronismo inesistente).</p>
               <p className="text-[11px] text-zinc-300">
                 • <strong>Accetta & Correggi:</strong> Salva il minuto/descrizione corretti, assegna i punti all&apos;utente e archivia la contestazione.<br />
-                • <strong>Elimina Blooper Errato:</strong> Elimina definitivamente il blooper dal catalogo se la segnalazione era totalmente errata.<br />
-                • <strong>Respingi Contestazione:</strong> La contestazione era infondata: mantieni il blooper invariato e rimuovi la contestazione.
+                • <strong>Elimina Blooper Errato:</strong> Elimina definitivamente il blooper dal catalogo se la segnalazione era totalmente errata e <strong>assegna i punti all&apos;utente</strong> che lo ha smascherato.<br />
+                • <strong>Respingi Contestazione:</strong> La contestazione era infondata: mantieni il blooper invariato e rimuovi la contestazione senza assegnare punti.
               </p>
             </div>
           </div>
@@ -419,10 +430,11 @@ export default function AdminModerationTab() {
             </div>
           ) : (
             data.contestazioni.map((c) => {
+              const defaultPts = c.is_double_points ? 20 : 10;
               const currentEdit = contestEditMap[c.id] || {
                 minuto: c.errori?.minuto || "",
                 descrizione: c.errori?.descrizione || "",
-                points: 10,
+                points: defaultPts,
               };
 
               return (
@@ -430,10 +442,20 @@ export default function AdminModerationTab() {
                   key={c.id}
                   className="rounded-2xl border border-rose-500/30 bg-zinc-900/60 p-5 space-y-4"
                 >
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-bold text-white">
-                      🎬 {c.errori?.films?.titolo || "Film"} ({c.errori?.films?.anno || "N/D"})
-                    </span>
+                  <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-bold text-white">
+                        🎬 {c.errori?.films?.titolo || "Film"} ({c.errori?.films?.anno || "N/D"})
+                      </span>
+                      <span className="text-[11px] px-2 py-0.5 rounded-md bg-zinc-800 text-zinc-300 border border-zinc-700">
+                        Contestato da: <strong className="text-amber-400">{c.user_handle || (c.user_email ? `@${c.user_email.split("@")[0]}` : "Utente")}</strong>
+                      </span>
+                      {c.is_double_points && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold">
+                          ⚡ 2x Punti (Abbonato)
+                        </span>
+                      )}
+                    </div>
                     <span className="text-zinc-500 font-mono text-[11px]">
                       {c.created_at ? c.created_at.slice(0, 16).replace("T", " ") : ""}
                     </span>
@@ -486,7 +508,7 @@ export default function AdminModerationTab() {
                           onChange={(e) =>
                             setContestEditMap({
                               ...contestEditMap,
-                              [c.id]: { ...currentEdit, points: parseInt(e.target.value, 10) || 10 },
+                              [c.id]: { ...currentEdit, points: parseInt(e.target.value, 10) || defaultPts },
                             })
                           }
                           className="w-14 rounded-lg bg-zinc-950 border border-zinc-700 px-2 py-1 text-xs text-white font-mono"
@@ -504,15 +526,15 @@ export default function AdminModerationTab() {
                         </button>
                         <button
                           onClick={() => handleDeleteContestedBlooper(c)}
-                          title="Elimina definitivamente questo blooper dall'archivio e chiudi la contestazione"
+                          title="Elimina definitivamente questo blooper dall'archivio, assegna i punti all'utente che ha smascherato il fake blooper e chiudi la contestazione"
                           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 border border-rose-500/30 font-bold text-xs hover:bg-rose-500 hover:text-zinc-950 active:scale-95 transition"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
-                          <span>Elimina Blooper Errato</span>
+                          <span>Elimina Blooper Errato (+{currentEdit.points}pt)</span>
                         </button>
                         <button
                           onClick={() => handleIgnoreContest(c.id)}
-                          title="La contestazione è infondata: mantieni il blooper invariato ed elimina solo la contestazione"
+                          title="La contestazione è infondata: mantieni il blooper invariato ed elimina solo la contestazione senza assegnare punti"
                           className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-300 border border-zinc-700 font-bold text-xs hover:text-white hover:bg-zinc-700 active:scale-95 transition"
                         >
                           <XCircle className="h-3.5 w-3.5" />
