@@ -155,7 +155,7 @@ function PricingContent() {
       )}
 
       {/* Grid Piani */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 items-stretch">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4.5 2xl:gap-6 items-stretch">
         {PRICING_PLANS.map((plan) => {
           const isPromo = plan.id === "lifetime-promo";
           const isAnnuale = plan.id === "annuale";
@@ -167,7 +167,7 @@ function PricingContent() {
           return (
             <div
               key={plan.id}
-              className={`relative flex flex-col justify-between rounded-2xl p-6 transition-all ${
+              className={`relative flex flex-col justify-between rounded-2xl p-5 xl:p-4.5 2xl:p-6 transition-all ${
                 isPromo
                   ? "border-2 border-amber-500 bg-gradient-to-b from-amber-950/40 via-zinc-900 to-zinc-950 shadow-2xl shadow-amber-500/10 scale-[1.02]"
                   : isAnnuale
@@ -177,12 +177,12 @@ function PricingContent() {
             >
               {/* Badge in evidenza */}
               {isPromo && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-0.5 text-[10px] font-black uppercase tracking-wider text-zinc-950 shadow-md">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-0.5 text-[10px] font-black uppercase tracking-wider text-zinc-950 shadow-md whitespace-nowrap">
                   Offerta di Lancio
                 </div>
               )}
               {isAnnuale && (
-                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-purple-500 px-3 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-md">
+                <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-purple-500 px-3 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-md whitespace-nowrap">
                   Più Popolare
                 </div>
               )}
@@ -191,16 +191,20 @@ function PricingContent() {
                 <div className="flex items-center justify-between mb-1">
                   <h3 className="text-base font-bold text-white">{plan.name}</h3>
                   {isCurrentPlan && (
-                    <span className="rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5">
+                    <span className="rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5 whitespace-nowrap">
                       Attivo
                     </span>
                   )}
                 </div>
                 <p className="text-xs text-zinc-400 min-h-[36px] mb-4">{plan.description}</p>
 
-                <div className="flex items-baseline gap-1 mb-6">
-                  <span className="text-3xl font-black text-white">{plan.price}</span>
-                  <span className="text-xs text-zinc-400 font-medium">/ {plan.period}</span>
+                <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-0.5 mb-5">
+                  <span className="text-2xl 2xl:text-3xl font-black text-white whitespace-nowrap tracking-tight">
+                    {plan.price.replace(/\s+/g, "\u00A0")}
+                  </span>
+                  <span className="text-xs text-zinc-400 font-medium whitespace-nowrap">
+                    / {plan.period}
+                  </span>
                 </div>
 
                 {/* Features List */}
@@ -224,7 +228,7 @@ function PricingContent() {
               {plan.id === "free" ? (
                 <button
                   disabled
-                  className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 py-2.5 text-xs font-bold text-zinc-400 cursor-default"
+                  className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 py-2.5 px-3 text-xs font-bold text-zinc-400 cursor-default whitespace-nowrap"
                 >
                   {isCurrentPlan ? "Piano Attuale" : "Incluso"}
                 </button>
@@ -232,7 +236,7 @@ function PricingContent() {
                 <button
                   onClick={handleManageBilling}
                   disabled={openingPortal}
-                  className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-purple-500/50 bg-purple-500/20 py-2.5 text-xs font-bold text-purple-300 hover:bg-purple-500/30 transition shadow"
+                  className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-purple-500/50 bg-purple-500/20 py-2.5 px-3 text-xs font-bold text-purple-300 hover:bg-purple-500/30 transition shadow whitespace-nowrap"
                 >
                   <span>{openingPortal ? "Apertura..." : "Disdici / Gestisci"}</span>
                 </button>
@@ -240,7 +244,7 @@ function PricingContent() {
                 <button
                   onClick={() => handleSelectPlan(plan.id)}
                   disabled={loadingPlan === plan.id}
-                  className={`w-full flex items-center justify-center gap-1.5 rounded-xl py-2.5 text-xs font-bold transition-all shadow-md ${
+                  className={`w-full flex items-center justify-center gap-1.5 rounded-xl py-2.5 px-3 text-xs font-bold transition-all shadow-md whitespace-nowrap ${
                     isPromo
                       ? "bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-950 hover:brightness-110 shadow-amber-500/20"
                       : isAnnuale
@@ -253,7 +257,7 @@ function PricingContent() {
                   ) : (
                     <>
                       <span>{isPromo ? "Acquista Promo" : `Scegli ${plan.name}`}</span>
-                      <ArrowRight className="h-3 w-3" />
+                      <ArrowRight className="h-3 w-3 shrink-0" />
                     </>
                   )}
                 </button>

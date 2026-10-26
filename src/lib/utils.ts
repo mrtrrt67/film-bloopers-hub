@@ -223,6 +223,6 @@ export function formatDateItalian(dateInput: string | Date | null | undefined): 
 export function formatHighlightedDateItalian(dateInput: string | Date | null | undefined): string {
   const formatted = formatDateItalian(dateInput);
   if (!formatted) return "";
-  return `<strong class="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black shadow-sm mx-1 tracking-normal">${formatted}</strong>`;
+  return `<strong class="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black shadow-sm mx-1.5 align-middle tracking-normal whitespace-nowrap">${formatted}</strong>`;
 }
 

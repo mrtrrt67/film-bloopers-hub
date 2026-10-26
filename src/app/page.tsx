@@ -143,7 +143,7 @@ export default async function HomePage() {
       />
 
       {/* Hero Section */}
-      <div className="relative overflow-hidden rounded-3xl border border-zinc-800 bg-gradient-to-b from-zinc-900/90 via-zinc-950 to-zinc-950 p-8 sm:p-14 mb-16 text-center shadow-2xl">
+      <div className="relative overflow-hidden rounded-3xl border border-zinc-800 bg-gradient-to-b from-zinc-900/90 via-zinc-950 to-zinc-950 p-5 sm:p-10 md:p-14 mb-16 text-center shadow-2xl">
         <div className="mx-auto max-w-3xl">
           <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-amber-500/30 px-4 py-1.5 text-xs font-black text-amber-400 mb-6">
             <Flame className="h-4 w-4" />
@@ -162,17 +162,17 @@ export default async function HomePage() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-xl mx-auto">
             <Link
               href="/esplora"
-              className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 px-6 py-4 text-base font-black text-zinc-950 shadow-xl shadow-orange-500/20 hover:brightness-110 transition-all"
+              className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 px-4 sm:px-6 py-3.5 sm:py-4 text-sm sm:text-base font-black text-zinc-950 shadow-xl shadow-orange-500/20 hover:brightness-110 active:scale-98 transition-all whitespace-nowrap"
             >
-              <Search className="h-5 w-5" />
-              Cerca o Aggiungi un Film
+              <Search className="h-4.5 w-4.5 sm:h-5 sm:w-5 shrink-0" />
+              <span>Cerca o Aggiungi un Film</span>
             </Link>
             <Link
               href="/classifica"
-              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-2xl border border-zinc-700 bg-zinc-900/80 px-6 py-4 text-base font-bold text-white hover:bg-zinc-800 transition-colors"
+              className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-2xl border border-zinc-700 bg-zinc-900/80 px-4 sm:px-6 py-3.5 sm:py-4 text-sm sm:text-base font-bold text-white hover:bg-zinc-800 active:scale-98 transition-colors whitespace-nowrap"
             >
-              <Trophy className="h-5 w-5 text-amber-400" />
-              Classifica Community
+              <Trophy className="h-4.5 w-4.5 sm:h-5 sm:w-5 text-amber-400 shrink-0" />
+              <span>Classifica Community</span>
             </Link>
           </div>
         </div>
