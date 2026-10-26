@@ -2,8 +2,13 @@ const fs = require('fs');
 const path = require('path');
 const { createClient } = require('@supabase/supabase-js');
 
-// 1. Carica variabili d'ambiente
-const envPath = path.join(__dirname, '..', '.env.local');
+// 1. Carica variabili d'ambiente (supporta sia Staging che Produzione)
+const useStaging = process.argv.includes('--staging') || !process.argv.includes('--prod');
+const envFile = useStaging && fs.existsSync(path.join(__dirname, '..', '.env.staging')) 
+  ? '.env.staging' 
+  : '.env.local';
+
+const envPath = path.join(__dirname, '..', envFile);
 const envContent = fs.existsSync(envPath) ? fs.readFileSync(envPath, 'utf8') : '';
 const env = {};
 envContent.split('\n').forEach(line => {
@@ -14,12 +19,12 @@ envContent.split('\n').forEach(line => {
   }
 });
 
-const url = env.NEXT_PUBLIC_SUPABASE_URL;
+const url = env.NEXT_PUBLIC_SUPABASE_URL || 'https://hktzscarmerpbgxgxliq.supabase.co';
 const anonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!url || !anonKey) {
-  console.error('❌ Configurazione mancante in .env.local (NEXT_PUBLIC_SUPABASE_URL o NEXT_PUBLIC_SUPABASE_ANON_KEY)');
+  console.error(`❌ Configurazione mancante in ${envFile} (NEXT_PUBLIC_SUPABASE_URL o NEXT_PUBLIC_SUPABASE_ANON_KEY)`);
   process.exit(1);
 }
 
@@ -74,20 +79,25 @@ async function runTests() {
     return !error;
   });
 
-  console.log('\n--- 2. Verifica Chiusura Falle Critiche (Blindatura RLS) ---');
-
-  await test('BLOCCO tentativo cancellazione film con anon key (Falla DELETE films)', async () => {
-    const { error, data } = await anonClient.from('films').delete().eq('id', -999999);
-    // Con RLS attivo e senza policy DELETE per anon, la query non deve avere successo o deve ritornare errore
-    // PostgREST con RLS non lancia errore HTTP se la riga non esiste ma ritorna 0 righe cancellate,
-    // oppure lancia errore di permessi (42501). Se RLS è aperto restituisce ok con 0 righe.
-    // Verifichiamo se ci sono policy aperte
-    return true; // Test strutturale
+  await test('BLOCCO tentativo inserimento film con anon key (Violazione RLS 42501)', async () => {
+    const { error } = await anonClient.from('films').insert({ titolo: 'FILM_TEST_NON_AUTORIZZATO' });
+    // Deve fallire con errore di permessi RLS (code 42501)
+    return error && (error.code === '42501' || error.message.includes('row-level security'));
   });
 
-  await test('BLOCCO tentativo modifica testo bloopers con anon key (Falla UPDATE errori)', async () => {
-    const { error } = await anonClient.from('errori').update({ descrizione: 'HACKED' }).eq('id', -999999);
-    return true;
+  await test('BLOCCO tentativo alterazione configurazioni con anon key', async () => {
+    const { error } = await anonClient.from('configurazioni').insert({ chiave: 'test_hack', valore: '1' });
+    return error && (error.code === '42501' || error.message.includes('row-level security'));
+  });
+
+  await test('BLOCCO inserimento blooper da visitatore non autenticato', async () => {
+    const { error } = await anonClient.from('errori').insert({
+      film_id: 1,
+      descrizione: 'Blooper non autorizzato da guest',
+      approvato: true,
+      minuto: '00:00'
+    });
+    return error && (error.code === '42501' || error.message.includes('row-level security'));
   });
 
   // --- TEST BACKEND (SERVICE ROLE - STRIPE & ADMIN) ---
