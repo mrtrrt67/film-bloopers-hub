@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, CheckCircle, AlertCircle, ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
@@ -18,61 +18,82 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState(false);
   const router = useRouter();
   const supabase = createClient();
+  const exchangingRef = useRef(false);
 
   useEffect(() => {
     let isMounted = true;
+
+    // Ascolta eventi di autenticazione in tempo reale (gestisce sia token hash che PKCE)
+    const { data: authListener } = supabase.auth.onAuthStateChange((event: any, s: any) => {
+      if (!isMounted) return;
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN" || s) {
+        setSessionReady(true);
+        setVerifying(false);
+        setError(null);
+      }
+    });
 
     async function initAuth() {
       try {
         const params = new URLSearchParams(window.location.search);
         const code = params.get("code");
 
-        // 1. Se c'è il parametro PKCE code nell'URL, scambialo per una sessione valida
-        if (code) {
+        // 1. Controlla prima se c'è già una sessione attiva (es. scambiata in automatico o già loggato)
+        const { data: { session: existingSession } } = await supabase.auth.getSession();
+        if (existingSession) {
+          if (isMounted) {
+            setSessionReady(true);
+            setVerifying(false);
+            setError(null);
+          }
+          return;
+        }
+
+        // 2. Se c'è il parametro PKCE code nell'URL, scambialo per una sessione valida (una sola volta)
+        if (code && !exchangingRef.current) {
+          exchangingRef.current = true;
           const { error: exchangeErr } = await supabase.auth.exchangeCodeForSession(code);
+
+          // Rimuovi il codice dall'URL per evitare tentativi di re-scambio duplicati
+          if (typeof window !== "undefined") {
+            window.history.replaceState({}, document.title, window.location.pathname);
+          }
+
           if (exchangeErr) {
-            console.error("Errore scambio codice sessione:", exchangeErr);
+            console.warn("Avviso scambio codice sessione:", exchangeErr);
+
+            // Verifica di riserva: controlla se la sessione è stata comunque creata in background
+            const { data: { session: checkSession } } = await supabase.auth.getSession();
+            if (checkSession) {
+              if (isMounted) {
+                setSessionReady(true);
+                setVerifying(false);
+                setError(null);
+              }
+              return;
+            }
+
             if (isMounted) {
               setError("Il link di recupero password è scaduto o è già stato utilizzato. Richiedi una nuova email di recupero.");
               setVerifying(false);
             }
             return;
           }
+
           if (isMounted) {
             setSessionReady(true);
             setVerifying(false);
+            setError(null);
           }
           return;
         }
 
-        // 2. Se non c'è il codice nei query params, controlla se c'è già una sessione attiva (es. hash fragment o sessione esistente)
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          if (isMounted) {
-            setSessionReady(true);
+        // 3. Se non c'è il codice, attendi 2 secondi per verificare se arriva tramite listener o hash
+        setTimeout(() => {
+          if (isMounted && verifying && !sessionReady) {
             setVerifying(false);
           }
-        } else {
-          // Attendi eventuale evento PASSWORD_RECOVERY da hash fragment
-          const { data: authListener } = supabase.auth.onAuthStateChange((event: any, s: any) => {
-            if (!isMounted) return;
-            if (event === "PASSWORD_RECOVERY" || s) {
-              setSessionReady(true);
-              setVerifying(false);
-            }
-          });
-
-          // Timeout di sicurezza se nessun token viene rilevato dopo 2 secondi
-          setTimeout(() => {
-            if (isMounted && verifying) {
-              setVerifying(false);
-            }
-          }, 2000);
-
-          return () => {
-            authListener.subscription.unsubscribe();
-          };
-        }
+        }, 2000);
       } catch (err: any) {
         console.error("Errore inizializzazione reset password:", err);
         if (isMounted) {
@@ -86,6 +107,7 @@ export default function ResetPasswordPage() {
 
     return () => {
       isMounted = false;
+      authListener?.subscription?.unsubscribe();
     };
   }, []);
 
