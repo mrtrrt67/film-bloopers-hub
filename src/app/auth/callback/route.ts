@@ -6,22 +6,24 @@ export async function GET(request: Request) {
   const code = searchParams.get("code");
   const next = searchParams.get("next") ?? "/auth/reset-password";
 
+  const forwardedHost = request.headers.get("x-forwarded-host");
+  const isLocalEnv = process.env.NODE_ENV === "development";
+  const redirectBase = isLocalEnv
+    ? origin
+    : forwardedHost
+    ? `https://${forwardedHost}`
+    : process.env.NEXT_PUBLIC_SITE_URL || origin;
+
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) {
-      const forwardedHost = request.headers.get("x-forwarded-host");
-      const isLocalEnv = process.env.NODE_ENV === "development";
-      if (isLocalEnv) {
-        return NextResponse.redirect(`${origin}${next}`);
-      } else if (forwardedHost) {
-        return NextResponse.redirect(`https://${forwardedHost}${next}`);
-      } else {
-        return NextResponse.redirect(`${origin}${next}`);
-      }
+      return NextResponse.redirect(`${redirectBase}${next}`);
+    } else {
+      console.error("Errore scambio codice in /auth/callback:", error);
     }
   }
 
   // Se lo scambio codice fallisce, reindirizza con messaggio di errore
-  return NextResponse.redirect(`${origin}/auth/reset-password?error=auth-code-error`);
+  return NextResponse.redirect(`${redirectBase}/auth/reset-password?error=auth-code-error`);
 }

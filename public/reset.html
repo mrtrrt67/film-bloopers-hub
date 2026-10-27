@@ -8,7 +8,7 @@
       // Cattura query string (?code=...) e hash fragment (#access_token=...)
       var search = window.location.search || '';
       var hash = window.location.hash || '';
-      var target = '/auth/reset-password' + search + hash;
+      var target = '/auth/callback' + search + (search ? '&next=/auth/reset-password' : '?next=/auth/reset-password') + hash;
       window.location.replace(target);
     })();
   </script>

@@ -37,8 +37,18 @@ export default function ResetPasswordPage() {
       try {
         const params = new URLSearchParams(window.location.search);
         const code = params.get("code");
+        const authError = params.get("error");
 
-        // 1. Controlla prima se c'è già una sessione attiva (es. scambiata in automatico o già loggato)
+        // 1. Se c'è un errore esplicito restituito dal callback o dall'autenticazione
+        if (authError) {
+          if (isMounted) {
+            setError("Il link di recupero password è scaduto o è già stato utilizzato. Richiedi una nuova email di recupero.");
+            setVerifying(false);
+          }
+          return;
+        }
+
+        // 2. Controlla prima se c'è già una sessione attiva (es. scambiata da /auth/callback)
         const { data: { session: existingSession } } = await supabase.auth.getSession();
         if (existingSession) {
           if (isMounted) {
@@ -49,51 +59,26 @@ export default function ResetPasswordPage() {
           return;
         }
 
-        // 2. Se c'è il parametro PKCE code nell'URL, scambialo per una sessione valida (una sola volta)
+        // 3. Se c'è il parametro code nell'URL, inoltralo a /auth/callback per lo scambio server-side (che scrive i cookie di sessione HTTP)
         if (code && !exchangingRef.current) {
           exchangingRef.current = true;
-          const { error: exchangeErr } = await supabase.auth.exchangeCodeForSession(code);
-
-          // Rimuovi il codice dall'URL per evitare tentativi di re-scambio duplicati
-          if (typeof window !== "undefined") {
-            window.history.replaceState({}, document.title, window.location.pathname);
-          }
-
-          if (exchangeErr) {
-            console.warn("Avviso scambio codice sessione:", exchangeErr);
-
-            // Verifica di riserva: controlla se la sessione è stata comunque creata in background
-            const { data: { session: checkSession } } = await supabase.auth.getSession();
-            if (checkSession) {
-              if (isMounted) {
-                setSessionReady(true);
-                setVerifying(false);
-                setError(null);
-              }
-              return;
-            }
-
-            if (isMounted) {
-              setError("Il link di recupero password è scaduto o è già stato utilizzato. Richiedi una nuova email di recupero.");
-              setVerifying(false);
-            }
-            return;
-          }
-
-          if (isMounted) {
-            setSessionReady(true);
-            setVerifying(false);
-            setError(null);
-          }
+          window.location.replace(`/auth/callback?code=${encodeURIComponent(code)}&next=/auth/reset-password`);
           return;
         }
 
-        // 3. Se non c'è il codice, attendi 2 secondi per verificare se arriva tramite listener o hash
-        setTimeout(() => {
-          if (isMounted && verifying && !sessionReady) {
+        // 4. Se non c'è il codice, attendi 1.5 secondi per verificare se arriva tramite listener o hash
+        setTimeout(async () => {
+          if (isMounted && !sessionReady) {
+            const { data: { session: retrySession } } = await supabase.auth.getSession();
+            if (retrySession) {
+              setSessionReady(true);
+              setError(null);
+            } else {
+              setError("Nessun link di recupero attivo rilevato. Richiedi una nuova email per reimpostare la tua password.");
+            }
             setVerifying(false);
           }
-        }, 2000);
+        }, 1500);
       } catch (err: any) {
         console.error("Errore inizializzazione reset password:", err);
         if (isMounted) {
