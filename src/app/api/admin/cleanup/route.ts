@@ -12,7 +12,8 @@ export async function POST() {
       return NextResponse.json({ error: "Accesso non autorizzato" }, { status: 403 });
     }
 
-    const adminDb = createAdminClient();
+    const hasServiceKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+    const adminDb = hasServiceKey ? createAdminClient() : supabase;
 
     // 1. Azzeramento suggerimenti
     await adminDb.from("suggerimenti").delete().neq("id", "00000000-0000-0000-0000-000000000000");

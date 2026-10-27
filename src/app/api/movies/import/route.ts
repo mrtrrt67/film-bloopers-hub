@@ -6,7 +6,8 @@ import { getTMDBMovieDetails, formatCredits } from "@/lib/tmdb";
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
-    const adminDb = createAdminClient();
+    const hasServiceKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+    const db = hasServiceKey ? createAdminClient() : supabase;
     const { tmdb_id } = await request.json();
 
     if (!tmdb_id) {
@@ -45,11 +46,22 @@ export async function POST(request: Request) {
       poster_url: formatted.poster_url,
     };
 
-    const { data: inserted, error: insertErr } = await adminDb
+    let { data: inserted, error: insertErr } = await db
       .from("films")
       .insert(newRecord)
       .select()
       .single();
+
+    // Se db ha dato errore e non era già supabase, tenta il fallback con il client della sessione utente
+    if (insertErr && db !== supabase) {
+      const retry = await supabase.from("films").insert(newRecord).select().single();
+      if (!retry.error && retry.data) {
+        inserted = retry.data;
+        insertErr = null;
+      } else {
+        insertErr = retry.error || insertErr;
+      }
+    }
 
     if (insertErr) {
       console.error("Errore inserimento film da TMDB:", insertErr);

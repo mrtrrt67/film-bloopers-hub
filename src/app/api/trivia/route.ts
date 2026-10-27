@@ -33,7 +33,8 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
-    const adminDb = createAdminClient();
+    const hasServiceKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+    const db = hasServiceKey ? createAdminClient() : supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     const body = await request.json();
@@ -41,23 +42,27 @@ export async function POST(request: Request) {
 
     // Azione 1: Like / Cuore a una curiosità
     if (action === "like" && trivia_id) {
-      // Incrementa like con admin client
-      const { data: current } = await adminDb
+      // 1. Prova prima con RPC se disponibile
+      const { data: rpcLikes, error: rpcErr } = await supabase.rpc("increment_trivia_likes", { trivia_id });
+      if (!rpcErr && typeof rpcLikes === "number") {
+        return NextResponse.json({ success: true, likes: rpcLikes });
+      }
+
+      // 2. Altrimenti lettura e update con db
+      const { data: current } = await db
         .from("movie_trivia")
         .select("likes")
         .eq("id", trivia_id)
         .single();
 
       const newLikes = (current?.likes || 0) + 1;
-      const { data: updated, error } = await adminDb
+      const { error: updErr } = await db
         .from("movie_trivia")
         .update({ likes: newLikes })
-        .eq("id", trivia_id)
-        .select()
-        .single();
+        .eq("id", trivia_id);
 
-      if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 });
+      if (updErr) {
+        return NextResponse.json({ error: updErr.message }, { status: 500 });
       }
 
       return NextResponse.json({ success: true, likes: newLikes });
@@ -82,21 +87,33 @@ export async function POST(request: Request) {
         ? `@${user.email.split("@")[0]}`
         : "Utente";
 
-      const { data: inserted, error } = await adminDb
+      const daInserire = {
+        film_id,
+        categoria: categoria || "Curiosità & Retroscena",
+        titolo,
+        descrizione,
+        fonte: fonte || null,
+        approvato: isUserAdmin, // Se inserito da admin è già approvato, altrimenti da moderare
+        inserito_da: authorHandle,
+        provenienza: "utente",
+        likes: 0,
+      };
+
+      let { data: inserted, error } = await db
         .from("movie_trivia")
-        .insert({
-          film_id,
-          categoria: categoria || "Curiosità & Retroscena",
-          titolo,
-          descrizione,
-          fonte: fonte || null,
-          approvato: isUserAdmin, // Se inserito da admin è già approvato, altrimenti da moderare
-          inserito_da: authorHandle,
-          provenienza: "utente",
-          likes: 0,
-        })
+        .insert(daInserire)
         .select()
         .single();
+
+      if (error && db !== supabase) {
+        const retry = await supabase.from("movie_trivia").insert(daInserire).select().single();
+        if (!retry.error && retry.data) {
+          inserted = retry.data;
+          error = null;
+        } else {
+          error = retry.error || error;
+        }
+      }
 
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });

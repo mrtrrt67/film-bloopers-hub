@@ -5,7 +5,8 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
-    const adminDb = createAdminClient();
+    const hasServiceKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
+    const db = hasServiceKey ? createAdminClient() : supabase;
     const { data: { user } } = await supabase.auth.getUser();
 
     const body = await request.json();
@@ -42,7 +43,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const { error: insertErr } = await adminDb.from("suggerimenti").insert({
+    const { error: insertErr } = await db.from("suggerimenti").insert({
       user_id: user?.id || null,
       email: emailUtente,
       messaggio: finalMessage,
