@@ -1,19 +1,93 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, CheckCircle, AlertCircle, ArrowLeft } from "lucide-react";
+import { Lock, CheckCircle, AlertCircle, ArrowLeft, Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [verifying, setVerifying] = useState(true);
+  const [sessionReady, setSessionReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
   const supabase = createClient();
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function initAuth() {
+      try {
+        const params = new URLSearchParams(window.location.search);
+        const code = params.get("code");
+
+        // 1. Se c'è il parametro PKCE code nell'URL, scambialo per una sessione valida
+        if (code) {
+          const { error: exchangeErr } = await supabase.auth.exchangeCodeForSession(code);
+          if (exchangeErr) {
+            console.error("Errore scambio codice sessione:", exchangeErr);
+            if (isMounted) {
+              setError("Il link di recupero password è scaduto o è già stato utilizzato. Richiedi una nuova email di recupero.");
+              setVerifying(false);
+            }
+            return;
+          }
+          if (isMounted) {
+            setSessionReady(true);
+            setVerifying(false);
+          }
+          return;
+        }
+
+        // 2. Se non c'è il codice nei query params, controlla se c'è già una sessione attiva (es. hash fragment o sessione esistente)
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          if (isMounted) {
+            setSessionReady(true);
+            setVerifying(false);
+          }
+        } else {
+          // Attendi eventuale evento PASSWORD_RECOVERY da hash fragment
+          const { data: authListener } = supabase.auth.onAuthStateChange((event: any, s: any) => {
+            if (!isMounted) return;
+            if (event === "PASSWORD_RECOVERY" || s) {
+              setSessionReady(true);
+              setVerifying(false);
+            }
+          });
+
+          // Timeout di sicurezza se nessun token viene rilevato dopo 2 secondi
+          setTimeout(() => {
+            if (isMounted && verifying) {
+              setVerifying(false);
+            }
+          }, 2000);
+
+          return () => {
+            authListener.subscription.unsubscribe();
+          };
+        }
+      } catch (err: any) {
+        console.error("Errore inizializzazione reset password:", err);
+        if (isMounted) {
+          setError(err?.message || "Impossibile validare il link di recupero.");
+          setVerifying(false);
+        }
+      }
+    }
+
+    initAuth();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -61,14 +135,30 @@ export default function ResetPasswordPage() {
           </p>
         </div>
 
-        {error && (
-          <div className="mb-4 flex items-center gap-2 rounded-xl bg-red-950/40 border border-red-800/60 p-3 text-xs text-red-300">
-            <AlertCircle className="h-4 w-4 shrink-0" />
-            <span>{error}</span>
+        {verifying ? (
+          <div className="flex flex-col items-center justify-center py-8 space-y-3">
+            <Loader2 className="h-8 w-8 text-amber-500 animate-spin" />
+            <p className="text-xs text-zinc-400">Verifica del link di recupero in corso...</p>
           </div>
-        )}
-
-        {success ? (
+        ) : error && !sessionReady ? (
+          <div className="space-y-4">
+            <div className="flex items-start gap-2.5 rounded-xl bg-red-950/40 border border-red-800/60 p-3.5 text-xs text-red-300">
+              <AlertCircle className="h-5 w-5 shrink-0 text-red-400 mt-0.5" />
+              <div className="space-y-1">
+                <span className="font-semibold block">Link non valido o scaduto</span>
+                <span>{error}</span>
+              </div>
+            </div>
+            <div className="text-center pt-2">
+              <Link
+                href="/"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors"
+              >
+                <ArrowLeft className="h-3.5 w-3.5" /> Torna alla home e richiedi un nuovo link
+              </Link>
+            </div>
+          </div>
+        ) : success ? (
           <div className="flex flex-col items-center text-center py-4 space-y-3">
             <CheckCircle className="h-10 w-10 text-emerald-400" />
             <h3 className="text-sm font-bold text-emerald-300">Password aggiornata con successo!</h3>
@@ -76,32 +166,57 @@ export default function ResetPasswordPage() {
           </div>
         ) : (
           <form onSubmit={handleReset} className="space-y-4">
+            {error && (
+              <div className="flex items-center gap-2 rounded-xl bg-red-950/40 border border-red-800/60 p-3 text-xs text-red-300">
+                <AlertCircle className="h-4 w-4 shrink-0" />
+                <span>{error}</span>
+              </div>
+            )}
+
             <div>
               <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
                 Nuova Password
               </label>
-              <input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
-              />
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full rounded-xl border border-zinc-800 bg-zinc-950 pl-3.5 pr-10 py-2.5 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                >
+                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             <div>
               <label className="block text-xs font-semibold text-zinc-300 mb-1.5">
                 Conferma Nuova Password
               </label>
-              <input
-                type="password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                placeholder="••••••••"
-                className="w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3.5 py-2.5 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
-              />
+              <div className="relative">
+                <input
+                  type={showConfirmPassword ? "text" : "password"}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="w-full rounded-xl border border-zinc-800 bg-zinc-950 pl-3.5 pr-10 py-2.5 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors"
+                >
+                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
 
             <button
