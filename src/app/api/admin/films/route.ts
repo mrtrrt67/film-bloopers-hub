@@ -16,7 +16,9 @@ export async function GET(request: Request) {
     const query = searchParams.get("q") || "";
     const filter = searchParams.get("filter") || "all";
 
-    let req = supabase.from("films").select("id, titolo, anno, regista, genere, trama, poster_url, attori, creato_il");
+    let req = supabase
+      .from("films")
+      .select("id, titolo, anno, regista, genere, trama, poster_url, attori, creato_il, movie_trivia(count), errori(count)");
 
     if (query.trim()) {
       req = req.or(`titolo.ilike.%${query.trim()}%,regista.ilike.%${query.trim()}%,genere.ilike.%${query.trim()}%`);
@@ -30,31 +32,22 @@ export async function GET(request: Request) {
 
     req = req.order("titolo", { ascending: true });
 
-    const hasServiceKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
-    const db = hasServiceKey ? createAdminClient() : supabase;
-
-    const [filmsRes, triviaRes, bloopersRes] = await Promise.all([
-      req,
-      db.from("movie_trivia").select("film_id"),
-      db.from("errori").select("film_id"),
-    ]);
+    const filmsRes = await req;
 
     if (filmsRes.error) throw filmsRes.error;
 
-    const triviaCountMap: Record<number, number> = {};
-    for (const t of triviaRes.data || []) {
-      triviaCountMap[Number(t.film_id)] = (triviaCountMap[Number(t.film_id)] || 0) + 1;
-    }
-
-    const bloopersCountMap: Record<number, number> = {};
-    for (const b of bloopersRes.data || []) {
-      bloopersCountMap[Number(b.film_id)] = (bloopersCountMap[Number(b.film_id)] || 0) + 1;
-    }
-
     let films = (filmsRes.data || []).map((film: any) => ({
-      ...film,
-      trivia_count: triviaCountMap[Number(film.id)] || 0,
-      bloopers_count: bloopersCountMap[Number(film.id)] || 0,
+      id: film.id,
+      titolo: film.titolo,
+      anno: film.anno,
+      regista: film.regista,
+      genere: film.genere,
+      trama: film.trama,
+      poster_url: film.poster_url,
+      attori: film.attori,
+      creato_il: film.creato_il,
+      trivia_count: film.movie_trivia?.[0]?.count ?? 0,
+      bloopers_count: film.errori?.[0]?.count ?? 0,
     }));
 
     if (filter === "with_trivia") {

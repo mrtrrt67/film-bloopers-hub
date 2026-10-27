@@ -19,27 +19,20 @@ export async function GET() {
     const hasServiceKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
     const db = hasServiceKey ? createAdminClient() : supabase;
 
-    // 1. Recupera tutti i film
+    // 1. Recupera tutti i film con conteggio curiosità
     const { data: allFilms, error: errFilms } = await db
       .from("films")
-      .select("id")
+      .select("id, movie_trivia(count)")
       .order("id", { ascending: true });
 
     if (errFilms) throw errFilms;
 
-    // 2. Recupera gli ID dei film con curiosità
-    const { data: existingTrivia, error: errTrivia } = await db
-      .from("movie_trivia")
-      .select("film_id");
-
-    if (errTrivia) throw errTrivia;
-
-    const filmIdsWithTrivia = new Set((existingTrivia || []).map((t: any) => Number(t.film_id)));
-    const missingFilms = (allFilms || []).filter((f: any) => !filmIdsWithTrivia.has(Number(f.id)));
+    const withTriviaFilms = (allFilms || []).filter((f: any) => (f.movie_trivia?.[0]?.count || 0) > 0);
+    const missingFilms = (allFilms || []).filter((f: any) => (f.movie_trivia?.[0]?.count || 0) === 0);
 
     return NextResponse.json({
       totalFilms: allFilms?.length || 0,
-      withTriviaCount: filmIdsWithTrivia.size,
+      withTriviaCount: withTriviaFilms.length,
       missingTriviaCount: missingFilms.length,
     });
   } catch (err: any) {
@@ -67,19 +60,12 @@ export async function POST(request: Request) {
     // 1. Recupera film senza curiosità
     const { data: allFilms, error: errFilms } = await db
       .from("films")
-      .select("id, titolo, anno, regista, attori, trama")
+      .select("id, titolo, anno, regista, attori, trama, movie_trivia(count)")
       .order("id", { ascending: true });
 
     if (errFilms) throw errFilms;
 
-    const { data: existingTrivia, error: errTrivia } = await db
-      .from("movie_trivia")
-      .select("film_id");
-
-    if (errTrivia) throw errTrivia;
-
-    const filmIdsWithTrivia = new Set((existingTrivia || []).map((t: any) => Number(t.film_id)));
-    const candidateFilms = (allFilms || []).filter((f: any) => !filmIdsWithTrivia.has(Number(f.id)));
+    const candidateFilms = (allFilms || []).filter((f: any) => (f.movie_trivia?.[0]?.count || 0) === 0);
 
     if (candidateFilms.length === 0) {
       return NextResponse.json({
