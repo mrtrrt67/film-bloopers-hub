@@ -26,23 +26,51 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [contestReason, setContestReason] = useState("");
   const [isLoggedIn, setIsLoggedIn] = useState(Boolean(userLoggedIn));
+  const [currentUser, setCurrentUser] = useState<any>(null);
+  const [currentProfile, setCurrentProfile] = useState<any>(null);
 
   useEffect(() => {
     if (userLoggedIn !== undefined) {
       setIsLoggedIn(userLoggedIn);
-      return;
     }
     const supabase = createClient();
-    supabase.auth.getUser().then(({ data }: { data: any }) => {
-      if (data?.user) setIsLoggedIn(true);
+    supabase.auth.getUser().then(async ({ data }: { data: any }) => {
+      const u = data?.user || null;
+      if (u) {
+        setIsLoggedIn(true);
+        setCurrentUser(u);
+        const { data: prof } = await supabase
+          .from("profiles")
+          .select("username, email")
+          .eq("id", u.id)
+          .maybeSingle();
+        if (prof) setCurrentProfile(prof);
+      }
     });
   }, [userLoggedIn]);
+
+  const userEmail = (currentUser?.email || "").toLowerCase().trim();
+  const userHandle = userEmail ? `@${userEmail.split("@")[0]}` : "";
+  const username = currentProfile?.username ? currentProfile.username.toLowerCase().trim() : "";
+  const blooperAuthor = (blooper.inserito_da || "").toLowerCase().trim();
+
+  const isOwnBlooper =
+    Boolean(blooperAuthor) &&
+    Boolean(userEmail || username) &&
+    (blooperAuthor === userEmail ||
+     blooperAuthor === userHandle ||
+     (username && (blooperAuthor === `@${username}` || blooperAuthor === username)));
 
   const attendibilita = calculateAttendibilita(conferme, contestazioni);
 
   const handleVote = async (tipo: "conferma" | "contestazione", motivo?: string): Promise<boolean> => {
     if (!isLoggedIn) {
       setShowAuthModal(true);
+      return false;
+    }
+
+    if (isOwnBlooper) {
+      alert("Non puoi votare o contestare un blooper inserito da te!");
       return false;
     }
 
@@ -116,6 +144,11 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
       return;
     }
 
+    if (isOwnBlooper) {
+      alert("Non puoi votare o contestare un blooper inserito da te!");
+      return;
+    }
+
     if (votoUtente === "contestazione") {
       // Se già contestato, cliccando di nuovo rimuove la contestazione
       handleVote("contestazione");
@@ -162,6 +195,17 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
             <Tag className="h-3 w-3" />
             {blooper.categoria}
           </span>
+
+          {/* Badge Confermato dalla Community (se conferme >= 3) */}
+          {conferme >= 3 && (
+            <span
+              title={`Confermato da ${conferme} utenti della community`}
+              className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1 text-xs font-bold text-emerald-400 shadow-sm shadow-emerald-500/10"
+            >
+              <ThumbsUp className="h-3 w-3 text-emerald-400" />
+              <span>Confermato ({conferme}👍)</span>
+            </span>
+          )}
         </div>
 
         {/* Badge Attendibilità */}
@@ -257,6 +301,11 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
           <User className="h-3.5 w-3.5" />
           <span>
             Autore: <strong className="text-zinc-300 font-semibold">{formatPublicAuthor(blooper.inserito_da, blooper.provenienza)}</strong>
+            {isOwnBlooper && (
+              <span className="ml-1.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 text-[10px] font-bold">
+                Tu
+              </span>
+            )}
           </span>
         </div>
 
@@ -265,30 +314,34 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
           <button
             type="button"
             onClick={() => handleVote("conferma")}
-            disabled={loading}
+            disabled={loading || isOwnBlooper}
             className={`flex items-center gap-1.5 rounded-lg border min-h-[38px] sm:min-h-[32px] px-3 sm:px-2.5 py-1.5 sm:py-1 font-semibold text-xs transition-all touch-manipulation active:scale-95 ${
-              votoUtente === "conferma"
+              isOwnBlooper
+                ? "border-zinc-800/60 bg-zinc-900/30 text-zinc-600 cursor-not-allowed opacity-60"
+                : votoUtente === "conferma"
                 ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/50 shadow-sm shadow-emerald-500/20"
                 : "border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:text-emerald-400"
             }`}
-            title="Conferma errore (👍)"
+            title={isOwnBlooper ? "Non puoi votare un tuo blooper" : "Conferma errore (👍)"}
           >
-            <ThumbsUp className="h-4 w-4 sm:h-3.5 sm:sm-3.5 text-emerald-400" />
+            <ThumbsUp className={`h-4 w-4 sm:h-3.5 sm:sm-3.5 ${isOwnBlooper ? "text-zinc-600" : "text-emerald-400"}`} />
             <span>{conferme}</span>
           </button>
 
           <button
             type="button"
             onClick={handleDislikeButtonClick}
-            disabled={loading}
+            disabled={loading || isOwnBlooper}
             className={`flex items-center gap-1.5 rounded-lg border min-h-[38px] sm:min-h-[32px] px-3 sm:px-2.5 py-1.5 sm:py-1 font-semibold text-xs transition-all touch-manipulation active:scale-95 ${
-              votoUtente === "contestazione"
+              isOwnBlooper
+                ? "border-zinc-800/60 bg-zinc-900/30 text-zinc-600 cursor-not-allowed opacity-60"
+                : votoUtente === "contestazione"
                 ? "bg-rose-500/20 text-rose-300 border-rose-500/50 shadow-sm shadow-rose-500/20"
                 : "border-zinc-800 bg-zinc-900/60 text-zinc-400 hover:border-zinc-700 hover:text-rose-400"
             }`}
-            title="Contesta errore (👎)"
+            title={isOwnBlooper ? "Non puoi contestare un tuo blooper" : "Contesta errore (👎)"}
           >
-            <ThumbsDown className="h-4 w-4 sm:h-3.5 sm:sm-3.5 text-rose-400" />
+            <ThumbsDown className={`h-4 w-4 sm:h-3.5 sm:sm-3.5 ${isOwnBlooper ? "text-zinc-600" : "text-rose-400"}`} />
             <span>{contestazioni}</span>
           </button>
         </div>

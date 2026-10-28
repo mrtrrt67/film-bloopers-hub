@@ -11,38 +11,9 @@ export async function POST(request: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { error: "Devi essere autenticato per votare e contestare i bloopers." },
+        { error: "Devi essere registrato per votare o contestare i bloopers." },
         { status: 401 }
       );
-    }
-
-    const adminEmail = (process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL || "mrtrrt67@gmail.com").toLowerCase();
-    const isUserAdmin = user.email?.toLowerCase() === adminEmail;
-
-    if (!isUserAdmin) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("tier, tipo_abbonamento, data_scadenza")
-        .eq("id", user.id)
-        .maybeSingle();
-
-      const today = new Date().toISOString().slice(0, 10);
-      const isExpired =
-        (profile?.tipo_abbonamento === "mensile" || profile?.tipo_abbonamento === "annuale") &&
-        profile?.data_scadenza &&
-        profile.data_scadenza < today;
-      const isPremium = profile?.tier === "premium" && !isExpired;
-
-      if (!isPremium) {
-        return NextResponse.json(
-          {
-            error:
-              "La votazione e la contestazione dei bloopers sono riservate agli iscritti ai Piani Premium. Sblocca il tuo piano per votare e scalare la classifica!",
-            requires_premium: true,
-          },
-          { status: 403 }
-        );
-      }
     }
 
     const { errore_id, tipo, motivo } = await request.json();
@@ -64,7 +35,43 @@ export async function POST(request: Request) {
 
     const motivoPulito = motivo && typeof motivo === "string" ? motivo.trim() : null;
 
-    // Verifica se l'utente ha già votato questo errore
+    // 1. Recupera il blooper di riferimento
+    const { data: targetBlooper } = await supabase
+      .from("errori")
+      .select("id, inserito_da, provenienza")
+      .eq("id", cleanErrId)
+      .maybeSingle();
+
+    if (!targetBlooper) {
+      return NextResponse.json({ error: "Blooper non trovato." }, { status: 404 });
+    }
+
+    // 2. Regola anti-auto-voto: un utente non può votare o contestare un proprio blooper
+    const { data: currentProfile } = await supabase
+      .from("profiles")
+      .select("username, email")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const userEmail = (user.email || "").toLowerCase().trim();
+    const userHandle = `@${userEmail.split("@")[0]}`;
+    const username = currentProfile?.username ? currentProfile.username.toLowerCase().trim() : "";
+    const blooperAuthor = (targetBlooper.inserito_da || "").toLowerCase().trim();
+
+    const isOwnBlooper =
+      blooperAuthor &&
+      (blooperAuthor === userEmail ||
+       blooperAuthor === userHandle ||
+       (username && (blooperAuthor === `@${username}` || blooperAuthor === username)));
+
+    if (isOwnBlooper) {
+      return NextResponse.json(
+        { error: "Non puoi votare o contestare un blooper inserito da te!" },
+        { status: 400 }
+      );
+    }
+
+    // 3. Verifica se l'utente ha già votato questo errore
     const { data: existingVote, error: selectErr } = await supabase
       .from("voti_bloopers")
       .select("id, tipo, motivo")
@@ -125,7 +132,7 @@ export async function POST(request: Request) {
       }
     }
 
-    // Recupera conteggio aggiornato dei voti da voti_bloopers
+    // 4. Recupera conteggio aggiornato dei voti da voti_bloopers
     const { data: voti, error: countErr } = await supabase
       .from("voti_bloopers")
       .select("tipo")
@@ -138,7 +145,7 @@ export async function POST(request: Request) {
     const conferme = (voti || []).filter((v: any) => v.tipo === "conferma").length;
     const contestazioni = (voti || []).filter((v: any) => v.tipo === "contestazione").length;
 
-    // Sincronizza i contatori direttamente nella tabella errori con privilegi admin per RLS
+    // 5. Sincronizza i contatori direttamente nella tabella errori con privilegi admin per RLS
     const adminDb = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
     const { error: updateErr } = await adminDb
       .from("errori")
@@ -167,4 +174,3 @@ export async function POST(request: Request) {
     );
   }
 }
-

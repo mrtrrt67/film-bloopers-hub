@@ -1,23 +1,25 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { AlertTriangle, CheckCircle, XCircle, Trash2, Edit3, Shield, Award, X } from "lucide-react";
+import { AlertTriangle, CheckCircle, XCircle, Trash2, Edit3, Shield, Award, X, ThumbsUp } from "lucide-react";
 import ConfirmModal from "@/components/ConfirmModal";
 
 export default function AdminModerationTab() {
-  const [subTab, setSubTab] = useState<"pending" | "contests" | "corrections" | "approved">("pending");
+  const [subTab, setSubTab] = useState<"pending" | "contests" | "corrections" | "approved" | "conferme">("pending");
   const [data, setData] = useState<{
     pending: any[];
     contestazioni: any[];
     approved: any[];
     resolved_contests: any[];
     corrections: any[];
+    conferme: any[];
   }>({
     pending: [],
     contestazioni: [],
     approved: [],
     resolved_contests: [],
     corrections: [],
+    conferme: [],
   });
   const [loading, setLoading] = useState(true);
   const [pointsMap, setPointsMap] = useState<Record<string, number>>({});
@@ -480,6 +482,17 @@ export default function AdminModerationTab() {
           <CheckCircle className="h-3.5 w-3.5" />
           Contestazioni Risolte ({data.resolved_contests?.length || 0})
         </button>
+        <button
+          onClick={() => setSubTab("conferme")}
+          className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition whitespace-nowrap ${
+            subTab === "conferme"
+              ? "bg-amber-500 text-zinc-950 shadow-md"
+              : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+          }`}
+        >
+          <ThumbsUp className="h-3.5 w-3.5" />
+          Registro Conferme 👍 ({data.conferme?.length || 0})
+        </button>
       </div>
 
       {/* 1. SEGNALAZIONI IN ATTESA */}
@@ -890,6 +903,95 @@ export default function AdminModerationTab() {
               ))
             )}
           </div>
+        </div>
+      )}
+
+      {/* 5. REGISTRO CONFERME (👍) */}
+      {subTab === "conferme" && (
+        <div className="space-y-4">
+          <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-200 flex items-start gap-3">
+            <ThumbsUp className="h-5 w-5 text-emerald-400 shrink-0 mt-0.5" />
+            <div className="space-y-1">
+              <p className="font-bold text-white text-sm">
+                Registro Voti della Community (👍 Pollici in Su)
+              </p>
+              <p className="text-zinc-300 leading-relaxed text-xs">
+                In questa sezione hai piena visibilità su tutti i voti positivi espressi dagli utenti registrati. 
+                Per scongiurare il &quot;clic selvaggio&quot; e tentativi di scalata artificiosa della classifica, il voto 👍 <strong className="text-white">non assegna punti all&apos;utente</strong>, ma serve unicamente ad accrescere l&apos;indice di attendibilità del blooper e a portarlo in cima all&apos;ordinamento dei film.
+              </p>
+            </div>
+          </div>
+
+          {(!data.conferme || data.conferme.length === 0) ? (
+            <div className="py-12 text-center text-zinc-500 text-xs rounded-2xl border border-zinc-800 bg-zinc-900/40">
+              Nessun voto di conferma registrato finora.
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {data.conferme.map((c: any) => {
+                const film = c.errori?.films;
+                return (
+                  <div
+                    key={c.id}
+                    className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 space-y-3 hover:border-zinc-700 transition"
+                  >
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <span className="font-black text-white">🎬 {film?.titolo || "Film"}</span>
+                        <span className="text-zinc-500 font-mono">({film?.anno || "N/D"})</span>
+                        {c.errori?.minuto && (
+                          <span className="bg-amber-500/20 text-amber-300 font-mono font-bold px-2 py-0.5 rounded text-[11px]">
+                            ⏱️ ~{c.errori.minuto.replace(/^~/, "")}
+                          </span>
+                        )}
+                        {c.errori?.categoria && (
+                          <span className="bg-zinc-800 text-zinc-300 border border-zinc-700 px-2 py-0.5 rounded text-[11px]">
+                            {c.errori.categoria}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/30 text-[11px]">
+                          👍 Confermato
+                        </span>
+                        <span className="text-[11px] text-zinc-500 font-mono">
+                          {c.created_at ? c.created_at.slice(0, 16).replace("T", " ") : ""}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Descrizione blooper votato */}
+                    {c.errori?.descrizione && (
+                      <p className="text-xs text-zinc-300 bg-zinc-950/60 p-3 rounded-xl border border-zinc-800/80 leading-relaxed">
+                        {c.errori.descrizione}
+                      </p>
+                    )}
+
+                    {/* Footer con info utente che ha votato e totale conferme */}
+                    <div className="flex flex-wrap items-center justify-between gap-2 pt-2 border-t border-zinc-800/60 text-xs">
+                      <div className="flex items-center gap-2 text-zinc-400">
+                        <span>
+                          Votato da: <strong className="text-amber-400">{c.user_handle}</strong>{" "}
+                          {c.user_email && <span className="text-zinc-500 font-mono text-[11px]">({c.user_email})</span>}
+                        </span>
+                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 uppercase font-bold border border-zinc-700">
+                          {c.user_tier || "free"}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 text-xs text-zinc-400">
+                        <span>Totale conferme blooper:</span>
+                        <span className="font-bold text-emerald-400 font-mono bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">
+                          {c.errori?.conferme ?? 1} 👍
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
       )}
 

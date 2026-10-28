@@ -52,12 +52,12 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
         if (blooperIds.length > 0) {
           const { data: userVotes } = await supabase
             .from("voti_bloopers")
-            .select("blooper_id, tipo")
+            .select("errore_id, tipo")
             .eq("user_id", u.id)
-            .in("blooper_id", blooperIds);
+            .in("errore_id", blooperIds);
 
           if (userVotes && userVotes.length > 0) {
-            const voteMap = new Map(userVotes.map((v: any) => [v.blooper_id, v.tipo]));
+            const voteMap = new Map(userVotes.map((v: any) => [v.errore_id, v.tipo]));
             setBloopers((prev) =>
               prev.map((b) => ({
                 ...b,
@@ -159,9 +159,27 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
     "Errori storici o fattuali",
   ];
 
-  const filteredBloopers = bloopers.filter((b) =>
-    selectedCategory === "Tutte" ? true : b.categoria === selectedCategory
-  );
+  const [sortBy, setSortBy] = useState<"minuto" | "conferme">("minuto");
+
+  const parseMinuto = (m: string) => {
+    if (!m) return 0;
+    const cleaned = m.replace(/[^0-9:]/g, "");
+    const parts = cleaned.split(":").map(Number);
+    if (parts.length === 2) return parts[0] * 60 + parts[1];
+    if (parts.length === 3) return parts[0] * 3600 + parts[1] * 60 + parts[2];
+    return Number(cleaned) || 0;
+  };
+
+  const filteredBloopers = bloopers
+    .filter((b) => (selectedCategory === "Tutte" ? true : b.categoria === selectedCategory))
+    .sort((a, b) => {
+      if (sortBy === "conferme") {
+        const diff = (b.conferme || 0) - (a.conferme || 0);
+        if (diff !== 0) return diff;
+        return parseMinuto(a.minuto) - parseMinuto(b.minuto);
+      }
+      return parseMinuto(a.minuto) - parseMinuto(b.minuto);
+    });
 
   return (
     <div className="mt-2">
@@ -206,23 +224,52 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
         </div>
       </div>
 
-      {/* Categorie Filter Pills */}
+      {/* Categorie Filter Pills & Ordinamento */}
       {bloopers.length > 0 && (
-        <div className="flex items-center gap-2 overflow-x-auto py-4 scrollbar-none">
-          <Filter className="h-3.5 w-3.5 text-zinc-500 shrink-0 mr-1" />
-          {categories.map((cat) => (
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-4 border-b border-zinc-800/50">
+          <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
+            <Filter className="h-3.5 w-3.5 text-zinc-500 shrink-0 mr-1" />
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat)}
+                className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  selectedCategory === cat
+                    ? "bg-amber-500 text-zinc-950 font-bold shadow"
+                    : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Toggle Ordinamento (Minuto / Conferme) */}
+          <div className="flex items-center gap-1.5 shrink-0 bg-zinc-900/90 border border-zinc-800 p-1 rounded-xl self-start sm:self-auto">
+            <span className="text-[11px] font-medium text-zinc-400 px-1.5">Ordina:</span>
             <button
-              key={cat}
-              onClick={() => setSelectedCategory(cat)}
-              className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                selectedCategory === cat
-                  ? "bg-amber-500 text-zinc-950 font-bold"
-                  : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white"
+              type="button"
+              onClick={() => setSortBy("minuto")}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${
+                sortBy === "minuto"
+                  ? "bg-zinc-800 text-amber-400 border border-amber-500/30 shadow-sm"
+                  : "text-zinc-400 hover:text-zinc-200"
               }`}
             >
-              {cat}
+              ⏱️ Minuto
             </button>
-          ))}
+            <button
+              type="button"
+              onClick={() => setSortBy("conferme")}
+              className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all flex items-center gap-1 ${
+                sortBy === "conferme"
+                  ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 shadow-sm"
+                  : "text-zinc-400 hover:text-zinc-200"
+              }`}
+            >
+              👍 Più confermati
+            </button>
+          </div>
         </div>
       )}
 

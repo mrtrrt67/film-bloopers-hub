@@ -202,12 +202,34 @@ export async function GET() {
         };
       });
 
+    // 4. Registro conferme (👍)
+    const { data: rawConferme } = await adminDb
+      .from("voti_bloopers")
+      .select("*, errori(id, minuto, categoria, descrizione, conferme, film_id, films(titolo, anno, id))")
+      .eq("tipo", "conferma")
+      .order("created_at", { ascending: false })
+      .limit(60);
+
+    const enrichedConferme = (rawConferme || []).map((c: any) => {
+      const p = c.user_id ? allProfiles?.find((prof: any) => prof.id === c.user_id) : null;
+      const isAdmin = isUserAdmin(p, null, adminEmail);
+      const handle = p?.email ? `@${p.email.split("@")[0]}` : (p?.username ? `@${p.username}` : "Utente Registrato");
+      return {
+        ...c,
+        user_email: p?.email || null,
+        user_handle: handle,
+        user_tier: p?.tier || (isAdmin ? "premium" : "free"),
+        created_at: c.created_at || null,
+      };
+    });
+
     return NextResponse.json({
       pending: enrichedPending,
       contestazioni: enrichedContestazioni,
       approved: approvedUserBloopers || [],
       resolved_contests: enrichedResolvedContests,
       corrections: pendingCorrections,
+      conferme: enrichedConferme,
     });
   } catch (err: any) {
     console.error("Errore moderazione:", err);
