@@ -157,7 +157,7 @@ export default function Navbar() {
     { href: "/", label: "Home" },
     { href: "/esplora", label: "Esplora" },
     { href: "/classifica", label: "Classifica" },
-    { href: "/pricing", label: "Piani Premium", isHighlight: true },
+    { href: "/pricing", label: "Premium & Supporto", isHighlight: true },
     { href: "/suggerimenti", label: "Suggerimenti" },
   ];
 

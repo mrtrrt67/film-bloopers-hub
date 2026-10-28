@@ -119,14 +119,14 @@ function PricingContent() {
 
       {/* Intestazione */}
       <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-10">
-        <span className="rounded-full bg-amber-500/10 border border-amber-500/30 px-3.5 py-1 text-xs font-bold text-amber-400 mb-3">
-          Sblocca l&apos;Esperienza Completa
+        <span className="rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-1 text-xs font-bold text-emerald-400 mb-3">
+          Archivio a Consultazione Libera & Gratuita
         </span>
         <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-          Scegli il Tuo Piano Ideale
+          Supporta il Progetto & Sblocca l&apos;IA
         </h1>
-        <p className="text-sm sm:text-base text-zinc-400 mt-3 leading-relaxed">
-          Nessuna sorpresa. Ricerche e bloopers illimitati generati dall&apos;IA, partecipazione alla community, classifiche e accesso a vita a partire da soli 0,99€.
+        <p className="text-sm sm:text-base text-zinc-300 mt-3 leading-relaxed">
+          Tutti i film, i bloopers e le curiosità sono <strong className="text-white">gratuiti e accessibili a chiunque</strong> senza paywall. I piani supporter servono per finanziare le chiamate all&apos;intelligenza artificiale (Google Gemini), sostenere i server e premiare i contributori più attivi della community.
         </p>
       </div>
 
