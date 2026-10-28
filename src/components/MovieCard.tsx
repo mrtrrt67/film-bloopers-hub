@@ -1,11 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Film as FilmIcon, AlertCircle } from "lucide-react";
+import { Film as FilmIcon, AlertCircle, Sparkles } from "lucide-react";
 import { Film } from "@/lib/types";
 import { slugify } from "@/lib/utils";
 
 interface MovieCardProps {
-  film: Film & { bloopers_count?: number };
+  film: Film & { bloopers_count?: number; trivia_count?: number };
 }
 
 export default function MovieCard({ film }: MovieCardProps) {
@@ -48,10 +48,30 @@ export default function MovieCard({ film }: MovieCardProps) {
           </span>
         )}
 
-        {/* Bloopers Count Badge */}
-        <div className="absolute bottom-2.5 left-2.5 flex items-center gap-1.5 rounded-lg bg-amber-500/90 text-zinc-950 px-2.5 py-1 text-xs font-black shadow-md">
-          <AlertCircle className="h-3.5 w-3.5" />
-          <span>{film.bloopers_count ?? "—"} Bloopers</span>
+        {/* Badges Container */}
+        <div className="absolute bottom-2.5 left-2.5 right-2.5 flex flex-wrap items-center gap-1.5 pointer-events-none">
+          {/* Bloopers Count Badge */}
+          <div className="flex items-center gap-1 rounded-lg bg-amber-500 text-zinc-950 px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] font-black shadow-md">
+            <AlertCircle className="h-3 w-3 shrink-0" />
+            <span>
+              {film.bloopers_count !== undefined
+                ? `${film.bloopers_count} ${film.bloopers_count === 1 ? "Blooper" : "Bloopers"}`
+                : "— Bloopers"}
+            </span>
+          </div>
+
+          {/* Curiosità Count Badge */}
+          {film.trivia_count !== undefined && film.trivia_count > 0 ? (
+            <div className="flex items-center gap-1 rounded-lg bg-zinc-950/85 text-amber-300 border border-amber-500/40 backdrop-blur-md px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] font-bold shadow-md">
+              <Sparkles className="h-3 w-3 shrink-0 text-amber-400" />
+              <span>{film.trivia_count} Curiosità</span>
+            </div>
+          ) : film.trivia_count === 0 ? (
+            <div className="flex items-center gap-1 rounded-lg bg-zinc-950/75 text-zinc-400 border border-zinc-800 backdrop-blur-md px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] font-medium shadow-md">
+              <Sparkles className="h-3 w-3 shrink-0 text-zinc-500" />
+              <span>0 Curiosità</span>
+            </div>
+          ) : null}
         </div>
       </div>
 

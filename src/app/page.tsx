@@ -27,16 +27,17 @@ export default async function HomePage() {
   const bannerBadge = conf["home_banner_top_badge"];
   const promoDeadline = conf["promo_lifetime_deadline"] || "2026-12-31";
 
-  // 2. Film in evidenza (con conteggio errori)
+  // 2. Film in evidenza (con conteggio errori e curiosità)
   const { data: filmsRaw } = await supabase
     .from("films")
-    .select("*, errori(id)")
+    .select("*, errori(count), movie_trivia(count)")
     .order("creato_il", { ascending: false })
     .limit(8);
 
-  const featuredFilms: (Film & { bloopers_count?: number })[] = (filmsRaw || []).map((f: any) => ({
+  const featuredFilms: (Film & { bloopers_count?: number; trivia_count?: number })[] = (filmsRaw || []).map((f: any) => ({
     ...f,
-    bloopers_count: Array.isArray(f.errori) ? f.errori.length : 0,
+    bloopers_count: f.errori?.[0]?.count ?? (Array.isArray(f.errori) ? f.errori.length : 0),
+    trivia_count: f.movie_trivia?.[0]?.count ?? (Array.isArray(f.movie_trivia) ? f.movie_trivia.length : 0),
   }));
 
   // 3. Ultimi bloopers approvati

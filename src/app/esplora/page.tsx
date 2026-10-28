@@ -12,7 +12,7 @@ import { slugify } from "@/lib/utils";
 
 export default function EsploraPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [dbFilms, setDbFilms] = useState<(Film & { bloopers_count?: number })[]>([]);
+  const [dbFilms, setDbFilms] = useState<(Film & { bloopers_count?: number; trivia_count?: number })[]>([]);
   const [tmdbResults, setTmdbResults] = useState<TMDBMovieResult[]>([]);
   const [activeTab, setActiveTab] = useState<"archivio" | "tmdb">("archivio");
   const [loading, setLoading] = useState(false);
@@ -27,13 +27,14 @@ export default function EsploraPage() {
       try {
         const { data: films } = await supabase
           .from("films")
-          .select("*, errori(id)")
+          .select("*, errori(count), movie_trivia(count)")
           .order("anno", { ascending: false });
 
         if (films) {
           const mapped = films.map((f: any) => ({
             ...f,
-            bloopers_count: Array.isArray(f.errori) ? f.errori.length : 0,
+            bloopers_count: f.errori?.[0]?.count ?? (Array.isArray(f.errori) ? f.errori.length : 0),
+            trivia_count: f.movie_trivia?.[0]?.count ?? (Array.isArray(f.movie_trivia) ? f.movie_trivia.length : 0),
           }));
           setDbFilms(mapped);
         }
