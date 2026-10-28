@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Search, Sparkles, Film as FilmIcon, Trophy, CheckCircle, ArrowRight, Flame } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import MovieCard from "@/components/MovieCard";
 import PromoBanner from "@/components/PromoBanner";
 import BlooperItem from "@/components/BlooperItem";
@@ -9,7 +9,7 @@ import { Film, Blooper } from "@/lib/types";
 export const revalidate = 60; // ISR ogni 60 secondi
 
 export default async function HomePage() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   // 1. Configurazioni dinamiche
   const { data: configRows } = await supabase

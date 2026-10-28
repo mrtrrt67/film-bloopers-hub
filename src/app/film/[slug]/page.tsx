@@ -4,35 +4,52 @@ import Image from "next/image";
 import Link from "next/link";
 import { 
   Film as FilmIcon, 
-  Sparkles, 
   ShoppingCart, 
   PlayCircle, 
-  Clock, 
-  User, 
-  CheckCircle, 
-  AlertTriangle, 
   ArrowLeft,
-  Share2
+  ArrowRight,
+  Sparkles,
+  AlertCircle
 } from "lucide-react";
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient } from "@/lib/supabase/public";
 import { Film, Blooper, MovieTrivia } from "@/lib/types";
-import BlooperItem from "@/components/BlooperItem";
-import { getAmazonSearchUrl, getYouTubeSearchUrl } from "@/lib/utils";
+import MovieCard from "@/components/MovieCard";
+import { getAmazonSearchUrl, getYouTubeSearchUrl, slugify } from "@/lib/utils";
 import FilmContentSwitcher from "@/components/FilmContentSwitcher";
+
+export const revalidate = 3600; // Rigenerazione e cache Edge ogni ora per massime prestazioni su Vercel CDN
 
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
 
+export async function generateStaticParams() {
+  try {
+    const supabase = createPublicClient();
+    const { data: films } = await supabase
+      .from("films")
+      .select("id, titolo, anno")
+      .order("creato_il", { ascending: false })
+      .limit(60);
+
+    return ((films as any[]) || []).map((film: any) => ({
+      slug: `${slugify(film.titolo, film.anno)}-${String(film.id)}`,
+    }));
+  } catch {
+    return [];
+  }
+}
+
 async function getFilmData(slug: string) {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
 
   // Estrae eventuale ID parziale dallo slug (es. "matrix-1999-143" o "matrix-1999")
   const parts = slug.split("-");
   const potentialId = parts[parts.length - 1];
 
+  let targetFilm: Film | null = null;
+
   if (potentialId && /^\d+$/.test(potentialId)) {
-    // Ricerca per ID numerico intero nel database Supabase
     const { data: byId } = await supabase
       .from("films")
       .select("*")
@@ -40,64 +57,97 @@ async function getFilmData(slug: string) {
       .maybeSingle();
 
     if (byId) {
-      const [bloopersRes, triviaRes] = await Promise.all([
-        supabase
-          .from("errori")
-          .select("*, voti_bloopers(tipo, user_id)")
-          .eq("film_id", byId.id)
-          .eq("approvato", true),
-        supabase
-          .from("movie_trivia")
-          .select("*")
-          .eq("film_id", byId.id)
-          .eq("approvato", true)
-          .order("ordine", { ascending: true })
-          .order("created_at", { ascending: false }),
-      ]);
-
-      return {
-        film: byId as Film,
-        bloopers: (bloopersRes.data || []) as any[],
-        trivia: (triviaRes.data || []) as MovieTrivia[],
-      };
+      targetFilm = byId as Film;
     }
   }
 
-  // Fallback: cerca per titolo approssimativo dallo slug
-  const titleGuess = slug.replace(/-[0-9]{4}.*$/, "").replace(/-/g, " ").trim();
-  if (titleGuess) {
-    const { data: byTitle } = await supabase
-      .from("films")
+  // Fallback: cerca per titolo approssimativo dallo slug se non trovato per ID
+  if (!targetFilm) {
+    const titleGuess = slug.replace(/-[0-9]{4}.*$/, "").replace(/-/g, " ").trim();
+    if (titleGuess) {
+      const { data: byTitle } = await supabase
+        .from("films")
+        .select("*")
+        .ilike("titolo", `%${titleGuess}%`)
+        .limit(1)
+        .maybeSingle();
+
+      if (byTitle) {
+        targetFilm = byTitle as Film;
+      }
+    }
+  }
+
+  if (!targetFilm) {
+    return null;
+  }
+
+  // Query congiunta per Bloopers, Curiosità e Film Correlati
+  const firstGenre = (targetFilm.genere || "").split(/[,/]/)[0].trim();
+
+  let relatedQuery = supabase
+    .from("films")
+    .select("*, errori(count), movie_trivia(count)")
+    .neq("id", targetFilm.id);
+
+  if (firstGenre) {
+    relatedQuery = relatedQuery.ilike("genere", `%${firstGenre}%`);
+  }
+
+  const [bloopersRes, triviaRes, relatedRes] = await Promise.all([
+    supabase
+      .from("errori")
+      .select("*, voti_bloopers(tipo, user_id)")
+      .eq("film_id", targetFilm.id)
+      .eq("approvato", true),
+    supabase
+      .from("movie_trivia")
       .select("*")
-      .ilike("titolo", `%${titleGuess}%`)
-      .limit(1)
-      .maybeSingle();
+      .eq("film_id", targetFilm.id)
+      .eq("approvato", true)
+      .order("ordine", { ascending: true })
+      .order("created_at", { ascending: false }),
+    relatedQuery
+      .order("creato_il", { ascending: false })
+      .limit(4),
+  ]);
 
-    if (byTitle) {
-      const [bloopersRes, triviaRes] = await Promise.all([
-        supabase
-          .from("errori")
-          .select("*, voti_bloopers(tipo, user_id)")
-          .eq("film_id", byTitle.id)
-          .eq("approvato", true),
-        supabase
-          .from("movie_trivia")
-          .select("*")
-          .eq("film_id", byTitle.id)
-          .eq("approvato", true)
-          .order("ordine", { ascending: true })
-          .order("created_at", { ascending: false }),
-      ]);
+  let relatedFilms = (relatedRes.data || []).map((f: any) => ({
+    ...f,
+    bloopers_count: f.errori?.[0]?.count ?? (Array.isArray(f.errori) ? f.errori.length : 0),
+    trivia_count: f.movie_trivia?.[0]?.count ?? (Array.isArray(f.movie_trivia) ? f.movie_trivia.length : 0),
+  }));
 
-      return {
-        film: byTitle as Film,
-        bloopers: (bloopersRes.data || []) as any[],
-        trivia: (triviaRes.data || []) as MovieTrivia[],
-      };
+  // Se i film correlati per genere sono meno di 4, integra con i più recenti
+  if (relatedFilms.length < 4) {
+    const { data: fallbackRecent } = await supabase
+      .from("films")
+      .select("*, errori(count), movie_trivia(count)")
+      .neq("id", targetFilm.id)
+      .order("creato_il", { ascending: false })
+      .limit(4);
+
+    const fallbackList = (fallbackRecent as any[]) || [];
+    if (fallbackList.length > 0) {
+      const existingIds = new Set(relatedFilms.map((r: any) => r.id));
+      for (const f of fallbackList) {
+        if (!existingIds.has(f.id) && relatedFilms.length < 4) {
+          relatedFilms.push({
+            ...f,
+            bloopers_count: f.errori?.[0]?.count ?? (Array.isArray(f.errori) ? f.errori.length : 0),
+            trivia_count: f.movie_trivia?.[0]?.count ?? (Array.isArray(f.movie_trivia) ? f.movie_trivia.length : 0),
+          });
+        }
+      }
     }
   }
 
-  return null;
+  return {
+    film: targetFilm,
+    bloopers: (bloopersRes.data || []) as any[],
+    trivia: (triviaRes.data || []) as MovieTrivia[],
+    relatedFilms,
+  };
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -112,15 +162,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const { film, bloopers, trivia } = data;
-  const title = `${film.titolo} (${film.anno || "N/D"}) — Bloopers, Errori di Scena e Curiosità`;
+  const title = `${film.titolo} (${film.anno || "N/D"}) — Errori, Bloopers e Curiosità`;
   
   const countParts: string[] = [];
-  if (bloopers?.length) countParts.push(`${bloopers.length} bloopers`);
+  if (bloopers?.length) countParts.push(`${bloopers.length} bloopers al minuto esatto`);
   if (trivia?.length) countParts.push(`${trivia.length} curiosità e retroscena`);
 
   const countDesc = countParts.length > 0
-    ? `Scopri ${countParts.join(" e ")} verificati.`
-    : "Scopri tutti i bloopers, le curiosità e i retroscena del film.";
+    ? `Scopri ${countParts.join(" e ")}.`
+    : "Scopri tutti gli errori, le curiosità e i retroscena dal set.";
 
   const maxTramaLen = Math.max(0, 155 - countDesc.length - 5);
   const tramaSnippet = film.trama && maxTramaLen > 20 ? ` ${film.trama.slice(0, maxTramaLen).trim()}...` : "";
@@ -132,13 +182,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title,
     description,
     keywords: [
+      `errori ${film.titolo}`,
       `bloopers ${film.titolo}`,
-      `errori film ${film.titolo}`,
       `curiosità ${film.titolo}`,
       `aneddoti ${film.titolo}`,
       `retroscena ${film.titolo}`,
-      `dietro le quinte ${film.titolo}`,
-      `errori di scena ${film.titolo}`,
+      `errori di montaggio ${film.titolo}`,
+      `sviste ${film.titolo}`,
       film.regista ? `film ${film.regista}` : "",
       film.genere || "",
     ].filter(Boolean),
@@ -154,7 +204,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
           url: imageUrl,
           width: 1200,
           height: 630,
-          alt: `Bloopers ed errori in ${film.titolo}`,
+          alt: `Errori e Bloopers in ${film.titolo}`,
         },
       ],
       type: "video.movie",
@@ -176,24 +226,19 @@ export default async function FilmDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { film, bloopers: rawBloopers, trivia = [], relatedFilms = [] } = data;
 
-  const { film, bloopers: rawBloopers, trivia = [] } = data;
-
-  // Normalizza i bloopers calcolando conferme, contestazioni e voto dell'utente autenticato
+  // Normalizza i bloopers calcolando conferme e contestazioni
+  // (l'eventuale voto dell'utente connesso viene idratato client-side in modo trasparente senza rompere la cache Edge)
   const bloopers: Blooper[] = rawBloopers.map((b: any) => {
     const voti = b.voti_bloopers || [];
     const conferme = voti.filter((v: any) => v.tipo === "conferma").length;
     const contestazioni = voti.filter((v: any) => v.tipo === "contestazione").length;
-    const userVote = user ? voti.find((v: any) => v.user_id === user.id)?.tipo : null;
     return {
       ...b,
       conferme,
       contestazioni,
-      voto_utente: userVote || null,
+      voto_utente: null,
     };
   });
 
@@ -284,8 +329,8 @@ export default async function FilmDetailPage({ params }: PageProps) {
       />
 
       <div className="min-h-screen pb-20">
-        {/* Backdrop Hero Section */}
-        <div className="relative w-full h-[320px] sm:h-[420px] bg-zinc-950 overflow-hidden">
+        {/* Backdrop Hero Section (compatto su mobile per far emergere subito il contenuto) */}
+        <div className="relative w-full h-[180px] sm:h-[360px] md:h-[400px] bg-zinc-950 overflow-hidden">
           {film.backdrop_url ? (
             <Image
               src={film.backdrop_url}
@@ -293,7 +338,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
               fill
               unoptimized
               priority
-              className="object-cover opacity-30 blur-sm scale-105"
+              className="object-cover opacity-25 blur-sm scale-105"
             />
           ) : (
             <div className="absolute inset-0 bg-gradient-to-b from-amber-950/20 via-zinc-900 to-zinc-950" />
@@ -301,10 +346,10 @@ export default async function FilmDetailPage({ params }: PageProps) {
           <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/70 to-transparent" />
 
           {/* Breadcrumb & Navigation */}
-          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-6">
+          <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
             <Link
               href="/esplora"
-              className="inline-flex items-center gap-2 rounded-xl bg-zinc-900/80 backdrop-blur-md border border-zinc-800 px-3.5 py-1.5 text-xs font-semibold text-zinc-300 hover:text-white transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900/80 backdrop-blur-md border border-zinc-800 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:text-white transition-colors"
             >
               <ArrowLeft className="h-3.5 w-3.5" /> Torna al catalogo
             </Link>
@@ -312,11 +357,111 @@ export default async function FilmDetailPage({ params }: PageProps) {
         </div>
 
         {/* Main Film Info & Content */}
-        <div className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 -mt-44 sm:-mt-56">
+        <div className="relative z-20 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 -mt-16 sm:-mt-44 md:-mt-52">
+          
+          {/* HEADER MOBILE: Layout compatto orizzontale (Mostra subito locandina, titolo e metadati) */}
+          <div className="flex md:hidden flex-col gap-3 mb-5">
+            <div className="flex items-start gap-3.5">
+              {/* Mini Locandina Mobile */}
+              <div className="relative aspect-[2/3] w-24 shrink-0 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900 shadow-2xl">
+                {film.poster_url ? (
+                  <Image
+                    src={film.poster_url}
+                    alt={film.titolo}
+                    fill
+                    unoptimized
+                    priority
+                    sizes="96px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center text-zinc-600">
+                    <FilmIcon className="h-8 w-8" />
+                  </div>
+                )}
+              </div>
+
+              {/* Informazioni Titolo Mobile */}
+              <div className="flex flex-col flex-1 min-w-0 pt-0.5">
+                <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                  {film.anno && (
+                    <span className="rounded-md bg-amber-500/10 border border-amber-500/30 px-2 py-0.5 text-[10px] font-black text-amber-400">
+                      {film.anno}
+                    </span>
+                  )}
+                  {film.genere && (
+                    <span className="rounded-md bg-zinc-800/80 border border-zinc-700 px-2 py-0.5 text-[10px] font-medium text-zinc-300 line-clamp-1">
+                      {film.genere.split(/[,/]/)[0]}
+                    </span>
+                  )}
+                </div>
+
+                <h1 className="text-xl font-black text-white tracking-tight leading-tight line-clamp-2">
+                  {film.titolo}
+                </h1>
+                
+                {film.regista && (
+                  <p className="text-xs text-zinc-400 mt-1 line-clamp-1">
+                    Regia: <span className="text-zinc-200 font-semibold">{film.regista}</span>
+                  </p>
+                )}
+
+                {/* Badge Rapidi Conteggio Contenuti */}
+                <div className="flex items-center gap-1.5 mt-2">
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500 text-zinc-950 text-[10px] font-black">
+                    <AlertCircle className="h-2.5 w-2.5" />
+                    {bloopers.length} Bloopers
+                  </span>
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-900 text-amber-300 border border-amber-500/40 text-[10px] font-bold">
+                    <Sparkles className="h-2.5 w-2.5 text-amber-400" />
+                    {trivia.length} Curiosità
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Azioni Esterne Mobile (compatte su 2 colonne) */}
+            <div className="grid grid-cols-2 gap-2 pt-1">
+              <a
+                href={amazonUrl}
+                target="_blank"
+                rel="sponsored noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 rounded-xl bg-zinc-900/90 border border-zinc-800 hover:border-amber-500/50 py-2 px-2 text-[11px] font-bold text-zinc-200 transition-all shadow-sm"
+              >
+                <ShoppingCart className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                <span className="truncate">Edizione Amazon</span>
+              </a>
+              <a
+                href={youtubeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1.5 rounded-xl bg-red-950/20 border border-red-900/40 hover:border-red-600/60 py-2 px-2 text-[11px] font-bold text-red-400 transition-all shadow-sm"
+              >
+                <PlayCircle className="h-3.5 w-3.5 text-red-500 shrink-0" />
+                <span className="truncate">Cerca su YouTube</span>
+              </a>
+            </div>
+
+            {/* Sinossi Trama Mobile */}
+            {film.trama && (
+              <details className="group rounded-xl border border-zinc-800/80 bg-zinc-900/30 p-3 text-xs">
+                <summary className="font-bold text-amber-400 cursor-pointer flex items-center justify-between">
+                  <span>Sinossi del Film</span>
+                  <span className="text-[10px] text-zinc-500 group-open:hidden">Mostra trama ▼</span>
+                </summary>
+                <p className="mt-2 text-zinc-300 leading-relaxed font-normal">
+                  {film.trama}
+                </p>
+              </details>
+            )}
+          </div>
+
+          {/* GRID DESKTOP (Invariato per schermi medi e grandi) */}
           <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-            {/* Colonna Sinistra: Poster & Azioni Esterne */}
-            <div className="md:col-span-4 lg:col-span-3 flex flex-col items-center sm:items-start gap-4">
-              <div className="relative aspect-[2/3] w-56 sm:w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl">
+            
+            {/* Colonna Sinistra Desktop: Poster & Azioni Esterne */}
+            <div className="hidden md:flex md:col-span-4 lg:col-span-3 flex-col items-start gap-4">
+              <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl">
                 {film.poster_url ? (
                   <Image
                     src={film.poster_url}
@@ -335,7 +480,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
                 )}
               </div>
 
-              {/* Bottoni Affiliazione & Video */}
+              {/* Bottoni Affiliazione & Video Desktop */}
               <div className="w-full flex flex-col gap-2 pt-2">
                 <a
                   href={amazonUrl}
@@ -358,9 +503,11 @@ export default async function FilmDetailPage({ params }: PageProps) {
               </div>
             </div>
 
-            {/* Colonna Destra: Dettagli Film & Sezione Bloopers */}
+            {/* Colonna Destra: Dettagli Film Desktop & Sezione Switcher (Sia Mobile che Desktop) */}
             <div className="md:col-span-8 lg:col-span-9 flex flex-col">
-              <div className="mb-6">
+              
+              {/* Intestazione Desktop */}
+              <div className="hidden md:block mb-6">
                 <div className="flex flex-wrap items-center gap-2.5 mb-2">
                   {film.anno && (
                     <span className="rounded-lg bg-amber-500/10 border border-amber-500/30 px-2.5 py-0.5 text-xs font-black text-amber-400">
@@ -388,7 +535,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
                   </p>
                 )}
 
-                {/* Cast & Crew Bar */}
+                {/* Cast & Crew Bar Desktop */}
                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-4 text-xs">
                   <div>
                     <span className="text-zinc-500 font-semibold block uppercase tracking-wider text-[10px]">
@@ -408,7 +555,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
                   </div>
                 </div>
 
-                {/* Sinossi Trama */}
+                {/* Sinossi Trama Desktop */}
                 <div className="mt-5 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 p-5">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
                     Sinossi del Film
@@ -419,12 +566,42 @@ export default async function FilmDetailPage({ params }: PageProps) {
                 </div>
               </div>
 
-              {/* Sezione Switcher Interattiva: Bloopers & Curiosità (Client Component) */}
+              {/* Sezione Switcher Interattiva: Bloopers & Curiosità (In primo piano per tutti i dispositivi) */}
               <FilmContentSwitcher
                 film={film}
                 initialBloopers={bloopers}
                 initialTrivia={trivia}
               />
+
+              {/* Sezione Film Correlati & Consigliati per SEO ed esplorazione */}
+              {relatedFilms.length > 0 && (
+                <div className="mt-16 pt-10 border-t border-zinc-800/80">
+                  <div className="flex items-center justify-between mb-6">
+                    <div>
+                      <h2 className="text-xl sm:text-2xl font-black text-white">
+                        Altri Film con Bloopers & Curiosità
+                      </h2>
+                      <p className="text-xs sm:text-sm text-zinc-400 mt-1">
+                        Continua ad esplorare gli errori e i retroscena cinematografici nel nostro archivio.
+                      </p>
+                    </div>
+                    <Link
+                      href="/esplora"
+                      className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors"
+                    >
+                      <span>Tutto il catalogo</span>
+                      <ArrowRight className="h-3.5 w-3.5" />
+                    </Link>
+                  </div>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+                    {relatedFilms.map((f: any) => (
+                      <MovieCard key={f.id} film={f} />
+                    ))}
+                  </div>
+                </div>
+              )}
+
             </div>
           </div>
         </div>

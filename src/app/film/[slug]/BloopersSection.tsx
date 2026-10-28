@@ -42,6 +42,26 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
           .eq("id", u.id)
           .maybeSingle();
         if (prof) setProfile(prof);
+
+        // Idrata i voti dell'utente per i bloopers del film
+        const blooperIds = bloopers.map((b) => b.id);
+        if (blooperIds.length > 0) {
+          const { data: userVotes } = await supabase
+            .from("voti_bloopers")
+            .select("blooper_id, tipo")
+            .eq("user_id", u.id)
+            .in("blooper_id", blooperIds);
+
+          if (userVotes && userVotes.length > 0) {
+            const voteMap = new Map(userVotes.map((v: any) => [v.blooper_id, v.tipo]));
+            setBloopers((prev) =>
+              prev.map((b) => ({
+                ...b,
+                voto_utente: (voteMap.get(b.id) as any) || b.voto_utente,
+              }))
+            );
+          }
+        }
       }
     });
   }, []);
