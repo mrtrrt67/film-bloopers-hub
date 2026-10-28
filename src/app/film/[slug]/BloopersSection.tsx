@@ -15,6 +15,10 @@ interface BloopersSectionProps {
 
 export default function BloopersSection({ film, initialBloopers, onBloopersUpdate }: BloopersSectionProps) {
   const [bloopers, setBloopers] = useState<Blooper[]>(initialBloopers);
+
+  useEffect(() => {
+    setBloopers(initialBloopers);
+  }, [initialBloopers]);
   const [user, setUser] = useState<any>(null);
   const [profile, setProfile] = useState<any>(null);
   const [generating, setGenerating] = useState(false);

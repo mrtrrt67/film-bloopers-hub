@@ -17,27 +17,10 @@ import MovieCard from "@/components/MovieCard";
 import { getAmazonSearchUrl, getYouTubeSearchUrl, slugify } from "@/lib/utils";
 import FilmContentSwitcher from "@/components/FilmContentSwitcher";
 
-export const revalidate = 3600; // Rigenerazione e cache Edge ogni ora per massime prestazioni su Vercel CDN
+export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
-}
-
-export async function generateStaticParams() {
-  try {
-    const supabase = createPublicClient();
-    const { data: films } = await supabase
-      .from("films")
-      .select("id, titolo, anno")
-      .order("creato_il", { ascending: false })
-      .limit(60);
-
-    return ((films as any[]) || []).map((film: any) => ({
-      slug: `${slugify(film.titolo, film.anno)}-${String(film.id)}`,
-    }));
-  } catch {
-    return [];
-  }
 }
 
 async function getFilmData(slug: string) {

@@ -6,6 +6,8 @@ import { Film, Blooper, MovieTrivia } from "@/lib/types";
 import BloopersSection from "@/app/film/[slug]/BloopersSection";
 import TriviaSection from "@/components/TriviaSection";
 
+import { createClient } from "@/lib/supabase/client";
+
 interface FilmContentSwitcherProps {
   film: Film;
   initialBloopers: Blooper[];
@@ -18,8 +20,67 @@ export default function FilmContentSwitcher({
   initialTrivia,
 }: FilmContentSwitcherProps) {
   const [activeTab, setActiveTab] = useState<"bloopers" | "trivia">("bloopers");
+  const [bloopers, setBloopers] = useState<Blooper[]>(initialBloopers);
+  const [trivia, setTrivia] = useState<MovieTrivia[]>(initialTrivia);
   const [bloopersCount, setBloopersCount] = useState(initialBloopers.length);
   const [triviaCount, setTriviaCount] = useState(initialTrivia.length);
+
+  // Sincronizza lo stato locale quando cambiano le props
+  useEffect(() => {
+    setBloopers(initialBloopers);
+    setBloopersCount(initialBloopers.length);
+  }, [initialBloopers]);
+
+  useEffect(() => {
+    setTrivia(initialTrivia);
+    setTriviaCount(initialTrivia.length);
+  }, [initialTrivia]);
+
+  // Se i dati iniziali sono vuoti, esegue un controllo immediato su Supabase (safety net anti-cache)
+  useEffect(() => {
+    if (initialBloopers.length === 0 || initialTrivia.length === 0) {
+      const supabase = createClient();
+
+      if (initialBloopers.length === 0) {
+        supabase
+          .from("errori")
+          .select("*, voti_bloopers(tipo, user_id)")
+          .eq("film_id", film.id)
+          .eq("approvato", true)
+          .then(({ data }: { data: any }) => {
+            if (data && data.length > 0) {
+              const mapped: Blooper[] = data.map((b: any) => {
+                const voti = b.voti_bloopers || [];
+                return {
+                  ...b,
+                  conferme: voti.filter((v: any) => v.tipo === "conferma").length,
+                  contestazioni: voti.filter((v: any) => v.tipo === "contestazione").length,
+                  voto_utente: null,
+                };
+              });
+              setBloopers(mapped);
+              setBloopersCount(mapped.length);
+            }
+          });
+      }
+
+      if (initialTrivia.length === 0) {
+        supabase
+          .from("movie_trivia")
+          .select("*")
+          .eq("film_id", film.id)
+          .eq("approvato", true)
+          .order("ordine", { ascending: true })
+          .order("created_at", { ascending: false })
+          .then(({ data }: { data: any }) => {
+            if (data && data.length > 0) {
+              setTrivia(data as MovieTrivia[]);
+              setTriviaCount(data.length);
+            }
+          });
+      }
+    }
+  }, [film.id, initialBloopers.length, initialTrivia.length]);
 
   // Rileva eventuale ancora nell'URL (#curiosita o #trivia o ?view=trivia)
   useEffect(() => {
@@ -43,10 +104,12 @@ export default function FilmContentSwitcher({
   };
 
   const handleBloopersUpdate = (updated: Blooper[]) => {
+    setBloopers(updated);
     setBloopersCount(updated.length);
   };
 
   const handleTriviaUpdate = (updated: MovieTrivia[]) => {
+    setTrivia(updated);
     setTriviaCount(updated.length);
   };
 
@@ -108,7 +171,7 @@ export default function FilmContentSwitcher({
             {activeTab === "bloopers" ? (
               <span className="flex items-center gap-1.5 text-zinc-400">
                 <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
-                Minutaggi al secondo, fotogrammi e voti della community
+                Minutaggi di scena, fotogrammi e voti della community
               </span>
             ) : (
               <span className="flex items-center gap-1.5 text-amber-400 font-medium">
@@ -124,7 +187,7 @@ export default function FilmContentSwitcher({
       <div className={activeTab === "bloopers" ? "block" : "hidden"}>
         <BloopersSection
           film={film}
-          initialBloopers={initialBloopers}
+          initialBloopers={bloopers}
           onBloopersUpdate={handleBloopersUpdate}
         />
       </div>
@@ -132,7 +195,7 @@ export default function FilmContentSwitcher({
       <div className={activeTab === "trivia" ? "block" : "hidden"}>
         <TriviaSection
           film={film}
-          initialTrivia={initialTrivia}
+          initialTrivia={trivia}
           onTriviaUpdate={handleTriviaUpdate}
         />
       </div>

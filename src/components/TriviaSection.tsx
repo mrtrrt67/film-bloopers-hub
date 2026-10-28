@@ -48,6 +48,10 @@ const CATEGORY_COLORS: Record<string, { bg: string; text: string; border: string
 
 export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: TriviaSectionProps) {
   const [triviaList, setTriviaList] = useState<MovieTrivia[]>(initialTrivia);
+
+  useEffect(() => {
+    setTriviaList(initialTrivia);
+  }, [initialTrivia]);
   const [selectedCategory, setSelectedCategory] = useState<string>("Tutte");
   const [user, setUser] = useState<any>(null);
   const [generating, setGenerating] = useState(false);

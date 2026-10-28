@@ -144,10 +144,13 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
       {/* Header Badges */}
       <div className="flex flex-wrap items-center justify-between gap-2.5 mb-3">
         <div className="flex flex-wrap items-center gap-2">
-          {/* Minuto */}
-          <span className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-800/90 border border-zinc-700 px-2.5 py-1 text-xs font-mono font-bold text-zinc-200">
-            <Clock className="h-3.5 w-3.5 text-amber-400" />
-            {blooper.minuto || "00:00"}
+          {/* Minuto indicativo */}
+          <span
+            title="Minutaggio indicativo della scena (può variare in base all'edizione/piattaforma streaming)"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-800/90 border border-zinc-700 px-2.5 py-1 text-xs font-mono font-bold text-zinc-200 cursor-help"
+          >
+            <Clock className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+            <span>~{blooper.minuto ? blooper.minuto.replace(/^~/, "") : "00:00"}</span>
           </span>
 
           {/* Categoria */}
