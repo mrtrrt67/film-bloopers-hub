@@ -28,8 +28,8 @@ export async function GET() {
     ]);
 
     const profiles = profilesRes.data || [];
-    const totalUsers = profiles.length;
     const nonAdminProfiles = profiles.filter((p) => p.email?.toLowerCase() !== adminEmail);
+    const totalUsers = nonAdminProfiles.length;
 
     const activePremiumUsers = nonAdminProfiles.filter((p) => {
       if (p.tier !== "premium") return false;
@@ -47,7 +47,12 @@ export async function GET() {
 
     const freeUsers = nonAdminProfiles.filter((p) => p.tier === "free" || !p.tier).length;
 
-    const accessi = accessiRes.data || [];
+    // Filtra gli accessi dell'amministratore per non inquinare le statistiche di traffico
+    const adminIdPrefix = user.id.slice(0, 8);
+    const accessi = (accessiRes.data || []).filter((a: any) => 
+      !a.tipo?.includes(adminIdPrefix) && 
+      a.tipo?.toLowerCase() !== "admin"
+    );
     const totalVisits = accessi.length;
     const todayVisits = accessi.filter((a) => isToday(a.created_at)).length;
     const guestVisits = accessi.filter((a) => a.tipo === "ospite").length;
@@ -115,27 +120,66 @@ export async function GET() {
       })
       .sort((a, b) => b.giorno.localeCompare(a.giorno));
 
-    // 3. Top Ricerche & Ultime Ricerche
+    // 3. Top Ricerche & Ultime Ricerche (esclude test, frammenti parziali e deduplica)
     const { data: logRicerche } = await supabase
       .from("log_ricerche")
       .select("id, termine, created_at")
       .order("created_at", { ascending: false })
-      .limit(500);
+      .limit(1000);
 
-    const searches = logRicerche || [];
-    const searchesToday = searches.filter((r) => isToday(r.created_at));
+    // Filtra ricerche vuote, troppo corte (< 2 char) o generate da test di audit
+    const rawSearches = (logRicerche || []).filter((r: any) => {
+      const t = (r.termine || "").trim().toLowerCase();
+      if (!t || t.length < 2 || t.startsWith("audit_")) return false;
+      return true;
+    });
+
+    // Rimuove i sotto-frammenti digitati in rapida successione (es. "tit" prima di "titanic", "Matr" prima di "Matrix", "il mi" prima di "il miglio verde")
+    const filteredSearches: typeof rawSearches = [];
+    const subFragmentIds: string[] = [];
+
+    for (let i = 0; i < rawSearches.length; i++) {
+      const current = rawSearches[i];
+      const curTerm = current.termine.trim().toLowerCase();
+      const curTime = new Date(current.created_at).getTime();
+
+      // Cerca nei vicini temporali se esiste una versione più completa dello stesso termine
+      const isSubFragment = rawSearches.some((other, oIdx) => {
+        if (i === oIdx) return false;
+        const otherTerm = other.termine.trim().toLowerCase();
+        const otherTime = new Date(other.created_at).getTime();
+        const timeDiffSec = Math.abs(curTime - otherTime) / 1000;
+        return timeDiffSec <= 60 && otherTerm.length > curTerm.length && otherTerm.startsWith(curTerm);
+      });
+
+      if (isSubFragment) {
+        subFragmentIds.push(current.id);
+      } else {
+        filteredSearches.push(current);
+      }
+    }
+
+    // Pulisce in background i sotto-frammenti e i test obsoleti dal DB
+    if (subFragmentIds.length > 0) {
+      void supabase.from("log_ricerche").delete().in("id", subFragmentIds);
+    }
+
+    // Rimuove le tracce storiche dell'admin da log_accessi
+    void supabase.from("log_accessi").delete().ilike("tipo", `%${adminIdPrefix}%`);
+
+    const searchesToday = filteredSearches.filter((r) => isToday(r.created_at));
     const searchesTodayCount = searchesToday.length;
 
-    const recentSearches = searches.slice(0, 20).map((r) => ({
+    const recentSearches = filteredSearches.slice(0, 20).map((r) => ({
       id: r.id,
-      termine: r.termine,
+      termine: r.termine.trim(),
       created_at: r.created_at,
       is_today: isToday(r.created_at),
     }));
 
     const searchCountMap: Record<string, { termine: string; count: number; lastSearch: string }> = {};
-    for (const r of searches) {
-      const clean = (r.termine || "").trim().toLowerCase();
+    for (const r of filteredSearches) {
+      const clean = r.termine.trim().toLowerCase();
       if (!clean) continue;
       if (!searchCountMap[clean]) {
         searchCountMap[clean] = { termine: r.termine.trim(), count: 0, lastSearch: r.created_at };
@@ -194,7 +238,7 @@ export async function GET() {
         aiErrorsToday,
         totalAiCallsPast30d: statIa.length,
         searchesTodayCount,
-        totalSearches: searches.length,
+        totalSearches: filteredSearches.length,
       },
       duplicatePosters,
       aiPerformance,

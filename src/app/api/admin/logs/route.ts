@@ -20,10 +20,16 @@ export async function GET(request: Request) {
       supabase.from("log_accessi").select("*").order("created_at", { ascending: false }).limit(limit),
     ]);
 
+    const adminIdPrefix = user.id.slice(0, 8);
+    const recentAccess = (accessRes.data || []).filter((a: any) => 
+      !a.tipo?.includes(adminIdPrefix) && 
+      a.tipo?.toLowerCase() !== "admin"
+    );
+
     return NextResponse.json({
       aiErrors: errRes.data || [],
       recentAiCalls: callsRes.data || [],
-      recentAccess: accessRes.data || [],
+      recentAccess,
     });
   } catch (err: any) {
     console.error("Errore log admin:", err);

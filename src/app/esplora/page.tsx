@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useTransition } from "react";
+import { useState, useEffect, useRef, useTransition } from "react";
 import { Search, Film as FilmIcon, Sparkles, Filter, Database, Globe } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -81,8 +81,37 @@ export default function EsploraPage() {
     return () => clearTimeout(timer);
   }, [searchTerm, activeTab, dbFilms]);
 
+  const lastLoggedRef = useRef<string>("");
+
+  // Registrazione analitica della ricerca (solo termini completi o selezioni)
+  const logSearchTerm = (term: string) => {
+    const clean = (term || "").trim();
+    if (!clean || clean.length < 2) return;
+    if (lastLoggedRef.current.toLowerCase() === clean.toLowerCase()) return;
+    lastLoggedRef.current = clean;
+
+    fetch("/api/movies/search/log", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query: clean }),
+    }).catch(() => {});
+  };
+
+  // Registra la ricerca solo quando l'utente ha terminato di digitare (2 secondi di pausa)
+  useEffect(() => {
+    const clean = searchTerm.trim();
+    if (!clean || clean.length < 2) return;
+
+    const timer = setTimeout(() => {
+      logSearchTerm(clean);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   // Importa un film da TMDB nel database Supabase al click
   const handleImportAndNavigate = async (movie: TMDBMovieResult) => {
+    if (movie.title) logSearchTerm(movie.title);
     setImportingId(movie.id);
     try {
       const res = await fetch("/api/movies/import", {
@@ -167,6 +196,16 @@ export default function EsploraPage() {
           type="text"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && searchTerm.trim().length >= 2) {
+              logSearchTerm(searchTerm);
+            }
+          }}
+          onBlur={() => {
+            if (searchTerm.trim().length >= 2) {
+              logSearchTerm(searchTerm);
+            }
+          }}
           placeholder="Cerca per titolo, anno, regista o attore (es. Matrix, Il Gladiatore, Nolan)..."
           className="w-full rounded-2xl border border-zinc-800 bg-zinc-900/60 pl-12 pr-4 py-4 text-base text-white placeholder-zinc-500 backdrop-blur-md focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 shadow-lg"
         />
@@ -197,7 +236,10 @@ export default function EsploraPage() {
             </p>
             {searchTerm && (
               <button
-                onClick={() => setActiveTab("tmdb")}
+                onClick={() => {
+                  setActiveTab("tmdb");
+                  if (searchTerm.trim().length >= 2) logSearchTerm(searchTerm);
+                }}
                 className="flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-zinc-950 shadow-md hover:brightness-110"
               >
                 <Globe className="h-4 w-4" />
