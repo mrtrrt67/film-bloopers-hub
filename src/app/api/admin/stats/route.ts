@@ -170,7 +170,7 @@ export async function GET() {
     const searchesToday = filteredSearches.filter((r) => isToday(r.created_at));
     const searchesTodayCount = searchesToday.length;
 
-    const recentSearches = filteredSearches.slice(0, 20).map((r) => ({
+    const recentSearches = filteredSearches.slice(0, 60).map((r) => ({
       id: r.id,
       termine: r.termine.trim(),
       created_at: r.created_at,

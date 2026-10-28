@@ -14,6 +14,7 @@ import {
   RefreshCw,
   Copy
 } from "lucide-react";
+import AdminPagination from "./AdminPagination";
 
 interface AdminStatsTabProps {
   onNavigateToFilms?: (filter?: string) => void;
@@ -24,6 +25,12 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchView, setSearchView] = useState<"recent" | "top">("recent");
+
+  // Paginazione per prospetto IA e ricerche
+  const [aiPerfPage, setAiPerfPage] = useState(1);
+  const [aiPerfPageSize, setAiPerfPageSize] = useState(10);
+  const [aiPerfModelFilter, setAiPerfModelFilter] = useState("all");
+  const [recentSearchPage, setRecentSearchPage] = useState(1);
 
   const amazonDashboardUrl = process.env.NEXT_PUBLIC_AMAZON_DASHBOARD_URL || "https://programma-affiliazione.amazon.it/home";
   const amazonTag = process.env.NEXT_PUBLIC_AMAZON_TAG || "cineblp196704-21";
@@ -48,6 +55,14 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
     fetchStats();
   }, []);
 
+  useEffect(() => {
+    setAiPerfPage(1);
+  }, [aiPerfModelFilter]);
+
+  useEffect(() => {
+    setRecentSearchPage(1);
+  }, [searchView]);
+
   if (loading) {
     return (
       <div className="flex min-h-[300px] items-center justify-center">
@@ -62,6 +77,27 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
   const topSearches = data?.topSearches || [];
   const recentSearches = data?.recentSearches || [];
   const topVotedBloopers = data?.topVotedBloopers || [];
+
+  // Modelli IA disponibili nel prospetto
+  const availableModels = Array.from(
+    new Set(aiPerformance.map((r: any) => r.modello).filter(Boolean))
+  ) as string[];
+
+  const filteredAiPerformance = aiPerformance.filter((row: any) => {
+    if (aiPerfModelFilter === "all") return true;
+    return row.modello === aiPerfModelFilter;
+  });
+
+  const paginatedAiPerformance = filteredAiPerformance.slice(
+    (aiPerfPage - 1) * aiPerfPageSize,
+    aiPerfPage * aiPerfPageSize
+  );
+
+  const searchPageSize = 10;
+  const paginatedRecentSearches = recentSearches.slice(
+    (recentSearchPage - 1) * searchPageSize,
+    recentSearchPage * searchPageSize
+  );
 
   return (
     <div className="space-y-8">
@@ -229,7 +265,7 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
             recentSearches.length === 0 ? (
               <p className="text-xs text-zinc-500 py-6 text-center">Nessuna ricerca recente registrata.</p>
             ) : (
-              <div className="overflow-x-auto max-h-[360px] overflow-y-auto pr-1">
+              <div className="overflow-x-auto overflow-y-auto pr-1">
                 <table className="w-full text-left text-xs">
                   <thead>
                     <tr className="border-b border-zinc-800 text-zinc-400">
@@ -238,7 +274,7 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-800/60 text-zinc-300 font-mono">
-                    {recentSearches.map((s: any, idx: number) => (
+                    {paginatedRecentSearches.map((s: any, idx: number) => (
                       <tr key={s.id || idx} className="hover:bg-zinc-800/30">
                         <td className="py-2.5 font-bold text-white font-sans flex items-center gap-2">
                           <span>{s.termine}</span>
@@ -255,6 +291,16 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
                     ))}
                   </tbody>
                 </table>
+
+                {recentSearches.length > searchPageSize && (
+                  <AdminPagination
+                    currentPage={recentSearchPage}
+                    totalItems={recentSearches.length}
+                    pageSize={searchPageSize}
+                    onPageChange={setRecentSearchPage}
+                    itemName="ricerche"
+                  />
+                )}
               </div>
             )
           ) : (
@@ -335,55 +381,87 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
       </div>
 
       {/* PROSPETTO ANALITICO GIORNALIERO PER MODELLO */}
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 space-y-4">
-        <div className="flex items-center justify-between">
-          <h4 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
-            <Bot className="h-4 w-4 text-amber-400" />
-            🤖 Prospetto Prestazioni IA Giornaliero per Modello (Ultimi 30 giorni)
-          </h4>
-          <span className="text-xs text-zinc-500 font-mono">Dati da statistiche_ia & log_errori_ia</span>
+      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+          <div>
+            <h4 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
+              <Bot className="h-4 w-4 text-amber-400" />
+              🤖 Prospetto Prestazioni IA Giornaliero per Modello
+            </h4>
+            <span className="text-xs text-zinc-500 font-mono">Dati da statistiche_ia & log_errori_ia (ultimi 30 giorni)</span>
+          </div>
+
+          {availableModels.length > 1 && (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-zinc-400">Modello:</span>
+              <select
+                value={aiPerfModelFilter}
+                onChange={(e) => setAiPerfModelFilter(e.target.value)}
+                className="rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-amber-500 transition"
+              >
+                <option value="all">Tutti i modelli ({availableModels.length})</option>
+                {availableModels.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            </div>
+          )}
         </div>
 
-        {aiPerformance.length === 0 ? (
-          <p className="text-xs text-zinc-500 py-6 text-center">Nessun dato di utilizzo IA registrato di recente.</p>
+        {filteredAiPerformance.length === 0 ? (
+          <p className="text-xs text-zinc-500 py-6 text-center">Nessun dato di utilizzo IA registrato per i filtri selezionati.</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead>
-                <tr className="border-b border-zinc-800 text-zinc-400">
-                  <th className="pb-2 font-medium">Data</th>
-                  <th className="pb-2 font-medium">Modello IA</th>
-                  <th className="pb-2 text-right font-medium">Riuscite</th>
-                  <th className="pb-2 text-right font-medium">Fallite</th>
-                  <th className="pb-2 text-right font-medium">Totale Richieste</th>
-                  <th className="pb-2 text-right font-medium">Tasso di Successo</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800/60 text-zinc-300 font-mono">
-                {aiPerformance.map((row: any, idx: number) => (
-                  <tr key={idx} className="hover:bg-zinc-800/30">
-                    <td className="py-2.5 font-bold text-white">{row.giorno}</td>
-                    <td className="py-2.5 font-semibold text-amber-300 font-sans">{row.modello}</td>
-                    <td className="py-2.5 text-right text-emerald-400 font-bold">{row.riuscite}</td>
-                    <td className="py-2.5 text-right text-rose-400 font-bold">{row.fallite}</td>
-                    <td className="py-2.5 text-right text-zinc-200">{row.totale}</td>
-                    <td className="py-2.5 text-right font-bold">
-                      <span
-                        className={`inline-block px-2 py-0.5 rounded text-[11px] ${
-                          row.tasso >= 90
-                            ? "bg-emerald-500/20 text-emerald-300"
-                            : row.tasso >= 70
-                            ? "bg-amber-500/20 text-amber-300"
-                            : "bg-rose-500/20 text-rose-300"
-                        }`}
-                      >
-                        {row.tasso}%
-                      </span>
-                    </td>
+          <div className="overflow-hidden rounded-xl border border-zinc-800/80">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-zinc-800 bg-zinc-950/40 text-zinc-400">
+                    <th className="py-2.5 px-4 font-medium">Data</th>
+                    <th className="py-2.5 px-4 font-medium">Modello IA</th>
+                    <th className="py-2.5 px-4 text-right font-medium">Riuscite</th>
+                    <th className="py-2.5 px-4 text-right font-medium">Fallite</th>
+                    <th className="py-2.5 px-4 text-right font-medium">Totale Richieste</th>
+                    <th className="py-2.5 px-4 text-right font-medium">Tasso di Successo</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-zinc-800/60 text-zinc-300 font-mono">
+                  {paginatedAiPerformance.map((row: any, idx: number) => (
+                    <tr key={idx} className="hover:bg-zinc-800/30">
+                      <td className="py-2.5 px-4 font-bold text-white">{row.giorno}</td>
+                      <td className="py-2.5 px-4 font-semibold text-amber-300 font-sans">{row.modello}</td>
+                      <td className="py-2.5 px-4 text-right text-emerald-400 font-bold">{row.riuscite}</td>
+                      <td className="py-2.5 px-4 text-right text-rose-400 font-bold">{row.fallite}</td>
+                      <td className="py-2.5 px-4 text-right text-zinc-200">{row.totale}</td>
+                      <td className="py-2.5 px-4 text-right font-bold">
+                        <span
+                          className={`inline-block px-2 py-0.5 rounded text-[11px] ${
+                            row.tasso >= 90
+                              ? "bg-emerald-500/20 text-emerald-300"
+                              : row.tasso >= 70
+                              ? "bg-amber-500/20 text-amber-300"
+                              : "bg-rose-500/20 text-rose-300"
+                          }`}
+                        >
+                          {row.tasso}%
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <AdminPagination
+              currentPage={aiPerfPage}
+              totalItems={filteredAiPerformance.length}
+              pageSize={aiPerfPageSize}
+              onPageChange={setAiPerfPage}
+              onPageSizeChange={setAiPerfPageSize}
+              pageSizeOptions={[10, 20, 50]}
+              itemName="record prestazioni"
+            />
           </div>
         )}
       </div>
