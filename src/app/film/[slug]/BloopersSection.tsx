@@ -332,23 +332,31 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
                 )}
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] text-zinc-300">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px] text-zinc-300">
                 <div className="p-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800/80">
                   <div className="font-bold text-white flex items-center gap-1 mb-1">
-                    <span className="text-emerald-400">🎯 +10 Punti</span> per approvazione
+                    <span className="text-emerald-400">🎯 +10 Punti</span> approvazione
                   </div>
                   <p className="text-zinc-400 text-[10px] leading-tight">
-                    Ad ogni blooper approvato ricevi 10 punti. 
-                    <strong className="text-amber-300"> +20 Punti (2x)</strong> per membri con Piano Annuale, Lifetime o Amministratore!
+                    Subito accreditati non appena lo staff valida il tuo blooper (+20 pt 2x per Annuale/Lifetime/Admin).
+                  </p>
+                </div>
+
+                <div className="p-2.5 rounded-xl border border-emerald-500/30 bg-emerald-950/30">
+                  <div className="font-bold text-emerald-300 flex items-center gap-1 mb-1">
+                    <span>👍 +1 Punto</span> per ogni voto
+                  </div>
+                  <p className="text-zinc-300 text-[10px] leading-tight">
+                    Ogni pollice in su che la community assegnerà al tuo blooper ti fa guadagnare +1 punto passivo nel tempo!
                   </p>
                 </div>
 
                 <div className="p-2.5 rounded-xl bg-zinc-900/80 border border-zinc-800/80">
                   <div className="font-bold text-white flex items-center gap-1 mb-1">
-                    <span className="text-amber-400">🎁 Mesi Premium Gratis</span>
+                    <span className="text-amber-400">🎁 Mesi Premium</span>
                   </div>
                   <p className="text-zinc-400 text-[10px] leading-tight">
-                    Ogni <strong className="text-white">50 punti</strong> accumulati sblocchi in automatico <strong className="text-amber-300">1 mese di Premium gratuito</strong>. A 10.000 punti sblocchi il <strong className="text-amber-300">Lifetime a vita!</strong>
+                    Ogni <strong className="text-white">50 punti</strong> sblocchi 1 mese Premium omaggio. A 10.000 punti ottieni il <strong className="text-amber-300">Lifetime a vita!</strong>
                   </p>
                 </div>
               </div>

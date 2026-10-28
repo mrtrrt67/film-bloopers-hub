@@ -194,34 +194,75 @@ export async function GET() {
       .sort((a, b) => b.count - a.count)
       .slice(0, 10);
 
-    // 4. Bloopers più votati / discussi
-    const { data: voti } = await supabase.from("voti_bloopers").select("errore_id, tipo");
-    const votesMap: Record<string, { conferme: number; contestazioni: number; totale: number }> = {};
-    for (const v of voti || []) {
-      if (!v.errore_id) continue;
-      if (!votesMap[v.errore_id]) votesMap[v.errore_id] = { conferme: 0, contestazioni: 0, totale: 0 };
-      if (v.tipo === "conferma") votesMap[v.errore_id].conferme += 1;
-      if (v.tipo === "contestazione") votesMap[v.errore_id].contestazioni += 1;
-      votesMap[v.errore_id].totale += 1;
+    // 4. Statistiche & Prospetto Bloopers (👍 e 👎)
+    const { count: totalBloopersCount } = await supabase
+      .from("errori")
+      .select("*", { count: "exact", head: true });
+
+    // Recupera conteggi aggregati per provenienza e totali voti
+    const { data: allBloopersSummary } = await supabase
+      .from("errori")
+      .select("conferme, contestazioni, provenienza, inserito_da");
+
+    let totalThumbsUp = 0;
+    let totalThumbsDown = 0;
+    let aiBloopersCount = 0;
+    let userBloopersCount = 0;
+
+    for (const b of allBloopersSummary || []) {
+      const isAi =
+        b.provenienza === "ia" ||
+        !b.inserito_da ||
+        b.inserito_da.toLowerCase().startsWith("ia") ||
+        b.inserito_da.toLowerCase().includes("filmbloopers");
+
+      if (isAi) aiBloopersCount++;
+      else userBloopersCount++;
+
+      totalThumbsUp += b.conferme || 0;
+      totalThumbsDown += b.contestazioni || 0;
     }
 
-    const topVoteIds = Object.entries(votesMap)
-      .sort((a, b) => b[1].totale - a[1].totale)
-      .slice(0, 8)
-      .map(([id]) => id);
+    const totalVotes = totalThumbsUp + totalThumbsDown;
+    const globalApprovalRate = totalVotes > 0 ? Math.round((totalThumbsUp / totalVotes) * 100) : 100;
 
-    let topVotedBloopers: any[] = [];
-    if (topVoteIds.length > 0) {
-      const { data: bloopersData } = await supabase
+    // Recupera i bloopers con voti
+    const { data: votedBloopers } = await supabase
+      .from("errori")
+      .select("id, minuto, categoria, descrizione, conferme, contestazioni, provenienza, inserito_da, creato_il, film_id, films(id, titolo, anno)")
+      .or("conferme.gt.0,contestazioni.gt.0")
+      .order("conferme", { ascending: false })
+      .limit(60);
+
+    let prospectList = [...(votedBloopers || [])];
+
+    // Se ci sono pochi bloopers con voti, recupera anche i più recenti per mostrare un prospetto completo
+    if (prospectList.length < 30) {
+      const { data: recentBloopers } = await supabase
         .from("errori")
-        .select("id, minuto, descrizione, film_id, films(titolo, anno)")
-        .in("id", topVoteIds);
+        .select("id, minuto, categoria, descrizione, conferme, contestazioni, provenienza, inserito_da, creato_il, film_id, films(id, titolo, anno)")
+        .order("creato_il", { ascending: false })
+        .limit(40);
 
-      topVotedBloopers = (bloopersData || []).map((b) => ({
-        ...b,
-        votes: votesMap[b.id] || { conferme: 0, contestazioni: 0, totale: 0 },
-      })).sort((a, b) => b.votes.totale - a.votes.totale);
+      const existingIds = new Set(prospectList.map((b) => b.id));
+      for (const rb of recentBloopers || []) {
+        if (!existingIds.has(rb.id)) {
+          prospectList.push(rb);
+          existingIds.add(rb.id);
+        }
+      }
     }
+
+    const bloopersStats = {
+      total: totalBloopersCount || (allBloopersSummary?.length ?? 0),
+      aiCount: aiBloopersCount,
+      userCount: userBloopersCount,
+      totalThumbsUp,
+      totalThumbsDown,
+      totalVotes,
+      globalApprovalRate,
+      list: prospectList,
+    };
 
     return NextResponse.json({
       metrics: {
@@ -244,7 +285,7 @@ export async function GET() {
       aiPerformance,
       topSearches,
       recentSearches,
-      topVotedBloopers,
+      bloopersStats,
     });
   } catch (err: any) {
     console.error("Errore recupero statistiche admin:", err);

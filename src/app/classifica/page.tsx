@@ -1,5 +1,5 @@
 import { Metadata } from "next";
-import { Trophy, Award, Crown, Star, Sparkles, Shield, User } from "lucide-react";
+import { Trophy, Award, Crown, Star, Sparkles, Shield, User, ThumbsUp, CheckCircle, AlertTriangle, Info, Zap } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatPublicAuthor, getRankInfo, replacePlaceholders } from "@/lib/utils";
 
@@ -29,14 +29,7 @@ export default async function ClassificaPage() {
   const sogliaLifetime = parseInt(conf["soglia_punti_lifetime"] || "10000", 10);
 
   const titoloPagina = conf["classifica_titolo"] || "Classifica Cacciatori di Bloopers";
-  const bannerTitolo = conf["classifica_banner_titolo"] || "Come funziona il sistema di punti e premi?";
-
-  const t1 = conf["classifica_testo_1"] || "Contribuisci segnalando nuovi errori o facendo validare le tue segnalazioni dall'amministratore.";
-  const t2Raw = conf["classifica_testo_2"] || "⭐ Premio Mensile (Ogni {soglia_mensile} punti): Ogni volta che accumuli {soglia_mensile} punti, sblocchi automaticamente 1 mese di abbonamento Premium gratuito.";
-  const t3Raw = conf["classifica_testo_3"] || "👑 Premio Lifetime ({soglia_lifetime} punti): Raggiungi la vetta della community arrivando a {soglia_lifetime} punti per sbloccare l'accesso Lifetime gratuito a vita!";
-
-  const t2 = replacePlaceholders(t2Raw, { soglia_mensile: sogliaMensile });
-  const t3 = replacePlaceholders(t3Raw, { soglia_lifetime: sogliaLifetime });
+  const bannerTitolo = conf["classifica_banner_titolo"] || "Come si guadagnano i Punti e come funzionano i Premi?";
 
   // 2. Recupero classifica utenti (escludendo l'amministratore)
   const adminEmail = (process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL || "mrtrrt67@gmail.com").toLowerCase();
@@ -86,26 +79,98 @@ export default async function ClassificaPage() {
         </div>
       )}
 
-      {/* Regole & Premi Box */}
-      <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-950/20 via-zinc-900/60 to-zinc-950 p-6 mb-10 shadow-xl">
-        <h3 className="text-sm font-black text-amber-400 flex items-center gap-2 mb-3">
-          <Award className="h-4 w-4" />
-          {bannerTitolo}
-        </h3>
-        <ul className="space-y-2 text-xs sm:text-sm text-zinc-300">
-          <li className="flex items-start gap-2">
-            <span className="text-amber-400 font-bold">•</span>
-            <span><strong>Guadagna punti:</strong> {t1}</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-amber-400 font-bold">•</span>
-            <span>{t2}</span>
-          </li>
-          <li className="flex items-start gap-2">
-            <span className="text-amber-400 font-bold">•</span>
-            <span>{t3}</span>
-          </li>
-        </ul>
+      {/* Sezione Regole & Sistema di Punteggio */}
+      <div className="rounded-3xl border border-amber-500/30 bg-gradient-to-br from-amber-950/25 via-zinc-900/80 to-zinc-950 p-6 sm:p-7 mb-10 shadow-2xl space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-zinc-800/80 pb-4">
+          <h3 className="text-base font-black text-white flex items-center gap-2.5">
+            <Award className="h-5 w-5 text-amber-400" />
+            <span>{bannerTitolo}</span>
+          </h3>
+          <span className="text-xs font-mono font-bold text-amber-400/90 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 self-start sm:self-auto">
+            ⚡ Regolamento Ufficiale Community
+          </span>
+        </div>
+
+        {/* Le 3 Vie per Guadagnare Punti */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Card 1: Segnalazione Nuovo Errore */}
+          <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/60 p-4 space-y-2 hover:border-amber-500/40 transition">
+            <div className="flex items-center justify-between">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-amber-500/15 text-amber-400 font-bold text-sm">
+                1
+              </span>
+              <span className="rounded-lg bg-amber-500/20 text-amber-300 font-mono font-bold text-xs px-2.5 py-1 border border-amber-500/30">
+                +10 Punti
+              </span>
+            </div>
+            <h4 className="text-sm font-bold text-white pt-1">Segnala un Nuovo Blooper</h4>
+            <p className="text-xs text-zinc-400 leading-relaxed">
+              Scovi un errore di scena, anacronismo o microfono visibile? Inseriscilo dalla scheda del film. Non appena lo staff lo verifica e lo approva, guadagni <strong className="text-amber-300">+10 pt</strong> (oppure <strong className="text-amber-300">+20 pt 2x</strong> con abbonamento Annuale o Lifetime).
+            </p>
+          </div>
+
+          {/* Card 2: Contestazione o Correzione */}
+          <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/60 p-4 space-y-2 hover:border-rose-500/40 transition">
+            <div className="flex items-center justify-between">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500/15 text-rose-400 font-bold text-sm">
+                2
+              </span>
+              <span className="rounded-lg bg-rose-500/20 text-rose-300 font-mono font-bold text-xs px-2.5 py-1 border border-rose-500/30">
+                +10 Punti
+              </span>
+            </div>
+            <h4 className="text-sm font-bold text-white pt-1">Contesta o Correggi un Errore</h4>
+            <p className="text-xs text-zinc-400 leading-relaxed">
+              Hai notato un blooper inesistente o un minutaggio impreciso? Clicca sul pollice in giù (👎) e motiva la contestazione: se la segnalazione porta alla rettifica o rimozione dell&apos;errore errato, ricevi <strong className="text-rose-300">+10 pt</strong> (+20 pt 2x con piano Annuale o Lifetime).
+            </p>
+          </div>
+
+          {/* Card 3: Rendita Pollici in Su */}
+          <div className="rounded-2xl border border-emerald-500/30 bg-emerald-950/15 p-4 space-y-2 hover:border-emerald-500/50 transition">
+            <div className="flex items-center justify-between">
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-300 font-bold text-sm">
+                3
+              </span>
+              <span className="rounded-lg bg-emerald-500/20 text-emerald-300 font-mono font-bold text-xs px-2.5 py-1 border border-emerald-500/40">
+                +1 Punto / 👍
+              </span>
+            </div>
+            <h4 className="text-sm font-bold text-white pt-1">Rendita Pollici in Su (👍)</h4>
+            <p className="text-xs text-zinc-300 leading-relaxed">
+              Ogni volta che un altro membro della community conferma con un pollice in su (👍) un tuo blooper approvato, guadagni <strong className="text-emerald-300">+1 punto passivo</strong>! Più i tuoi bloopers sono curati e veritieri, più punti accumulerai automaticamente nel tempo.
+            </p>
+          </div>
+        </div>
+
+        {/* Note di Trasparenza & Anti-Spam */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-3.5 flex items-start gap-3 text-xs text-zinc-400">
+            <Info className="h-4 w-4 text-cyan-400 shrink-0 mt-0.5" />
+            <div>
+              <strong className="text-zinc-200">Archivio IA vs Utenti:</strong> Il catalogo iniziale è stato pre-popolato dall&apos;Intelligenza Artificiale per fornire una solida base di partenza. I bloopers IA non appartengono ad alcun utente e non generano punti sui voti; i punti spettano unicamente agli utenti reali sui loro bloopers originali approvati.
+            </div>
+          </div>
+
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-3.5 flex items-start gap-3 text-xs text-zinc-400">
+            <Shield className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
+            <div>
+              <strong className="text-zinc-200">Zero Clic Selvaggio:</strong> Votare 👍 un blooper assegna 0 punti al votante ed è impossibile votare i propri bloopers. Questo impedisce account bot o spam e premia solo la reale qualità delle scoperte cinematografiche.
+            </div>
+          </div>
+        </div>
+
+        {/* Premi in Palio */}
+        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="flex items-center gap-2.5">
+            <Crown className="h-5 w-5 text-amber-400 shrink-0" />
+            <div>
+              <strong className="text-white text-sm">I Premi in Palio:</strong>
+              <p className="text-zinc-400 text-xs">
+                Ogni <strong className="text-amber-300">{sogliaMensile} Punti</strong> sblocchi automaticamente 1 mese Premium omaggio. Al raggiungimento di <strong className="text-amber-300">{sogliaLifetime} Punti</strong> ottieni il pass <strong>Lifetime gratuito per sempre</strong>!
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Classifica Table */}

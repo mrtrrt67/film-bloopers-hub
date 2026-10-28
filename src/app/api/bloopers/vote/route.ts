@@ -1,6 +1,28 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { checkAndAwardPointRewards } from "@/lib/rewards";
+
+async function resolveAuthorProfile(adminDb: any, userEmailOrHandle?: string | null) {
+  if (!userEmailOrHandle) return null;
+  const raw = userEmailOrHandle.trim();
+  const clean = raw.replace(/^@/, "").trim().toLowerCase();
+
+  if (raw.includes("@") && raw.includes(".") && !raw.startsWith("@")) {
+    const { data: p } = await adminDb.from("profiles").select("*").eq("email", raw.toLowerCase()).maybeSingle();
+    if (p) return p;
+  }
+  const { data: pUser } = await adminDb.from("profiles").select("*").ilike("username", clean).maybeSingle();
+  if (pUser) return pUser;
+
+  const { data: pPrefix } = await adminDb.from("profiles").select("*").ilike("email", `${clean}@%`).maybeSingle();
+  if (pPrefix) return pPrefix;
+
+  const { data: pRaw } = await adminDb.from("profiles").select("*").eq("email", raw).maybeSingle();
+  if (pRaw) return pRaw;
+
+  return null;
+}
 
 export async function POST(request: Request) {
   try {
@@ -35,10 +57,10 @@ export async function POST(request: Request) {
 
     const motivoPulito = motivo && typeof motivo === "string" ? motivo.trim() : null;
 
-    // 1. Recupera il blooper di riferimento
+    // 1. Recupera il blooper di riferimento con info sul film
     const { data: targetBlooper } = await supabase
       .from("errori")
-      .select("id, inserito_da, provenienza")
+      .select("id, inserito_da, provenienza, film_id, films(titolo, anno)")
       .eq("id", cleanErrId)
       .maybeSingle();
 
@@ -84,6 +106,7 @@ export async function POST(request: Request) {
     }
 
     let resultingTipo: "conferma" | "contestazione" | null = tipo;
+    let deltaConferme = 0;
 
     if (existingVote) {
       if (existingVote.tipo === tipo && !motivoPulito) {
@@ -99,6 +122,9 @@ export async function POST(request: Request) {
           throw new Error("Impossibile rimuovere il voto: " + delErr.message);
         }
         resultingTipo = null;
+        if (existingVote.tipo === "conferma") {
+          deltaConferme = -1;
+        }
       } else {
         // Cambia tipo di voto o aggiorna/conferma la motivazione
         const { error: updErr } = await supabase
@@ -113,6 +139,12 @@ export async function POST(request: Request) {
         if (updErr) {
           console.error("Errore aggiornamento voto:", updErr);
           throw new Error("Impossibile aggiornare il voto: " + updErr.message);
+        }
+
+        if (existingVote.tipo !== "conferma" && tipo === "conferma") {
+          deltaConferme = 1;
+        } else if (existingVote.tipo === "conferma" && tipo !== "conferma") {
+          deltaConferme = -1;
         }
       }
     } else {
@@ -129,6 +161,10 @@ export async function POST(request: Request) {
       if (insErr) {
         console.error("Errore inserimento voto:", insErr);
         throw new Error("Impossibile registrare il voto: " + insErr.message);
+      }
+
+      if (tipo === "conferma") {
+        deltaConferme = 1;
       }
     }
 
@@ -157,6 +193,42 @@ export async function POST(request: Request) {
 
     if (updateErr) {
       console.error("Errore aggiornamento contatori in errori:", updateErr);
+    }
+
+    // 6. Accredito punteggio all'autore del blooper (ogni 👍 fa guadagnare +1 punto all'utente che l'ha inserito)
+    // Se il blooper è generato da IA (come la quasi totalità di quelli iniziali nel catalogo), nessun utente riceve punti.
+    const isAiBlooper =
+      targetBlooper.provenienza === "ia" ||
+      !targetBlooper.inserito_da ||
+      targetBlooper.inserito_da.toLowerCase().startsWith("ia") ||
+      targetBlooper.inserito_da.toLowerCase().includes("filmbloopers");
+
+    if (!isAiBlooper && deltaConferme !== 0) {
+      try {
+        const authorProfile = await resolveAuthorProfile(adminDb, targetBlooper.inserito_da);
+        if (authorProfile && authorProfile.id !== user.id) {
+          if (deltaConferme > 0) {
+            const newTotal = (authorProfile.punti || 0) + 1;
+            await checkAndAwardPointRewards(adminDb, authorProfile.id, newTotal);
+
+            const filmTitolo = (targetBlooper as any)?.films?.titolo || "un film";
+            await adminDb.from("notifiche_utenti").insert({
+              user_id: authorProfile.id,
+              tipo: "conferma_ricevuta",
+              titolo: "Nuovo Pollice in Su Ricevuto! 👍",
+              messaggio: `La community ha confermato con un pollice in su il tuo blooper in "${filmTitolo}"! Ti è stato accreditato +1 punto.`,
+              punti: 1,
+              film_titolo: filmTitolo,
+              letta: false,
+            });
+          } else if (deltaConferme < 0) {
+            const newTotal = Math.max(0, (authorProfile.punti || 0) - 1);
+            await adminDb.from("profiles").update({ punti: newTotal }).eq("id", authorProfile.id);
+          }
+        }
+      } catch (errAuthor) {
+        console.error("Errore accredito punti autore blooper:", errAuthor);
+      }
     }
 
     return NextResponse.json({

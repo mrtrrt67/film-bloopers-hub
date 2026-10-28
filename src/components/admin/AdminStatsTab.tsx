@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import Link from "next/link";
 import { 
   BarChart3, 
   ExternalLink, 
@@ -12,7 +13,17 @@ import {
   Search, 
   Flame, 
   RefreshCw,
-  Copy
+  Copy,
+  ThumbsUp,
+  ThumbsDown,
+  CheckCircle,
+  Sparkles,
+  Filter,
+  Tag,
+  Clock,
+  ArrowRight,
+  User,
+  ShieldAlert
 } from "lucide-react";
 import AdminPagination from "./AdminPagination";
 
@@ -31,6 +42,13 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
   const [aiPerfPageSize, setAiPerfPageSize] = useState(10);
   const [aiPerfModelFilter, setAiPerfModelFilter] = useState("all");
   const [recentSearchPage, setRecentSearchPage] = useState(1);
+
+  // Filtri & Paginazione Prospetto Bloopers
+  const [blooperSearchQuery, setBlooperSearchQuery] = useState("");
+  const [blooperFilterType, setBlooperFilterType] = useState<"all" | "voted" | "ai" | "user" | "high_conf" | "high_cont">("all");
+  const [blooperSortBy, setBlooperSortBy] = useState<"conferme" | "contestazioni" | "votes" | "recent">("conferme");
+  const [blooperPage, setBlooperPage] = useState(1);
+  const [blooperPageSize, setBlooperPageSize] = useState(8);
 
   const amazonDashboardUrl = process.env.NEXT_PUBLIC_AMAZON_DASHBOARD_URL || "https://programma-affiliazione.amazon.it/home";
   const amazonTag = process.env.NEXT_PUBLIC_AMAZON_TAG || "cineblp196704-21";
@@ -76,7 +94,74 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
   const aiPerformance = data?.aiPerformance || [];
   const topSearches = data?.topSearches || [];
   const recentSearches = data?.recentSearches || [];
-  const topVotedBloopers = data?.topVotedBloopers || [];
+
+  const bloopersStats = data?.bloopersStats || {
+    total: 0,
+    aiCount: 0,
+    userCount: 0,
+    totalThumbsUp: 0,
+    totalThumbsDown: 0,
+    totalVotes: 0,
+    globalApprovalRate: 100,
+    list: [],
+  };
+
+  const filteredBloopers = useMemo(() => {
+    const list: any[] = bloopersStats.list || [];
+    return list
+      .filter((b: any) => {
+        if (blooperSearchQuery.trim()) {
+          const q = blooperSearchQuery.toLowerCase();
+          const matchTitle = (b.films?.titolo || "").toLowerCase().includes(q);
+          const matchDesc = (b.descrizione || "").toLowerCase().includes(q);
+          const matchCat = (b.categoria || "").toLowerCase().includes(q);
+          const matchAuthor = (b.inserito_da || "").toLowerCase().includes(q);
+          const matchMin = (b.minuto || "").toLowerCase().includes(q);
+          if (!matchTitle && !matchDesc && !matchCat && !matchAuthor && !matchMin) return false;
+        }
+
+        const isAi =
+          b.provenienza === "ia" ||
+          !b.inserito_da ||
+          b.inserito_da.toLowerCase().startsWith("ia") ||
+          b.inserito_da.toLowerCase().includes("filmbloopers");
+
+        if (blooperFilterType === "voted") {
+          return (b.conferme || 0) > 0 || (b.contestazioni || 0) > 0;
+        }
+        if (blooperFilterType === "high_conf") {
+          return (b.conferme || 0) > 0;
+        }
+        if (blooperFilterType === "high_cont") {
+          return (b.contestazioni || 0) > 0;
+        }
+        if (blooperFilterType === "ai") {
+          return isAi;
+        }
+        if (blooperFilterType === "user") {
+          return !isAi;
+        }
+
+        return true;
+      })
+      .sort((a: any, b: any) => {
+        if (blooperSortBy === "votes") {
+          return ((b.conferme || 0) + (b.contestazioni || 0)) - ((a.conferme || 0) + (a.contestazioni || 0));
+        }
+        if (blooperSortBy === "conferme") {
+          return (b.conferme || 0) - (a.conferme || 0);
+        }
+        if (blooperSortBy === "contestazioni") {
+          return (b.contestazioni || 0) - (a.contestazioni || 0);
+        }
+        return new Date(b.creato_il || 0).getTime() - new Date(a.creato_il || 0).getTime();
+      });
+  }, [bloopersStats.list, blooperSearchQuery, blooperFilterType, blooperSortBy]);
+
+  const paginatedBloopers = useMemo(() => {
+    const start = (blooperPage - 1) * blooperPageSize;
+    return filteredBloopers.slice(start, start + blooperPageSize);
+  }, [filteredBloopers, blooperPage, blooperPageSize]);
 
   // Modelli IA disponibili nel prospetto
   const availableModels = Array.from(
@@ -338,46 +423,294 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
           )}
         </div>
 
-        {/* BLOOPERS PIÙ VOTATI / DISCUSSI */}
+        {/* SINTESI GRADIMENTO BLOOPERS (CARD COMPATTA) */}
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h4 className="text-sm font-black text-white uppercase tracking-wider flex items-center gap-2">
               <Flame className="h-4 w-4 text-amber-400" />
-              🔥 Bloopers più votati / discussi
+              Sintesi Gradimento Bloopers
             </h4>
-            <span className="text-xs text-zinc-500 font-mono">Dati da voti_bloopers</span>
+            <span className="text-xs text-zinc-500 font-mono">Dati catalogo</span>
           </div>
 
-          {topVotedBloopers.length === 0 ? (
-            <p className="text-xs text-zinc-500 py-6 text-center">Nessun voto registrato sui bloopers.</p>
-          ) : (
-            <div className="space-y-2.5 max-h-[380px] overflow-y-auto pr-1">
-              {topVotedBloopers.map((b: any) => (
-                <div
-                  key={b.id}
-                  className="rounded-xl border border-zinc-800 bg-zinc-950/70 p-3 hover:border-zinc-700 transition"
-                >
-                  <div className="flex items-center justify-between text-xs font-bold text-amber-400 mb-1">
-                    <span>🎬 {b.films?.titolo || "Film"} ({b.films?.anno || "N/D"})</span>
-                    <span className="font-mono text-zinc-400 bg-zinc-800/80 px-2 py-0.5 rounded text-[10px]">
-                      ⏱️ {b.minuto}
-                    </span>
-                  </div>
-                  <p className="text-xs text-zinc-300 line-clamp-2 mb-2">
-                    {b.descrizione}
-                  </p>
-                  <div className="flex items-center gap-3 text-[11px] font-semibold text-zinc-400">
-                    <span className="text-emerald-400">👍 {b.votes?.conferme || 0} conferme</span>
-                    <span className="text-rose-400">⚠️ {b.votes?.contestazioni || 0} contestazioni</span>
-                    <span className="text-amber-300 font-bold ml-auto">
-                      Totale: {b.votes?.totale || 0}
-                    </span>
-                  </div>
-                </div>
-              ))}
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/20 p-3 space-y-1">
+              <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
+                <ThumbsUp className="h-4 w-4" />
+                <span>Pollici in Su</span>
+              </div>
+              <div className="text-xl font-black text-white font-mono">{bloopersStats.totalThumbsUp}</div>
+              <p className="text-[10px] text-zinc-400">Conferme totali espresse</p>
             </div>
-          )}
+
+            <div className="rounded-xl border border-rose-500/30 bg-rose-950/20 p-3 space-y-1">
+              <div className="flex items-center gap-1.5 text-rose-400 font-bold">
+                <ThumbsDown className="h-4 w-4" />
+                <span>Contestazioni</span>
+              </div>
+              <div className="text-xl font-black text-white font-mono">{bloopersStats.totalThumbsDown}</div>
+              <p className="text-[10px] text-zinc-400">Errori contestati</p>
+            </div>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-zinc-950/70 border border-zinc-800 space-y-2 text-xs">
+            <div className="flex items-center justify-between">
+              <span className="text-zinc-400">Archivio Totale:</span>
+              <span className="font-bold text-white font-mono">{bloopersStats.total} Bloopers</span>
+            </div>
+            <div className="flex items-center justify-between text-[11px] text-zinc-500">
+              <span className="flex items-center gap-1 text-cyan-400">
+                <Bot className="h-3 w-3" /> Generati da IA:
+              </span>
+              <span className="font-mono font-bold text-zinc-300">
+                {bloopersStats.aiCount} ({bloopersStats.total > 0 ? Math.round((bloopersStats.aiCount / bloopersStats.total) * 100) : 0}%)
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-[11px] text-zinc-500">
+              <span className="flex items-center gap-1 text-amber-400">
+                <User className="h-3 w-3" /> Inseriti da Utenti:
+              </span>
+              <span className="font-mono font-bold text-zinc-300">{bloopersStats.userCount}</span>
+            </div>
+            <div className="pt-2 border-t border-zinc-800 flex items-center justify-between text-[11px]">
+              <span className="text-zinc-400">Indice di Gradimento:</span>
+              <span className="font-mono font-bold text-emerald-400">{bloopersStats.globalApprovalRate}% 👍</span>
+            </div>
+          </div>
         </div>
+      </div>
+
+      {/* PROSPETTO ANALITICO COMPLETO BLOOPERS & MONITORAGGIO GRADIMENTO (👍 / 👎) */}
+      <div className="rounded-3xl border border-zinc-800 bg-zinc-900/60 p-6 space-y-6 shadow-2xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800 pb-5">
+          <div>
+            <div className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5 text-amber-400" />
+              <h3 className="text-base font-black text-white uppercase tracking-wider">
+                Prospetto Analitico Bloopers & Monitoraggio Voti (👍 / 👎)
+              </h3>
+            </div>
+            <p className="text-xs text-zinc-400 mt-1 max-w-2xl leading-relaxed">
+              Quadro statistico dettagliato sui bloopers del catalogo: monitora in tempo reale le conferme positive e le contestazioni, analizza il gradimento percentuale e filtra tra bloopers IA e segnalazioni degli utenti.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono font-bold text-zinc-400 bg-zinc-950 px-3 py-1.5 rounded-xl border border-zinc-800">
+              Risultati: <strong className="text-amber-400">{filteredBloopers.length}</strong>
+            </span>
+          </div>
+        </div>
+
+        {/* Barra di Ricerca e Filtri */}
+        <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
+          {/* Campo Cerca */}
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+            <input
+              type="text"
+              value={blooperSearchQuery}
+              onChange={(e) => {
+                setBlooperSearchQuery(e.target.value);
+                setBlooperPage(1);
+              }}
+              placeholder="Cerca per film, attore, minuto o testo..."
+              className="w-full rounded-xl bg-zinc-950 border border-zinc-800 pl-9 pr-3.5 py-2 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-amber-400 transition"
+            />
+          </div>
+
+          {/* Filtro Tipologia */}
+          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none pb-1 lg:pb-0">
+            <Filter className="h-3.5 w-3.5 text-zinc-500 shrink-0 mr-1" />
+            {[
+              { id: "all", label: "Tutti" },
+              { id: "voted", label: "Con Voti (👍/👎)" },
+              { id: "high_conf", label: "👍 Più Confermati" },
+              { id: "high_cont", label: "👎 Più Contestati" },
+              { id: "user", label: "👤 Solo Utenti" },
+              { id: "ai", label: "🤖 Solo IA" },
+            ].map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                onClick={() => {
+                  setBlooperFilterType(f.id as any);
+                  setBlooperPage(1);
+                }}
+                className={`shrink-0 px-2.5 py-1.5 rounded-lg text-xs font-bold transition ${
+                  blooperFilterType === f.id
+                    ? "bg-amber-500 text-zinc-950 shadow"
+                    : "bg-zinc-950 text-zinc-400 border border-zinc-800 hover:text-white"
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Ordinamento */}
+          <div className="flex items-center gap-2 self-start lg:self-auto">
+            <span className="text-xs text-zinc-400 shrink-0">Ordina:</span>
+            <select
+              value={blooperSortBy}
+              onChange={(e) => setBlooperSortBy(e.target.value as any)}
+              className="rounded-xl bg-zinc-950 border border-zinc-800 px-3 py-1.5 text-xs text-zinc-200 focus:outline-none focus:border-amber-400 transition"
+            >
+              <option value="conferme">👍 Più Pollici in Su</option>
+              <option value="contestazioni">👎 Più Contestazioni</option>
+              <option value="votes">Totale Voti Espressi</option>
+              <option value="recent">Più Recenti Inseriti</option>
+            </select>
+          </div>
+        </div>
+
+        {/* Tabella Prospetto Bloopers */}
+        {filteredBloopers.length === 0 ? (
+          <div className="py-12 text-center text-xs text-zinc-500 rounded-2xl border border-zinc-800 bg-zinc-950/40">
+            Nessun blooper corrisponde ai criteri di ricerca impostati.
+          </div>
+        ) : (
+          <div className="space-y-4">
+            <div className="overflow-x-auto rounded-2xl border border-zinc-800 bg-zinc-950/60">
+              <table className="w-full text-left text-xs">
+                <thead>
+                  <tr className="border-b border-zinc-800 text-zinc-400 bg-zinc-950/90 text-[11px] uppercase tracking-wider">
+                    <th className="py-3 px-4 font-semibold">Film & Scena</th>
+                    <th className="py-3 px-3 font-semibold">Origine / Autore</th>
+                    <th className="py-3 px-4 font-semibold">Descrizione Blooper</th>
+                    <th className="py-3 px-3 text-center font-semibold">👍 Voti Su</th>
+                    <th className="py-3 px-3 text-center font-semibold">👎 Voti Giù</th>
+                    <th className="py-3 px-4 text-center font-semibold">Attendibilità</th>
+                    <th className="py-3 px-3 text-right font-semibold">Azione</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
+                  {paginatedBloopers.map((b: any) => {
+                    const isAi =
+                      b.provenienza === "ia" ||
+                      !b.inserito_da ||
+                      b.inserito_da.toLowerCase().startsWith("ia") ||
+                      b.inserito_da.toLowerCase().includes("filmbloopers");
+
+                    const tot = (b.conferme || 0) + (b.contestazioni || 0);
+                    const percent = tot > 0 ? Math.round(((b.conferme || 0) / tot) * 100) : 100;
+
+                    return (
+                      <tr key={b.id} className="hover:bg-zinc-800/30 transition group">
+                        {/* Film & Minuto */}
+                        <td className="py-3.5 px-4 font-sans max-w-[190px]">
+                          <div className="font-black text-white group-hover:text-amber-400 transition truncate">
+                            🎬 {b.films?.titolo || "Film"}
+                          </div>
+                          <div className="flex items-center gap-1.5 text-zinc-500 text-[11px] mt-0.5 font-mono">
+                            <span>({b.films?.anno || "N/D"})</span>
+                            <span>•</span>
+                            <span className="text-amber-400/90 font-bold">~{b.minuto ? b.minuto.replace(/^~/, "") : "00:00"}</span>
+                          </div>
+                        </td>
+
+                        {/* Autore / Origine */}
+                        <td className="py-3.5 px-3 whitespace-nowrap">
+                          {isAi ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-cyan-500/10 text-cyan-300 border border-cyan-500/20 text-[10px] font-bold">
+                              <Bot className="h-3 w-3" /> IA
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 text-[10px] font-bold">
+                              <User className="h-3 w-3" /> {b.inserito_da || "Utente"}
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Descrizione */}
+                        <td className="py-3.5 px-4 max-w-sm">
+                          <p className="line-clamp-2 text-zinc-300 text-xs leading-relaxed">
+                            {b.descrizione}
+                          </p>
+                          {b.categoria && (
+                            <span className="inline-block mt-1 text-[10px] text-zinc-500 font-mono">
+                              🏷️ {b.categoria}
+                            </span>
+                          )}
+                        </td>
+
+                        {/* Conferme 👍 */}
+                        <td className="py-3.5 px-3 text-center">
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg font-mono font-bold text-xs ${
+                            (b.conferme || 0) > 0
+                              ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
+                              : "text-zinc-500"
+                          }`}>
+                            <ThumbsUp className="h-3 w-3" />
+                            {b.conferme || 0}
+                          </span>
+                        </td>
+
+                        {/* Contestazioni 👎 */}
+                        <td className="py-3.5 px-3 text-center">
+                          <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg font-mono font-bold text-xs ${
+                            (b.contestazioni || 0) > 0
+                              ? "bg-rose-500/20 text-rose-300 border border-rose-500/40"
+                              : "text-zinc-500"
+                          }`}>
+                            <ThumbsDown className="h-3 w-3" />
+                            {b.contestazioni || 0}
+                          </span>
+                        </td>
+
+                        {/* Attendibilità */}
+                        <td className="py-3.5 px-4 text-center">
+                          <div className="flex flex-col items-center gap-1">
+                            <span className={`font-mono text-xs font-bold ${
+                              percent >= 70 ? "text-emerald-400" : percent >= 40 ? "text-amber-400" : "text-rose-400"
+                            }`}>
+                              {tot > 0 ? `${percent}%` : "100% (Verg.)"}
+                            </span>
+                            <div className="w-16 h-1.5 rounded-full bg-zinc-800 overflow-hidden">
+                              <div
+                                className={`h-full ${
+                                  percent >= 70 ? "bg-emerald-400" : percent >= 40 ? "bg-amber-400" : "bg-rose-500"
+                                }`}
+                                style={{ width: `${percent}%` }}
+                              />
+                            </div>
+                          </div>
+                        </td>
+
+                        {/* Azione link film */}
+                        <td className="py-3.5 px-3 text-right">
+                          {b.films?.id && (
+                            <Link
+                              href={`/film/${b.films.id}`}
+                              target="_blank"
+                              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-amber-500/40 transition text-[11px]"
+                              title="Visualizza blooper nella scheda del film"
+                            >
+                              <span>Apri</span>
+                              <ExternalLink className="h-3 w-3" />
+                            </Link>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {filteredBloopers.length > blooperPageSize && (
+              <AdminPagination
+                currentPage={blooperPage}
+                totalItems={filteredBloopers.length}
+                pageSize={blooperPageSize}
+                onPageChange={setBlooperPage}
+                onPageSizeChange={setBlooperPageSize}
+                pageSizeOptions={[8, 16, 32]}
+                itemName="bloopers nel prospetto"
+              />
+            )}
+          </div>
+        )}
       </div>
 
       {/* PROSPETTO ANALITICO GIORNALIERO PER MODELLO */}
