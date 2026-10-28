@@ -20,6 +20,7 @@ import {
 import { normalizePosterUrl } from "@/lib/tmdb";
 import { slugify } from "@/lib/utils";
 import ConfirmModal from "@/components/ConfirmModal";
+import AdminPagination from "./AdminPagination";
 
 interface AdminFilmsTabProps {
   initialFilter?: string;
@@ -30,6 +31,8 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState<string>(initialFilter); // 'all', 'missing_poster', 'missing_cast', 'duplicates'
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(18);
   
   // Azioni bulk
   const [updatingAllPosters, setUpdatingAllPosters] = useState(false);
@@ -37,6 +40,10 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   const [populatingTrivia, setPopulatingTrivia] = useState(false);
   const [populatingProgress, setPopulatingProgress] = useState<string | null>(null);
   const [missingTriviaCount, setMissingTriviaCount] = useState<number | null>(null);
+
+  const [populatingBloopers, setPopulatingBloopers] = useState(false);
+  const [populatingBloopersProgress, setPopulatingBloopersProgress] = useState<string | null>(null);
+  const [missingBloopersCount, setMissingBloopersCount] = useState<number | null>(null);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
 
   const [confirmModal, setConfirmModal] = useState<{
@@ -102,9 +109,22 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     }
   };
 
+  const fetchMissingBloopersStats = async () => {
+    try {
+      const res = await fetch("/api/admin/bloopers-batch");
+      if (res.ok) {
+        const data = await res.json();
+        setMissingBloopersCount(typeof data.missingBloopersCount === "number" ? data.missingBloopersCount : null);
+      }
+    } catch (err) {
+      console.error("Errore statistiche bloopers mancanti:", err);
+    }
+  };
+
   useEffect(() => {
     fetchFilms();
     fetchMissingTriviaStats();
+    fetchMissingBloopersStats();
   }, []);
 
   // Mappa di frequenza dei poster per rilevare duplicati
@@ -128,6 +148,12 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     }
 
     // 2. Filtro categoria
+    if (filterType === "with_bloopers") {
+      return (f.bloopers_count || 0) > 0;
+    }
+    if (filterType === "missing_bloopers") {
+      return !f.bloopers_count || f.bloopers_count === 0;
+    }
     if (filterType === "with_trivia") {
       return (f.trivia_count || 0) > 0;
     }
@@ -146,6 +172,12 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
 
     return true;
   });
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery, filterType]);
+
+  const paginatedFilms = filteredFilms.slice((page - 1) * pageSize, page * pageSize);
 
   // Aggiorna tutte le locandine mancanti
   const handleUpdateAllPosters = async () => {
@@ -268,6 +300,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
               `✨ IA completata con successo: generate ${totalGenerated} curiosità su ${totalProcessed} film! (${lastRemaining} film ancora senza curiosità)`
             );
             await fetchFilms();
+            await fetchMissingTriviaStats();
           } else if (lastError) {
             setActionMessage(`❌ ${lastError}`);
           }
@@ -277,6 +310,78 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
         } finally {
           setPopulatingTrivia(false);
           setPopulatingProgress(null);
+        }
+      },
+      "Avvia Generazione 5 Film",
+      "warning"
+    );
+  };
+
+  // Popola bloopers 5 alla volta con IA (in modo sequenziale con progresso in tempo reale)
+  const handleBatchPopulateBloopers = async () => {
+    openConfirm(
+      "⚡ Popola Bloopers con IA (5 Film)",
+      "Avviare la ricerca automatica di bloopers con Gemini per 5 film che non hanno ancora errori caricati? Verranno generati errori di scena, anacronismi e sviste documentate con avanzamento in tempo reale.",
+      async () => {
+        setPopulatingBloopers(true);
+        setActionMessage(null);
+        let totalProcessed = 0;
+        let totalGenerated = 0;
+        let lastRemaining = missingBloopersCount ?? 0;
+        let lastError: string | null = null;
+
+        try {
+          // Eseguiamo 5 chiamate (limit: 1) in sequenza per eliminare qualsiasi rischio di timeout Vercel
+          for (let step = 1; step <= 5; step++) {
+            setPopulatingBloopersProgress(`Film ${step}/5 in elaborazione...`);
+            const res = await fetch("/api/admin/bloopers-batch", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ limit: 1 }),
+            });
+
+            if (!res.ok) {
+              const errJson = await res.json().catch(() => ({}));
+              lastError = errJson.error || `Errore HTTP ${res.status}`;
+              break;
+            }
+
+            const data = await res.json();
+            if (!data.success) {
+              lastError = data.error || "Generazione non riuscita";
+              break;
+            }
+
+            if (data.processedCount === 0) {
+              // Tutti i film del catalogo sono completati
+              lastRemaining = 0;
+              setMissingBloopersCount(0);
+              break;
+            }
+
+            totalProcessed += data.processedCount || 0;
+            totalGenerated += data.totalBloopersGenerated || 0;
+            if (typeof data.remainingFilmsWithoutBloopers === "number") {
+              lastRemaining = data.remainingFilmsWithoutBloopers;
+              setMissingBloopersCount(data.remainingFilmsWithoutBloopers);
+            }
+          }
+
+          if (totalProcessed > 0) {
+            setActionMessage(
+              `🎬 IA completata con successo: generati ${totalGenerated} bloopers su ${totalProcessed} film! (${lastRemaining} film ancora senza bloopers)`
+            );
+            await fetchFilms();
+            await fetchMissingBloopersStats();
+          } else if (lastError) {
+            setActionMessage(`❌ ${lastError}`);
+          }
+        } catch (err: any) {
+          console.error("Errore generazione batch bloopers:", err);
+          setActionMessage(`❌ Errore durante la generazione: ${err?.message || "Connessione interrotta"}`);
+        } finally {
+          setPopulatingBloopers(false);
+          setPopulatingBloopersProgress(null);
         }
       },
       "Avvia Generazione 5 Film",
@@ -416,6 +521,8 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     }
   };
 
+  const withBloopersCount = films.filter((f) => (f.bloopers_count || 0) > 0).length;
+  const missingBloopersFilmCount = films.filter((f) => !f.bloopers_count || f.bloopers_count === 0).length;
   const withTriviaCount = films.filter((f) => (f.trivia_count || 0) > 0).length;
   const missingTriviaFilmCount = films.filter((f) => !f.trivia_count || f.trivia_count === 0).length;
   const missingPostersCount = films.filter((f) => !f.poster_url || f.poster_url.trim() === "").length;
@@ -458,9 +565,23 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
           </button>
 
           <button
+            onClick={handleBatchPopulateBloopers}
+            disabled={populatingBloopers || missingBloopersCount === 0}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-orange-500 to-amber-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-md shadow-orange-500/10 whitespace-nowrap shrink-0"
+            title="Genera bloopers con IA per 5 film che non ne hanno ancora"
+          >
+            <Sparkles className={`h-3.5 w-3.5 ${populatingBloopers ? "animate-spin" : ""}`} />
+            <span>
+              {populatingBloopers
+                ? (populatingBloopersProgress || "Generazione 5 film...")
+                : `⚡ Popola Bloopers (5 film)${missingBloopersCount !== null ? ` [${missingBloopersCount}]` : ""}`}
+            </span>
+          </button>
+
+          <button
             onClick={handleBatchPopulateTrivia}
             disabled={populatingTrivia || missingTriviaCount === 0}
-            className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-md shadow-amber-500/10 whitespace-nowrap shrink-0"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-md shadow-amber-500/10 whitespace-nowrap shrink-0"
             title="Genera curiosità con IA per 5 film che non ne hanno ancora"
           >
             <Sparkles className={`h-3.5 w-3.5 ${populatingTrivia ? "animate-spin" : ""}`} />
@@ -505,6 +626,26 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
             }`}
           >
             Tutti ({films.length})
+          </button>
+          <button
+            onClick={() => setFilterType("with_bloopers")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap flex items-center gap-1.5 ${
+              filterType === "with_bloopers"
+                ? "bg-amber-500 text-zinc-950"
+                : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+            }`}
+          >
+            <span>🎬 Con Bloopers ({withBloopersCount})</span>
+          </button>
+          <button
+            onClick={() => setFilterType("missing_bloopers")}
+            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap ${
+              filterType === "missing_bloopers"
+                ? "bg-amber-500 text-zinc-950"
+                : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+            }`}
+          >
+            Senza Bloopers ({missingBloopersFilmCount})
           </button>
           <button
             onClick={() => setFilterType("with_trivia")}
@@ -570,125 +711,147 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
           Nessun film trovato con i criteri selezionati.
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredFilms.map((film) => {
-            const isDuplicate = film.poster_url && posterFrequency[film.poster_url] > 1;
-            const isMissingPoster = !film.poster_url || film.poster_url.trim() === "";
-            const isMissingCast = !film.attori || film.attori.trim() === "" || film.attori === "N/D";
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {paginatedFilms.map((film) => {
+              const isDuplicate = film.poster_url && posterFrequency[film.poster_url] > 1;
+              const isMissingPoster = !film.poster_url || film.poster_url.trim() === "";
+              const isMissingCast = !film.attori || film.attori.trim() === "" || film.attori === "N/D";
 
-            return (
-              <div
-                key={film.id}
-                className="flex flex-col justify-between rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 hover:border-zinc-700 transition"
-              >
-                <div className="flex gap-3">
-                  {/* Poster Thumbnail */}
-                  <div className="relative h-24 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-950 border border-zinc-800 flex items-center justify-center">
-                    {film.poster_url ? (
-                      <Image
-                        src={film.poster_url}
-                        alt={film.titolo}
-                        fill
-                        unoptimized
-                        className="object-cover"
-                        sizes="64px"
-                      />
-                    ) : (
-                      <ImageIcon className="h-6 w-6 text-zinc-700" />
-                    )}
-                  </div>
-
-                  {/* Informazioni Film */}
-                  <div className="flex-1 min-w-0 space-y-1">
-                    <div className="flex items-start justify-between gap-1">
-                      <h4 className="text-sm font-bold text-white truncate">
-                        {film.titolo}
-                      </h4>
-                      <span className="font-mono text-xs text-amber-400 shrink-0 font-bold">
-                        {film.anno || "N/D"}
-                      </span>
-                    </div>
-
-                    <p className="text-[11px] text-zinc-400 truncate">
-                      <strong>Regia:</strong> {film.regista || "N/D"}
-                    </p>
-
-                    <p className="text-[11px] text-zinc-400 truncate">
-                      <strong>Genere:</strong> {film.genere || "N/D"}
-                    </p>
-
-                    <p className="text-[11px] text-zinc-500 line-clamp-1">
-                      <strong>Cast:</strong> {film.attori || "N/D"}
-                    </p>
-
-                    {/* Badge diagnostici e contenuti */}
-                    <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
-                      {(film.trivia_count || 0) > 0 ? (
-                        <span className="rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-bold px-1.5 py-0.5 flex items-center gap-1">
-                          <Sparkles className="h-2.5 w-2.5" />
-                          {film.trivia_count} Curiosità
-                        </span>
+              return (
+                <div
+                  key={film.id}
+                  className="flex flex-col justify-between rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4 hover:border-zinc-700 transition"
+                >
+                  <div className="flex gap-3">
+                    {/* Poster Thumbnail */}
+                    <div className="relative h-24 w-16 shrink-0 overflow-hidden rounded-lg bg-zinc-950 border border-zinc-800 flex items-center justify-center">
+                      {film.poster_url ? (
+                        <Image
+                          src={film.poster_url}
+                          alt={film.titolo}
+                          fill
+                          unoptimized
+                          className="object-cover"
+                          sizes="64px"
+                        />
                       ) : (
-                        <span className="rounded bg-zinc-800/80 text-zinc-500 border border-zinc-800 text-[9px] font-medium px-1.5 py-0.5">
-                          0 Curiosità
-                        </span>
+                        <ImageIcon className="h-6 w-6 text-zinc-700" />
                       )}
+                    </div>
 
-                      <span className="rounded bg-zinc-800 text-zinc-300 text-[9px] font-medium px-1.5 py-0.5">
-                        🎬 {film.bloopers_count || 0} Blooper
-                      </span>
+                    {/* Informazioni Film */}
+                    <div className="flex-1 min-w-0 space-y-1">
+                      <div className="flex items-start justify-between gap-1">
+                        <h4 className="text-sm font-bold text-white truncate">
+                          {film.titolo}
+                        </h4>
+                        <span className="font-mono text-xs text-amber-400 shrink-0 font-bold">
+                          {film.anno || "N/D"}
+                        </span>
+                      </div>
 
-                      {isMissingPoster && (
-                        <span className="rounded bg-rose-500/20 text-rose-300 text-[9px] font-bold px-1.5 py-0.5">
-                          Senza Poster
-                        </span>
-                      )}
-                      {isDuplicate && (
-                        <span className="rounded bg-amber-500/20 text-amber-300 text-[9px] font-bold px-1.5 py-0.5" title="Condivide il poster con altri film">
-                          Poster Condiviso ({posterFrequency[film.poster_url]})
-                        </span>
-                      )}
-                      {isMissingCast && (
-                        <span className="rounded bg-zinc-800 text-zinc-400 text-[9px] font-bold px-1.5 py-0.5">
-                          Senza Cast
-                        </span>
-                      )}
+                      <p className="text-[11px] text-zinc-400 truncate">
+                        <strong>Regia:</strong> {film.regista || "N/D"}
+                      </p>
+
+                      <p className="text-[11px] text-zinc-400 truncate">
+                        <strong>Genere:</strong> {film.genere || "N/D"}
+                      </p>
+
+                      <p className="text-[11px] text-zinc-500 line-clamp-1">
+                        <strong>Cast:</strong> {film.attori || "N/D"}
+                      </p>
+
+                      {/* Badge diagnostici e contenuti */}
+                      <div className="flex flex-wrap items-center gap-1.5 pt-1.5">
+                        {(film.trivia_count || 0) > 0 ? (
+                          <span className="rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[9px] font-bold px-1.5 py-0.5 flex items-center gap-1">
+                            <Sparkles className="h-2.5 w-2.5" />
+                            {film.trivia_count} Curiosità
+                          </span>
+                        ) : (
+                          <span className="rounded bg-zinc-800/80 text-zinc-500 border border-zinc-800 text-[9px] font-medium px-1.5 py-0.5">
+                            0 Curiosità
+                          </span>
+                        )}
+
+                        {(film.bloopers_count || 0) > 0 ? (
+                          <span className="rounded bg-orange-500/20 text-orange-300 border border-orange-500/30 text-[9px] font-bold px-1.5 py-0.5 flex items-center gap-1">
+                            🎬 {film.bloopers_count} Blooper
+                          </span>
+                        ) : (
+                          <span className="rounded bg-zinc-800/80 text-zinc-500 border border-zinc-800 text-[9px] font-medium px-1.5 py-0.5">
+                            0 Blooper
+                          </span>
+                        )}
+
+                        {isMissingPoster && (
+                          <span className="rounded bg-rose-500/20 text-rose-300 text-[9px] font-bold px-1.5 py-0.5">
+                            Senza Poster
+                          </span>
+                        )}
+                        {isDuplicate && (
+                          <span className="rounded bg-amber-500/20 text-amber-300 text-[9px] font-bold px-1.5 py-0.5" title="Condivide il poster con altri film">
+                            Poster Condiviso ({posterFrequency[film.poster_url]})
+                          </span>
+                        )}
+                        {isMissingCast && (
+                          <span className="rounded bg-zinc-800 text-zinc-400 text-[9px] font-bold px-1.5 py-0.5">
+                            Senza Cast
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Azioni Scheda */}
+                  <div className="flex items-center justify-between pt-3 mt-3 border-t border-zinc-800/60 text-xs">
+                    <span className="text-[10px] text-zinc-500 font-mono">ID: {film.id}</span>
+                    <div className="flex items-center gap-1.5">
+                      <Link
+                        href={`/film/${slugify(film.titolo, film.anno)}-${film.id}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-1 rounded-lg text-zinc-400 hover:text-amber-400 hover:bg-zinc-800 transition"
+                        title="Apri scheda film sul sito in una nuova scheda"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                      </Link>
+                      <button
+                        onClick={() => openEditModal(film)}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-amber-500 hover:text-zinc-950 text-zinc-200 font-bold transition text-[11px]"
+                      >
+                        <Edit3 className="h-3 w-3" />
+                        <span>Modifica</span>
+                      </button>
+                      <button
+                        onClick={() => handleDeleteFilm(film)}
+                        className="p-1 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition"
+                        title="Elimina film"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
                     </div>
                   </div>
                 </div>
+              );
+            })}
+          </div>
 
-                {/* Azioni Scheda */}
-                <div className="flex items-center justify-between pt-3 mt-3 border-t border-zinc-800/60 text-xs">
-                  <span className="text-[10px] text-zinc-500 font-mono">ID: {film.id}</span>
-                  <div className="flex items-center gap-1.5">
-                    <Link
-                      href={`/film/${slugify(film.titolo, film.anno)}-${film.id}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-1 rounded-lg text-zinc-400 hover:text-amber-400 hover:bg-zinc-800 transition"
-                      title="Apri scheda film sul sito in una nuova scheda"
-                    >
-                      <ExternalLink className="h-3.5 w-3.5" />
-                    </Link>
-                    <button
-                      onClick={() => openEditModal(film)}
-                      className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-800 hover:bg-amber-500 hover:text-zinc-950 text-zinc-200 font-bold transition text-[11px]"
-                    >
-                      <Edit3 className="h-3 w-3" />
-                      <span>Modifica</span>
-                    </button>
-                    <button
-                      onClick={() => handleDeleteFilm(film)}
-                      className="p-1 rounded-lg text-zinc-500 hover:text-rose-400 hover:bg-rose-500/10 transition"
-                      title="Elimina film"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
+          {filteredFilms.length > 0 && (
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 overflow-hidden shadow-xl">
+              <AdminPagination
+                currentPage={page}
+                totalItems={filteredFilms.length}
+                pageSize={pageSize}
+                onPageChange={setPage}
+                onPageSizeChange={setPageSize}
+                pageSizeOptions={[18, 36, 72]}
+                itemName="film"
+              />
+            </div>
+          )}
         </div>
       )}
 
