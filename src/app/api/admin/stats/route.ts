@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export async function GET() {
   try {
@@ -10,6 +11,8 @@ export async function GET() {
     if (!user || user.email?.toLowerCase() !== adminEmail) {
       return NextResponse.json({ error: "Accesso non autorizzato" }, { status: 403 });
     }
+
+    const adminDb = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
 
     const now = new Date();
     const todayUtc = now.toISOString().slice(0, 10);
@@ -22,9 +25,9 @@ export async function GET() {
 
     // 1. Metriche Utenti & Visite
     const [profilesRes, accessiRes, filmsRes] = await Promise.all([
-      supabase.from("profiles").select("id, email, tier, calls_today, last_reset_date, tipo_abbonamento, subscription_type, data_scadenza, expires_at"),
-      supabase.from("log_accessi").select("tipo, created_at"),
-      supabase.from("films").select("id, titolo, anno, poster_url"),
+      adminDb.from("profiles").select("id, email, tier, calls_today, last_reset_date, tipo_abbonamento, subscription_type, data_scadenza, expires_at"),
+      adminDb.from("log_accessi").select("tipo, created_at"),
+      adminDb.from("films").select("id, titolo, anno, poster_url"),
     ]);
 
     const profiles = profilesRes.data || [];
@@ -79,8 +82,8 @@ export async function GET() {
     const thirtyDaysStr = thirtyDaysAgo.toISOString();
 
     const [statIaRes, errIaRes] = await Promise.all([
-      supabase.from("statistiche_ia").select("*").gte("data_chiamata", thirtyDaysStr).order("data_chiamata", { ascending: false }),
-      supabase.from("log_errori_ia").select("*").gte("created_at", thirtyDaysStr).order("created_at", { ascending: false }),
+      adminDb.from("statistiche_ia").select("*").gte("data_chiamata", thirtyDaysStr).order("data_chiamata", { ascending: false }),
+      adminDb.from("log_errori_ia").select("*").gte("created_at", thirtyDaysStr).order("created_at", { ascending: false }),
     ]);
 
     const statIa = statIaRes.data || [];
@@ -121,7 +124,7 @@ export async function GET() {
       .sort((a, b) => b.giorno.localeCompare(a.giorno));
 
     // 3. Top Ricerche & Ultime Ricerche (esclude test, frammenti parziali e deduplica)
-    const { data: logRicerche } = await supabase
+    const { data: logRicerche } = await adminDb
       .from("log_ricerche")
       .select("id, termine, created_at")
       .order("created_at", { ascending: false })
@@ -161,11 +164,11 @@ export async function GET() {
 
     // Pulisce in background i sotto-frammenti e i test obsoleti dal DB
     if (subFragmentIds.length > 0) {
-      void supabase.from("log_ricerche").delete().in("id", subFragmentIds);
+      void adminDb.from("log_ricerche").delete().in("id", subFragmentIds);
     }
 
     // Rimuove le tracce storiche dell'admin da log_accessi
-    void supabase.from("log_accessi").delete().ilike("tipo", `%${adminIdPrefix}%`);
+    void adminDb.from("log_accessi").delete().ilike("tipo", `%${adminIdPrefix}%`);
 
     const searchesToday = filteredSearches.filter((r) => isToday(r.created_at));
     const searchesTodayCount = searchesToday.length;
@@ -195,12 +198,12 @@ export async function GET() {
       .slice(0, 10);
 
     // 4. Statistiche & Prospetto Bloopers (👍 e 👎)
-    const { count: totalBloopersCount } = await supabase
+    const { count: totalBloopersCount } = await adminDb
       .from("errori")
       .select("*", { count: "exact", head: true });
 
     // Recupera conteggi aggregati per provenienza e totali voti
-    const { data: allBloopersSummary } = await supabase
+    const { data: allBloopersSummary } = await adminDb
       .from("errori")
       .select("conferme, contestazioni, provenienza, inserito_da");
 
@@ -227,7 +230,7 @@ export async function GET() {
     const globalApprovalRate = totalVotes > 0 ? Math.round((totalThumbsUp / totalVotes) * 100) : 100;
 
     // Recupera i bloopers con voti
-    const { data: votedBloopers } = await supabase
+    const { data: votedBloopers } = await adminDb
       .from("errori")
       .select("id, minuto, categoria, descrizione, conferme, contestazioni, provenienza, inserito_da, creato_il, film_id, films(id, titolo, anno)")
       .or("conferme.gt.0,contestazioni.gt.0")
@@ -238,7 +241,7 @@ export async function GET() {
 
     // Se ci sono pochi bloopers con voti, recupera anche i più recenti per mostrare un prospetto completo
     if (prospectList.length < 30) {
-      const { data: recentBloopers } = await supabase
+      const { data: recentBloopers } = await adminDb
         .from("errori")
         .select("id, minuto, categoria, descrizione, conferme, contestazioni, provenienza, inserito_da, creato_il, film_id, films(id, titolo, anno)")
         .order("creato_il", { ascending: false })

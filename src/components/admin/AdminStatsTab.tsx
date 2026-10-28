@@ -35,6 +35,7 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [searchView, setSearchView] = useState<"recent" | "top">("recent");
 
   // Paginazione per prospetto IA e ricerche
@@ -56,13 +57,18 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
   const fetchStats = async () => {
     try {
       setRefreshing(true);
+      setErrorMessage(null);
       const res = await fetch("/api/admin/stats");
       if (res.ok) {
         const json = await res.json();
         setData(json);
+      } else {
+        const errJson = await res.json().catch(() => ({}));
+        setErrorMessage(errJson?.error || `Errore HTTP ${res.status}: Impossibile caricare le statistiche.`);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Errore fetch stats:", err);
+      setErrorMessage(err?.message || "Errore di connessione durante il recupero dei dati.");
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -110,30 +116,34 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
     const list: any[] = bloopersStats.list || [];
     return list
       .filter((b: any) => {
+        if (!b) return false;
+        const film = Array.isArray(b.films) ? b.films[0] : b.films;
+
         if (blooperSearchQuery.trim()) {
           const q = blooperSearchQuery.toLowerCase();
-          const matchTitle = (b.films?.titolo || "").toLowerCase().includes(q);
-          const matchDesc = (b.descrizione || "").toLowerCase().includes(q);
-          const matchCat = (b.categoria || "").toLowerCase().includes(q);
-          const matchAuthor = (b.inserito_da || "").toLowerCase().includes(q);
-          const matchMin = (b.minuto || "").toLowerCase().includes(q);
+          const matchTitle = String(film?.titolo || "").toLowerCase().includes(q);
+          const matchDesc = String(b.descrizione || "").toLowerCase().includes(q);
+          const matchCat = String(b.categoria || "").toLowerCase().includes(q);
+          const matchAuthor = String(b.inserito_da || "").toLowerCase().includes(q);
+          const matchMin = String(b.minuto || "").toLowerCase().includes(q);
           if (!matchTitle && !matchDesc && !matchCat && !matchAuthor && !matchMin) return false;
         }
 
+        const inserito = String(b.inserito_da || "").toLowerCase();
         const isAi =
           b.provenienza === "ia" ||
           !b.inserito_da ||
-          b.inserito_da.toLowerCase().startsWith("ia") ||
-          b.inserito_da.toLowerCase().includes("filmbloopers");
+          inserito.startsWith("ia") ||
+          inserito.includes("filmbloopers");
 
         if (blooperFilterType === "voted") {
-          return (b.conferme || 0) > 0 || (b.contestazioni || 0) > 0;
+          return (Number(b.conferme) || 0) > 0 || (Number(b.contestazioni) || 0) > 0;
         }
         if (blooperFilterType === "high_conf") {
-          return (b.conferme || 0) > 0;
+          return (Number(b.conferme) || 0) > 0;
         }
         if (blooperFilterType === "high_cont") {
-          return (b.contestazioni || 0) > 0;
+          return (Number(b.contestazioni) || 0) > 0;
         }
         if (blooperFilterType === "ai") {
           return isAi;
@@ -146,13 +156,13 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
       })
       .sort((a: any, b: any) => {
         if (blooperSortBy === "votes") {
-          return ((b.conferme || 0) + (b.contestazioni || 0)) - ((a.conferme || 0) + (a.contestazioni || 0));
+          return ((Number(b.conferme) || 0) + (Number(b.contestazioni) || 0)) - ((Number(a.conferme) || 0) + (Number(a.contestazioni) || 0));
         }
         if (blooperSortBy === "conferme") {
-          return (b.conferme || 0) - (a.conferme || 0);
+          return (Number(b.conferme) || 0) - (Number(a.conferme) || 0);
         }
         if (blooperSortBy === "contestazioni") {
-          return (b.contestazioni || 0) - (a.contestazioni || 0);
+          return (Number(b.contestazioni) || 0) - (Number(a.contestazioni) || 0);
         }
         return new Date(b.creato_il || 0).getTime() - new Date(a.creato_il || 0).getTime();
       });
@@ -186,6 +196,27 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
 
   return (
     <div className="space-y-8">
+      {/* BANNER SEGNALAZIONE ERRORE SE PRESENTE */}
+      {errorMessage && (
+        <div className="rounded-2xl border border-rose-500/40 bg-rose-950/20 p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <ShieldAlert className="h-5 w-5 text-rose-400 shrink-0" />
+            <div>
+              <h4 className="text-sm font-bold text-rose-200">Avviso Caricamento Statistiche</h4>
+              <p className="text-xs text-rose-300/80 mt-0.5">{errorMessage}</p>
+            </div>
+          </div>
+          <button
+            onClick={fetchStats}
+            disabled={refreshing}
+            className="rounded-xl bg-rose-600 px-4 py-2 text-xs font-bold text-white hover:bg-rose-500 transition disabled:opacity-50 shrink-0 flex items-center gap-1.5"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin" : ""}`} />
+            Riprova
+          </button>
+        </div>
+      )}
+
       {/* 1. DASHBOARD AMAZON AFFILIATI (CARD IN EVIDENZA) */}
       <div className="relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-500/10 via-zinc-900 to-zinc-900 p-6 sm:p-8 shadow-xl">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
@@ -586,26 +617,35 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
                 </thead>
                 <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
                   {paginatedBloopers.map((b: any) => {
+                    const film = Array.isArray(b.films) ? b.films[0] : b.films;
+                    const filmTitolo = film?.titolo || "Film";
+                    const filmAnno = film?.anno || "N/D";
+                    const filmId = film?.id || b.film_id;
+
+                    const inseritoStr = String(b.inserito_da || "").toLowerCase();
                     const isAi =
                       b.provenienza === "ia" ||
                       !b.inserito_da ||
-                      b.inserito_da.toLowerCase().startsWith("ia") ||
-                      b.inserito_da.toLowerCase().includes("filmbloopers");
+                      inseritoStr.startsWith("ia") ||
+                      inseritoStr.includes("filmbloopers");
 
-                    const tot = (b.conferme || 0) + (b.contestazioni || 0);
-                    const percent = tot > 0 ? Math.round(((b.conferme || 0) / tot) * 100) : 100;
+                    const conf = Number(b.conferme) || 0;
+                    const cont = Number(b.contestazioni) || 0;
+                    const tot = conf + cont;
+                    const percent = tot > 0 ? Math.round((conf / tot) * 100) : 100;
+                    const minutoClean = String(b.minuto || "00:00").replace(/^~/, "");
 
                     return (
                       <tr key={b.id} className="hover:bg-zinc-800/30 transition group">
                         {/* Film & Minuto */}
                         <td className="py-3.5 px-4 font-sans max-w-[190px]">
                           <div className="font-black text-white group-hover:text-amber-400 transition truncate">
-                            🎬 {b.films?.titolo || "Film"}
+                            🎬 {filmTitolo}
                           </div>
                           <div className="flex items-center gap-1.5 text-zinc-500 text-[11px] mt-0.5 font-mono">
-                            <span>({b.films?.anno || "N/D"})</span>
+                            <span>({filmAnno})</span>
                             <span>•</span>
-                            <span className="text-amber-400/90 font-bold">~{b.minuto ? b.minuto.replace(/^~/, "") : "00:00"}</span>
+                            <span className="text-amber-400/90 font-bold">~{minutoClean}</span>
                           </div>
                         </td>
 
@@ -637,24 +677,24 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
                         {/* Conferme 👍 */}
                         <td className="py-3.5 px-3 text-center">
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg font-mono font-bold text-xs ${
-                            (b.conferme || 0) > 0
+                            conf > 0
                               ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/40"
                               : "text-zinc-500"
                           }`}>
                             <ThumbsUp className="h-3 w-3" />
-                            {b.conferme || 0}
+                            {conf}
                           </span>
                         </td>
 
                         {/* Contestazioni 👎 */}
                         <td className="py-3.5 px-3 text-center">
                           <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg font-mono font-bold text-xs ${
-                            (b.contestazioni || 0) > 0
+                            cont > 0
                               ? "bg-rose-500/20 text-rose-300 border border-rose-500/40"
                               : "text-zinc-500"
                           }`}>
                             <ThumbsDown className="h-3 w-3" />
-                            {b.contestazioni || 0}
+                            {cont}
                           </span>
                         </td>
 
@@ -679,9 +719,9 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
 
                         {/* Azione link film */}
                         <td className="py-3.5 px-3 text-right">
-                          {b.films?.id && (
+                          {filmId && (
                             <Link
-                              href={`/film/${b.films.id}`}
+                              href={`/film/${filmId}`}
                               target="_blank"
                               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white hover:border-amber-500/40 transition text-[11px]"
                               title="Visualizza blooper nella scheda del film"

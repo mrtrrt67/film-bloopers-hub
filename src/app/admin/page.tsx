@@ -25,6 +25,7 @@ import AdminUsersTab from "@/components/admin/AdminUsersTab";
 import AdminModerationTab from "@/components/admin/AdminModerationTab";
 import AdminSuggestionsTab from "@/components/admin/AdminSuggestionsTab";
 import AdminConfigTab from "@/components/admin/AdminConfigTab";
+import AdminErrorBoundary from "@/components/admin/AdminErrorBoundary";
 
 type AdminTab = "stats" | "logs" | "films" | "users" | "moderation" | "suggestions" | "config";
 
@@ -158,7 +159,7 @@ export default function AdminPage() {
       </div>
 
       {/* CONTENUTO DELLE TAB */}
-      <div>
+      <AdminErrorBoundary tabName={tabsConfig.find((t) => t.id === activeTab)?.label || activeTab}>
         {activeTab === "stats" && (
           <AdminStatsTab onNavigateToFilms={handleNavigateToFilms} />
         )}
@@ -186,7 +187,7 @@ export default function AdminPage() {
         {activeTab === "config" && (
           <AdminConfigTab />
         )}
-      </div>
+      </AdminErrorBoundary>
     </div>
   );
 }
