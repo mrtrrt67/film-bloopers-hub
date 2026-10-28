@@ -87,14 +87,6 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
     setRecentSearchPage(1);
   }, [searchView]);
 
-  if (loading) {
-    return (
-      <div className="flex min-h-[300px] items-center justify-center">
-        <span className="h-8 w-8 animate-spin rounded-full border-2 border-amber-400 border-t-transparent" />
-      </div>
-    );
-  }
-
   const metrics = data?.metrics || {};
   const duplicatePosters = data?.duplicatePosters || [];
   const aiPerformance = data?.aiPerformance || [];
@@ -193,6 +185,14 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
     (recentSearchPage - 1) * searchPageSize,
     recentSearchPage * searchPageSize
   );
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[300px] items-center justify-center">
+        <span className="h-8 w-8 animate-spin rounded-full border-2 border-amber-400 border-t-transparent" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
