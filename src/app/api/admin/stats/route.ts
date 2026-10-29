@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isTestAccount, isTestAccessType, shouldExcludeTestAccounts } from "@/lib/test-accounts";
+import { deduplicateAccessRecords } from "@/lib/dedup-visits";
 
 export async function GET(request: Request) {
   try {
@@ -27,7 +28,7 @@ export async function GET(request: Request) {
     // 1. Metriche Utenti & Visite
     const [profilesRes, accessiRes, filmsRes] = await Promise.all([
       adminDb.from("profiles").select("id, email, username, tier, calls_today, last_reset_date, tipo_abbonamento, subscription_type, data_scadenza, expires_at"),
-      adminDb.from("log_accessi").select("tipo, created_at"),
+      adminDb.from("log_accessi").select("id, tipo, created_at"),
       adminDb.from("films").select("id, titolo, anno, poster_url"),
     ]);
 
@@ -80,7 +81,7 @@ export async function GET(request: Request) {
     }
 
     // Filtra gli accessi: l'admin è sempre escluso, i test solo in produzione
-    const accessi = (accessiRes.data || []).filter((a: any) => {
+    const rawAccessi = (accessiRes.data || []).filter((a: any) => {
       const t = (a.tipo || "").toLowerCase();
       if (t.includes(adminIdPrefix) || t.includes("mrtrrt67") || t.includes(adminEmail) || t === "admin") {
         return false;
@@ -90,6 +91,21 @@ export async function GET(request: Request) {
       }
       return true;
     });
+
+    // Deduplica accessi cloni prima dei conteggi
+    const { uniqueRecords: accessi, duplicateIds: statDuplicateIds } = deduplicateAccessRecords(rawAccessi, 4000);
+
+    // Se ci sono ID duplicati, puliscili dal DB
+    if (statDuplicateIds.length > 0) {
+      void (async () => {
+        try {
+          for (let i = 0; i < statDuplicateIds.length; i += 100) {
+            const batch = statDuplicateIds.slice(i, i + 100);
+            await adminDb.from("log_accessi").delete().in("id", batch);
+          }
+        } catch {}
+      })();
+    }
 
     const totalVisits = accessi.length;
     const todayVisits = accessi.filter((a) => isToday(a.created_at)).length;

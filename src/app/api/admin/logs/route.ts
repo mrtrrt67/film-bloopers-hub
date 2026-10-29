@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { isTestAccount, isTestAccessType, shouldExcludeTestAccounts } from "@/lib/test-accounts";
+import { deduplicateAccessRecords } from "@/lib/dedup-visits";
 
 export async function GET(request: Request) {
   try {
@@ -51,18 +53,38 @@ export async function GET(request: Request) {
       }
     });
 
-    const recentAccess = (accessRes.data || [])
-      // L'amministratore è sempre escluso. I test sono esclusi solo in produzione, lasciati in staging!
-      .filter((a: any) => {
-        const t = (a.tipo || "").toLowerCase();
-        if (t.includes(adminIdPrefix) || t.includes("mrtrrt67") || t.includes(adminEmail) || t === "admin") {
-          return false;
+    // 1. Filtra admin e account test (in produzione)
+    const filteredRawAccess = (accessRes.data || []).filter((a: any) => {
+      const t = (a.tipo || "").toLowerCase();
+      if (t.includes(adminIdPrefix) || t.includes("mrtrrt67") || t.includes(adminEmail) || t === "admin") {
+        return false;
+      }
+      if (excludeTests && isTestAccessType(a.tipo, testPrefixes)) {
+        return false;
+      }
+      return true;
+    });
+
+    // 2. Deduplica cloni generati entro 4 secondi (doppio mount React, chiamate parallele)
+    const { uniqueRecords: deduplicatedAccess, duplicateIds } = deduplicateAccessRecords(filteredRawAccess, 4000);
+
+    // 3. Pulizia permanente dei duplicati storici dal database con i privilegi dell'admin
+    if (duplicateIds.length > 0) {
+      const dbToClean = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
+      void (async () => {
+        try {
+          for (let i = 0; i < duplicateIds.length; i += 100) {
+            const batch = duplicateIds.slice(i, i + 100);
+            await dbToClean.from("log_accessi").delete().in("id", batch);
+          }
+        } catch (cleanupErr) {
+          console.warn("Pulizia duplicati log_accessi non riuscita:", cleanupErr);
         }
-        if (excludeTests && isTestAccessType(a.tipo, testPrefixes)) {
-          return false;
-        }
-        return true;
-      })
+      })();
+    }
+
+    // 4. Mappatura finale per UI
+    const recentAccess = deduplicatedAccess
       .map((a: any) => {
         const rawTipo = a.tipo || "ospite";
         if (rawTipo === "ospite") {

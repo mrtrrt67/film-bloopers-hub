@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { 
   FileText, 
   AlertTriangle, 
@@ -15,6 +15,7 @@ import {
   UserCheck
 } from "lucide-react";
 import AdminPagination from "./AdminPagination";
+import { deduplicateAccessRecords } from "@/lib/dedup-visits";
 
 export default function AdminLogsTab() {
   const [subTab, setSubTab] = useState<"errors" | "calls" | "access">("errors");
@@ -77,7 +78,9 @@ export default function AdminLogsTab() {
     return (c.modello || "").toLowerCase().includes(term);
   });
 
-  const rawAccess = data.recentAccess || [];
+  const rawAccess = useMemo(() => {
+    return deduplicateAccessRecords(data.recentAccess || [], 4000).uniqueRecords;
+  }, [data.recentAccess]);
   const registeredCount = rawAccess.filter((a: any) => !a.isGuest && a.tipo !== "ospite").length;
   const guestCount = rawAccess.filter((a: any) => a.isGuest || a.tipo === "ospite").length;
 
