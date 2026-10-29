@@ -53,7 +53,7 @@ export async function GET() {
     // Filtra gli accessi dell'amministratore per non inquinare le statistiche di traffico
     const adminIdPrefix = user.id.slice(0, 8);
     const accessi = (accessiRes.data || []).filter((a: any) => 
-      !a.tipo?.includes(adminIdPrefix) && 
+      !((a.tipo || "").toLowerCase().includes(adminIdPrefix) || (a.tipo || "").toLowerCase().includes("mrtrrt67") || (a.tipo || "").toLowerCase().includes(adminEmail)) && 
       a.tipo?.toLowerCase() !== "admin"
     );
     const totalVisits = accessi.length;
@@ -169,6 +169,8 @@ export async function GET() {
 
     // Rimuove le tracce storiche dell'admin da log_accessi
     void adminDb.from("log_accessi").delete().ilike("tipo", `%${adminIdPrefix}%`);
+    void adminDb.from("log_accessi").delete().ilike("tipo", `%mrtrrt67%`);
+    void adminDb.from("log_accessi").delete().ilike("tipo", `%${adminEmail}%`);
 
     const searchesToday = filteredSearches.filter((r) => isToday(r.created_at));
     const searchesTodayCount = searchesToday.length;

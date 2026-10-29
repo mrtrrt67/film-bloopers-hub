@@ -76,7 +76,7 @@ export default function AdminLogsTab() {
   const accessLogs = (data.recentAccess || []).filter((a: any) => {
     if (!filterText.trim()) return true;
     const term = filterText.toLowerCase();
-    return (a.tipo || "").toLowerCase().includes(term);
+    return (a.tipo || "").toLowerCase().includes(term) || (a.username || "").toLowerCase().includes(term);
   });
 
   const paginatedErrors = aiErrors.slice((page - 1) * pageSize, page * pageSize);
@@ -296,7 +296,17 @@ export default function AdminLogsTab() {
                           {a.created_at ? a.created_at.slice(0, 19).replace("T", " ") : "N/D"}
                         </td>
                         <td className="py-2.5 px-4 font-bold text-white capitalize">
-                          {a.tipo === "ospite" ? "👻 Visita Ospite" : "👤 Utente Registrato"}
+                          {a.isGuest || a.tipo === "ospite" ? (
+                            <span className="inline-flex items-center gap-1.5 text-zinc-400 font-medium">
+                              <span>👻</span>
+                              <span>Visita Ospite</span>
+                            </span>
+                          ) : (
+                            <span className="inline-flex items-center gap-1.5 text-amber-400 font-bold">
+                              <span>👤</span>
+                              <span>{a.username || "Utente Registrato"}</span>
+                            </span>
+                          )}
                         </td>
                       </tr>
                     ))}

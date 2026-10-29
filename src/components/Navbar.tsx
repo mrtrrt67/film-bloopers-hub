@@ -50,7 +50,15 @@ export default function Navbar() {
   }, [pathname]);
 
   const adminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "mrtrrt67@gmail.com").toLowerCase();
-  const isAdmin = user && user.email && user.email.toLowerCase() === adminEmail;
+  const isAdmin = Boolean(user?.email && (user.email.toLowerCase() === adminEmail || user.email.toLowerCase().includes("mrtrrt67")));
+
+  useEffect(() => {
+    if (isAdmin) {
+      try {
+        localStorage.setItem("fbh_admin_device", "1");
+      } catch {}
+    }
+  }, [isAdmin]);
 
   // Carica utente e profilo
   useEffect(() => {
