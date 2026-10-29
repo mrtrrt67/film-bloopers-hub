@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { isTestAccount, isTestAccessType } from "@/lib/test-accounts";
+import { isTestAccount, isTestAccessType, shouldExcludeTestAccounts } from "@/lib/test-accounts";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -32,11 +32,20 @@ export async function GET() {
     ]);
 
     const profiles = profilesRes.data || [];
-    // Esclude rigorosamente l'amministratore e tutti gli account di test/audit dalle metriche reali
-    const realProfiles = profiles.filter((p) => !isTestAccount(p.email, p.username));
-    const totalUsers = realProfiles.length;
+    const excludeTests = shouldExcludeTestAccounts(request);
 
-    const activePremiumUsers = realProfiles.filter((p) => {
+    // In STAGING gli utenti di test rimangono visibili, conteggiati e attivi.
+    // In PRODUZIONE escludiamo categoricamente l'amministratore e gli account di test/audit.
+    const activeProfiles = profiles.filter((p) => {
+      const isAdm = p.email?.toLowerCase() === adminEmail || p.email?.toLowerCase().includes("mrtrrt67");
+      if (isAdm) return false;
+      if (excludeTests && isTestAccount(p.email, p.username)) return false;
+      return true;
+    });
+
+    const totalUsers = activeProfiles.length;
+
+    const activePremiumUsers = activeProfiles.filter((p) => {
       if (p.tier !== "premium") return false;
       const scad = p.data_scadenza || p.expires_at ? String(p.data_scadenza || p.expires_at).slice(0, 10) : null;
       const sub = p.tipo_abbonamento || p.subscription_type || "nessuno";
@@ -44,31 +53,43 @@ export async function GET() {
       return true;
     }).length;
 
-    const expiredUsers = realProfiles.filter((p) => {
+    const expiredUsers = activeProfiles.filter((p) => {
       const scad = p.data_scadenza || p.expires_at ? String(p.data_scadenza || p.expires_at).slice(0, 10) : null;
       const sub = p.tipo_abbonamento || p.subscription_type || "nessuno";
       return (sub === "mensile" || sub === "annuale") && scad && scad < todayUtc;
     }).length;
 
-    const freeUsers = realProfiles.filter((p) => p.tier === "free" || !p.tier).length;
+    const freeUsers = activeProfiles.filter((p) => p.tier === "free" || !p.tier).length;
 
-    // Raccoglie identificatori e prefissi degli account di test per filtrare i log
+    // Raccoglie i prefissi e username di test SOLO se excludeTests è attivo (produzione)
     const testPrefixes = new Set<string>();
-    testPrefixes.add(user.id.slice(0, 8).toLowerCase());
-    profiles.forEach((p) => {
-      if (isTestAccount(p.email, p.username)) {
-        if (p.id) {
-          testPrefixes.add(p.id.slice(0, 8).toLowerCase());
-          testPrefixes.add(p.id.toLowerCase());
-        }
-        if (p.username) testPrefixes.add(p.username.toLowerCase());
-        if (p.email) testPrefixes.add(p.email.toLowerCase());
-      }
-    });
     const adminIdPrefix = user.id.slice(0, 8);
-    const accessi = (accessiRes.data || []).filter((a: any) => !isTestAccessType(a.tipo, testPrefixes));
+    testPrefixes.add(adminIdPrefix.toLowerCase());
 
+    if (excludeTests) {
+      profiles.forEach((p) => {
+        if (isTestAccount(p.email, p.username)) {
+          if (p.id) {
+            testPrefixes.add(p.id.slice(0, 8).toLowerCase());
+            testPrefixes.add(p.id.toLowerCase());
+          }
+          if (p.username) testPrefixes.add(p.username.toLowerCase());
+          if (p.email) testPrefixes.add(p.email.toLowerCase());
+        }
+      });
+    }
 
+    // Filtra gli accessi: l'admin è sempre escluso, i test solo in produzione
+    const accessi = (accessiRes.data || []).filter((a: any) => {
+      const t = (a.tipo || "").toLowerCase();
+      if (t.includes(adminIdPrefix) || t.includes("mrtrrt67") || t.includes(adminEmail) || t === "admin") {
+        return false;
+      }
+      if (excludeTests && isTestAccessType(a.tipo, testPrefixes)) {
+        return false;
+      }
+      return true;
+    });
 
     const totalVisits = accessi.length;
     const todayVisits = accessi.filter((a) => isToday(a.created_at)).length;
@@ -144,14 +165,12 @@ export async function GET() {
       .order("created_at", { ascending: false })
       .limit(1000);
 
-    // Filtra ricerche vuote, troppo corte (< 2 char) o generate da test di audit
     const rawSearches = (logRicerche || []).filter((r: any) => {
       const t = (r.termine || "").trim().toLowerCase();
-      if (!t || t.length < 2 || t.startsWith("audit_")) return false;
+      if (!t || t.length < 2 || (excludeTests && t.startsWith("audit_"))) return false;
       return true;
     });
 
-    // Rimuove i sotto-frammenti digitati in rapida successione (es. "tit" prima di "titanic", "Matr" prima di "Matrix", "il mi" prima di "il miglio verde")
     const filteredSearches: typeof rawSearches = [];
     const subFragmentIds: string[] = [];
 
@@ -160,7 +179,6 @@ export async function GET() {
       const curTerm = current.termine.trim().toLowerCase();
       const curTime = new Date(current.created_at).getTime();
 
-      // Cerca nei vicini temporali se esiste una versione più completa dello stesso termine
       const isSubFragment = rawSearches.some((other, oIdx) => {
         if (i === oIdx) return false;
         const otherTerm = other.termine.trim().toLowerCase();
@@ -181,12 +199,16 @@ export async function GET() {
       void adminDb.from("log_ricerche").delete().in("id", subFragmentIds);
     }
 
-    // Rimuove le tracce storiche dell'admin da log_accessi
+    // Rimuove le tracce storiche dell'admin da log_accessi (sempre)
     void adminDb.from("log_accessi").delete().ilike("tipo", `%${adminIdPrefix}%`);
     void adminDb.from("log_accessi").delete().ilike("tipo", `%mrtrrt67%`);
     void adminDb.from("log_accessi").delete().ilike("tipo", `%${adminEmail}%`);
-    void adminDb.from("log_accessi").delete().ilike("tipo", `audit_%`);
-    void adminDb.from("log_accessi").delete().ilike("tipo", `test_%`);
+
+    // In produzione ripulisce anche i log di test, in staging li mantiene
+    if (excludeTests) {
+      void adminDb.from("log_accessi").delete().ilike("tipo", `audit_%`);
+      void adminDb.from("log_accessi").delete().ilike("tipo", `test_%`);
+    }
 
     const searchesToday = filteredSearches.filter((r) => isToday(r.created_at));
     const searchesTodayCount = searchesToday.length;
@@ -220,7 +242,6 @@ export async function GET() {
       .from("errori")
       .select("*", { count: "exact", head: true });
 
-    // Recupera conteggi aggregati per provenienza e totali voti
     const { data: allBloopersSummary } = await adminDb
       .from("errori")
       .select("conferme, contestazioni, provenienza, inserito_da");
@@ -247,7 +268,6 @@ export async function GET() {
     const totalVotes = totalThumbsUp + totalThumbsDown;
     const globalApprovalRate = totalVotes > 0 ? Math.round((totalThumbsUp / totalVotes) * 100) : 100;
 
-    // Recupera i bloopers con voti
     const { data: votedBloopers } = await adminDb
       .from("errori")
       .select("id, minuto, categoria, descrizione, conferme, contestazioni, provenienza, inserito_da, creato_il, film_id, films(id, titolo, anno)")
@@ -257,7 +277,6 @@ export async function GET() {
 
     let prospectList = [...(votedBloopers || [])];
 
-    // Se ci sono pochi bloopers con voti, recupera anche i più recenti per mostrare un prospetto completo
     if (prospectList.length < 30) {
       const { data: recentBloopers } = await adminDb
         .from("errori")
@@ -301,6 +320,7 @@ export async function GET() {
         totalAiCallsPast30d: statIa.length,
         searchesTodayCount,
         totalSearches: filteredSearches.length,
+        isStaging: !excludeTests,
       },
       duplicatePosters,
       aiPerformance,

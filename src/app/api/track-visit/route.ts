@@ -1,15 +1,25 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { isTestAccount } from "@/lib/test-accounts";
+import { isTestAccount, shouldExcludeTestAccounts } from "@/lib/test-accounts";
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    // Ignora categoricamente visite dell'amministratore e di qualsiasi utente di test
-    if (user && isTestAccount(user.email, user.user_metadata?.username)) {
+    const adminEmail = (process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL || "mrtrrt67@gmail.com").toLowerCase();
+
+    // L'amministratore non viene mai tracciato per non inquinare le visite
+    if (user && (user.email?.toLowerCase() === adminEmail || user.email?.toLowerCase().includes("mrtrrt67"))) {
+      return NextResponse.json({ ok: true, ignored: true });
+    }
+
+    const excludeTests = shouldExcludeTestAccounts(request);
+
+    // In PRODUZIONE ignoriamo le visite degli utenti di test.
+    // In STAGING invece tracciamo regolarmente per consentire i test di verifica.
+    if (excludeTests && user && isTestAccount(user.email, user.user_metadata?.username)) {
       return NextResponse.json({ ok: true, ignored: true });
     }
 
@@ -26,7 +36,7 @@ export async function POST() {
         .eq("id", user.id)
         .maybeSingle();
 
-      if (isTestAccount(user.email, prof?.username)) {
+      if (excludeTests && isTestAccount(user.email, prof?.username)) {
         return NextResponse.json({ ok: true, ignored: true });
       }
 

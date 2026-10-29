@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
-import { isTestAccount, isTestAccessType } from "@/lib/test-accounts";
+import { isTestAccount, isTestAccessType, shouldExcludeTestAccounts } from "@/lib/test-accounts";
 
 export async function GET(request: Request) {
   try {
@@ -14,6 +14,7 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const limit = Math.min(Math.max(parseInt(searchParams.get("limit") || "500", 10), 10), 1000);
+    const excludeTests = shouldExcludeTestAccounts(request);
 
     const [errRes, callsRes, accessRes, profilesRes] = await Promise.all([
       supabase.from("log_errori_ia").select("*").order("created_at", { ascending: false }).limit(limit),
@@ -39,8 +40,8 @@ export async function GET(request: Request) {
         profileMap.set(p.email.toLowerCase(), uName);
       }
 
-      // Raccoglie i prefissi e username degli account di test/audit da escludere
-      if (isTestAccount(p.email, p.username)) {
+      // Raccoglie i prefissi e username di test SOLO se excludeTests è attivo (produzione)
+      if (excludeTests && isTestAccount(p.email, p.username)) {
         if (p.id) {
           testPrefixes.add(p.id.slice(0, 8).toLowerCase());
           testPrefixes.add(p.id.toLowerCase());
@@ -51,7 +52,17 @@ export async function GET(request: Request) {
     });
 
     const recentAccess = (accessRes.data || [])
-      .filter((a: any) => !isTestAccessType(a.tipo, testPrefixes))
+      // L'amministratore è sempre escluso. I test sono esclusi solo in produzione, lasciati in staging!
+      .filter((a: any) => {
+        const t = (a.tipo || "").toLowerCase();
+        if (t.includes(adminIdPrefix) || t.includes("mrtrrt67") || t.includes(adminEmail) || t === "admin") {
+          return false;
+        }
+        if (excludeTests && isTestAccessType(a.tipo, testPrefixes)) {
+          return false;
+        }
+        return true;
+      })
       .map((a: any) => {
         const rawTipo = a.tipo || "ospite";
         if (rawTipo === "ospite") {
@@ -80,7 +91,11 @@ export async function GET(request: Request) {
           username: resolvedUsername,
         };
       })
-      .filter((a: any) => a.isGuest || !isTestAccount(null, a.username));
+      .filter((a: any) => {
+        if (a.isGuest) return true;
+        if (excludeTests && isTestAccount(null, a.username)) return false;
+        return true;
+      });
 
     return NextResponse.json({
       aiErrors: errRes.data || [],

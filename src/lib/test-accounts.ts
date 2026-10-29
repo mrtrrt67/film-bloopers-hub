@@ -1,6 +1,6 @@
 /**
- * Utility centralizzata per rilevare ed escludere account di amministrazione
- * e profili/visite di test da tutte le statistiche e metriche di produzione.
+ * Utility centralizzata per la gestione di ambienti (Staging vs Produzione)
+ * e identificazione di account e log di test.
  */
 
 export const ADMIN_EMAIL = (
@@ -8,6 +8,66 @@ export const ADMIN_EMAIL = (
   process.env.NEXT_PUBLIC_ADMIN_EMAIL ||
   "mrtrrt67@gmail.com"
 ).toLowerCase().trim();
+
+/**
+ * Rileva se il codice è in esecuzione nell'ambiente di Staging / Preview / Locale
+ */
+export function isStagingEnvironment(request?: Request): boolean {
+  if (
+    process.env.VERCEL_ENV === "preview" ||
+    process.env.NEXT_PUBLIC_VERCEL_ENV === "preview" ||
+    process.env.NODE_ENV === "development"
+  ) {
+    return true;
+  }
+
+  const siteUrl = (
+    process.env.NEXT_PUBLIC_SITE_URL ||
+    process.env.SITE_URL ||
+    ""
+  ).toLowerCase();
+
+  if (
+    siteUrl.includes("staging") ||
+    siteUrl.includes("vercel.app") ||
+    siteUrl.includes("localhost") ||
+    siteUrl.includes("127.0.0.1")
+  ) {
+    return true;
+  }
+
+  if (request) {
+    const host = (
+      request.headers.get("x-forwarded-host") ||
+      request.headers.get("host") ||
+      ""
+    ).toLowerCase();
+
+    if (
+      host.includes("staging") ||
+      host.includes("vercel.app") ||
+      host.includes("localhost") ||
+      host.includes("127.0.0.1")
+    ) {
+      return true;
+    }
+  }
+
+  const supabaseUrl = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").toLowerCase();
+  if (supabaseUrl.includes("hktzscarmerpbgxgxliq") || supabaseUrl.includes("staging")) {
+    return true;
+  }
+
+  return false;
+}
+
+/**
+ * Gli utenti di test vanno esclusi SOLO in PRODUZIONE.
+ * In STAGING devono rimanere visibili, conteggiati e attivi per consentire i test completi.
+ */
+export function shouldExcludeTestAccounts(request?: Request): boolean {
+  return !isStagingEnvironment(request);
+}
 
 export function isTestEmail(email?: string | null): boolean {
   if (!email) return false;
@@ -24,7 +84,7 @@ export function isTestEmail(email?: string | null): boolean {
     e.includes("audit") ||
     e.includes("diag_") ||
     e.includes("dummy") ||
-    e.endsWith("@filmbloopers.online") || // es. test_diag... o free@filmbloopers.online
+    e.endsWith("@filmbloopers.online") ||
     e.endsWith("@example.com") ||
     e.endsWith("@test.com")
   ) {
