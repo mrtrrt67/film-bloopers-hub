@@ -12,7 +12,7 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const limit = Math.min(Math.max(parseInt(searchParams.get("limit") || "250", 10), 10), 500);
+    const limit = Math.min(Math.max(parseInt(searchParams.get("limit") || "500", 10), 10), 1000);
 
     const [errRes, callsRes, accessRes, profilesRes] = await Promise.all([
       supabase.from("log_errori_ia").select("*").order("created_at", { ascending: false }).limit(limit),

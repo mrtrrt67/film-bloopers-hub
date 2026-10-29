@@ -9,12 +9,16 @@ import {
   RefreshCw, 
   Search,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  Users,
+  Ghost,
+  UserCheck
 } from "lucide-react";
 import AdminPagination from "./AdminPagination";
 
 export default function AdminLogsTab() {
   const [subTab, setSubTab] = useState<"errors" | "calls" | "access">("errors");
+  const [accessFilter, setAccessFilter] = useState<"all" | "registered" | "guest">("all");
   const [data, setData] = useState<any>({ aiErrors: [], recentAiCalls: [], recentAccess: [] });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -26,7 +30,7 @@ export default function AdminLogsTab() {
   const fetchLogs = async () => {
     try {
       setRefreshing(true);
-      const res = await fetch("/api/admin/logs?limit=300");
+      const res = await fetch("/api/admin/logs?limit=500");
       if (res.ok) {
         const json = await res.json();
         setData(json);
@@ -46,7 +50,7 @@ export default function AdminLogsTab() {
   // Reset pagina al cambio tab o filtro
   useEffect(() => {
     setPage(1);
-  }, [subTab, filterText]);
+  }, [subTab, filterText, accessFilter]);
 
   if (loading) {
     return (
@@ -73,10 +77,22 @@ export default function AdminLogsTab() {
     return (c.modello || "").toLowerCase().includes(term);
   });
 
-  const accessLogs = (data.recentAccess || []).filter((a: any) => {
+  const rawAccess = data.recentAccess || [];
+  const registeredCount = rawAccess.filter((a: any) => !a.isGuest && a.tipo !== "ospite").length;
+  const guestCount = rawAccess.filter((a: any) => a.isGuest || a.tipo === "ospite").length;
+
+  const accessLogs = rawAccess.filter((a: any) => {
+    const isGuest = a.isGuest || a.tipo === "ospite";
+    if (accessFilter === "registered" && isGuest) return false;
+    if (accessFilter === "guest" && !isGuest) return false;
+
     if (!filterText.trim()) return true;
     const term = filterText.toLowerCase();
-    return (a.tipo || "").toLowerCase().includes(term) || (a.username || "").toLowerCase().includes(term);
+    return (
+      (a.tipo || "").toLowerCase().includes(term) ||
+      (a.username || "").toLowerCase().includes(term) ||
+      (a.created_at || "").toLowerCase().includes(term)
+    );
   });
 
   const paginatedErrors = aiErrors.slice((page - 1) * pageSize, page * pageSize);
@@ -119,7 +135,7 @@ export default function AdminLogsTab() {
             }`}
           >
             <LogIn className="h-3.5 w-3.5" />
-            Accessi ({data.recentAccess?.length || 0})
+            Accessi ({rawAccess.length})
           </button>
         </div>
 
@@ -128,7 +144,7 @@ export default function AdminLogsTab() {
             <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-zinc-500" />
             <input
               type="text"
-              placeholder="Filtra per film, modello..."
+              placeholder={subTab === "access" ? "Cerca per username, ospite..." : "Filtra per film, modello..."}
               value={filterText}
               onChange={(e) => setFilterText(e.target.value)}
               className="w-full rounded-xl bg-zinc-900 border border-zinc-800 pl-9 pr-3 py-1.5 text-xs text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500"
@@ -139,18 +155,18 @@ export default function AdminLogsTab() {
             disabled={refreshing}
             className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 transition shrink-0"
           >
-            <RefreshCw className={`h-3 w-3 ${refreshing ? "animate-spin" : ""}`} />
-            Aggiorna
+            <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? "animate-spin text-amber-400" : ""}`} />
+            <span className="hidden sm:inline">Aggiorna</span>
           </button>
         </div>
       </div>
 
-      {/* 1. LOG ERRORI IA */}
+      {/* 1. ERRORI IA */}
       {subTab === "errors" && (
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 overflow-hidden shadow-xl">
           {aiErrors.length === 0 ? (
             <div className="py-12 text-center text-zinc-500 text-xs">
-              Nessun errore IA registrato di recente 🎉
+              Nessun errore registrato di recente. Ottimo lavoro!
             </div>
           ) : (
             <>
@@ -159,44 +175,62 @@ export default function AdminLogsTab() {
                   <thead>
                     <tr className="border-b border-zinc-800 bg-zinc-950/40 text-zinc-400 font-semibold">
                       <th className="py-3 px-4">Data / Ora</th>
+                      <th className="py-3 px-4">Operazione</th>
+                      <th className="py-3 px-4">Film / Contesto</th>
+                      <th className="py-3 px-4">Modello</th>
                       <th className="py-3 px-4">Utente</th>
-                      <th className="py-3 px-4">Film</th>
-                      <th className="py-3 px-4">Modello IA</th>
-                      <th className="py-3 px-4">Errore / Dettaglio Tecnico</th>
+                      <th className="py-3 px-4">Dettagli Errore</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
-                    {paginatedErrors.map((err: any) => {
-                      const isExpanded = expandedErrorId === err.id;
-                      const dateStr = err.created_at ? err.created_at.slice(0, 16).replace("T", " ") : "N/D";
+                    {paginatedErrors.map((e: any) => {
+                      const isExpanded = expandedErrorId === e.id;
+                      const hasLongError = (e.errore_dettaglio || "").length > 80;
+
                       return (
-                        <tr key={err.id} className="hover:bg-zinc-800/30">
-                          <td className="py-3 px-4 font-mono text-zinc-400 whitespace-nowrap text-[11px]">
-                            {dateStr}
+                        <tr key={e.id} className="hover:bg-zinc-800/30">
+                          <td className="py-2.5 px-4 font-mono text-zinc-400 text-[11px] whitespace-nowrap">
+                            {e.created_at ? e.created_at.slice(0, 19).replace("T", " ") : "N/D"}
                           </td>
-                          <td className="py-3 px-4 text-zinc-400 text-[11px]">
-                            {err.utente || "Ospite"}
+                          <td className="py-2.5 px-4 font-semibold text-rose-400 uppercase tracking-wider text-[10px]">
+                            {e.operazione || "N/D"}
                           </td>
-                          <td className="py-3 px-4 font-bold text-white whitespace-nowrap">
-                            {err.film || "N/D"}
+                          <td className="py-2.5 px-4 font-medium text-white max-w-[150px] truncate">
+                            {e.film || "Generale"}
                           </td>
-                          <td className="py-3 px-4 font-mono text-amber-400 whitespace-nowrap">
-                            {err.modello || "default"}
+                          <td className="py-2.5 px-4 font-mono text-zinc-400 text-[11px]">
+                            {e.modello || "default"}
                           </td>
-                          <td className="py-3 px-4">
-                            <div className="flex items-start justify-between gap-2">
-                              <span className="font-mono text-rose-300 text-[11px] break-all">
-                                {isExpanded
-                                  ? err.errore_dettaglio
-                                  : (err.errore_dettaglio || "").slice(0, 90) +
-                                    ((err.errore_dettaglio || "").length > 90 ? "..." : "")}
-                              </span>
-                              {(err.errore_dettaglio || "").length > 90 && (
+                          <td className="py-2.5 px-4 text-zinc-400 text-[11px]">
+                            {e.utente || "anonimo"}
+                          </td>
+                          <td className="py-2.5 px-4 max-w-xs">
+                            <div className="text-zinc-300">
+                              {isExpanded ? (
+                                <pre className="whitespace-pre-wrap font-mono text-[10px] bg-zinc-950 p-2 rounded border border-zinc-800 text-rose-300">
+                                  {e.errore_dettaglio}
+                                </pre>
+                              ) : (
+                                <span className="line-clamp-2 text-zinc-400 text-[11px]">
+                                  {e.errore_dettaglio || "Nessun dettaglio"}
+                                </span>
+                              )}
+                              {hasLongError && (
                                 <button
-                                  onClick={() => setExpandedErrorId(isExpanded ? null : err.id)}
-                                  className="text-zinc-500 hover:text-white shrink-0 p-1"
+                                  onClick={() => setExpandedErrorId(isExpanded ? null : e.id)}
+                                  className="mt-1 text-[10px] text-amber-400 hover:underline flex items-center gap-0.5"
                                 >
-                                  {isExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                                  {isExpanded ? (
+                                    <>
+                                      <span>Comprimi</span>
+                                      <ChevronUp className="h-3 w-3" />
+                                    </>
+                                  ) : (
+                                    <>
+                                      <span>Mostra tutto</span>
+                                      <ChevronDown className="h-3 w-3" />
+                                    </>
+                                  )}
                                 </button>
                               )}
                             </div>
@@ -215,19 +249,19 @@ export default function AdminLogsTab() {
                 onPageChange={setPage}
                 onPageSizeChange={setPageSize}
                 pageSizeOptions={[10, 15, 25, 50]}
-                itemName="errori IA"
+                itemName="errori"
               />
             </>
           )}
         </div>
       )}
 
-      {/* 2. CHIAMATE IA RIUSCITE */}
+      {/* 2. CHIAMATE RIUSCITE */}
       {subTab === "calls" && (
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 overflow-hidden shadow-xl">
           {recentCalls.length === 0 ? (
             <div className="py-12 text-center text-zinc-500 text-xs">
-              Nessuna chiamata IA recente registrata.
+              Nessuna chiamata recente registrata.
             </div>
           ) : (
             <>
@@ -236,21 +270,47 @@ export default function AdminLogsTab() {
                   <thead>
                     <tr className="border-b border-zinc-800 bg-zinc-950/40 text-zinc-400 font-semibold">
                       <th className="py-3 px-4">Data / Ora</th>
-                      <th className="py-3 px-4">Modello Utilizzato</th>
-                      <th className="py-3 px-4 text-right">Tempo di Esecuzione</th>
+                      <th className="py-3 px-4">Modello</th>
+                      <th className="py-3 px-4">Stato</th>
+                      <th className="py-3 px-4">Tempo Risposta</th>
+                      <th className="py-3 px-4">Token Stimati</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-zinc-800/60 text-zinc-300 font-mono">
+                  <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
                     {paginatedCalls.map((c: any) => (
                       <tr key={c.id} className="hover:bg-zinc-800/30">
-                        <td className="py-2.5 px-4 text-zinc-400 text-[11px]">
+                        <td className="py-2.5 px-4 font-mono text-zinc-400 text-[11px]">
                           {c.data_chiamata ? c.data_chiamata.slice(0, 19).replace("T", " ") : "N/D"}
                         </td>
-                        <td className="py-2.5 px-4 font-bold text-amber-400 font-sans">
-                          {c.modello}
+                        <td className="py-2.5 px-4 font-medium text-white">
+                          {c.modello || "sconosciuto"}
                         </td>
-                        <td className="py-2.5 px-4 text-right text-emerald-400">
-                          {c.tempo_esecuzione ? `${c.tempo_esecuzione}s` : "N/D"}
+                        <td className="py-2.5 px-4">
+                          <span
+                            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                              c.stato === "fallita"
+                                ? "bg-rose-500/10 text-rose-400 border border-rose-500/20"
+                                : "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                            }`}
+                          >
+                            {c.stato === "fallita" ? (
+                              <>
+                                <AlertTriangle className="h-3 w-3" />
+                                Fallita
+                              </>
+                            ) : (
+                              <>
+                                <CheckCircle className="h-3 w-3" />
+                                Riuscita
+                              </>
+                            )}
+                          </span>
+                        </td>
+                        <td className="py-2.5 px-4 font-mono text-zinc-400 text-[11px]">
+                          {c.tempo_risposta_ms ? `${c.tempo_risposta_ms} ms` : "N/D"}
+                        </td>
+                        <td className="py-2.5 px-4 font-mono text-zinc-400 text-[11px]">
+                          {c.token_utilizzati || "N/D"}
                         </td>
                       </tr>
                     ))}
@@ -265,66 +325,141 @@ export default function AdminLogsTab() {
                 onPageChange={setPage}
                 onPageSizeChange={setPageSize}
                 pageSizeOptions={[10, 15, 25, 50]}
-                itemName="chiamate IA"
+                itemName="chiamate"
               />
             </>
           )}
         </div>
       )}
 
-      {/* 3. LOG ACCESSI */}
+      {/* 3. LOG ACCESSI (CON SEZIONI & FILTRI PER REGISTRATI, OSPITI E TUTTI) */}
       {subTab === "access" && (
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 overflow-hidden shadow-xl">
-          {accessLogs.length === 0 ? (
-            <div className="py-12 text-center text-zinc-500 text-xs">
-              Nessun accesso registrato.
-            </div>
-          ) : (
-            <>
-              <div className="overflow-x-auto">
-                <table className="w-full text-left text-xs">
-                  <thead>
-                    <tr className="border-b border-zinc-800 bg-zinc-950/40 text-zinc-400 font-semibold">
-                      <th className="py-3 px-4">Data / Ora</th>
-                      <th className="py-3 px-4">Tipo Visita</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
-                    {paginatedAccess.map((a: any) => (
-                      <tr key={a.id} className="hover:bg-zinc-800/30">
-                        <td className="py-2.5 px-4 font-mono text-zinc-400 text-[11px]">
-                          {a.created_at ? a.created_at.slice(0, 19).replace("T", " ") : "N/D"}
-                        </td>
-                        <td className="py-2.5 px-4 font-bold text-white capitalize">
-                          {a.isGuest || a.tipo === "ospite" ? (
-                            <span className="inline-flex items-center gap-1.5 text-zinc-400 font-medium">
-                              <span>👻</span>
-                              <span>Visita Ospite</span>
-                            </span>
-                          ) : (
-                            <span className="inline-flex items-center gap-1.5 text-amber-400 font-bold">
-                              <span>👤</span>
-                              <span>{a.username || "Utente Registrato"}</span>
-                            </span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+        <div className="space-y-4">
+          {/* Barra Filtri: Tutti / Registrati / Ospiti */}
+          <div className="flex flex-wrap items-center justify-between gap-3 bg-zinc-900/80 p-3 rounded-2xl border border-zinc-800 shadow-sm">
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => setAccessFilter("all")}
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+                  accessFilter === "all"
+                    ? "bg-zinc-800 text-white border border-zinc-700 shadow-sm"
+                    : "text-zinc-400 hover:text-white bg-zinc-950/40 border border-transparent"
+                }`}
+              >
+                <Users className="h-3.5 w-3.5 text-zinc-400" />
+                <span>Tutti gli Accessi</span>
+                <span className="rounded-full bg-zinc-900 px-2 py-0.5 text-[10px] text-zinc-300 border border-zinc-700/60 font-mono">
+                  {rawAccess.length}
+                </span>
+              </button>
 
-              <AdminPagination
-                currentPage={page}
-                totalItems={accessLogs.length}
-                pageSize={pageSize}
-                onPageChange={setPage}
-                onPageSizeChange={setPageSize}
-                pageSizeOptions={[10, 15, 25, 50]}
-                itemName="accessi"
-              />
-            </>
-          )}
+              <button
+                type="button"
+                onClick={() => setAccessFilter("registered")}
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+                  accessFilter === "registered"
+                    ? "bg-amber-500/20 text-amber-300 border border-amber-500/40 shadow-sm"
+                    : "text-zinc-400 hover:text-amber-300 bg-zinc-950/40 border border-transparent"
+                }`}
+              >
+                <UserCheck className="h-3.5 w-3.5 text-amber-400" />
+                <span>👤 Utenti Registrati</span>
+                <span className="rounded-full bg-amber-500/10 px-2 py-0.5 text-[10px] text-amber-300 border border-amber-500/20 font-mono">
+                  {registeredCount}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setAccessFilter("guest")}
+                className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+                  accessFilter === "guest"
+                    ? "bg-zinc-800 text-zinc-200 border border-zinc-600 shadow-sm"
+                    : "text-zinc-400 hover:text-zinc-200 bg-zinc-950/40 border border-transparent"
+                }`}
+              >
+                <Ghost className="h-3.5 w-3.5 text-zinc-400" />
+                <span>👻 Visite Ospiti</span>
+                <span className="rounded-full bg-zinc-900 px-2 py-0.5 text-[10px] text-zinc-400 border border-zinc-800 font-mono">
+                  {guestCount}
+                </span>
+              </button>
+            </div>
+
+            <div className="text-[11px] text-zinc-400 font-medium">
+              Risultati filtrati: <strong className="text-white font-mono">{accessLogs.length}</strong>
+            </div>
+          </div>
+
+          {/* Tabella accessi */}
+          <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 overflow-hidden shadow-xl">
+            {accessLogs.length === 0 ? (
+              <div className="py-12 text-center text-zinc-500 text-xs">
+                Nessun accesso registrato per il filtro selezionato.
+              </div>
+            ) : (
+              <>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead>
+                      <tr className="border-b border-zinc-800 bg-zinc-950/40 text-zinc-400 font-semibold">
+                        <th className="py-3 px-4">Data / Ora</th>
+                        <th className="py-3 px-4">Visitatore / Username</th>
+                        <th className="py-3 px-4 text-right">Tipologia</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
+                      {paginatedAccess.map((a: any) => {
+                        const isGuest = a.isGuest || a.tipo === "ospite";
+                        return (
+                          <tr key={a.id} className="hover:bg-zinc-800/30 transition-colors">
+                            <td className="py-2.5 px-4 font-mono text-zinc-400 text-[11px] whitespace-nowrap">
+                              {a.created_at ? a.created_at.slice(0, 19).replace("T", " ") : "N/D"}
+                            </td>
+                            <td className="py-2.5 px-4 font-bold text-white">
+                              {isGuest ? (
+                                <span className="inline-flex items-center gap-2 text-zinc-400 font-medium">
+                                  <Ghost className="h-3.5 w-3.5 text-zinc-500 shrink-0" />
+                                  <span>Visitatore Ospite (Anonimo)</span>
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-2 text-amber-400 font-bold">
+                                  <UserCheck className="h-3.5 w-3.5 text-amber-400 shrink-0" />
+                                  <span>{a.username || "Utente Registrato"}</span>
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-2.5 px-4 text-right">
+                              {isGuest ? (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-zinc-800/80 text-zinc-400 border border-zinc-700/50">
+                                  Ospite
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                  Registrato
+                                </span>
+                              )}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+
+                <AdminPagination
+                  currentPage={page}
+                  totalItems={accessLogs.length}
+                  pageSize={pageSize}
+                  onPageChange={setPage}
+                  onPageSizeChange={setPageSize}
+                  pageSizeOptions={[10, 15, 25, 50]}
+                  itemName="accessi"
+                />
+              </>
+            )}
+          </div>
         </div>
       )}
     </div>
