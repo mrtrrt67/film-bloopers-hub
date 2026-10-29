@@ -79,7 +79,7 @@ export default async function HomePage() {
   const jsonLdWebsite = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "FilmBloopers Hub",
+    name: "FilmBloopers Hub", alternateName: ["FilmBloopers", "filmbloopers", "Film Bloopers", "filmbloopers.online"],
     url: siteUrl,
     description: "Il Portale Italiano degli Errori nei Film e Bloopers Cinematografici",
     inLanguage: "it-IT",
@@ -96,7 +96,7 @@ export default async function HomePage() {
   const jsonLdOrg = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "FilmBloopers Hub",
+    name: "FilmBloopers Hub", alternateName: ["FilmBloopers", "filmbloopers", "Film Bloopers", "filmbloopers.online"],
     url: siteUrl,
     logo: `${siteUrl}/icon.svg`,
     description: "Il primo archivio collaborativo in lingua italiana dedicato alla scoperta e verifica di errori di montaggio, bloopers e anacronismi nei film.",
