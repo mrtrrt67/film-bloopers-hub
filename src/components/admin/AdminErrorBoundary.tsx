@@ -27,6 +27,12 @@ export default class AdminErrorBoundary extends Component<Props, State> {
     console.error("AdminErrorBoundary caught error in tab", this.props.tabName, error, errorInfo);
   }
 
+  public componentDidUpdate(prevProps: Props) {
+    if (prevProps.tabName !== this.props.tabName && this.state.hasError) {
+      this.setState({ hasError: false, error: null });
+    }
+  }
+
   private handleReset = () => {
     this.setState({ hasError: false, error: null });
   };
