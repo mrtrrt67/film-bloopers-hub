@@ -3,6 +3,9 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isTestAccount, shouldExcludeTestAccounts } from "@/lib/test-accounts";
 
+// Cache in memoria per deduplicare chiamate identiche arrivate entro pochi secondi
+const recentVisitsCache = new Map<string, number>();
+
 export async function POST(request: Request) {
   try {
     const supabase = await createClient();
@@ -47,6 +50,43 @@ export async function POST(request: Request) {
         `utente_${user.id.slice(0, 8)}`;
 
       tipo = `utente:${username}`;
+    }
+
+    // 1. Deduplicazione Server-Side in memoria (IP + Tipo entro 5 secondi)
+    const clientIp =
+      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+      request.headers.get("x-real-ip") ||
+      "unknown_ip";
+
+    const cacheKey = `${clientIp}_${tipo}`;
+    const now = Date.now();
+    const lastSeen = recentVisitsCache.get(cacheKey);
+
+    if (lastSeen && now - lastSeen < 5000) {
+      return NextResponse.json({ ok: true, deduplicated: true });
+    }
+    recentVisitsCache.set(cacheKey, now);
+
+    // Pulizia periodica della cache in memoria
+    if (recentVisitsCache.size > 500) {
+      const cutoff = now - 30000;
+      for (const [k, time] of recentVisitsCache.entries()) {
+        if (time < cutoff) recentVisitsCache.delete(k);
+      }
+    }
+
+    // 2. Deduplicazione Database: controlla se lo stesso tipo è stato registrato negli ultimi 3 secondi
+    const threeSecondsAgo = new Date(now - 3000).toISOString();
+    const { data: recentDbRow } = await db
+      .from("log_accessi")
+      .select("id")
+      .eq("tipo", tipo)
+      .gte("created_at", threeSecondsAgo)
+      .limit(1)
+      .maybeSingle();
+
+    if (recentDbRow) {
+      return NextResponse.json({ ok: true, deduplicated: true });
     }
 
     await db.from("log_accessi").insert({ tipo });
