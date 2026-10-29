@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Film, ShieldCheck, Heart } from "lucide-react";
+import CookiePreferencesButton from "@/components/CookiePreferencesButton";
 
 export default function Footer() {
   return (
@@ -71,6 +72,9 @@ export default function Footer() {
                 <Link href="/cookie" className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
                   <span>Cookie Policy</span>
                 </Link>
+              </li>
+              <li>
+                <CookiePreferencesButton />
               </li>
               <li>
                 <Link href="/note-legali" className="hover:text-amber-400 transition-colors flex items-center gap-1.5">

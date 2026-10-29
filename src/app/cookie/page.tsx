@@ -1,15 +1,16 @@
 import { Metadata } from "next";
 import Link from "next/link";
-import { Cookie, ArrowLeft, CheckCircle, ShieldCheck, Settings, ExternalLink } from "lucide-react";
+import { Cookie, ArrowLeft, CheckCircle, ShieldCheck, BarChart3, Settings, ExternalLink } from "lucide-react";
+import CookiePreferencesButton from "@/components/CookiePreferencesButton";
 
 export const metadata: Metadata = {
   title: "Informativa sui Cookie (Cookie Policy) | FilmBloopers Hub",
   description:
-    "Informativa completa sull'utilizzo dei cookie tecnici e di terze parti su FilmBloopers Hub in conformità alla Direttiva ePrivacy e al GDPR.",
+    "Informativa completa sull'utilizzo dei cookie tecnici, analitici (Google Analytics) e di terze parti su FilmBloopers Hub in conformità alla Direttiva ePrivacy e al GDPR.",
 };
 
 export default function CookiePage() {
-  const lastUpdated = "24 Ottobre 2026";
+  const lastUpdated = "29 Ottobre 2026";
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-300 py-12 px-4 sm:px-6 lg:px-8">
@@ -38,14 +39,17 @@ export default function CookiePage() {
           </div>
         </div>
 
-        {/* Intro */}
-        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 space-y-3 leading-relaxed text-sm">
+        {/* Intro & Pannello Preferenze Rapido */}
+        <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-6 space-y-4 leading-relaxed text-sm">
           <p className="text-zinc-200">
-            La presente Cookie Policy descrive le tipologie di cookie e tecnologie similari impiegate su <strong>FilmBloopers Hub</strong> (&quot;Sito&quot;), le finalità per le quali vengono installati e come l&apos;utente può gestire o revocare le proprie preferenze.
+            La presente Cookie Policy descrive le tipologie di cookie e tecnologie similari impiegate su <strong>FilmBloopers Hub</strong> (&quot;Sito&quot;), le finalità per le quali vengono installati e come l&apos;utente può gestire o revocare in qualsiasi momento le proprie preferenze.
           </p>
           <p className="text-xs text-zinc-400">
-            Trattiamo la riservatezza delle informazioni con il massimo rigore: non utilizziamo cookie di profilazione pubblicitaria invasiva né rivendiamo abitudini di navigazione a terze parti.
+            Rispettiamo pienamente la tua privacy e il Regolamento Generale sulla Protezione dei Dati (GDPR): i cookie analitici non essenziali sono disabilitati per impostazione predefinita finché non esprimi il tuo consenso tramite il banner o il pulsante sottostante.
           </p>
+          <div className="pt-2">
+            <CookiePreferencesButton variant="button" />
+          </div>
         </div>
 
         {/* Sezioni */}
@@ -88,6 +92,7 @@ export default function CookiePage() {
                 </p>
                 <div className="rounded-lg bg-zinc-950 p-3 font-mono text-[11px] text-zinc-400 space-y-1">
                   <p>• <code>sb-*-auth-token</code>: Gestito dall&apos;infrastruttura sicura di Supabase per conservare il token JWT di autenticazione crittografato.</p>
+                  <p>• <code>fbh_cookie_consent</code>: Memorizza localmente le tue preferenze sui cookie per non riproporre il banner ad ogni visita.</p>
                   <p>• <code>theme / ui_prefs</code>: Memorizza temporaneamente le preferenze grafiche dell&apos;interfaccia.</p>
                 </div>
                 <p className="text-[11px] text-zinc-400">
@@ -95,7 +100,28 @@ export default function CookiePage() {
                 </p>
               </div>
 
-              {/* Cookie di Terze Parti */}
+              {/* Cookie Statistici / Analitici (Google Analytics) */}
+              <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 space-y-2">
+                <div className="flex items-center justify-between">
+                  <h3 className="font-bold text-amber-300 flex items-center gap-1.5 text-xs">
+                    <BarChart3 className="h-4 w-4 text-amber-400" />
+                    Cookie Analitici & Statistici (Google Analytics 4)
+                  </h3>
+                  <span className="text-[10px] uppercase font-bold text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded">Richiede Consenso</span>
+                </div>
+                <p className="text-zinc-300">
+                  Utilizziamo Google Analytics 4 (Google Ireland Limited) per raccogliere informazioni statistiche anonime e aggregate su come i visitatori interagiscono con il sito (pagine più consultate, tempo di permanenza, dispositivo usato), al solo scopo di ottimizzare le prestazioni e i contenuti editoriali.
+                </p>
+                <div className="rounded-lg bg-zinc-950 p-3 font-mono text-[11px] text-zinc-400 space-y-1">
+                  <p>• <code>_ga</code>, <code>_ga_*</code>: Identificatori casuali per distinguere sessioni uniche di navigazione (durata max 2 anni o secondo preferenza).</p>
+                  <p>• <strong>Google Consent Mode v2:</strong> Gli script analitici rimangono disattivati e non rilasciano cookie finché non viene esplicitamente cliccato &quot;Accetta tutti&quot; o abilitata la voce nel pannello preferenze.</p>
+                </div>
+                <p className="text-[11px] text-zinc-400">
+                  <em>Base giuridica:</em> Consenso preventivo dell&apos;interessato (Art. 6, par. 1, lett. a del GDPR). Puoi revocare o modificare il tuo consenso in qualsiasi istante.
+                </p>
+              </div>
+
+              {/* Cookie di Terze Parti Funzionali */}
               <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 space-y-2">
                 <h3 className="font-bold text-white flex items-center gap-1.5 text-xs">
                   <ShieldCheck className="h-4 w-4 text-amber-400" />
@@ -129,17 +155,20 @@ export default function CookiePage() {
             </div>
           </div>
 
-          {/* 4. Come Disabilitare i Cookie nel Browser */}
+          {/* 4. Come Gestire o Disabilitare i Cookie */}
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-3">
             <h2 className="text-base font-bold text-white flex items-center gap-2">
               <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-zinc-800 text-xs text-amber-400 font-mono">4</span>
               Come Gestire o Disabilitare i Cookie
             </h2>
-            <div className="text-xs text-zinc-300 space-y-2 leading-relaxed">
+            <div className="text-xs text-zinc-300 space-y-3 leading-relaxed">
               <p>
-                L&apos;utente può bloccare o cancellare in qualsiasi momento i cookie modificando le impostazioni del proprio browser. La disattivazione totale dei cookie tecnici potrebbe tuttavia compromettere la possibilità di accedere al proprio account o completare acquisti.
+                Oltre al banner e al pannello preferenze di FilmBloopers Hub, l&apos;utente può bloccare o cancellare in qualsiasi momento i cookie modificando le impostazioni del proprio browser. La disattivazione totale dei cookie tecnici potrebbe tuttavia compromettere la possibilità di accedere al proprio account o completare acquisti.
               </p>
-              <p className="text-zinc-400">Di seguito i link alle istruzioni dei principali browser:</p>
+              <div className="pt-1">
+                <CookiePreferencesButton variant="button" />
+              </div>
+              <p className="text-zinc-400 pt-2">Istruzioni per i principali browser:</p>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 font-mono text-[11px]">
                 <a
                   href="https://support.google.com/chrome/answer/95647"

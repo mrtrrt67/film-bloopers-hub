@@ -5,6 +5,8 @@ import Footer from "@/components/Footer";
 import AccessTracker from "@/components/AccessTracker";
 import PwaInstallPrompt from "@/components/PwaInstallPrompt";
 import RewardCelebrationBanner from "@/components/RewardCelebrationBanner";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
+import CookieBanner from "@/components/CookieBanner";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -123,8 +125,10 @@ export default function RootLayout({
         className="min-h-full flex flex-col bg-zinc-950 text-zinc-100 selection:bg-amber-500 selection:text-zinc-950"
         style={{ backgroundColor: "#09090b" }}
       >
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || "G-J9PFHEC6T4"} />
         <AccessTracker />
         <PwaInstallPrompt />
+        <CookieBanner />
         <Navbar />
         <RewardCelebrationBanner />
         <main className="flex-1">{children}</main>
