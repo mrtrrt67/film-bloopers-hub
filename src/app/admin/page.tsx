@@ -159,7 +159,7 @@ export default function AdminPage() {
       </div>
 
       {/* CONTENUTO DELLE TAB */}
-      <AdminErrorBoundary tabName={tabsConfig.find((t) => t.id === activeTab)?.label || activeTab}>
+      <AdminErrorBoundary key={activeTab} tabName={tabsConfig.find((t) => t.id === activeTab)?.label || activeTab}>
         {activeTab === "stats" && (
           <AdminStatsTab onNavigateToFilms={handleNavigateToFilms} />
         )}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { 
   FileText, 
   AlertTriangle, 
@@ -78,9 +78,7 @@ export default function AdminLogsTab() {
     return (c.modello || "").toLowerCase().includes(term);
   });
 
-  const rawAccess = useMemo(() => {
-    return deduplicateAccessRecords(data.recentAccess || [], 4000).uniqueRecords;
-  }, [data.recentAccess]);
+  const rawAccess = deduplicateAccessRecords(data.recentAccess || [], 4000).uniqueRecords;
   const registeredCount = rawAccess.filter((a: any) => !a.isGuest && a.tipo !== "ospite").length;
   const guestCount = rawAccess.filter((a: any) => a.isGuest || a.tipo === "ospite").length;
 
