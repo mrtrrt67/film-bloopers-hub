@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isTestAccount } from "@/lib/test-accounts";
 
 export async function GET() {
   try {
@@ -69,6 +70,7 @@ export async function GET() {
           calls_today_real: callsTodayReal,
           last_reset_date: lastResetStr,
           is_admin: isUserAdmin,
+          is_test: isTestAccount(p.email, p.username),
           is_expired: isExpired,
         };
       })

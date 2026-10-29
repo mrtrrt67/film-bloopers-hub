@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { isTestAccount, isTestAccessType } from "@/lib/test-accounts";
 
 export async function GET(request: Request) {
   try {
@@ -25,6 +26,9 @@ export async function GET(request: Request) {
 
     // Mappa per risolvere gli username reali dei visitatori registrati
     const profileMap = new Map<string, string>();
+    const testPrefixes = new Set<string>();
+    testPrefixes.add(adminIdPrefix.toLowerCase());
+
     (profilesRes.data || []).forEach((p: any) => {
       const uName = p.username || p.email?.split("@")[0] || "Utente";
       if (p.id) {
@@ -34,18 +38,20 @@ export async function GET(request: Request) {
       if (p.email) {
         profileMap.set(p.email.toLowerCase(), uName);
       }
+
+      // Raccoglie i prefissi e username degli account di test/audit da escludere
+      if (isTestAccount(p.email, p.username)) {
+        if (p.id) {
+          testPrefixes.add(p.id.slice(0, 8).toLowerCase());
+          testPrefixes.add(p.id.toLowerCase());
+        }
+        if (p.username) testPrefixes.add(p.username.toLowerCase());
+        if (p.email) testPrefixes.add(p.email.toLowerCase());
+      }
     });
 
     const recentAccess = (accessRes.data || [])
-      .filter((a: any) => {
-        const t = (a.tipo || "").toLowerCase();
-        return (
-          !t.includes(adminIdPrefix) &&
-          !t.includes("mrtrrt67") &&
-          !t.includes(adminEmail) &&
-          t !== "admin"
-        );
-      })
+      .filter((a: any) => !isTestAccessType(a.tipo, testPrefixes))
       .map((a: any) => {
         const rawTipo = a.tipo || "ospite";
         if (rawTipo === "ospite") {
@@ -73,7 +79,8 @@ export async function GET(request: Request) {
           isGuest: false,
           username: resolvedUsername,
         };
-      });
+      })
+      .filter((a: any) => a.isGuest || !isTestAccount(null, a.username));
 
     return NextResponse.json({
       aiErrors: errRes.data || [],

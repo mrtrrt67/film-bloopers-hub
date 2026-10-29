@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isTestAccount, isTestAccessType } from "@/lib/test-accounts";
 
 export async function GET() {
   try {
@@ -25,16 +26,17 @@ export async function GET() {
 
     // 1. Metriche Utenti & Visite
     const [profilesRes, accessiRes, filmsRes] = await Promise.all([
-      adminDb.from("profiles").select("id, email, tier, calls_today, last_reset_date, tipo_abbonamento, subscription_type, data_scadenza, expires_at"),
+      adminDb.from("profiles").select("id, email, username, tier, calls_today, last_reset_date, tipo_abbonamento, subscription_type, data_scadenza, expires_at"),
       adminDb.from("log_accessi").select("tipo, created_at"),
       adminDb.from("films").select("id, titolo, anno, poster_url"),
     ]);
 
     const profiles = profilesRes.data || [];
-    const nonAdminProfiles = profiles.filter((p) => p.email?.toLowerCase() !== adminEmail);
-    const totalUsers = nonAdminProfiles.length;
+    // Esclude rigorosamente l'amministratore e tutti gli account di test/audit dalle metriche reali
+    const realProfiles = profiles.filter((p) => !isTestAccount(p.email, p.username));
+    const totalUsers = realProfiles.length;
 
-    const activePremiumUsers = nonAdminProfiles.filter((p) => {
+    const activePremiumUsers = realProfiles.filter((p) => {
       if (p.tier !== "premium") return false;
       const scad = p.data_scadenza || p.expires_at ? String(p.data_scadenza || p.expires_at).slice(0, 10) : null;
       const sub = p.tipo_abbonamento || p.subscription_type || "nessuno";
@@ -42,20 +44,32 @@ export async function GET() {
       return true;
     }).length;
 
-    const expiredUsers = nonAdminProfiles.filter((p) => {
+    const expiredUsers = realProfiles.filter((p) => {
       const scad = p.data_scadenza || p.expires_at ? String(p.data_scadenza || p.expires_at).slice(0, 10) : null;
       const sub = p.tipo_abbonamento || p.subscription_type || "nessuno";
       return (sub === "mensile" || sub === "annuale") && scad && scad < todayUtc;
     }).length;
 
-    const freeUsers = nonAdminProfiles.filter((p) => p.tier === "free" || !p.tier).length;
+    const freeUsers = realProfiles.filter((p) => p.tier === "free" || !p.tier).length;
 
-    // Filtra gli accessi dell'amministratore per non inquinare le statistiche di traffico
+    // Raccoglie identificatori e prefissi degli account di test per filtrare i log
+    const testPrefixes = new Set<string>();
+    testPrefixes.add(user.id.slice(0, 8).toLowerCase());
+    profiles.forEach((p) => {
+      if (isTestAccount(p.email, p.username)) {
+        if (p.id) {
+          testPrefixes.add(p.id.slice(0, 8).toLowerCase());
+          testPrefixes.add(p.id.toLowerCase());
+        }
+        if (p.username) testPrefixes.add(p.username.toLowerCase());
+        if (p.email) testPrefixes.add(p.email.toLowerCase());
+      }
+    });
     const adminIdPrefix = user.id.slice(0, 8);
-    const accessi = (accessiRes.data || []).filter((a: any) => 
-      !((a.tipo || "").toLowerCase().includes(adminIdPrefix) || (a.tipo || "").toLowerCase().includes("mrtrrt67") || (a.tipo || "").toLowerCase().includes(adminEmail)) && 
-      a.tipo?.toLowerCase() !== "admin"
-    );
+    const accessi = (accessiRes.data || []).filter((a: any) => !isTestAccessType(a.tipo, testPrefixes));
+
+
+
     const totalVisits = accessi.length;
     const todayVisits = accessi.filter((a) => isToday(a.created_at)).length;
     const guestVisits = accessi.filter((a) => a.tipo === "ospite").length;
@@ -171,6 +185,8 @@ export async function GET() {
     void adminDb.from("log_accessi").delete().ilike("tipo", `%${adminIdPrefix}%`);
     void adminDb.from("log_accessi").delete().ilike("tipo", `%mrtrrt67%`);
     void adminDb.from("log_accessi").delete().ilike("tipo", `%${adminEmail}%`);
+    void adminDb.from("log_accessi").delete().ilike("tipo", `audit_%`);
+    void adminDb.from("log_accessi").delete().ilike("tipo", `test_%`);
 
     const searchesToday = filteredSearches.filter((r) => isToday(r.created_at));
     const searchesTodayCount = searchesToday.length;

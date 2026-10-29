@@ -134,7 +134,7 @@ export default function AdminUsersTab() {
   const filtered = profiles.filter((p) => {
     if (!filterQuery.trim()) return true;
     const term = filterQuery.toLowerCase();
-    return (p.email || "").toLowerCase().includes(term) || (p.tier || "").toLowerCase().includes(term);
+    return (p.email || "").toLowerCase().includes(term) || (p.tier || "").toLowerCase().includes(term) || (p.username || "").toLowerCase().includes(term);
   });
 
   return (
@@ -226,6 +226,11 @@ export default function AdminUsersTab() {
                             @{profile.username || (profile.email ? profile.email.split("@")[0] : "utente")}
                           </p>
                           <span className="text-[11px] text-zinc-400 font-mono">({profile.email || "N/D"})</span>
+                          {profile.is_test && !profile.is_admin && (
+                            <span className="rounded-full bg-purple-500/20 px-2 py-0.5 text-[10px] font-bold uppercase text-purple-300 border border-purple-500/40">
+                              TEST
+                            </span>
+                          )}
                           {profile.is_admin && (
                             <span className="rounded-full bg-amber-400/20 px-2 py-0.5 text-[10px] font-black uppercase text-amber-300 border border-amber-400/40">
                               ADMIN

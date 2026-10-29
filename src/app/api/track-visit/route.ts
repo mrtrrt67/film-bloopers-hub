@@ -1,16 +1,15 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { isTestAccount } from "@/lib/test-accounts";
 
 export async function POST() {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
-    const adminEmail = (process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL || "mrtrrt67@gmail.com").toLowerCase();
-
-    // Ignora categoricamente qualsiasi visita dell'amministratore
-    if (user && (user.email?.toLowerCase() === adminEmail || user.email?.toLowerCase().includes("mrtrrt67"))) {
+    // Ignora categoricamente visite dell'amministratore e di qualsiasi utente di test
+    if (user && isTestAccount(user.email, user.user_metadata?.username)) {
       return NextResponse.json({ ok: true, ignored: true });
     }
 
@@ -26,6 +25,10 @@ export async function POST() {
         .select("username")
         .eq("id", user.id)
         .maybeSingle();
+
+      if (isTestAccount(user.email, prof?.username)) {
+        return NextResponse.json({ ok: true, ignored: true });
+      }
 
       const username =
         prof?.username ||
