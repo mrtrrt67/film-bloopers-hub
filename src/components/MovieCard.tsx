@@ -5,7 +5,11 @@ import { Film } from "@/lib/types";
 import { slugify } from "@/lib/utils";
 
 interface MovieCardProps {
-  film: Film & { bloopers_count?: number; trivia_count?: number };
+  film: Film & {
+    bloopers_count?: number;
+    trivia_count?: number;
+    recommendationReason?: string;
+  };
 }
 
 export default function MovieCard({ film }: MovieCardProps) {
@@ -40,6 +44,13 @@ export default function MovieCard({ film }: MovieCardProps) {
 
         {/* Gradient Overlay */}
         <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+
+        {/* Recommendation Reason Badge */}
+        {film.recommendationReason && (
+          <span className="absolute top-2.5 left-2.5 z-10 max-w-[70%] truncate rounded-md bg-amber-500 text-zinc-950 px-2 py-0.5 text-[10px] font-black uppercase tracking-wider shadow-md">
+            {film.recommendationReason}
+          </span>
+        )}
 
         {/* Year Badge */}
         {film.anno && (

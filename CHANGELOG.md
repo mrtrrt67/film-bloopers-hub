@@ -31,6 +31,11 @@ Questa release segna il consolidamento stabile della piattaforma Next.js 16 con 
   - Pulsante flottante permanente per la revisione del consenso.
 
 - **SEO & Search Console**:
+- **Motore di Raccomandazione SEO "Potrebbero piacerti anche" (`src/lib/recommendations.ts`)**:
+  - Algoritmo oggettivo di correlazione cinematografica multi-fattoriale: saghe e franchise (+80 pt), stesso regista (+50 pt), attori condivisi (+15 pt/attore), generi in comune (+10 pt/genere) e decade affine (+5 pt).
+  - Cache in-memory del catalogo con risposta istantanea (<1ms) e zero carico sul DB.
+  - Sezione dedicata con 5 film correlati, badge esplicativi di affinità ("Stessa saga", "Regia: ...", "Genere affine") e internal linking ottimizzato per la scansione dei crawler.
+
 - **Favicon & Google Search Branding**:
   - Adozione del pacchetto favicon ad alta risoluzione conforme alle linee guida di Google Search (multipli di 48px: 192x192, 512x512, ico e apple-touch-icon).
   - Configurazione completa in public/ e routing nativo App Router (src/app/icon.png, src/app/apple-icon.png, src/app/favicon.ico).

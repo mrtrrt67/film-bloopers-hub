@@ -16,6 +16,7 @@ import { Film, Blooper, MovieTrivia } from "@/lib/types";
 import MovieCard from "@/components/MovieCard";
 import { getAmazonSearchUrl, getYouTubeSearchUrl, slugify } from "@/lib/utils";
 import FilmContentSwitcher from "@/components/FilmContentSwitcher";
+import { getRelatedFilms } from "@/lib/recommendations";
 
 export const dynamic = "force-dynamic";
 
@@ -65,19 +66,8 @@ async function getFilmData(slug: string) {
     return null;
   }
 
-  // Query congiunta per Bloopers, Curiosità e Film Correlati
-  const firstGenre = (targetFilm.genere || "").split(/[,/]/)[0].trim();
-
-  let relatedQuery = supabase
-    .from("films")
-    .select("*, errori(count), movie_trivia(count)")
-    .neq("id", targetFilm.id);
-
-  if (firstGenre) {
-    relatedQuery = relatedQuery.ilike("genere", `%${firstGenre}%`);
-  }
-
-  const [bloopersRes, triviaRes, relatedRes] = await Promise.all([
+  // Query congiunta per Bloopers, Curiosità e Film Correlati ad Alta Affinità (Motore di Raccomandazione SEO)
+  const [bloopersRes, triviaRes, relatedFilms] = await Promise.all([
     supabase
       .from("errori")
       .select("*, voti_bloopers(tipo, user_id)")
@@ -90,40 +80,8 @@ async function getFilmData(slug: string) {
       .eq("approvato", true)
       .order("ordine", { ascending: true })
       .order("created_at", { ascending: false }),
-    relatedQuery
-      .order("creato_il", { ascending: false })
-      .limit(4),
+    getRelatedFilms(targetFilm, 5),
   ]);
-
-  let relatedFilms = (relatedRes.data || []).map((f: any) => ({
-    ...f,
-    bloopers_count: f.errori?.[0]?.count ?? (Array.isArray(f.errori) ? f.errori.length : 0),
-    trivia_count: f.movie_trivia?.[0]?.count ?? (Array.isArray(f.movie_trivia) ? f.movie_trivia.length : 0),
-  }));
-
-  // Se i film correlati per genere sono meno di 4, integra con i più recenti
-  if (relatedFilms.length < 4) {
-    const { data: fallbackRecent } = await supabase
-      .from("films")
-      .select("*, errori(count), movie_trivia(count)")
-      .neq("id", targetFilm.id)
-      .order("creato_il", { ascending: false })
-      .limit(4);
-
-    const fallbackList = (fallbackRecent as any[]) || [];
-    if (fallbackList.length > 0) {
-      const existingIds = new Set(relatedFilms.map((r: any) => r.id));
-      for (const f of fallbackList) {
-        if (!existingIds.has(f.id) && relatedFilms.length < 4) {
-          relatedFilms.push({
-            ...f,
-            bloopers_count: f.errori?.[0]?.count ?? (Array.isArray(f.errori) ? f.errori.length : 0),
-            trivia_count: f.movie_trivia?.[0]?.count ?? (Array.isArray(f.movie_trivia) ? f.movie_trivia.length : 0),
-          });
-        }
-      }
-    }
-  }
 
   return {
     film: targetFilm,
@@ -561,11 +519,14 @@ export default async function FilmDetailPage({ params }: PageProps) {
                 <div className="mt-16 pt-10 border-t border-zinc-800/80">
                   <div className="flex items-center justify-between mb-6">
                     <div>
-                      <h2 className="text-xl sm:text-2xl font-black text-white">
-                        Altri Film con Bloopers & Curiosità
-                      </h2>
-                      <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-                        Continua ad esplorare gli errori e i retroscena cinematografici nel nostro archivio.
+                      <div className="flex items-center gap-2 mb-1">
+                        <Sparkles className="h-5 w-5 text-amber-400 shrink-0" />
+                        <h2 className="text-xl sm:text-2xl font-black text-white">
+                          Potrebbero piacerti anche:
+                        </h2>
+                      </div>
+                      <p className="text-xs sm:text-sm text-zinc-400">
+                        Pellicole affini consigliate per regia, saga cinematografica, cast e genere.
                       </p>
                     </div>
                     <Link
@@ -577,7 +538,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
                     </Link>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
                     {relatedFilms.map((f: any) => (
                       <MovieCard key={f.id} film={f} />
                     ))}
