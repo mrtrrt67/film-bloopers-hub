@@ -14,6 +14,20 @@ let cachedFilms: ScoredFilm[] | null = null;
 let lastCacheTime = 0;
 const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minuti di persistenza in-memory
 
+
+function extractCount(field: any): number {
+  if (!field) return 0;
+  if (typeof field === "number") return field;
+  if (Array.isArray(field)) {
+    if (field.length > 0 && typeof field[0]?.count === "number") {
+      return field[0].count;
+    }
+    return field.length;
+  }
+  if (typeof field?.count === "number") return field.count;
+  return 0;
+}
+
 function normalize(str: string | null | undefined): string {
   return (str || "")
     .toLowerCase()
@@ -192,8 +206,8 @@ async function getCatalog(): Promise<ScoredFilm[]> {
 
   cachedFilms = (data as any[]).map((f) => ({
     ...f,
-    bloopers_count: f.errori?.[0]?.count ?? (Array.isArray(f.errori) ? f.errori.length : 0),
-    trivia_count: f.movie_trivia?.[0]?.count ?? (Array.isArray(f.movie_trivia) ? f.movie_trivia.length : 0),
+    bloopers_count: extractCount(f.errori),
+    trivia_count: extractCount(f.movie_trivia),
   }));
 
   lastCacheTime = now;

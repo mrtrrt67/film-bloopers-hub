@@ -31,6 +31,11 @@ Questa release segna il consolidamento stabile della piattaforma Next.js 16 con 
   - Pulsante flottante permanente per la revisione del consenso.
 
 - **SEO & Search Console**:
+- **Sincronizzazione Live Conteggi Bloopers & Curiosità Home/Esplora**:
+  - Passaggio della Homepage (`src/app/page.tsx`) a rendering dinamico real-time (`force-dynamic`) con caricamento parallelo in `Promise.all`.
+  - Risolto il disallineamento generato dalla precedente cache statica/ISR durante l'importazione di nuovi film.
+  - Nuovo helper universale `extractCount` in Home, Catalogo Esplora e Raccomandazioni per mappare con precisione sia array che oggetti PostgREST.
+
 - **Motore di Raccomandazione SEO "Potrebbero piacerti anche" (`src/lib/recommendations.ts`)**:
   - Algoritmo oggettivo di correlazione cinematografica multi-fattoriale: saghe e franchise (+80 pt), stesso regista (+50 pt), attori condivisi (+15 pt/attore), generi in comune (+10 pt/genere) e decade affine (+5 pt).
   - Cache in-memory del catalogo con risposta istantanea (<1ms) e zero carico sul DB.

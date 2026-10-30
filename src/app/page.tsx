@@ -6,18 +6,44 @@ import PromoBanner from "@/components/PromoBanner";
 import BlooperItem from "@/components/BlooperItem";
 import { Film, Blooper } from "@/lib/types";
 
-export const revalidate = 60; // ISR ogni 60 secondi
+export const dynamic = "force-dynamic";
+function extractCount(field: any): number {
+  if (!field) return 0;
+  if (typeof field === "number") return field;
+  if (Array.isArray(field)) {
+    if (field.length > 0 && typeof field[0]?.count === "number") {
+      return field[0].count;
+    }
+    return field.length;
+  }
+  if (typeof field?.count === "number") return field.count;
+  return 0;
+}
+
 
 export default async function HomePage() {
   const supabase = createPublicClient();
 
-  // 1. Configurazioni dinamiche
-  const { data: configRows } = await supabase
-    .from("configurazioni")
-    .select("chiave, valore, visibile");
+  // Caricamento parallelo ad alte prestazioni e dati in tempo reale
+  const [
+    configRes,
+    filmsRes,
+    recentBloopersRes,
+    filmsCountRes,
+    bloopersCountRes,
+    triviaCountRes,
+  ] = await Promise.all([
+    supabase.from("configurazioni").select("chiave, valore, visibile"),
+    supabase.from("films").select("*, errori(count), movie_trivia(count)").order("creato_il", { ascending: false }).limit(8),
+    supabase.from("errori").select("*, films(titolo, anno, id), voti_bloopers(tipo)").eq("approvato", true).order("creato_il", { ascending: false }).limit(4),
+    supabase.from("films").select("*", { count: "exact", head: true }),
+    supabase.from("errori").select("*", { count: "exact", head: true }).eq("approvato", true),
+    supabase.from("movie_trivia").select("*", { count: "exact", head: true }).eq("approvato", true),
+  ]);
 
+  // 1. Configurazioni dinamiche
   const conf: Record<string, string> = {};
-  (configRows || []).forEach((c: any) => {
+  (configRes.data || []).forEach((c: any) => {
     conf[c.chiave] = c.valore;
   });
 
@@ -27,28 +53,15 @@ export default async function HomePage() {
   const bannerBadge = conf["home_banner_top_badge"];
   const promoDeadline = conf["promo_lifetime_deadline"] || "2026-12-31";
 
-  // 2. Film in evidenza (con conteggio errori e curiosità)
-  const { data: filmsRaw } = await supabase
-    .from("films")
-    .select("*, errori(count), movie_trivia(count)")
-    .order("creato_il", { ascending: false })
-    .limit(8);
-
-  const featuredFilms: (Film & { bloopers_count?: number; trivia_count?: number })[] = (filmsRaw || []).map((f: any) => ({
+  // 2. Film in evidenza (con conteggio errori e curiosità accurati al 100%)
+  const featuredFilms: (Film & { bloopers_count?: number; trivia_count?: number })[] = (filmsRes.data || []).map((f: any) => ({
     ...f,
-    bloopers_count: f.errori?.[0]?.count ?? (Array.isArray(f.errori) ? f.errori.length : 0),
-    trivia_count: f.movie_trivia?.[0]?.count ?? (Array.isArray(f.movie_trivia) ? f.movie_trivia.length : 0),
+    bloopers_count: extractCount(f.errori),
+    trivia_count: extractCount(f.movie_trivia),
   }));
 
   // 3. Ultimi bloopers approvati
-  const { data: recentBloopersRaw } = await supabase
-    .from("errori")
-    .select("*, films(titolo, anno, id), voti_bloopers(tipo)")
-    .eq("approvato", true)
-    .order("creato_il", { ascending: false })
-    .limit(4);
-
-  const recentBloopers = (recentBloopersRaw || []).map((b: any) => {
+  const recentBloopers = (recentBloopersRes.data || []).map((b: any) => {
     const voti = b.voti_bloopers || [];
     const conferme = voti.filter((v: any) => v.tipo === "conferma").length;
     const contestazioni = voti.filter((v: any) => v.tipo === "contestazione").length;
@@ -60,19 +73,9 @@ export default async function HomePage() {
   });
 
   // 4. Statistiche Archivio
-  const { count: countFilms } = await supabase
-    .from("films")
-    .select("*", { count: "exact", head: true });
-
-  const { count: countBloopers } = await supabase
-    .from("errori")
-    .select("*", { count: "exact", head: true })
-    .eq("approvato", true);
-
-  const { count: countTrivia } = await supabase
-    .from("movie_trivia")
-    .select("*", { count: "exact", head: true })
-    .eq("approvato", true);
+  const countFilms = filmsCountRes.count ?? 0;
+  const countBloopers = bloopersCountRes.count ?? 0;
+  const countTrivia = triviaCountRes.count ?? 0;
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://filmbloopers.online";
 

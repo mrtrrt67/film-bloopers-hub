@@ -10,6 +10,20 @@ import { Film, TMDBMovieResult } from "@/lib/types";
 import MovieCard from "@/components/MovieCard";
 import { slugify } from "@/lib/utils";
 
+
+function extractCount(field: any): number {
+  if (!field) return 0;
+  if (typeof field === "number") return field;
+  if (Array.isArray(field)) {
+    if (field.length > 0 && typeof field[0]?.count === "number") {
+      return field[0].count;
+    }
+    return field.length;
+  }
+  if (typeof field?.count === "number") return field.count;
+  return 0;
+}
+
 export default function EsploraPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [dbFilms, setDbFilms] = useState<(Film & { bloopers_count?: number; trivia_count?: number })[]>([]);
@@ -33,8 +47,8 @@ export default function EsploraPage() {
         if (films) {
           const mapped = films.map((f: any) => ({
             ...f,
-            bloopers_count: f.errori?.[0]?.count ?? (Array.isArray(f.errori) ? f.errori.length : 0),
-            trivia_count: f.movie_trivia?.[0]?.count ?? (Array.isArray(f.movie_trivia) ? f.movie_trivia.length : 0),
+            bloopers_count: extractCount(f.errori),
+            trivia_count: extractCount(f.movie_trivia),
           }));
           setDbFilms(mapped);
         }
