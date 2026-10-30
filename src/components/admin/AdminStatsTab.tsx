@@ -26,6 +26,7 @@ import {
   ShieldAlert
 } from "lucide-react";
 import AdminPagination from "./AdminPagination";
+import AdminIndexNowCard from "./AdminIndexNowCard";
 
 interface AdminStatsTabProps {
   onNavigateToFilms?: (filter?: string) => void;
@@ -343,6 +344,9 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
           </div>
         </div>
       )}
+
+      {/* CARD INDICIZZAZIONE BING / INDEXNOW */}
+      <AdminIndexNowCard />
 
       {/* 2 COLONNE: RICERCHE & BLOOPERS PIÙ VOTATI */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
