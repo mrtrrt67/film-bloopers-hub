@@ -15,15 +15,23 @@ interface StreamingAvailabilityCardProps {
  * Genera il link diretto e ufficiale alla pagina/app del provider per avviare il film.
  */
 export function getPlatformWatchUrl(
-  name: string,
+  provider: WatchProviderItem,
   title: string,
-  amazonTag = "filmbloopers-21"
+  amazonTag = "filmbloopers-21",
+  primeDirectUrl?: string | null
 ): string {
+  // 1. Se JustWatch ha fornito il deep-link diretto al film, usiamolo direttamente!
+  if (provider.directUrl) {
+    return provider.directUrl;
+  }
+
+  const name = provider.name;
   const lower = name.toLowerCase();
   const q = encodeURIComponent(title);
 
-  // Prime Video: link diretto al catalogo streaming di primevideo.com
+  // Prime Video: se c'è un primeDirectUrl usalo, altrimenti fallback con ricerca Prime Video
   if (lower.includes("prime") || lower.includes("amazon")) {
+    if (primeDirectUrl) return primeDirectUrl;
     return `https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${q}&tag=${amazonTag}`;
   }
   // Paramount+
@@ -177,9 +185,10 @@ export function StreamingAvailabilityCard({
             <div className="flex flex-col gap-2">
               {flatrate.map((provider) => {
                 const watchUrl = getPlatformWatchUrl(
-                  provider.name,
+                  provider,
                   filmTitle,
-                  amazonTag
+                  amazonTag,
+                  streaming?.primeVideoDirectUrl
                 );
                 const brand = getProviderBrandStyle(provider.name);
                 const isPrime =
@@ -247,9 +256,10 @@ export function StreamingAvailabilityCard({
             <div className="flex flex-col gap-2">
               {rentOrBuy.map((provider) => {
                 const watchUrl = getPlatformWatchUrl(
-                  provider.name,
+                  provider,
                   filmTitle,
-                  amazonTag
+                  amazonTag,
+                  streaming?.primeVideoDirectUrl
                 );
                 const brand = getProviderBrandStyle(provider.name);
                 const isPrime =
@@ -396,9 +406,10 @@ export function StreamingAvailabilityCard({
 
             {flatrate.map((provider) => {
               const watchUrl = getPlatformWatchUrl(
-                provider.name,
+                provider,
                 filmTitle,
-                amazonTag
+                amazonTag,
+                streaming?.primeVideoDirectUrl
               );
               const brand = getProviderBrandStyle(provider.name);
               const isPrime =
@@ -455,9 +466,10 @@ export function StreamingAvailabilityCard({
 
             {rentOrBuy.map((provider) => {
               const watchUrl = getPlatformWatchUrl(
-                provider.name,
+                provider,
                 filmTitle,
-                amazonTag
+                amazonTag,
+                streaming?.primeVideoDirectUrl
               );
               const brand = getProviderBrandStyle(provider.name);
               const isPrime =

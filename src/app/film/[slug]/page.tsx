@@ -394,7 +394,11 @@ export default async function FilmDetailPage({ params }: PageProps) {
             {/* Azioni Esterne Mobile (compatte su 3 colonne con IMDb) */}
             <div className="grid grid-cols-3 gap-1.5 pt-1">
               <a
-                href={ratingInfo?.streaming?.isOnPrimeVideo ? primeVideoUrl : amazonUrl}
+                href={
+                  ratingInfo?.streaming?.isOnPrimeVideo
+                    ? ratingInfo?.streaming?.primeVideoDirectUrl || primeVideoUrl
+                    : amazonUrl
+                }
                 target="_blank"
                 rel="sponsored noopener noreferrer"
                 className="flex items-center justify-center gap-1 rounded-xl bg-zinc-900/90 border border-zinc-800 hover:border-amber-500/50 py-2 px-1 text-[10px] font-bold text-zinc-200 transition-all shadow-sm"

@@ -38,6 +38,7 @@ Questa release segna il consolidamento stabile della piattaforma Next.js 16 con 
     - Se assente da Prime Video: Hero CTA dedicata per trovare l'Edizione Fisica da collezione (DVD, Blu-ray & Steelbook 4K) su Amazon.
   - Sezione informativa con badge ufficiali ad alta risoluzione per le piattaforme attive in abbonamento in Italia (Paramount+, Netflix, Disney+, Now, Apple TV, ecc.).
   - Pulsanti di riproduzione diretta in stile IMDb: apertura immediata su `primevideo.com` (o app Prime Video) per avviare il film, e deep-link per avviare lo streaming su Paramount+, Netflix, Disney+, Apple TV e Now.
+  - Deep-link ufficiali diretti Prime Video & JustWatch: estrazione in tempo reale tramite JustWatch GraphQL dell'URL diretto del film (`gti` / `standardWebURL`), consentendo all'utente di atterrare direttamente sul player del titolo anziché nella pagina di ricerca.
   - Interfaccia grafica curata sia per Desktop (card dedicata nella barra laterale sotto la locandina) che per Mobile (card responsive compatta ed elegante sopra i bloopers).
 
 - **Valutazione Cinematografica & Badge Ufficiale IMDb (`src/lib/tmdb.ts`, `src/app/film/[slug]/page.tsx`)**:

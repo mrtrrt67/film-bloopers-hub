@@ -1,4 +1,5 @@
 import { TMDBMovieDetails, TMDBMovieResult, FilmRatingInfo, FilmStreamingInfo, WatchProviderItem } from "./types";
+import { fetchJustWatchDirectOffers, JWDirectOffers } from "./justwatch";
 
 const TMDB_API_BASE = "https://api.themoviedb.org/3";
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p";
@@ -429,39 +430,62 @@ export async function fetchDetailsForMovie(
 
 
 /**
- * Estrae e struttura le piattaforme di streaming attive in Italia per un film/serie da TMDB.
+ * Estrae e struttura le piattaforme di streaming attive in Italia per un film/serie da TMDB
+ * integrandole con i deep-link ufficiali JustWatch per avviare direttamente il film.
  */
-export function parseStreamingProviders(details: any): FilmStreamingInfo | null {
-  if (!details) return null;
+export function parseStreamingProviders(
+  details: any,
+  jwOffers?: JWDirectOffers | null
+): FilmStreamingInfo | null {
+  if (!details && !jwOffers) return null;
 
-  const wp = details["watch/providers"] || details.watch_providers || details.watchProviders;
+  const wp =
+    details?.["watch/providers"] ||
+    details?.watch_providers ||
+    details?.watchProviders;
   const itData = wp?.results?.IT || wp?.results?.it;
-  if (!itData) return null;
 
-  const rawFlatrate: any[] = Array.isArray(itData.flatrate) ? itData.flatrate : [];
-  const rawRent: any[] = Array.isArray(itData.rent) ? itData.rent : [];
-  const rawBuy: any[] = Array.isArray(itData.buy) ? itData.buy : [];
+  const rawFlatrate: any[] = Array.isArray(itData?.flatrate) ? itData.flatrate : [];
+  const rawRent: any[] = Array.isArray(itData?.rent) ? itData.rent : [];
+  const rawBuy: any[] = Array.isArray(itData?.buy) ? itData.buy : [];
 
   const isAmazonProvider = (p: any): boolean => {
     const name = (p.provider_name || "").toLowerCase();
     const id = Number(p.provider_id);
     return (
       id === 119 || // Amazon Prime Video
-      id === 10 ||  // Amazon Video
-      id === 9 ||   // Amazon
+      id === 10 || // Amazon Video
+      id === 9 || // Amazon
       name.includes("amazon") ||
       name.includes("prime video")
     );
   };
 
   const isPrimeFlatrate = rawFlatrate.some(isAmazonProvider);
-  const isPrimeRentBuy = rawRent.some(isAmazonProvider) || rawBuy.some(isAmazonProvider);
-  const isOnPrimeVideo = isPrimeFlatrate || isPrimeRentBuy;
+  const isPrimeRentBuy =
+    rawRent.some(isAmazonProvider) || rawBuy.some(isAmazonProvider);
+  const isOnPrimeVideo =
+    isPrimeFlatrate || isPrimeRentBuy || Boolean(jwOffers?.primeDirectUrl);
+
+  const getDirectUrlForProvider = (name: string): string | null => {
+    const lower = name.toLowerCase();
+    if (lower.includes("prime") || lower.includes("amazon")) {
+      return jwOffers?.primeDirectUrl || null;
+    }
+    if (!jwOffers?.directUrlsByPlatform) return null;
+    for (const [key, url] of jwOffers.directUrlsByPlatform.entries()) {
+      if (lower.includes(key) || key.includes(lower)) {
+        return url;
+      }
+    }
+    return null;
+  };
 
   const formatItem = (p: any): WatchProviderItem => ({
     id: p.provider_id,
     name: p.provider_name || "Streaming",
     logoUrl: p.logo_path ? `https://image.tmdb.org/t/p/w92${p.logo_path}` : null,
+    directUrl: getDirectUrlForProvider(p.provider_name || ""),
   });
 
   // Flatrate providers (abbonamento)
@@ -488,17 +512,18 @@ export function parseStreamingProviders(details: any): FilmStreamingInfo | null 
     isOnPrimeVideo,
     isPrimeFlatrate,
     isPrimeRentBuy,
+    primeVideoDirectUrl: jwOffers?.primeDirectUrl || null,
     flatrate,
     rentOrBuy,
-    justWatchLink: itData.link || null,
+    justWatchLink: itData?.link || null,
   };
 }
 
 const ratingCache = new Map<string, FilmRatingInfo>();
 
 /**
- * Recupera la valutazione cinematografica (su base 10), il conteggio voti
- * e l'ID/link ufficiale IMDb per una pellicola tramite TMDB.
+ * Recupera la valutazione cinematografica (su base 10), il conteggio voti,
+ * l'ID/link ufficiale IMDb e la disponibilità streaming con deep-link per una pellicola.
  */
 export async function getFilmRatingInfo(
   title: string,
@@ -508,7 +533,9 @@ export async function getFilmRatingInfo(
 ): Promise<FilmRatingInfo | null> {
   if (!title && !tmdbId) return null;
   const cleanTitle = (title || "").trim();
-  const cacheKey = tmdbId ? `id_${tmdbId}` : `${cleanTitle.toLowerCase()}_${year || ""}`;
+  const cacheKey = tmdbId
+    ? `id_${tmdbId}`
+    : `${cleanTitle.toLowerCase()}_${year || ""}`;
 
   if (ratingCache.has(cacheKey)) {
     return ratingCache.get(cacheKey)!;
@@ -532,12 +559,19 @@ export async function getFilmRatingInfo(
 
     // 2. Se non avevamo tmdbId o la chiamata diretta non ha trovato nulla, cerchiamo per titolo
     if (!details && cleanTitle) {
-      const candidates = await searchTMDBMovies(cleanTitle, year || undefined, 1, overrideApiKey);
+      const candidates = await searchTMDBMovies(
+        cleanTitle,
+        year || undefined,
+        1,
+        overrideApiKey
+      );
       if (candidates && candidates.length > 0) {
         let best = candidates[0];
         if (year) {
           const yearStr = String(year);
-          const matchYear = candidates.find((c) => c.release_date?.startsWith(yearStr));
+          const matchYear = candidates.find((c) =>
+            c.release_date?.startsWith(yearStr)
+          );
           if (matchYear) best = matchYear;
         }
 
@@ -548,8 +582,12 @@ export async function getFilmRatingInfo(
             details = await getTMDBMovieDetails(best.id, overrideApiKey);
             if (details) {
               if (details.imdb_id) imdbId = details.imdb_id;
-              if (typeof details.vote_count === "number") voteCount = details.vote_count;
-              if (typeof details.vote_average === "number" && details.vote_average > 0) {
+              if (typeof details.vote_count === "number")
+                voteCount = details.vote_count;
+              if (
+                typeof details.vote_average === "number" &&
+                details.vote_average > 0
+              ) {
                 voteAverage = details.vote_average;
               }
             }
@@ -564,8 +602,14 @@ export async function getFilmRatingInfo(
       return null;
     }
 
-    const streaming = details ? parseStreamingProviders(details) : null;
-    const finalRating = typeof voteAverage === "number" ? Math.round(voteAverage * 10) / 10 : 0;
+    // Recupera offerte dirette JustWatch (Deep-Link ufficiali al player)
+    const titleForJW = cleanTitle || (details ? details.title : "");
+    const jwOffers = await fetchJustWatchDirectOffers(titleForJW, year);
+
+    const streaming =
+      details || jwOffers ? parseStreamingProviders(details, jwOffers) : null;
+    const finalRating =
+      typeof voteAverage === "number" ? Math.round(voteAverage * 10) / 10 : 0;
 
     const imdbUrl = imdbId
       ? `https://www.imdb.com/title/${imdbId}/`

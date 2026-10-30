@@ -128,12 +128,14 @@ export interface WatchProviderItem {
   id: number;
   name: string;
   logoUrl: string | null;
+  directUrl?: string | null;
 }
 
 export interface FilmStreamingInfo {
   isOnPrimeVideo: boolean;
   isPrimeFlatrate: boolean;
   isPrimeRentBuy: boolean;
+  primeVideoDirectUrl?: string | null;
   flatrate: WatchProviderItem[];
   rentOrBuy: WatchProviderItem[];
   justWatchLink?: string | null;
