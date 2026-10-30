@@ -31,6 +31,11 @@ Questa release segna il consolidamento stabile della piattaforma Next.js 16 con 
   - Pulsante flottante permanente per la revisione del consenso.
 
 - **SEO & Search Console**:
+- **Favicon & Google Search Branding**:
+  - Adozione del pacchetto favicon ad alta risoluzione conforme alle linee guida di Google Search (multipli di 48px: 192x192, 512x512, ico e apple-touch-icon).
+  - Configurazione completa in public/ e routing nativo App Router (src/app/icon.png, src/app/apple-icon.png, src/app/favicon.ico).
+  - Aggiornamento di manifest.webmanifest e site.webmanifest con branding coordinato.
+
   - Integrazione nativa IndexNow (Microsoft Bing, Yandex, Seznam, Naver) con chiave di verifica pubblica `b3106037cdfc4d729c7eac554ef4fb55.txt`.
   - Servizio centralizzato `src/lib/indexnow.ts` con tracciamento differenziale delle pagine già inviate e invio mirato solo delle URL mancanti.
   - Nuova API `src/app/api/admin/indexnow` e card interattiva `AdminIndexNowCard` con contatori in tempo reale (Pagine Totali, Già Inviate, Mancanti) e sottomissione incrementale con un clic.
