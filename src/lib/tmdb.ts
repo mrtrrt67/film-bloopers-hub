@@ -1,4 +1,4 @@
-import { TMDBMovieDetails, TMDBMovieResult } from "./types";
+import { TMDBMovieDetails, TMDBMovieResult, FilmRatingInfo } from "./types";
 
 const TMDB_API_BASE = "https://api.themoviedb.org/3";
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p";
@@ -425,3 +425,76 @@ export async function fetchDetailsForMovie(
   return null;
 }
 
+
+
+const ratingCache = new Map<string, FilmRatingInfo>();
+
+/**
+ * Recupera la valutazione cinematografica (su base 10), il conteggio voti
+ * e l'ID/link ufficiale IMDb per una pellicola tramite TMDB.
+ */
+export async function getFilmRatingInfo(
+  title: string,
+  year?: string | number | null
+): Promise<FilmRatingInfo | null> {
+  if (!title) return null;
+  const cleanTitle = title.trim();
+  const cacheKey = `${cleanTitle.toLowerCase()}_${year || ""}`;
+
+  if (ratingCache.has(cacheKey)) {
+    return ratingCache.get(cacheKey)!;
+  }
+
+  try {
+    const candidates = await searchTMDBMovies(cleanTitle, year || undefined);
+    if (!candidates || candidates.length === 0) {
+      return null;
+    }
+
+    // Seleziona il candidato più accurato: corrispondenza per anno se specificato
+    let best = candidates[0];
+    if (year) {
+      const yearStr = String(year);
+      const matchYear = candidates.find((c) => c.release_date?.startsWith(yearStr));
+      if (matchYear) best = matchYear;
+    }
+
+    if (!best || typeof best.vote_average !== "number" || best.vote_average <= 0) {
+      return null;
+    }
+
+    // Recupera l'imdb_id dai dettagli del film
+    let imdbId: string | null = null;
+    let voteCount: number | undefined = (best as any).vote_count;
+
+    try {
+      const details = await getTMDBMovieDetails(best.id);
+      if (details) {
+        if (details.imdb_id) imdbId = details.imdb_id;
+        if (typeof details.vote_count === "number") voteCount = details.vote_count;
+        if (typeof details.vote_average === "number" && details.vote_average > 0) {
+          best.vote_average = details.vote_average;
+        }
+      }
+    } catch {
+      // Usa i dati della ricerca base
+    }
+
+    const imdbUrl = imdbId
+      ? `https://www.imdb.com/title/${imdbId}/`
+      : `https://www.imdb.com/find/?q=${encodeURIComponent(cleanTitle)}`;
+
+    const info: FilmRatingInfo = {
+      rating: Math.round(best.vote_average * 10) / 10,
+      voteCount,
+      imdbId,
+      imdbUrl,
+    };
+
+    ratingCache.set(cacheKey, info);
+    return info;
+  } catch (err) {
+    console.error("Errore recupero valutazione film:", err);
+    return null;
+  }
+}

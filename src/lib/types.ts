@@ -107,6 +107,8 @@ export interface TMDBMovieResult {
 
 export interface TMDBMovieDetails extends TMDBMovieResult {
   runtime?: number;
+  imdb_id?: string | null;
+  vote_count?: number;
   genres?: { id: number; name: string }[];
   belongs_to_collection?: {
     id: number;
@@ -118,4 +120,11 @@ export interface TMDBMovieDetails extends TMDBMovieResult {
     cast: { id: number; name: string; character: string; profile_path?: string }[];
     crew: { id: number; name: string; job: string }[];
   };
+}
+
+export interface FilmRatingInfo {
+  rating: number;
+  voteCount?: number;
+  imdbId?: string | null;
+  imdbUrl: string;
 }

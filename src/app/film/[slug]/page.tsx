@@ -9,14 +9,17 @@ import {
   ArrowLeft,
   ArrowRight,
   Sparkles,
-  AlertCircle
+  AlertCircle,
+  Star,
+  ExternalLink
 } from "lucide-react";
 import { createPublicClient } from "@/lib/supabase/public";
-import { Film, Blooper, MovieTrivia } from "@/lib/types";
+import { Film, Blooper, MovieTrivia, FilmRatingInfo } from "@/lib/types";
 import MovieCard from "@/components/MovieCard";
 import { getAmazonSearchUrl, getYouTubeSearchUrl, slugify } from "@/lib/utils";
 import FilmContentSwitcher from "@/components/FilmContentSwitcher";
 import { getRelatedFilms } from "@/lib/recommendations";
+import { getFilmRatingInfo } from "@/lib/tmdb";
 
 export const dynamic = "force-dynamic";
 
@@ -66,8 +69,8 @@ async function getFilmData(slug: string) {
     return null;
   }
 
-  // Query congiunta per Bloopers, Curiosità e Film Correlati ad Alta Affinità (Motore di Raccomandazione SEO)
-  const [bloopersRes, triviaRes, relatedFilms] = await Promise.all([
+  // Query congiunta per Bloopers, Curiosità, Film Correlati e Valutazione IMDb/TMDB
+  const [bloopersRes, triviaRes, relatedFilms, ratingInfo] = await Promise.all([
     supabase
       .from("errori")
       .select("*, voti_bloopers(tipo, user_id)")
@@ -81,6 +84,7 @@ async function getFilmData(slug: string) {
       .order("ordine", { ascending: true })
       .order("created_at", { ascending: false }),
     getRelatedFilms(targetFilm, 5),
+    getFilmRatingInfo(targetFilm.titolo, targetFilm.anno),
   ]);
 
   return {
@@ -88,6 +92,7 @@ async function getFilmData(slug: string) {
     bloopers: (bloopersRes.data || []) as any[],
     trivia: (triviaRes.data || []) as MovieTrivia[],
     relatedFilms,
+    ratingInfo,
   };
 }
 
@@ -167,7 +172,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
     notFound();
   }
 
-  const { film, bloopers: rawBloopers, trivia = [], relatedFilms = [] } = data;
+  const { film, bloopers: rawBloopers, trivia = [], relatedFilms = [], ratingInfo } = data;
 
   // Normalizza i bloopers calcolando conferme e contestazioni
   // (l'eventuale voto dell'utente connesso viene idratato client-side in modo trasparente senza rompere la cache Edge)
@@ -203,6 +208,13 @@ export default async function FilmDetailPage({ params }: PageProps) {
     image: film.poster_url || film.backdrop_url || undefined,
     description: film.trama || undefined,
     genre: film.genere || undefined,
+    aggregateRating: ratingInfo ? {
+      "@type": "AggregateRating",
+      ratingValue: ratingInfo.rating.toFixed(1),
+      bestRating: "10",
+      worstRating: "1",
+      ratingCount: ratingInfo.voteCount || 100,
+    } : undefined,
   };
 
   const jsonLdBreadcrumbs = {
@@ -357,29 +369,55 @@ export default async function FilmDetailPage({ params }: PageProps) {
                     <Sparkles className="h-2.5 w-2.5 text-amber-400" />
                     {trivia.length} Curiosità
                   </span>
+                  {ratingInfo && (
+                    <a
+                      href={ratingInfo.imdbUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-900 border border-amber-500/40 text-[10px] font-bold text-zinc-200 hover:border-amber-400 transition-colors"
+                      title="Valutazione e scheda ufficiale su IMDb"
+                    >
+                      <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
+                      <span className="text-amber-300 font-black">{ratingInfo.rating.toFixed(1)}</span>
+                      <span className="rounded bg-[#F5C518] text-black px-1 text-[8px] font-black uppercase tracking-wider">
+                        IMDb
+                      </span>
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
 
-            {/* Azioni Esterne Mobile (compatte su 2 colonne) */}
-            <div className="grid grid-cols-2 gap-2 pt-1">
+            {/* Azioni Esterne Mobile (compatte su 3 colonne con IMDb) */}
+            <div className="grid grid-cols-3 gap-1.5 pt-1">
               <a
                 href={amazonUrl}
                 target="_blank"
                 rel="sponsored noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-zinc-900/90 border border-zinc-800 hover:border-amber-500/50 py-2 px-2 text-[11px] font-bold text-zinc-200 transition-all shadow-sm"
+                className="flex items-center justify-center gap-1 rounded-xl bg-zinc-900/90 border border-zinc-800 hover:border-amber-500/50 py-2 px-1 text-[10px] font-bold text-zinc-200 transition-all shadow-sm"
               >
-                <ShoppingCart className="h-3.5 w-3.5 text-amber-400 shrink-0" />
-                <span className="truncate">Edizione Amazon</span>
+                <ShoppingCart className="h-3 w-3 text-amber-400 shrink-0" />
+                <span className="truncate">Amazon</span>
               </a>
               <a
                 href={youtubeUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1.5 rounded-xl bg-red-950/20 border border-red-900/40 hover:border-red-600/60 py-2 px-2 text-[11px] font-bold text-red-400 transition-all shadow-sm"
+                className="flex items-center justify-center gap-1 rounded-xl bg-red-950/20 border border-red-900/40 hover:border-red-600/60 py-2 px-1 text-[10px] font-bold text-red-400 transition-all shadow-sm"
               >
-                <PlayCircle className="h-3.5 w-3.5 text-red-500 shrink-0" />
-                <span className="truncate">Cerca su YouTube</span>
+                <PlayCircle className="h-3 w-3 text-red-500 shrink-0" />
+                <span className="truncate">YouTube</span>
+              </a>
+              <a
+                href={ratingInfo ? ratingInfo.imdbUrl : `https://www.imdb.com/find/?q=${encodeURIComponent(film.titolo)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-1 rounded-xl bg-zinc-900/90 border border-zinc-800 hover:border-[#F5C518]/60 py-2 px-1 text-[10px] font-bold text-zinc-200 transition-all shadow-sm"
+              >
+                <span className="rounded bg-[#F5C518] text-black px-1 text-[8px] font-black uppercase">
+                  IMDb
+                </span>
+                <span className="truncate">{ratingInfo ? `${ratingInfo.rating.toFixed(1)} ★` : "IMDb"}</span>
               </a>
             </div>
 
@@ -441,6 +479,25 @@ export default async function FilmDetailPage({ params }: PageProps) {
                   <PlayCircle className="h-4 w-4 text-red-500 group-hover:scale-110 transition-transform" />
                   Cerca Bloopers su YouTube
                 </a>
+                <a
+                  href={ratingInfo ? ratingInfo.imdbUrl : `https://www.imdb.com/find/?q=${encodeURIComponent(film.titolo)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center justify-between gap-2 rounded-xl bg-zinc-900/80 border border-zinc-800 hover:border-[#F5C518]/60 py-2.5 px-4 text-xs font-bold text-zinc-200 transition-all shadow-md group"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="rounded bg-[#F5C518] text-black px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider group-hover:scale-105 transition-transform">
+                      IMDb
+                    </span>
+                    <span>Scheda su IMDb</span>
+                  </div>
+                  {ratingInfo && (
+                    <span className="text-xs font-black text-amber-400 flex items-center gap-1">
+                      ★ {ratingInfo.rating.toFixed(1)}
+                    </span>
+                  )}
+                  <ExternalLink className="h-3.5 w-3.5 text-zinc-500 group-hover:text-[#F5C518] transition-colors" />
+                </a>
               </div>
             </div>
 
@@ -459,6 +516,25 @@ export default async function FilmDetailPage({ params }: PageProps) {
                     <span className="rounded-lg bg-zinc-800/80 border border-zinc-700 px-2.5 py-0.5 text-xs font-medium text-zinc-300">
                       {film.genere}
                     </span>
+                  )}
+                  {ratingInfo && (
+                    <a
+                      href={ratingInfo.imdbUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900/90 border border-amber-500/30 hover:border-amber-400 px-2.5 py-0.5 text-xs font-bold text-zinc-100 transition-all group shadow-sm"
+                      title="Valutazione e scheda ufficiale su IMDb"
+                    >
+                      <span className="text-amber-400 flex items-center gap-1">
+                        <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
+                        <span className="font-black text-amber-300">{ratingInfo.rating.toFixed(1)}</span>
+                        <span className="text-[10px] text-zinc-500 font-normal">/10</span>
+                      </span>
+                      <span className="rounded bg-[#F5C518] text-black px-1.5 py-0.2 text-[9px] font-black uppercase tracking-wider group-hover:brightness-110">
+                        IMDb
+                      </span>
+                      <ExternalLink className="h-3 w-3 text-zinc-500 group-hover:text-amber-400 transition-colors" />
+                    </a>
                   )}
                   {film.tmdb_id && (
                     <span className="rounded-lg bg-emerald-950/40 border border-emerald-800/60 px-2 py-0.5 text-[10px] font-bold text-emerald-400">

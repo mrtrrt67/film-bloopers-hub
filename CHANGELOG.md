@@ -31,6 +31,12 @@ Questa release segna il consolidamento stabile della piattaforma Next.js 16 con 
   - Pulsante flottante permanente per la revisione del consenso.
 
 - **SEO & Search Console**:
+- **Valutazione Cinematografica & Badge Ufficiale IMDb (`src/lib/tmdb.ts`, `src/app/film/[slug]/page.tsx`)**:
+  - Integrazione della valutazione cinematografica su base 10 e dell'identificativo ufficiale IMDb (`imdb_id`) tramite TMDB con cache in-memory a latenza zero.
+  - Badge visivo con stellina dorata, punteggio su base 10 e logo giallo ufficiale `IMDb` con link diretto alla scheda del film su desktop e mobile.
+  - Pulsante dedicato ad alta visibilità nella barra laterale desktop e barra azioni mobile per consultare la scheda IMDb con un clic.
+  - Dati strutturati Schema.org JSON-LD aggiornati con blocco `aggregateRating` per abilitare le stelline di recensione ⭐ nei risultati di ricerca Google.
+
 - **Sincronizzazione Live Conteggi Bloopers & Curiosità Home/Esplora**:
   - Passaggio della Homepage (`src/app/page.tsx`) a rendering dinamico real-time (`force-dynamic`) con caricamento parallelo in `Promise.all`.
   - Risolto il disallineamento generato dalla precedente cache statica/ISR durante l'importazione di nuovi film.
