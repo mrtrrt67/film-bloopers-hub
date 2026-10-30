@@ -120,6 +120,23 @@ export interface TMDBMovieDetails extends TMDBMovieResult {
     cast: { id: number; name: string; character: string; profile_path?: string }[];
     crew: { id: number; name: string; job: string }[];
   };
+  "watch/providers"?: any;
+  watch_providers?: any;
+}
+
+export interface WatchProviderItem {
+  id: number;
+  name: string;
+  logoUrl: string | null;
+}
+
+export interface FilmStreamingInfo {
+  isOnPrimeVideo: boolean;
+  isPrimeFlatrate: boolean;
+  isPrimeRentBuy: boolean;
+  flatrate: WatchProviderItem[];
+  rentOrBuy: WatchProviderItem[];
+  justWatchLink?: string | null;
 }
 
 export interface FilmRatingInfo {
@@ -127,4 +144,5 @@ export interface FilmRatingInfo {
   voteCount?: number;
   imdbId?: string | null;
   imdbUrl: string;
+  streaming?: FilmStreamingInfo | null;
 }

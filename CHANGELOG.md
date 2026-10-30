@@ -31,6 +31,14 @@ Questa release segna il consolidamento stabile della piattaforma Next.js 16 con 
   - Pulsante flottante permanente per la revisione del consenso.
 
 - **SEO & Search Console**:
+- **Disponibilità Streaming & Monetizzazione Amazon-First ("Dove Vederlo")**:
+  - Integrazione ufficiale dati JustWatch via TMDB Watch Providers API per l'Italia (`append_to_response=watch/providers`).
+  - Strategia di monetizzazione commerciale "Amazon-First":
+    - Se presente su Prime Video (flatrate o noleggio/acquisto): Hero CTA prominente brandizzata con link tracciato (`filmbloopers-21`), evidenziando se il film è incluso con l'abbonamento Prime o a noleggio/acquisto digitale.
+    - Se assente da Prime Video: Hero CTA dedicata per trovare l'Edizione Fisica da collezione (DVD, Blu-ray & Steelbook 4K) su Amazon.
+  - Sezione informativa con badge ufficiali ad alta risoluzione per le piattaforme attive in abbonamento in Italia (Paramount+, Netflix, Disney+, Now, Apple TV, ecc.).
+  - Interfaccia grafica curata sia per Desktop (card dedicata nella barra laterale sotto la locandina) che per Mobile (card responsive compatta ed elegante sopra i bloopers).
+
 - **Valutazione Cinematografica & Badge Ufficiale IMDb (`src/lib/tmdb.ts`, `src/app/film/[slug]/page.tsx`)**:
   - Integrazione della valutazione cinematografica su base 10 e dell'identificativo ufficiale IMDb (`imdb_id`) tramite TMDB con cache in-memory a latenza zero.
   - Badge visivo con stellina dorata, punteggio su base 10 e logo giallo ufficiale `IMDb` con link diretto alla scheda del film su desktop e mobile.

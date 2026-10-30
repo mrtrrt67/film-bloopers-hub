@@ -1,4 +1,4 @@
-import { TMDBMovieDetails, TMDBMovieResult, FilmRatingInfo } from "./types";
+import { TMDBMovieDetails, TMDBMovieResult, FilmRatingInfo, FilmStreamingInfo, WatchProviderItem } from "./types";
 
 const TMDB_API_BASE = "https://api.themoviedb.org/3";
 const TMDB_IMAGE_BASE = "https://image.tmdb.org/t/p";
@@ -101,7 +101,7 @@ export async function getTMDBMovieDetails(
   try {
     // 1. Prova endpoint /movie se non è specificato come serie TV
     if (mediaType !== "tv") {
-      const movieUrl = `${TMDB_API_BASE}/movie/${tmdbId}?api_key=${apiKey}&append_to_response=credits,keywords&language=it-IT`;
+      const movieUrl = `${TMDB_API_BASE}/movie/${tmdbId}?api_key=${apiKey}&append_to_response=credits,keywords,watch/providers&language=it-IT`;
       let res = await fetch(movieUrl, { next: { revalidate: 86400 } });
 
       if (res.ok) {
@@ -119,7 +119,7 @@ export async function getTMDBMovieDetails(
     }
 
     // 2. Se /movie restituisce 404 o fallisce, oppure mediaType === "tv", prova /tv/{id}
-    const tvUrl = `${TMDB_API_BASE}/tv/${tmdbId}?api_key=${apiKey}&append_to_response=credits,keywords&language=it-IT`;
+    const tvUrl = `${TMDB_API_BASE}/tv/${tmdbId}?api_key=${apiKey}&append_to_response=credits,keywords,watch/providers&language=it-IT`;
     let resTv = await fetch(tvUrl, { next: { revalidate: 86400 } });
     if (resTv.ok) {
       const tvData = await resTv.json();
@@ -155,6 +155,7 @@ export async function getTMDBMovieDetails(
         },
         belongs_to_collection: null,
         media_type: "tv",
+        "watch/providers": tvData["watch/providers"],
       };
 
       return adapted;
@@ -427,6 +428,72 @@ export async function fetchDetailsForMovie(
 
 
 
+/**
+ * Estrae e struttura le piattaforme di streaming attive in Italia per un film/serie da TMDB.
+ */
+export function parseStreamingProviders(details: any): FilmStreamingInfo | null {
+  if (!details) return null;
+
+  const wp = details["watch/providers"] || details.watch_providers || details.watchProviders;
+  const itData = wp?.results?.IT || wp?.results?.it;
+  if (!itData) return null;
+
+  const rawFlatrate: any[] = Array.isArray(itData.flatrate) ? itData.flatrate : [];
+  const rawRent: any[] = Array.isArray(itData.rent) ? itData.rent : [];
+  const rawBuy: any[] = Array.isArray(itData.buy) ? itData.buy : [];
+
+  const isAmazonProvider = (p: any): boolean => {
+    const name = (p.provider_name || "").toLowerCase();
+    const id = Number(p.provider_id);
+    return (
+      id === 119 || // Amazon Prime Video
+      id === 10 ||  // Amazon Video
+      id === 9 ||   // Amazon
+      name.includes("amazon") ||
+      name.includes("prime video")
+    );
+  };
+
+  const isPrimeFlatrate = rawFlatrate.some(isAmazonProvider);
+  const isPrimeRentBuy = rawRent.some(isAmazonProvider) || rawBuy.some(isAmazonProvider);
+  const isOnPrimeVideo = isPrimeFlatrate || isPrimeRentBuy;
+
+  const formatItem = (p: any): WatchProviderItem => ({
+    id: p.provider_id,
+    name: p.provider_name || "Streaming",
+    logoUrl: p.logo_path ? `https://image.tmdb.org/t/p/w92${p.logo_path}` : null,
+  });
+
+  // Flatrate providers (abbonamento)
+  const seenFlatrate = new Set<number>();
+  const flatrate: WatchProviderItem[] = [];
+  for (const p of rawFlatrate) {
+    if (!seenFlatrate.has(p.provider_id)) {
+      seenFlatrate.add(p.provider_id);
+      flatrate.push(formatItem(p));
+    }
+  }
+
+  // Rent / Buy combinati (noleggio o acquisto)
+  const seenRentBuy = new Set<number>();
+  const rentOrBuy: WatchProviderItem[] = [];
+  for (const p of [...rawRent, ...rawBuy]) {
+    if (!seenRentBuy.has(p.provider_id)) {
+      seenRentBuy.add(p.provider_id);
+      rentOrBuy.push(formatItem(p));
+    }
+  }
+
+  return {
+    isOnPrimeVideo,
+    isPrimeFlatrate,
+    isPrimeRentBuy,
+    flatrate,
+    rentOrBuy,
+    justWatchLink: itData.link || null,
+  };
+}
+
 const ratingCache = new Map<string, FilmRatingInfo>();
 
 /**
@@ -435,66 +502,87 @@ const ratingCache = new Map<string, FilmRatingInfo>();
  */
 export async function getFilmRatingInfo(
   title: string,
-  year?: string | number | null
+  year?: string | number | null,
+  tmdbId?: number | null,
+  overrideApiKey?: string
 ): Promise<FilmRatingInfo | null> {
-  if (!title) return null;
-  const cleanTitle = title.trim();
-  const cacheKey = `${cleanTitle.toLowerCase()}_${year || ""}`;
+  if (!title && !tmdbId) return null;
+  const cleanTitle = (title || "").trim();
+  const cacheKey = tmdbId ? `id_${tmdbId}` : `${cleanTitle.toLowerCase()}_${year || ""}`;
 
   if (ratingCache.has(cacheKey)) {
     return ratingCache.get(cacheKey)!;
   }
 
   try {
-    const candidates = await searchTMDBMovies(cleanTitle, year || undefined);
-    if (!candidates || candidates.length === 0) {
-      return null;
-    }
-
-    // Seleziona il candidato più accurato: corrispondenza per anno se specificato
-    let best = candidates[0];
-    if (year) {
-      const yearStr = String(year);
-      const matchYear = candidates.find((c) => c.release_date?.startsWith(yearStr));
-      if (matchYear) best = matchYear;
-    }
-
-    if (!best || typeof best.vote_average !== "number" || best.vote_average <= 0) {
-      return null;
-    }
-
-    // Recupera l'imdb_id dai dettagli del film
+    let details: TMDBMovieDetails | null = null;
+    let voteAverage: number | undefined;
+    let voteCount: number | undefined;
     let imdbId: string | null = null;
-    let voteCount: number | undefined = (best as any).vote_count;
 
-    try {
-      const details = await getTMDBMovieDetails(best.id);
+    // 1. Se abbiamo già l'ID TMDB associato al film nel DB, carichiamo direttamente i dettagli
+    if (tmdbId) {
+      details = await getTMDBMovieDetails(tmdbId, overrideApiKey);
       if (details) {
-        if (details.imdb_id) imdbId = details.imdb_id;
-        if (typeof details.vote_count === "number") voteCount = details.vote_count;
-        if (typeof details.vote_average === "number" && details.vote_average > 0) {
-          best.vote_average = details.vote_average;
+        imdbId = details.imdb_id || null;
+        voteAverage = details.vote_average;
+        voteCount = details.vote_count;
+      }
+    }
+
+    // 2. Se non avevamo tmdbId o la chiamata diretta non ha trovato nulla, cerchiamo per titolo
+    if (!details && cleanTitle) {
+      const candidates = await searchTMDBMovies(cleanTitle, year || undefined, 1, overrideApiKey);
+      if (candidates && candidates.length > 0) {
+        let best = candidates[0];
+        if (year) {
+          const yearStr = String(year);
+          const matchYear = candidates.find((c) => c.release_date?.startsWith(yearStr));
+          if (matchYear) best = matchYear;
+        }
+
+        if (best) {
+          voteAverage = best.vote_average;
+          voteCount = (best as any).vote_count;
+          try {
+            details = await getTMDBMovieDetails(best.id, overrideApiKey);
+            if (details) {
+              if (details.imdb_id) imdbId = details.imdb_id;
+              if (typeof details.vote_count === "number") voteCount = details.vote_count;
+              if (typeof details.vote_average === "number" && details.vote_average > 0) {
+                voteAverage = details.vote_average;
+              }
+            }
+          } catch {
+            // Fallback con dati base della ricerca
+          }
         }
       }
-    } catch {
-      // Usa i dati della ricerca base
     }
+
+    if (!details && (typeof voteAverage !== "number" || voteAverage <= 0)) {
+      return null;
+    }
+
+    const streaming = details ? parseStreamingProviders(details) : null;
+    const finalRating = typeof voteAverage === "number" ? Math.round(voteAverage * 10) / 10 : 0;
 
     const imdbUrl = imdbId
       ? `https://www.imdb.com/title/${imdbId}/`
       : `https://www.imdb.com/find/?q=${encodeURIComponent(cleanTitle)}`;
 
     const info: FilmRatingInfo = {
-      rating: Math.round(best.vote_average * 10) / 10,
+      rating: finalRating,
       voteCount,
       imdbId,
       imdbUrl,
+      streaming,
     };
 
     ratingCache.set(cacheKey, info);
     return info;
   } catch (err) {
-    console.error("Errore recupero valutazione film:", err);
+    console.error("Errore recupero valutazione film e streaming:", err);
     return null;
   }
 }

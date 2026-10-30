@@ -20,6 +20,7 @@ import { getAmazonSearchUrl, getYouTubeSearchUrl, slugify } from "@/lib/utils";
 import FilmContentSwitcher from "@/components/FilmContentSwitcher";
 import { getRelatedFilms } from "@/lib/recommendations";
 import { getFilmRatingInfo } from "@/lib/tmdb";
+import { StreamingAvailabilityCard } from "@/components/film/StreamingAvailabilityCard";
 
 export const dynamic = "force-dynamic";
 
@@ -84,7 +85,7 @@ async function getFilmData(slug: string) {
       .order("ordine", { ascending: true })
       .order("created_at", { ascending: false }),
     getRelatedFilms(targetFilm, 5),
-    getFilmRatingInfo(targetFilm.titolo, targetFilm.anno),
+    getFilmRatingInfo(targetFilm.titolo, targetFilm.anno, targetFilm.tmdb_id),
   ]);
 
   return {
@@ -397,7 +398,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
                 className="flex items-center justify-center gap-1 rounded-xl bg-zinc-900/90 border border-zinc-800 hover:border-amber-500/50 py-2 px-1 text-[10px] font-bold text-zinc-200 transition-all shadow-sm"
               >
                 <ShoppingCart className="h-3 w-3 text-amber-400 shrink-0" />
-                <span className="truncate">Amazon</span>
+                <span className="truncate">{ratingInfo?.streaming?.isOnPrimeVideo ? "Prime Video" : "Amazon"}</span>
               </a>
               <a
                 href={youtubeUrl}
@@ -433,6 +434,16 @@ export default async function FilmDetailPage({ params }: PageProps) {
                 </p>
               </details>
             )}
+
+            {/* Card Dove Guardarlo in Streaming Mobile */}
+            <div className="pt-1">
+              <StreamingAvailabilityCard
+                streaming={ratingInfo?.streaming}
+                amazonUrl={amazonUrl}
+                filmTitle={film.titolo}
+                variant="banner"
+              />
+            </div>
           </div>
 
           {/* GRID DESKTOP (Invariato per schermi medi e grandi) */}
@@ -459,17 +470,16 @@ export default async function FilmDetailPage({ params }: PageProps) {
                 )}
               </div>
 
-              {/* Bottoni Affiliazione & Video Desktop */}
-              <div className="w-full flex flex-col gap-2 pt-2">
-                <a
-                  href={amazonUrl}
-                  target="_blank"
-                  rel="sponsored noopener noreferrer"
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-amber-500/50 py-2.5 px-4 text-xs font-bold text-zinc-200 transition-all shadow-md group"
-                >
-                  <ShoppingCart className="h-4 w-4 text-amber-400 group-hover:scale-110 transition-transform" />
-                  Cerca Edizione su Amazon
-                </a>
+              {/* Card Streaming & Dove Guardarlo Desktop */}
+              <StreamingAvailabilityCard
+                streaming={ratingInfo?.streaming}
+                amazonUrl={amazonUrl}
+                filmTitle={film.titolo}
+                variant="sidebar"
+              />
+
+              {/* Bottoni Video YouTube & Scheda IMDb Desktop */}
+              <div className="w-full flex flex-col gap-2">
                 <a
                   href={youtubeUrl}
                   target="_blank"
