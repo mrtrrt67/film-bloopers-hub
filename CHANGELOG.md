@@ -32,8 +32,9 @@ Questa release segna il consolidamento stabile della piattaforma Next.js 16 con 
 
 - **SEO & Search Console**:
   - Integrazione nativa IndexNow (Microsoft Bing, Yandex, Seznam, Naver) con chiave di verifica pubblica `b3106037cdfc4d729c7eac554ef4fb55.txt`.
-  - Servizio centralizzato `src/lib/indexnow.ts` e API protetta `src/app/api/admin/indexnow` per sottomissione massiva o mirata delle URL.
-  - Nuova card `AdminIndexNowCard` in Console Amministrazione per l'invio rapido del catalogo completo e notifiche automatiche in background sui nuovi film importati.
+  - Servizio centralizzato `src/lib/indexnow.ts` con tracciamento differenziale delle pagine già inviate e invio mirato solo delle URL mancanti.
+  - Nuova API `src/app/api/admin/indexnow` e card interattiva `AdminIndexNowCard` con contatori in tempo reale (Pagine Totali, Già Inviate, Mancanti) e sottomissione incrementale con un clic.
+  - Notifiche automatiche in background sui nuovi film importati.
   - Dati strutturati Schema.org JSON-LD (WebSite con `alternateName` e Organization) per il posizionamento corretto del Site Name ("FilmBloopers Hub") su Google.
   - Generazione dinamica di `robots.txt` e `sitemap.xml` con revalidate orario.
   - Metadata OpenGraph e Twitter Card dinamici per ogni scheda film.

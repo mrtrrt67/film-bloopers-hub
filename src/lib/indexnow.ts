@@ -12,6 +12,19 @@ export interface IndexNowResponse {
   message: string;
 }
 
+export interface IndexNowTracking {
+  submittedUrls: string[];
+  lastSubmittedAt: string | null;
+  lastStatus: number | null;
+  lastCount: number | null;
+}
+
+function getSupabaseClient() {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://gmiwhscbqvadnlqruhjs.supabase.co";
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+  return createClient(supabaseUrl, supabaseKey);
+}
+
 /**
  * Invia una lista di URL a IndexNow (Bing, Yandex, Seznam, Naver)
  */
@@ -49,8 +62,6 @@ export async function submitToIndexNow(urls: string[]): Promise<IndexNowResponse
       body: JSON.stringify(payload),
     });
 
-    // 200: OK
-    // 202: Accepted (l'elaborazione della chiave o delle URL avverrà a breve)
     const isOk = res.status === 200 || res.status === 202;
     let message = "";
 
@@ -76,6 +87,11 @@ export async function submitToIndexNow(urls: string[]): Promise<IndexNowResponse
       default:
         message = `Risposta IndexNow con codice di stato HTTP ${res.status}.`;
         break;
+    }
+
+    // Registra nello storico locale gli URL inviati con successo
+    if (isOk) {
+      void recordSubmittedUrls(cleanUrls, res.status).catch(() => {});
     }
 
     return {
@@ -114,14 +130,11 @@ export async function getAllSiteUrls(): Promise<string[]> {
   ];
 
   try {
-    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://gmiwhscbqvadnlqruhjs.supabase.co";
-    const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
-    const supabase = createClient(supabaseUrl, supabaseKey);
-
+    const supabase = getSupabaseClient();
     const { data: films } = await supabase
       .from("films")
       .select("id, titolo, anno")
-      .limit(1000);
+      .limit(2000);
 
     const movieUrls = (films || []).map((film: any) => {
       const slug = slugify(film.titolo, film.anno);
@@ -136,3 +149,83 @@ export async function getAllSiteUrls(): Promise<string[]> {
   }
 }
 
+/**
+ * Recupera lo storico degli URL inviati da configurazioni
+ */
+export async function getIndexNowTracking(dbClient?: any): Promise<IndexNowTracking> {
+  const db = dbClient || getSupabaseClient();
+  try {
+    const { data } = await db
+      .from("configurazioni")
+      .select("valore")
+      .eq("chiave", "indexnow_tracking")
+      .maybeSingle();
+
+    if (data?.valore) {
+      const parsed = JSON.parse(data.valore);
+      return {
+        submittedUrls: Array.isArray(parsed.submittedUrls) ? parsed.submittedUrls : [],
+        lastSubmittedAt: parsed.lastSubmittedAt || null,
+        lastStatus: parsed.lastStatus || null,
+        lastCount: parsed.lastCount || null,
+      };
+    }
+  } catch (e) {
+    console.warn("Errore lettura indexnow_tracking:", e);
+  }
+
+  return {
+    submittedUrls: [],
+    lastSubmittedAt: null,
+    lastStatus: null,
+    lastCount: null,
+  };
+}
+
+/**
+ * Salva l'elenco incrementale degli URL inviati in configurazioni
+ */
+export async function recordSubmittedUrls(urls: string[], status: number, dbClient?: any): Promise<void> {
+  const db = dbClient || getSupabaseClient();
+  try {
+    const current = await getIndexNowTracking(db);
+    const set = new Set([...current.submittedUrls, ...urls]);
+    const payload = {
+      submittedUrls: Array.from(set),
+      lastSubmittedAt: new Date().toISOString(),
+      lastStatus: status,
+      lastCount: urls.length,
+    };
+
+    await db.from("configurazioni").upsert({
+      chiave: "indexnow_tracking",
+      valore: JSON.stringify(payload),
+      visibile: false,
+    });
+  } catch (e) {
+    console.warn("Errore salvataggio indexnow_tracking:", e);
+  }
+}
+
+/**
+ * Calcola quali URL del sito non sono ancora stati inviati a IndexNow
+ */
+export async function getIndexNowDiff(dbClient?: any): Promise<{
+  allUrls: string[];
+  submittedUrls: string[];
+  missingUrls: string[];
+  lastSubmittedAt: string | null;
+}> {
+  const allUrls = await getAllSiteUrls();
+  const tracking = await getIndexNowTracking(dbClient);
+  const submittedSet = new Set(tracking.submittedUrls);
+
+  const missingUrls = allUrls.filter((u) => !submittedSet.has(u));
+
+  return {
+    allUrls,
+    submittedUrls: tracking.submittedUrls,
+    missingUrls,
+    lastSubmittedAt: tracking.lastSubmittedAt,
+  };
+}
