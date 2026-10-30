@@ -189,7 +189,9 @@ export default async function FilmDetailPage({ params }: PageProps) {
     };
   });
 
-  const amazonUrl = getAmazonSearchUrl(film.titolo, film.anno);
+  const amazonTag = process.env.NEXT_PUBLIC_AMAZON_TAG || "filmbloopers-21";
+  const amazonUrl = getAmazonSearchUrl(film.titolo, film.anno, amazonTag);
+  const primeVideoUrl = `https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${encodeURIComponent(film.titolo)}&tag=${amazonTag}`;
   const youtubeUrl = getYouTubeSearchUrl(film.titolo);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://filmbloopers.online";
@@ -392,7 +394,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
             {/* Azioni Esterne Mobile (compatte su 3 colonne con IMDb) */}
             <div className="grid grid-cols-3 gap-1.5 pt-1">
               <a
-                href={amazonUrl}
+                href={ratingInfo?.streaming?.isOnPrimeVideo ? primeVideoUrl : amazonUrl}
                 target="_blank"
                 rel="sponsored noopener noreferrer"
                 className="flex items-center justify-center gap-1 rounded-xl bg-zinc-900/90 border border-zinc-800 hover:border-amber-500/50 py-2 px-1 text-[10px] font-bold text-zinc-200 transition-all shadow-sm"
@@ -441,6 +443,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
                 streaming={ratingInfo?.streaming}
                 amazonUrl={amazonUrl}
                 filmTitle={film.titolo}
+                amazonTag={amazonTag}
                 variant="banner"
               />
             </div>
@@ -475,6 +478,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
                 streaming={ratingInfo?.streaming}
                 amazonUrl={amazonUrl}
                 filmTitle={film.titolo}
+                amazonTag={amazonTag}
                 variant="sidebar"
               />
 
