@@ -126,6 +126,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     title,
     description,
     keywords: [
+      `dove vedere ${film.titolo}`,
+      `dove vedere ${film.titolo} in streaming`,
+      `streaming ${film.titolo}`,
       `errori ${film.titolo}`,
       `bloopers ${film.titolo}`,
       `curiosità ${film.titolo}`,
