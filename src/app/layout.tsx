@@ -17,11 +17,15 @@ export const viewport: Viewport = {
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
+  preload: true,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+  preload: true,
 });
 
 export const metadata: Metadata = {
@@ -124,7 +128,7 @@ export default function RootLayout({
       style={{ backgroundColor: "#09090b", colorScheme: "dark" }}
     >
       <body
-        className="min-h-full flex flex-col bg-zinc-950 text-zinc-100 selection:bg-amber-500 selection:text-zinc-950"
+        className={`${geistSans.className} min-h-full flex flex-col bg-zinc-950 text-zinc-100 selection:bg-amber-500 selection:text-zinc-950`}
         style={{ backgroundColor: "#09090b" }}
       >
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || "G-J9PFHEC6T4"} />

@@ -154,12 +154,12 @@ export default async function HomePage() {
       {/* Hero Section */}
       <div className="relative overflow-hidden rounded-3xl border border-zinc-800 bg-gradient-to-b from-zinc-900/90 via-zinc-950 to-zinc-950 p-5 sm:p-10 md:p-14 mb-16 text-center shadow-2xl">
         <div className="mx-auto max-w-3xl">
-          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-amber-500/30 px-4 py-1.5 text-xs font-black text-amber-400 mb-6">
+          <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-amber-500/30 px-3.5 sm:px-4 py-1.5 text-[11px] sm:text-xs font-black text-amber-400 mb-6 max-w-full">
             <Flame className="h-4 w-4" />
             <span>L&apos;Archivio Ufficiale di Bloopers, Curiosità & Retroscena del Cinema</span>
           </div>
 
-          <h1 className="text-4xl sm:text-6xl font-black text-white tracking-tight leading-[1.1] mb-6">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.15] mb-6">
             Bloopers, Errori e Curiosità nella Storia del Cinema
           </h1>
 
