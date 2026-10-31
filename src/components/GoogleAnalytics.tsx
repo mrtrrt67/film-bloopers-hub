@@ -8,11 +8,11 @@ export default function GoogleAnalytics({ gaId }: { gaId?: string }) {
       <Script
         id="google-gtag-script"
         src={`https://www.googletagmanager.com/gtag/js?id=${id}`}
-        strategy="afterInteractive"
+        strategy="lazyOnload"
       />
       <Script
         id="google-consent-and-gtag"
-        strategy="afterInteractive"
+        strategy="lazyOnload"
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
