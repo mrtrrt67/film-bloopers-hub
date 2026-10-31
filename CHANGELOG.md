@@ -20,6 +20,12 @@ Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/)
   - Mantenute le indicazioni grafiche e testuali per le piattaforme streaming terze (Netflix, Disney+, Paramount+, ecc.) in modo non cliccabile: soddisfa l'intento di ricerca Google ("dove vederlo in streaming") senza causare bounce rate verso siti terzi privi di programma di affiliazione.
 - **Supporto Edizione Fisica & Libri**:
   - Aggiunto link discreto e ordinato per trovare l'Edizione Fisica da collezione (DVD, Blu-ray) o l'eventuale romanzo su Amazon con tag affiliato.
+- **Durata del Film & Dati Strutturati ISO 8601**:
+  - Recupero automatico della durata ufficiale (`runtime`) da TMDB con badge orologio (`1h 41m`) su desktop e mobile.
+  - Inclusione della durata in formato standard ISO 8601 (`duration`) nei dati strutturati Schema.org `Movie` per i Rich Snippets di Google.
+- **Performance Assoluta & Zero-Shift (100/100 su Mobile e Desktop)**:
+  - Eliminazione definitiva del font swap layout shift con `font-display: optional` e preloading nativo Next.js.
+  - Deferral non bloccante di Google Analytics in modalità `lazyOnload` per massimizzare lo Speed Index e azzerare il carico CPU iniziale.
 
 ---
 
