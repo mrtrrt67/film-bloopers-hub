@@ -607,22 +607,25 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   return (
     <div className="space-y-6">
       {/* BARRA SUPERIORE: AZIONI VELOCI & CONTEGGI */}
-      <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-4 p-5 rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-xl">
-        <div>
-          <h3 className="text-base font-black text-white flex items-center gap-2">
-            <Film className="h-5 w-5 text-amber-400" />
-            Archivio Film ({films.length} pellicole)
-          </h3>
-          <p className="text-xs text-zinc-400 mt-0.5">
-            Gestisci schede, correggi locandine errate o duplicate e aggiorna il cast via TMDB.
-          </p>
+      <div className="flex flex-col gap-4 p-5 rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-zinc-800/70">
+          <div>
+            <h3 className="text-base font-black text-white flex items-center gap-2">
+              <Film className="h-5 w-5 text-amber-400 shrink-0" />
+              Archivio Film ({films.length} pellicole)
+            </h3>
+            <p className="text-xs text-zinc-400 mt-0.5">
+              Gestisci schede, correggi locandine errate o duplicate e aggiorna il cast via TMDB.
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0 overflow-x-auto max-w-full pb-1 xl:pb-0">
+        {/* Toolbar Azioni Rapide con wrap reattivo (non sfora mai i bordi) */}
+        <div className="flex flex-wrap items-center gap-2.5">
           <button
             onClick={handleUpdateAllPosters}
             disabled={updatingAllPosters || missingPostersCount === 0}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-amber-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 whitespace-nowrap shrink-0"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-amber-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 whitespace-nowrap shadow-sm"
             title="Recupera tutte le locandine mancanti da TMDB"
           >
             <ImageIcon className={`h-3.5 w-3.5 ${updatingAllPosters ? "animate-spin" : ""}`} />
@@ -632,14 +635,17 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
           <button
             onClick={handleUpdateAllCast}
             disabled={updatingAllCast || missingCastCount === 0}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-200 border border-zinc-700 hover:text-white hover:bg-zinc-700 active:scale-95 transition disabled:opacity-50 whitespace-nowrap shrink-0"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-200 border border-zinc-700 hover:text-white hover:bg-zinc-700 active:scale-95 transition disabled:opacity-50 whitespace-nowrap shadow-sm"
             title="Recupera il cast mancante da TMDB"
           >
             <Users className={`h-3.5 w-3.5 ${updatingAllCast ? "animate-spin" : ""}`} />
             <span>Cast Mancante ({missingCastCount})</span>
           </button>
 
-          <div className="flex items-center gap-1 shrink-0 bg-zinc-950/60 p-1 rounded-2xl border border-zinc-800">
+          <div className="hidden sm:block h-6 w-px bg-zinc-800/80 mx-0.5" />
+
+          {/* Bloopers Batch */}
+          <div className="flex items-center gap-1 bg-zinc-950/60 p-1 rounded-2xl border border-zinc-800 shadow-sm">
             <div className="flex items-center bg-zinc-900 rounded-xl p-0.5 border border-zinc-800">
               {[5, 20, 50].map((num) => (
                 <button
@@ -673,7 +679,8 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
             </button>
           </div>
 
-          <div className="flex items-center gap-1 shrink-0 bg-zinc-950/60 p-1 rounded-2xl border border-zinc-800">
+          {/* Trivia Batch */}
+          <div className="flex items-center gap-1 bg-zinc-950/60 p-1 rounded-2xl border border-zinc-800 shadow-sm">
             <div className="flex items-center bg-zinc-900 rounded-xl p-0.5 border border-zinc-800">
               {[5, 20, 50].map((num) => (
                 <button
