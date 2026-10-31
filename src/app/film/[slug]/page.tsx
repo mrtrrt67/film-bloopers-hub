@@ -8,12 +8,13 @@ import {
   ArrowRight,
   Sparkles,
   AlertCircle,
-  Star
+  Star,
+  Clock
 } from "lucide-react";
 import { createPublicClient } from "@/lib/supabase/public";
 import { Film, Blooper, MovieTrivia, FilmRatingInfo } from "@/lib/types";
 import MovieCard from "@/components/MovieCard";
-import { getAmazonSearchUrl, slugify } from "@/lib/utils";
+import { getAmazonSearchUrl, slugify, formatMovieDuration } from "@/lib/utils";
 import FilmContentSwitcher from "@/components/FilmContentSwitcher";
 import { getRelatedFilms } from "@/lib/recommendations";
 import { getFilmRatingInfo } from "@/lib/tmdb";
@@ -191,6 +192,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
 
   const amazonTag = process.env.NEXT_PUBLIC_AMAZON_TAG || "filmbloopers-21";
   const amazonUrl = getAmazonSearchUrl(film.titolo, film.anno, amazonTag);
+  const formattedDuration = formatMovieDuration(ratingInfo?.runtime);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://filmbloopers.online";
   const filmUrl = `${siteUrl}/film/${slug}`;
@@ -202,6 +204,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
     name: film.titolo,
     url: filmUrl,
     datePublished: film.anno ? `${film.anno}-01-01` : undefined,
+    duration: ratingInfo?.runtime ? `PT${Math.floor(ratingInfo.runtime / 60)}H${ratingInfo.runtime % 60}M` : undefined,
     director: film.regista ? { "@type": "Person", name: film.regista } : undefined,
     actor: film.attori
       ? film.attori.split(",").map((a: string) => ({ "@type": "Person", name: a.trim() }))
@@ -343,6 +346,12 @@ export default async function FilmDetailPage({ params }: PageProps) {
                       {film.anno}
                     </span>
                   )}
+                  {formattedDuration && (
+                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 border border-zinc-800 px-2.5 py-0.5 text-xs font-bold text-zinc-200">
+                      <Clock className="h-3.5 w-3.5 text-amber-400" />
+                      <span>{formattedDuration}</span>
+                    </span>
+                  )}
                   {film.genere && (
                     <span className="rounded-md bg-zinc-800/80 border border-zinc-700 px-2 py-0.5 text-[10px] font-medium text-zinc-300 line-clamp-1">
                       {film.genere.split(/[,/]/)[0]}
@@ -454,6 +463,12 @@ export default async function FilmDetailPage({ params }: PageProps) {
                   {film.anno && (
                     <span className="rounded-lg bg-amber-500/10 border border-amber-500/30 px-2.5 py-0.5 text-xs font-black text-amber-400">
                       Anno {film.anno}
+                    </span>
+                  )}
+                  {formattedDuration && (
+                    <span className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 border border-zinc-800 px-2.5 py-0.5 text-xs font-bold text-zinc-200">
+                      <Clock className="h-3.5 w-3.5 text-amber-400" />
+                      <span>{formattedDuration}</span>
                     </span>
                   )}
                   {film.genere && (

@@ -621,6 +621,7 @@ export async function getFilmRatingInfo(
       imdbId,
       imdbUrl,
       streaming,
+      runtime: details?.runtime || null,
     };
 
     ratingCache.set(cacheKey, info);

@@ -168,6 +168,19 @@ export function getYouTubeSearchUrl(titolo: string): string {
   return `https://www.youtube.com/results?search_query=${query}`;
 }
 
+export function formatMovieDuration(minutes?: number | null): string | null {
+  if (!minutes || typeof minutes !== "number" || minutes <= 0) return null;
+  const hours = Math.floor(minutes / 60);
+  const remainingMins = minutes % 60;
+  if (hours > 0 && remainingMins > 0) {
+    return `${hours}h ${remainingMins}m`;
+  }
+  if (hours > 0) {
+    return `${hours}h`;
+  }
+  return `${remainingMins}m`;
+}
+
 export function formatDateItalian(dateInput: string | Date | null | undefined): string {
   if (!dateInput) return "";
 

@@ -147,4 +147,5 @@ export interface FilmRatingInfo {
   imdbId?: string | null;
   imdbUrl: string;
   streaming?: FilmStreamingInfo | null;
+  runtime?: number | null;
 }
