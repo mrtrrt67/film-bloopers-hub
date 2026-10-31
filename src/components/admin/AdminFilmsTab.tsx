@@ -149,10 +149,10 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
 
     // 2. Filtro categoria
     if (filterType === "with_bloopers") {
-      return (f.bloopers_count || 0) > 0;
+      return (f.bloopers_count || 0) >= 10;
     }
     if (filterType === "missing_bloopers") {
-      return !f.bloopers_count || f.bloopers_count === 0;
+      return (f.bloopers_count || 0) < 10;
     }
     if (filterType === "with_trivia") {
       return (f.trivia_count || 0) > 0;
@@ -317,11 +317,11 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     );
   };
 
-  // Popola bloopers 5 alla volta con IA (in modo sequenziale con progresso in tempo reale)
+  // Incrementa bloopers a quota 10 (5 alla volta con IA in modo sequenziale)
   const handleBatchPopulateBloopers = async () => {
     openConfirm(
-      "⚡ Popola Bloopers con IA (5 Film)",
-      "Avviare la ricerca automatica di bloopers con Gemini per 5 film che non hanno ancora errori caricati? Verranno generati errori di scena, anacronismi e sviste documentate con avanzamento in tempo reale.",
+      "⚡ Porta a 10 Bloopers con IA (5 Film)",
+      "Avviare la ricerca ed integrazione automatica con Gemini per portare a quota 10 i bloopers di 5 film che ne hanno meno? Verranno generati solo gli errori mancanti evitando duplicati.",
       async () => {
         setPopulatingBloopers(true);
         setActionMessage(null);
@@ -331,13 +331,13 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
         let lastError: string | null = null;
 
         try {
-          // Eseguiamo 5 chiamate (limit: 1) in sequenza per eliminare qualsiasi rischio di timeout Vercel
+          // Eseguiamo 5 chiamate (limit: 1, targetCount: 10) in sequenza per eliminare qualsiasi rischio di timeout Vercel
           for (let step = 1; step <= 5; step++) {
             setPopulatingBloopersProgress(`Film ${step}/5 in elaborazione...`);
             const res = await fetch("/api/admin/bloopers-batch", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ limit: 1 }),
+              body: JSON.stringify({ limit: 1, targetCount: 10 }),
             });
 
             if (!res.ok) {
@@ -369,7 +369,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
 
           if (totalProcessed > 0) {
             setActionMessage(
-              `🎬 IA completata con successo: generati ${totalGenerated} bloopers su ${totalProcessed} film! (${lastRemaining} film ancora senza bloopers)`
+              `🎬 IA completata con successo: aggiunti ${totalGenerated} nuovi bloopers portando ${totalProcessed} film a quota 10! (${lastRemaining} film ancora sotto quota 10)`
             );
             await fetchFilms();
             await fetchMissingBloopersStats();
@@ -521,8 +521,8 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     }
   };
 
-  const withBloopersCount = films.filter((f) => (f.bloopers_count || 0) > 0).length;
-  const missingBloopersFilmCount = films.filter((f) => !f.bloopers_count || f.bloopers_count === 0).length;
+  const withBloopersCount = films.filter((f) => (f.bloopers_count || 0) >= 10).length;
+  const missingBloopersFilmCount = films.filter((f) => (f.bloopers_count || 0) < 10).length;
   const withTriviaCount = films.filter((f) => (f.trivia_count || 0) > 0).length;
   const missingTriviaFilmCount = films.filter((f) => !f.trivia_count || f.trivia_count === 0).length;
   const missingPostersCount = films.filter((f) => !f.poster_url || f.poster_url.trim() === "").length;
@@ -568,13 +568,13 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
             onClick={handleBatchPopulateBloopers}
             disabled={populatingBloopers || missingBloopersCount === 0}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-orange-500 to-amber-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-md shadow-orange-500/10 whitespace-nowrap shrink-0"
-            title="Genera bloopers con IA per 5 film che non ne hanno ancora"
+            title="Incrementa i bloopers con IA portando a quota 10 i film che ne hanno meno"
           >
             <Sparkles className={`h-3.5 w-3.5 ${populatingBloopers ? "animate-spin" : ""}`} />
             <span>
               {populatingBloopers
                 ? (populatingBloopersProgress || "Generazione 5 film...")
-                : `⚡ Popola Bloopers (5 film)${missingBloopersCount !== null ? ` [${missingBloopersCount}]` : ""}`}
+                : `⚡ Porta a 10 Bloopers (5 film)${missingBloopersCount !== null ? ` [${missingBloopersCount}]` : ""}`}
             </span>
           </button>
 
@@ -635,7 +635,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                 : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
             }`}
           >
-            <span>🎬 Con Bloopers ({withBloopersCount})</span>
+            <span>🎬 Con ≥10 Bloopers ({withBloopersCount})</span>
           </button>
           <button
             onClick={() => setFilterType("missing_bloopers")}
@@ -645,7 +645,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                 : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
             }`}
           >
-            Senza Bloopers ({missingBloopersFilmCount})
+            Meno di 10 Bloopers ({missingBloopersFilmCount})
           </button>
           <button
             onClick={() => setFilterType("with_trivia")}
@@ -776,9 +776,13 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                           </span>
                         )}
 
-                        {(film.bloopers_count || 0) > 0 ? (
-                          <span className="rounded bg-orange-500/20 text-orange-300 border border-orange-500/30 text-[9px] font-bold px-1.5 py-0.5 flex items-center gap-1">
+                        {(film.bloopers_count || 0) >= 10 ? (
+                          <span className="rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold px-1.5 py-0.5 flex items-center gap-1">
                             🎬 {film.bloopers_count} Blooper
+                          </span>
+                        ) : (film.bloopers_count || 0) > 0 ? (
+                          <span className="rounded bg-orange-500/20 text-orange-300 border border-orange-500/30 text-[9px] font-bold px-1.5 py-0.5 flex items-center gap-1">
+                            🎬 {film.bloopers_count}/10 Blooper
                           </span>
                         ) : (
                           <span className="rounded bg-zinc-800/80 text-zinc-500 border border-zinc-800 text-[9px] font-medium px-1.5 py-0.5">

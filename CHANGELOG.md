@@ -26,6 +26,11 @@ Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/)
 - **Performance Assoluta & Zero-Shift (100/100 su Mobile e Desktop)**:
   - Eliminazione definitiva del font swap layout shift con `font-display: optional` e preloading nativo Next.js.
   - Deferral non bloccante di Google Analytics in modalità `lazyOnload` per massimizzare lo Speed Index e azzerare il carico CPU iniziale.
+- **Batch Incremento Bloopers a Quota 10**:
+  - Algoritmo di scansione ed integrazione automatica con Gemini per tutti i film con meno di 10 errori caricati.
+  - Generazione selettiva della quota mancante (`10 - attuali`) con rigida deduplicazione dagli errori già presenti.
+  - Integrazione diretta nel pannello Admin (`/admin`) con avanzamento sequenziale in tempo reale (resiliente ai timeout serverless).
+  - Script CLI dedicato `scripts/populate-bloopers-to-10.js` per esecuzioni arbitrarie da terminale con rate-limiting automatico.
 
 ---
 

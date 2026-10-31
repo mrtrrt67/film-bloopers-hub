@@ -27,13 +27,21 @@ export async function GET() {
 
     if (errFilms) throw errFilms;
 
-    const withBloopersFilms = (allFilms || []).filter((f: any) => (f.errori?.[0]?.count || 0) > 0);
-    const missingFilms = (allFilms || []).filter((f: any) => (f.errori?.[0]?.count || 0) === 0);
+    const targetCount = 10;
+    const underTargetFilms = (allFilms || []).filter((f: any) => (f.errori?.[0]?.count || 0) < targetCount);
+    const atTargetFilms = (allFilms || []).filter((f: any) => (f.errori?.[0]?.count || 0) >= targetCount);
+    const totalMissingBloopers = underTargetFilms.reduce(
+      (acc: number, f: any) => acc + (targetCount - (f.errori?.[0]?.count || 0)),
+      0
+    );
 
     return NextResponse.json({
       totalFilms: allFilms?.length || 0,
-      withBloopersCount: withBloopersFilms.length,
-      missingBloopersCount: missingFilms.length,
+      withBloopersCount: atTargetFilms.length,
+      missingBloopersCount: underTargetFilms.length,
+      underTargetFilmsCount: underTargetFilms.length,
+      totalMissingBloopers,
+      targetCount,
     });
   } catch (err: any) {
     console.error("Errore verifica bloopers mancanti:", err);
@@ -55,9 +63,10 @@ export async function POST(request: Request) {
     const db = hasServiceKey ? createAdminClient() : supabase;
 
     const body = await request.json().catch(() => ({}));
-    const limit = Math.min(Number(body?.limit) || 5, 10); // Massimo 10 per volta per sicurezza timeout
+    const limit = Math.min(Number(body?.limit) || 1, 10);
+    const targetCount = Number(body?.targetCount) || 10;
 
-    // 1. Recupera film senza bloopers
+    // 1. Recupera film che hanno meno di targetCount bloopers
     const { data: allFilms, error: errFilms } = await db
       .from("films")
       .select("id, titolo, anno, regista, attori, trama, errori(count)")
@@ -65,25 +74,34 @@ export async function POST(request: Request) {
 
     if (errFilms) throw errFilms;
 
-    const candidateFilms = (allFilms || []).filter((f: any) => (f.errori?.[0]?.count || 0) === 0);
+    // Ordina i film per minor numero di bloopers esistenti (prima chi ne ha 1, 2, 3...)
+    const candidateFilms = (allFilms || [])
+      .map((f: any) => ({
+        ...f,
+        currentCount: f.errori?.[0]?.count || 0,
+      }))
+      .filter((f: any) => f.currentCount < targetCount)
+      .sort((a: any, b: any) => a.currentCount - b.currentCount);
 
     if (candidateFilms.length === 0) {
       return NextResponse.json({
         success: true,
-        message: "Tutti i film presenti nel catalogo hanno già almeno un blooper!",
+        message: `Tutti i film presenti nel catalogo hanno già almeno ${targetCount} bloopers!`,
         processedCount: 0,
         totalBloopersGenerated: 0,
         remainingFilmsWithoutBloopers: 0,
+        remainingFilmsUnderTarget: 0,
         results: [],
       });
     }
 
     const batch = candidateFilms.slice(0, limit);
-    const results: Array<{ film_id: number; titolo: string; generated: number; error?: string }> = [];
+    const results: Array<{ film_id: number; titolo: string; generated: number; currentCount: number; targetCount: number; error?: string }> = [];
     let totalGenerated = 0;
 
     for (let i = 0; i < batch.length; i++) {
       const film = batch[i];
+      const countNeeded = Math.max(1, targetCount - film.currentCount);
 
       try {
         const { data: existingBloopers } = await db
@@ -100,6 +118,7 @@ export async function POST(request: Request) {
           attori: film.attori,
           trama: film.trama,
           erroriEsistenti: descrizioniEsistenti,
+          countNeeded,
         });
 
         const { bloopers, modelUsed, executionTimeSec, error: genError, errorsLog } = genResult;
@@ -136,6 +155,8 @@ export async function POST(request: Request) {
             film_id: film.id,
             titolo: film.titolo,
             generated: 0,
+            currentCount: film.currentCount,
+            targetCount,
             error: genError || "Nessun blooper generato",
           });
           continue;
@@ -169,6 +190,8 @@ export async function POST(request: Request) {
             film_id: film.id,
             titolo: film.titolo,
             generated: 0,
+            currentCount: film.currentCount,
+            targetCount,
             error: insertErr.message,
           });
         } else {
@@ -177,6 +200,8 @@ export async function POST(request: Request) {
             film_id: film.id,
             titolo: film.titolo,
             generated: bloopers.length,
+            currentCount: film.currentCount + bloopers.length,
+            targetCount,
           });
 
           // Log statistiche
@@ -204,6 +229,8 @@ export async function POST(request: Request) {
           film_id: film.id,
           titolo: film.titolo,
           generated: 0,
+          currentCount: film.currentCount,
+          targetCount,
           error: err.message,
         });
       }
@@ -221,6 +248,7 @@ export async function POST(request: Request) {
       processedCount: results.filter((r) => r.generated > 0).length,
       totalBloopersGenerated: totalGenerated,
       remainingFilmsWithoutBloopers: Math.max(0, remainingCount),
+      remainingFilmsUnderTarget: Math.max(0, remainingCount),
       results,
     });
   } catch (err: any) {

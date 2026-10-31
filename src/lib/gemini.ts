@@ -61,6 +61,7 @@ export async function generateBloopersForMovie(params: {
   attori?: string | null;
   trama?: string | null;
   erroriEsistenti?: string[];
+  countNeeded?: number;
 }): Promise<GenerateBloopersResult> {
   const ai = getGeminiClient();
   if (!ai) {
@@ -83,6 +84,13 @@ export async function generateBloopersForMovie(params: {
           .join("\n")}`
       : "";
 
+  const requested = typeof params.countNeeded === "number" && params.countNeeded > 0
+    ? Math.min(params.countNeeded, 10)
+    : 5;
+  const countInstruction = requested <= 2
+    ? `Trova esattamente ${requested} o ${requested + 1} errori/bloopers concreti, celebri o documentati per questo film.`
+    : `Trova tra ${Math.max(2, requested - 1)} e ${Math.min(10, requested + 1)} errori/bloopers concreti, celebri o documentati per questo film.`;
+
   const prompt = `Sei un esperto enciclopedico di bloopers, errori di montaggio, sviste storiche e ciak falsi nella storia del cinema.
 
 DATI UFFICIALI DEL FILM:
@@ -93,7 +101,7 @@ DATI UFFICIALI DEL FILM:
 ${esclusioneText}
 
 COMPITO:
-Trova tra 5 e 8 errori/bloopers concreti, celebri o documentati per questo film.
+${countInstruction}
 Le categorie ammesse sono ESCLUSIVAMENTE:
 1. "Errori di scena / Posizione"
 2. "Troupe o microfoni visibili"

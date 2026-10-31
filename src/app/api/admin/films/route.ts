@@ -55,9 +55,9 @@ export async function GET(request: Request) {
     } else if (filter === "missing_trivia") {
       films = films.filter((f: any) => f.trivia_count === 0);
     } else if (filter === "with_bloopers") {
-      films = films.filter((f: any) => f.bloopers_count > 0);
+      films = films.filter((f: any) => f.bloopers_count >= 10);
     } else if (filter === "missing_bloopers") {
-      films = films.filter((f: any) => f.bloopers_count === 0);
+      films = films.filter((f: any) => f.bloopers_count < 10);
     }
 
     return NextResponse.json({ films });
