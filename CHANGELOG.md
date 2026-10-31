@@ -6,6 +6,23 @@ Il formato è basato su [Keep a Changelog](https://keepachangelog.com/it/1.0.0/)
 
 ---
 
+## [2.2.0] - 2026-10-31
+
+### ✨ Ottimizzazione Monetizzazione, Deep-Link Prime Video & UI Snella
+- **Deep Linking Diretto Prime Video**:
+  - Risoluzione dell'URL specifico del film via API GraphQL di JustWatch (`standardWebURL` con `gti`/ASIN e tag affiliato `filmbloopers-21`).
+  - Il pulsante porta direttamente alla scheda e player del film su Prime Video (anziché su una pagina generica di risultati di ricerca) sia su desktop che sull'app mobile.
+- **Snellimento UI & Focus su Bloopers**:
+  - Rimozione della barra a 3 pulsanti esterni su mobile e dei bottoni ridondanti su desktop.
+  - Rimozione del pulsante per la ricerca video su YouTube (che disperdeva visitatori).
+  - Rimozione del link in uscita verso IMDb, mantenendo unicamente il badge visivo con la votazione ufficiale (`★ X.X IMDb`).
+- **SEO & Search Intent Preservati**:
+  - Mantenute le indicazioni grafiche e testuali per le piattaforme streaming terze (Netflix, Disney+, Paramount+, ecc.) in modo non cliccabile: soddisfa l'intento di ricerca Google ("dove vederlo in streaming") senza causare bounce rate verso siti terzi privi di programma di affiliazione.
+- **Supporto Edizione Fisica & Libri**:
+  - Aggiunto link discreto e ordinato per trovare l'Edizione Fisica da collezione (DVD, Blu-ray) o l'eventuale romanzo su Amazon con tag affiliato.
+
+---
+
 ## [2.1.0] - 2026-10-30 - Stable Release
 
 Questa release segna il consolidamento stabile della piattaforma Next.js 16 con architettura server/client moderna, piena conformità GDPR/Analytics, isolamento delle metriche e console amministrativa completa e resiliente.

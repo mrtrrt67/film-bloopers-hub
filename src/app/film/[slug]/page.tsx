@@ -4,19 +4,16 @@ import Image from "next/image";
 import Link from "next/link";
 import { 
   Film as FilmIcon, 
-  ShoppingCart, 
-  PlayCircle, 
   ArrowLeft,
   ArrowRight,
   Sparkles,
   AlertCircle,
-  Star,
-  ExternalLink
+  Star
 } from "lucide-react";
 import { createPublicClient } from "@/lib/supabase/public";
 import { Film, Blooper, MovieTrivia, FilmRatingInfo } from "@/lib/types";
 import MovieCard from "@/components/MovieCard";
-import { getAmazonSearchUrl, getYouTubeSearchUrl, slugify } from "@/lib/utils";
+import { getAmazonSearchUrl, slugify } from "@/lib/utils";
 import FilmContentSwitcher from "@/components/FilmContentSwitcher";
 import { getRelatedFilms } from "@/lib/recommendations";
 import { getFilmRatingInfo } from "@/lib/tmdb";
@@ -191,8 +188,6 @@ export default async function FilmDetailPage({ params }: PageProps) {
 
   const amazonTag = process.env.NEXT_PUBLIC_AMAZON_TAG || "filmbloopers-21";
   const amazonUrl = getAmazonSearchUrl(film.titolo, film.anno, amazonTag);
-  const primeVideoUrl = `https://www.primevideo.com/search/ref=atv_nb_sr?phrase=${encodeURIComponent(film.titolo)}&tag=${amazonTag}`;
-  const youtubeUrl = getYouTubeSearchUrl(film.titolo);
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://filmbloopers.online";
   const filmUrl = `${siteUrl}/film/${slug}`;
@@ -373,59 +368,19 @@ export default async function FilmDetailPage({ params }: PageProps) {
                     {trivia.length} Curiosità
                   </span>
                   {ratingInfo && (
-                    <a
-                      href={ratingInfo.imdbUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-900 border border-amber-500/40 text-[10px] font-bold text-zinc-200 hover:border-amber-400 transition-colors"
-                      title="Valutazione e scheda ufficiale su IMDb"
+                    <span
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-900 border border-amber-500/40 text-[10px] font-bold text-zinc-200"
+                      title="Valutazione ufficiale IMDb"
                     >
                       <Star className="h-2.5 w-2.5 fill-amber-400 text-amber-400" />
                       <span className="text-amber-300 font-black">{ratingInfo.rating.toFixed(1)}</span>
                       <span className="rounded bg-[#F5C518] text-black px-1 text-[8px] font-black uppercase tracking-wider">
                         IMDb
                       </span>
-                    </a>
+                    </span>
                   )}
                 </div>
               </div>
-            </div>
-
-            {/* Azioni Esterne Mobile (compatte su 3 colonne con IMDb) */}
-            <div className="grid grid-cols-3 gap-1.5 pt-1">
-              <a
-                href={
-                  ratingInfo?.streaming?.isOnPrimeVideo
-                    ? ratingInfo?.streaming?.primeVideoDirectUrl || primeVideoUrl
-                    : amazonUrl
-                }
-                target="_blank"
-                rel="sponsored noopener noreferrer"
-                className="flex items-center justify-center gap-1 rounded-xl bg-zinc-900/90 border border-zinc-800 hover:border-amber-500/50 py-2 px-1 text-[10px] font-bold text-zinc-200 transition-all shadow-sm"
-              >
-                <ShoppingCart className="h-3 w-3 text-amber-400 shrink-0" />
-                <span className="truncate">{ratingInfo?.streaming?.isOnPrimeVideo ? "Prime Video" : "Amazon"}</span>
-              </a>
-              <a
-                href={youtubeUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1 rounded-xl bg-red-950/20 border border-red-900/40 hover:border-red-600/60 py-2 px-1 text-[10px] font-bold text-red-400 transition-all shadow-sm"
-              >
-                <PlayCircle className="h-3 w-3 text-red-500 shrink-0" />
-                <span className="truncate">YouTube</span>
-              </a>
-              <a
-                href={ratingInfo ? ratingInfo.imdbUrl : `https://www.imdb.com/find/?q=${encodeURIComponent(film.titolo)}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-1 rounded-xl bg-zinc-900/90 border border-zinc-800 hover:border-[#F5C518]/60 py-2 px-1 text-[10px] font-bold text-zinc-200 transition-all shadow-sm"
-              >
-                <span className="rounded bg-[#F5C518] text-black px-1 text-[8px] font-black uppercase">
-                  IMDb
-                </span>
-                <span className="truncate">{ratingInfo ? `${ratingInfo.rating.toFixed(1)} ★` : "IMDb"}</span>
-              </a>
             </div>
 
             {/* Sinossi Trama Mobile */}
@@ -485,38 +440,6 @@ export default async function FilmDetailPage({ params }: PageProps) {
                 amazonTag={amazonTag}
                 variant="sidebar"
               />
-
-              {/* Bottoni Video YouTube & Scheda IMDb Desktop */}
-              <div className="w-full flex flex-col gap-2">
-                <a
-                  href={youtubeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full flex items-center justify-center gap-2 rounded-xl bg-red-950/20 border border-red-900/40 hover:border-red-600/60 py-2.5 px-4 text-xs font-bold text-red-400 transition-all shadow-md group"
-                >
-                  <PlayCircle className="h-4 w-4 text-red-500 group-hover:scale-110 transition-transform" />
-                  Cerca Bloopers su YouTube
-                </a>
-                <a
-                  href={ratingInfo ? ratingInfo.imdbUrl : `https://www.imdb.com/find/?q=${encodeURIComponent(film.titolo)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full flex items-center justify-between gap-2 rounded-xl bg-zinc-900/80 border border-zinc-800 hover:border-[#F5C518]/60 py-2.5 px-4 text-xs font-bold text-zinc-200 transition-all shadow-md group"
-                >
-                  <div className="flex items-center gap-2">
-                    <span className="rounded bg-[#F5C518] text-black px-1.5 py-0.5 text-[10px] font-black uppercase tracking-wider group-hover:scale-105 transition-transform">
-                      IMDb
-                    </span>
-                    <span>Scheda su IMDb</span>
-                  </div>
-                  {ratingInfo && (
-                    <span className="text-xs font-black text-amber-400 flex items-center gap-1">
-                      ★ {ratingInfo.rating.toFixed(1)}
-                    </span>
-                  )}
-                  <ExternalLink className="h-3.5 w-3.5 text-zinc-500 group-hover:text-[#F5C518] transition-colors" />
-                </a>
-              </div>
             </div>
 
             {/* Colonna Destra: Dettagli Film Desktop & Sezione Switcher (Sia Mobile che Desktop) */}
@@ -536,23 +459,19 @@ export default async function FilmDetailPage({ params }: PageProps) {
                     </span>
                   )}
                   {ratingInfo && (
-                    <a
-                      href={ratingInfo.imdbUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900/90 border border-amber-500/30 hover:border-amber-400 px-2.5 py-0.5 text-xs font-bold text-zinc-100 transition-all group shadow-sm"
-                      title="Valutazione e scheda ufficiale su IMDb"
+                    <span
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900/90 border border-amber-500/30 px-2.5 py-0.5 text-xs font-bold text-zinc-100 shadow-sm"
+                      title="Valutazione ufficiale IMDb"
                     >
                       <span className="text-amber-400 flex items-center gap-1">
                         <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" />
                         <span className="font-black text-amber-300">{ratingInfo.rating.toFixed(1)}</span>
                         <span className="text-[10px] text-zinc-500 font-normal">/10</span>
                       </span>
-                      <span className="rounded bg-[#F5C518] text-black px-1.5 py-0.2 text-[9px] font-black uppercase tracking-wider group-hover:brightness-110">
+                      <span className="rounded bg-[#F5C518] text-black px-1.5 py-0.2 text-[9px] font-black uppercase tracking-wider">
                         IMDb
                       </span>
-                      <ExternalLink className="h-3 w-3 text-zinc-500 group-hover:text-amber-400 transition-colors" />
-                    </a>
+                    </span>
                   )}
                   {film.tmdb_id && (
                     <span className="rounded-lg bg-emerald-950/40 border border-emerald-800/60 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
