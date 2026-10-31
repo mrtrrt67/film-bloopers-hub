@@ -79,7 +79,7 @@ export default function MovieCard({ film }: MovieCardProps) {
             </div>
           ) : film.trivia_count === 0 ? (
             <div className="flex items-center gap-1 rounded-lg bg-zinc-950/75 text-zinc-400 border border-zinc-800 backdrop-blur-md px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] font-medium shadow-md">
-              <Sparkles className="h-3 w-3 shrink-0 text-zinc-500" />
+              <Sparkles className="h-3 w-3 shrink-0 text-zinc-400" />
               <span>0 Curiosità</span>
             </div>
           ) : null}

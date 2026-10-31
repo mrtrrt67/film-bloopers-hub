@@ -192,7 +192,7 @@ export default async function HomePage() {
             <div className="text-2xl sm:text-3xl font-black text-white font-mono">
               {countFilms || 250}+
             </div>
-            <div className="text-xs text-zinc-500 font-medium uppercase tracking-wider mt-0.5">
+            <div className="text-xs text-zinc-400 font-medium uppercase tracking-wider mt-0.5">
               Film Archiviati
             </div>
           </div>
@@ -200,7 +200,7 @@ export default async function HomePage() {
             <div className="text-2xl sm:text-3xl font-black text-amber-400 font-mono">
               {((countBloopers || 1000) + (countTrivia || 0))}+
             </div>
-            <div className="text-xs text-zinc-500 font-medium uppercase tracking-wider mt-0.5">
+            <div className="text-xs text-zinc-400 font-medium uppercase tracking-wider mt-0.5">
               Bloopers & Curiosità
             </div>
           </div>
@@ -208,7 +208,7 @@ export default async function HomePage() {
             <div className="text-2xl sm:text-3xl font-black text-emerald-400 font-mono">
               100%
             </div>
-            <div className="text-xs text-zinc-500 font-medium uppercase tracking-wider mt-0.5">
+            <div className="text-xs text-zinc-400 font-medium uppercase tracking-wider mt-0.5">
               Dati TMDB Ufficiali
             </div>
           </div>

@@ -82,7 +82,7 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="mailto:supporto@filmbloopers.it" className="text-zinc-500 hover:text-zinc-300 transition-colors text-[11px] block pt-1">
+                <a href="mailto:supporto@filmbloopers.it" className="text-zinc-400 hover:text-zinc-200 transition-colors text-[11px] block pt-1">
                   Assistenza: supporto@filmbloopers.it
                 </a>
               </li>
@@ -96,14 +96,14 @@ export default function Footer() {
               <p className="font-semibold text-zinc-300">Affiliazione Commerciale Amazon:</p>
               <p>In qualità di Affiliato Amazon, FilmBloopers Hub riceve un guadagno dagli acquisti idonei effettuati tramite i link del sito.</p>
             </div>
-            <div className="text-[11px] text-zinc-500 leading-normal">
+            <div className="text-[11px] text-zinc-400 leading-normal">
               Questo prodotto utilizza le API di The Movie Database (TMDB) per trame, cast e locandine, ma non è approvato o certificato da TMDB.
             </div>
           </div>
         </div>
 
         {/* Informazioni Societarie e Barra Bottom */}
-        <div className="border-t border-zinc-900 pt-6 space-y-3 text-xs text-zinc-500">
+        <div className="border-t border-zinc-900 pt-6 space-y-3 text-xs text-zinc-400">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[11px] text-zinc-400">
             <p>
               <strong>FilmBloopers Hub</strong> — Il database intelligente degli errori cinematografici | P.IVA / C.F.: 12345678901 | Sede Legale: Via Roma 1, 10121 Torino (TO) | Contatti: supporto@filmbloopers.it
