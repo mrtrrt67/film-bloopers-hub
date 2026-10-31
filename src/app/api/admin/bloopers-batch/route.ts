@@ -65,6 +65,7 @@ export async function POST(request: Request) {
     const body = await request.json().catch(() => ({}));
     const limit = Math.min(Number(body?.limit) || 1, 10);
     const targetCount = Number(body?.targetCount) || 10;
+    const excludeIds: number[] = Array.isArray(body?.excludeIds) ? body.excludeIds : [];
 
     // 1. Recupera film che hanno meno di targetCount bloopers
     const { data: allFilms, error: errFilms } = await db
@@ -74,23 +75,30 @@ export async function POST(request: Request) {
 
     if (errFilms) throw errFilms;
 
+    const remainingUnderTargetOverall = (allFilms || []).filter(
+      (f: any) => (f.errori?.[0]?.count || 0) < targetCount
+    ).length;
+
     // Ordina i film per minor numero di bloopers esistenti (prima chi ne ha 1, 2, 3...)
     const candidateFilms = (allFilms || [])
       .map((f: any) => ({
         ...f,
         currentCount: f.errori?.[0]?.count || 0,
       }))
-      .filter((f: any) => f.currentCount < targetCount)
+      .filter((f: any) => f.currentCount < targetCount && !excludeIds.includes(f.id))
       .sort((a: any, b: any) => a.currentCount - b.currentCount);
 
     if (candidateFilms.length === 0) {
       return NextResponse.json({
         success: true,
-        message: `Tutti i film presenti nel catalogo hanno già almeno ${targetCount} bloopers!`,
+        message:
+          remainingUnderTargetOverall === 0
+            ? `Tutti i film presenti nel catalogo hanno già almeno ${targetCount} bloopers!`
+            : `Tutti i film disponibili per questa sessione sono stati esaminati.`,
         processedCount: 0,
         totalBloopersGenerated: 0,
-        remainingFilmsWithoutBloopers: 0,
-        remainingFilmsUnderTarget: 0,
+        remainingFilmsWithoutBloopers: remainingUnderTargetOverall,
+        remainingFilmsUnderTarget: remainingUnderTargetOverall,
         results: [],
       });
     }

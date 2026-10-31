@@ -46,6 +46,28 @@ async function getAvailableModels(ai: GoogleGenAI): Promise<string[]> {
   return discovered;
 }
 
+function cleanAndParseJson<T>(raw: string): T | null {
+  if (!raw) return null;
+  const jsonMatch = raw.match(/\[[\s\S]*\]/);
+  const text = jsonMatch ? jsonMatch[0] : raw;
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    let sanitized = text.replace(/,\s*([}\]])/g, "$1");
+    if (!sanitized.endsWith("]") && sanitized.startsWith("[")) {
+      const lastObj = sanitized.lastIndexOf("}");
+      if (lastObj !== -1) {
+        sanitized = sanitized.slice(0, lastObj + 1) + "]";
+      }
+    }
+    try {
+      return JSON.parse(sanitized) as T;
+    } catch {
+      return null;
+    }
+  }
+}
+
 export interface GenerateBloopersResult {
   bloopers: GeneratedBlooper[];
   modelUsed?: string;
@@ -145,7 +167,7 @@ FORMATO OUTPUT:
       const jsonMatch = text.match(/\[[\s\S]*\]/);
       const cleanJson = jsonMatch ? jsonMatch[0] : text;
 
-      const parsed = JSON.parse(cleanJson) as GeneratedBlooper[];
+      const parsed = cleanAndParseJson<GeneratedBlooper[]>(text);
       if (Array.isArray(parsed) && parsed.length > 0) {
         return {
           bloopers: parsed.map((item) => ({
@@ -189,7 +211,7 @@ FORMATO OUTPUT:
       const jsonMatch = text.match(/\[[\s\S]*\]/);
       const cleanJson = jsonMatch ? jsonMatch[0] : text;
 
-      const parsed = JSON.parse(cleanJson) as GeneratedBlooper[];
+      const parsed = cleanAndParseJson<GeneratedBlooper[]>(text);
       if (Array.isArray(parsed) && parsed.length > 0) {
         return {
           bloopers: parsed.map((item) => ({

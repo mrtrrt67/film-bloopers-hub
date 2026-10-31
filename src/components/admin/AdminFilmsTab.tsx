@@ -318,11 +318,11 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     );
   };
 
-  // Incrementa bloopers con IA in modo sequenziale (quantità selezionabile: 5, 20 o 50 film)
+  // Incrementa bloopers con IA in modo sequenziale con protezione rate-limit (3s di pausa) ed esclusione duplicati
   const handleBatchPopulateBloopers = async () => {
     openConfirm(
       `⚡ Incrementa Bloopers con IA (${bloopersBatchSize} Film)`,
-      `Avviare la ricerca ed integrazione automatica con Gemini per arricchire i bloopers di ${bloopersBatchSize} film? Verranno generati nuovi errori verificati evitando duplicati con avanzamento in tempo reale.`,
+      `Avviare la ricerca ed integrazione automatica con Gemini per arricchire i bloopers di ${bloopersBatchSize} film? Le chiamate avvengono con ritmo controllato per rispettare i limiti API di Gemini ed evitare interruzioni.`,
       async () => {
         setPopulatingBloopers(true);
         setActionMessage(null);
@@ -330,41 +330,79 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
         let totalGenerated = 0;
         let lastRemaining = missingBloopersCount ?? 0;
         let lastError: string | null = null;
+        const processedFilmIds: number[] = [];
 
         try {
-          // Eseguiamo bloopersBatchSize chiamate (limit: 1, targetCount: 10) in sequenza per eliminare qualsiasi rischio di timeout Vercel
           for (let step = 1; step <= bloopersBatchSize; step++) {
             setPopulatingBloopersProgress(`Film ${step}/${bloopersBatchSize} in elaborazione...`);
-            const res = await fetch("/api/admin/bloopers-batch", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ limit: 1, targetCount: 10 }),
-            });
 
-            if (!res.ok) {
-              const errJson = await res.json().catch(() => ({}));
-              lastError = errJson.error || `Errore HTTP ${res.status}`;
-              break;
+            let res: Response | null = null;
+            let data: any = null;
+            let retries = 0;
+
+            // Fino a 2 tentativi con raffreddamento automatico in caso di quota 429
+            while (retries < 2) {
+              try {
+                res = await fetch("/api/admin/bloopers-batch", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    limit: 1,
+                    targetCount: 10,
+                    excludeIds: processedFilmIds,
+                  }),
+                });
+
+                if (res.status === 429) {
+                  setPopulatingBloopersProgress(`Film ${step}/${bloopersBatchSize}: limite temporaneo Gemini, raffreddamento in corso (8s)...`);
+                  await new Promise((r) => setTimeout(r, 8000));
+                  retries++;
+                  continue;
+                }
+
+                if (res.ok) {
+                  data = await res.json();
+                  break;
+                } else {
+                  const errJson = await res.json().catch(() => ({}));
+                  lastError = errJson.error || `Errore HTTP ${res.status}`;
+                  break;
+                }
+              } catch (fetchErr: any) {
+                lastError = fetchErr?.message || "Errore di connessione";
+                break;
+              }
             }
 
-            const data = await res.json();
-            if (!data.success) {
-              lastError = data.error || "Generazione non riuscita";
-              break;
+            if (!data || !data.success) {
+              // Se questo singolo film ha restituito errore, registralo ma NON interrompere il batch: passa al successivo!
+              console.warn(`Film ${step} saltato: ${lastError || "errore sconosciuto"}`);
+            } else {
+              if (data.results && data.results.length > 0) {
+                data.results.forEach((r: any) => {
+                  if (r.film_id) processedFilmIds.push(r.film_id);
+                });
+              }
+
+              if (data.processedCount > 0) {
+                totalProcessed += data.processedCount;
+                totalGenerated += data.totalBloopersGenerated || 0;
+              }
+
+              if (typeof data.remainingFilmsUnderTarget === "number") {
+                lastRemaining = data.remainingFilmsUnderTarget;
+                setMissingBloopersCount(data.remainingFilmsUnderTarget);
+                // Se tutti i film del catalogo hanno già raggiunto quota 10, possiamo terminare
+                if (data.remainingFilmsUnderTarget === 0) {
+                  break;
+                }
+              }
             }
 
-            if (data.processedCount === 0) {
-              // Tutti i film del catalogo sono completati
-              lastRemaining = 0;
-              setMissingBloopersCount(0);
-              break;
-            }
-
-            totalProcessed += data.processedCount || 0;
-            totalGenerated += data.totalBloopersGenerated || 0;
-            if (typeof data.remainingFilmsWithoutBloopers === "number") {
-              lastRemaining = data.remainingFilmsWithoutBloopers;
-              setMissingBloopersCount(data.remainingFilmsWithoutBloopers);
+            // Pausa cortese di 3 secondi tra una chiamata e l'altra per rimanere stabilmente
+            // sotto il limite di 15 richieste/minuto (RPM) della Free Tier di Google Gemini
+            if (step < bloopersBatchSize) {
+              await new Promise((r) => setTimeout(r, 3000));
             }
           }
 
