@@ -44,6 +44,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   const [populatingBloopers, setPopulatingBloopers] = useState(false);
   const [populatingBloopersProgress, setPopulatingBloopersProgress] = useState<string | null>(null);
   const [missingBloopersCount, setMissingBloopersCount] = useState<number | null>(null);
+  const [bloopersBatchSize, setBloopersBatchSize] = useState<number>(5);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
 
   const [confirmModal, setConfirmModal] = useState<{
@@ -317,11 +318,11 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     );
   };
 
-  // Incrementa bloopers a quota 10 (5 alla volta con IA in modo sequenziale)
+  // Incrementa bloopers con IA in modo sequenziale (quantità selezionabile: 5, 20 o 50 film)
   const handleBatchPopulateBloopers = async () => {
     openConfirm(
-      "⚡ Incrementa Bloopers con IA (5 Film)",
-      "Avviare la ricerca ed integrazione automatica con Gemini per arricchire i bloopers di 5 film? Verranno generati nuovi errori verificati evitando duplicati.",
+      `⚡ Incrementa Bloopers con IA (${bloopersBatchSize} Film)`,
+      `Avviare la ricerca ed integrazione automatica con Gemini per arricchire i bloopers di ${bloopersBatchSize} film? Verranno generati nuovi errori verificati evitando duplicati con avanzamento in tempo reale.`,
       async () => {
         setPopulatingBloopers(true);
         setActionMessage(null);
@@ -331,9 +332,9 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
         let lastError: string | null = null;
 
         try {
-          // Eseguiamo 5 chiamate (limit: 1, targetCount: 10) in sequenza per eliminare qualsiasi rischio di timeout Vercel
-          for (let step = 1; step <= 5; step++) {
-            setPopulatingBloopersProgress(`Film ${step}/5 in elaborazione...`);
+          // Eseguiamo bloopersBatchSize chiamate (limit: 1, targetCount: 10) in sequenza per eliminare qualsiasi rischio di timeout Vercel
+          for (let step = 1; step <= bloopersBatchSize; step++) {
+            setPopulatingBloopersProgress(`Film ${step}/${bloopersBatchSize} in elaborazione...`);
             const res = await fetch("/api/admin/bloopers-batch", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -384,7 +385,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
           setPopulatingBloopersProgress(null);
         }
       },
-      "Avvia Generazione 5 Film",
+      `Avvia Generazione (${bloopersBatchSize} Film)`,
       "warning"
     );
   };
@@ -564,19 +565,39 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
             <span>Cast Mancante ({missingCastCount})</span>
           </button>
 
-          <button
-            onClick={handleBatchPopulateBloopers}
-            disabled={populatingBloopers || missingBloopersCount === 0}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-orange-500 to-amber-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-md shadow-orange-500/10 whitespace-nowrap shrink-0"
-            title="Incrementa i bloopers con IA per i film con meno contenuti"
-          >
-            <Sparkles className={`h-3.5 w-3.5 ${populatingBloopers ? "animate-spin" : ""}`} />
-            <span>
-              {populatingBloopers
-                ? (populatingBloopersProgress || "Generazione 5 film...")
-                : `⚡ Incrementa Bloopers (5 film)${missingBloopersCount !== null ? ` [${missingBloopersCount}]` : ""}`}
-            </span>
-          </button>
+          <div className="flex items-center gap-1 shrink-0 bg-zinc-950/60 p-1 rounded-2xl border border-zinc-800">
+            <div className="flex items-center bg-zinc-900 rounded-xl p-0.5 border border-zinc-800">
+              {[5, 20, 50].map((num) => (
+                <button
+                  key={num}
+                  type="button"
+                  onClick={() => setBloopersBatchSize(num)}
+                  disabled={populatingBloopers}
+                  className={`px-2 py-1 text-[11px] font-bold rounded-lg transition ${
+                    bloopersBatchSize === num
+                      ? "bg-amber-500 text-zinc-950 shadow-sm"
+                      : "text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  {num}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={handleBatchPopulateBloopers}
+              disabled={populatingBloopers || missingBloopersCount === 0}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-orange-500 to-amber-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-md shadow-orange-500/10 whitespace-nowrap"
+              title={`Incrementa i bloopers con IA per ${bloopersBatchSize} film con meno contenuti`}
+            >
+              <Sparkles className={`h-3.5 w-3.5 ${populatingBloopers ? "animate-spin" : ""}`} />
+              <span>
+                {populatingBloopers
+                  ? (populatingBloopersProgress || `Generazione ${bloopersBatchSize} film...`)
+                  : `⚡ Incrementa Bloopers (${bloopersBatchSize} film)${missingBloopersCount !== null ? ` [${missingBloopersCount}]` : ""}`}
+              </span>
+            </button>
+          </div>
 
           <button
             onClick={handleBatchPopulateTrivia}
