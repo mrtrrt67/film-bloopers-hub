@@ -30,11 +30,36 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 const ai = new GoogleGenAI({ apiKey: geminiApiKey });
 
 const DEFAULT_MODELS = [
-  "gemini-2.5-flash",
-  "gemini-flash-latest",
-  "gemini-2.5-pro",
-  "gemini-1.5-flash"
+  "gemini-flash-lite-latest",
+  "gemini-3.5-flash",
+  "gemini-3-flash-preview",
+  "gemini-3.6-flash",
+  "gemini-3.8-flash",
+  "gemini-3.7-flash",
+  "gemini-flash-latest"
 ];
+
+function cleanAndParseJson(raw) {
+  if (!raw) return null;
+  const jsonMatch = raw.match(/\[[\s\S]*\]/);
+  const text = jsonMatch ? jsonMatch[0] : raw;
+  try {
+    return JSON.parse(text);
+  } catch {
+    let sanitized = text.replace(/,\s*([}\]])/g, "$1");
+    if (!sanitized.endsWith("]") && sanitized.startsWith("[")) {
+      const lastObj = sanitized.lastIndexOf("}");
+      if (lastObj !== -1) {
+        sanitized = sanitized.slice(0, lastObj + 1) + "]";
+      }
+    }
+    try {
+      return JSON.parse(sanitized);
+    } catch {
+      return null;
+    }
+  }
+}
 
 async function generateBloopers(film, existingBloopers, countNeeded) {
   const esclusioneText = existingBloopers.length > 0
@@ -86,9 +111,7 @@ FORMATO OUTPUT:
       const text = response.text?.trim() || "";
       if (!text) continue;
 
-      const jsonMatch = text.match(/\[[\s\S]*\]/);
-      const cleanJson = jsonMatch ? jsonMatch[0] : text;
-      const parsed = JSON.parse(cleanJson);
+      const parsed = cleanAndParseJson(text);
       if (Array.isArray(parsed) && parsed.length > 0) {
         return { bloopers: parsed, modelUsed: model };
       }
@@ -184,7 +207,7 @@ async function main() {
 
     // Pausa cortese per rate-limit
     if (i < batch.length - 1) {
-      await new Promise(r => setTimeout(r, 1200));
+      await new Promise(r => setTimeout(r, 3000));
     }
   }
 
