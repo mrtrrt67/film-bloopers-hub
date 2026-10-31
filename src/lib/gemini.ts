@@ -262,6 +262,7 @@ export async function generateTriviaForMovie(params: {
   attori?: string | null;
   trama?: string | null;
   triviaEsistenti?: string[];
+  countNeeded?: number;
 }): Promise<GenerateTriviaResult> {
   const ai = getGeminiClient();
   if (!ai) {
@@ -274,7 +275,7 @@ export async function generateTriviaForMovie(params: {
     };
   }
 
-  const { titolo, anno, regista, attori, trama, triviaEsistenti = [] } = params;
+  const { titolo, anno, regista, attori, trama, triviaEsistenti = [], countNeeded } = params;
 
   const esclusioneText =
     triviaEsistenti.length > 0
@@ -294,7 +295,7 @@ DATI UFFICIALI DEL FILM:
 ${esclusioneText}
 
 COMPITO:
-Trova tra 5 e 8 curiosità, retroscena, aneddoti memorabili o segreti di produzione concreti e verificati su questo film.
+${countNeeded ? `Trova ESATTAMENTE ${Math.max(2, countNeeded)}` : "Trova tra 5 e 8"} curiosità, retroscena, aneddoti memorabili o segreti di produzione concreti e verificati su questo film.
 
 Le categorie ammesse sono ESCLUSIVAMENTE:
 1. "Curiosità & Retroscena"

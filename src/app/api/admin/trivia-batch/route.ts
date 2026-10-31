@@ -113,6 +113,8 @@ export async function POST(request: Request) {
 
         const triviaEsistenti = (existingTriviaRows || []).map((t: any) => `${t.titolo}: ${t.descrizione}`);
 
+        const countNeeded = Math.max(1, targetCount - (film.currentCount || 0));
+
         const genResult = await generateTriviaForMovie({
           titolo: film.titolo,
           anno: film.anno,
@@ -120,6 +122,7 @@ export async function POST(request: Request) {
           attori: film.attori,
           trama: film.trama,
           triviaEsistenti,
+          countNeeded,
         });
 
         const { trivia, modelUsed, executionTimeSec, error: genError, errorsLog } = genResult;
@@ -161,7 +164,9 @@ export async function POST(request: Request) {
           continue;
         }
 
-        const daInserire = trivia.map((g, idx) => ({
+        const toInsert = trivia.slice(0, countNeeded);
+
+        const daInserire = toInsert.map((g, idx) => ({
           film_id: film.id,
           categoria: g.categoria,
           titolo: g.titolo,

@@ -66,7 +66,7 @@ async function generateTrivia(film, existingTrivia, countNeeded) {
     ? `\nCURIOSITÀ GIÀ REGISTRATE (NON RIPETERE QUESTE O ANEDDOTI SIMILI):\n${existingTrivia.slice(0, 15).map(e => `- ${e.slice(0, 120)}`).join('\n')}`
     : '';
 
-  const numToGen = Math.min(Math.max(2, countNeeded), 3);
+  const numToGen = Math.max(2, countNeeded);
 
   const prompt = `Sei un esperto enciclopedico di storia del cinema, retroscena e aneddoti di produzione cinematografica.
 
@@ -187,7 +187,9 @@ async function main() {
       continue;
     }
 
-    const daInserire = trivia.map((g, idx) => ({
+    const toInsert = trivia.slice(0, countNeeded);
+
+    const daInserire = toInsert.map((g, idx) => ({
       film_id: film.id,
       categoria: g.categoria || "Aneddoti dal set",
       titolo: g.titolo || "Curiosità dal set",
@@ -207,7 +209,7 @@ async function main() {
     } else {
       totalAdded += daInserire.length;
       const newTotal = film.currentCount + daInserire.length;
-      console.log(`   ✅ Inserite ${daInserire.length} nuove curiosità (via ${modelUsed}) -> Totale film: ${newTotal} curiosità`);
+      console.log(`   ✅ Inserite ${daInserire.length} nuove curiosità (via ${modelUsed}) -> Totale film: ${newTotal}/${targetCount} curiosità`);
     }
 
     // Pausa di 3 secondi tra una chiamata e l'altra per rimanere sotto i 15 RPM
