@@ -157,10 +157,10 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
       return (f.bloopers_count || 0) < 10;
     }
     if (filterType === "with_trivia") {
-      return (f.trivia_count || 0) > 0;
+      return (f.trivia_count || 0) >= 10;
     }
     if (filterType === "missing_trivia") {
-      return !f.trivia_count || f.trivia_count === 0;
+      return (f.trivia_count || 0) < 10;
     }
     if (filterType === "missing_poster") {
       return !f.poster_url || f.poster_url.trim() === "";
@@ -251,7 +251,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   const handleBatchPopulateTrivia = async () => {
     openConfirm(
       `⚡ Popola Curiosità con IA (${triviaBatchSize} Film)`,
-      `Avviare la generazione automatica con Gemini per ${triviaBatchSize} film che non hanno ancora curiosità? Verranno generate 3 curiosità e aneddoti verificati per ciascuna pellicola con ritmo controllato.`,
+      `Avviare la generazione automatica con Gemini per ${triviaBatchSize} film per arricchirli con curiosità inedite? Verranno generate 3 nuove curiosità e aneddoti verificati per ciascuna pellicola con ritmo controllato.`,
       async () => {
         setPopulatingTrivia(true);
         setActionMessage(null);
@@ -598,8 +598,8 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
 
   const withBloopersCount = films.filter((f) => (f.bloopers_count || 0) >= 10).length;
   const missingBloopersFilmCount = films.filter((f) => (f.bloopers_count || 0) < 10).length;
-  const withTriviaCount = films.filter((f) => (f.trivia_count || 0) > 0).length;
-  const missingTriviaFilmCount = films.filter((f) => !f.trivia_count || f.trivia_count === 0).length;
+  const withTriviaCount = films.filter((f) => (f.trivia_count || 0) >= 10).length;
+  const missingTriviaFilmCount = films.filter((f) => (f.trivia_count || 0) < 10).length;
   const missingPostersCount = films.filter((f) => !f.poster_url || f.poster_url.trim() === "").length;
   const missingCastCount = films.filter((f) => !f.attori || f.attori.trim() === "" || f.attori === "N/D").length;
   const duplicatePostersCount = films.filter((f) => f.poster_url && posterFrequency[f.poster_url] > 1).length;
@@ -696,13 +696,13 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
               onClick={handleBatchPopulateTrivia}
               disabled={populatingTrivia || missingTriviaCount === 0}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-md shadow-amber-500/10 whitespace-nowrap"
-              title={`Genera curiosità con IA per ${triviaBatchSize} film che non ne hanno ancora`}
+              title={`Genera curiosità con IA per ${triviaBatchSize} film`}
             >
               <Sparkles className={`h-3.5 w-3.5 ${populatingTrivia ? "animate-spin" : ""}`} />
               <span>
                 {populatingTrivia
                   ? (populatingProgress || `Generazione ${triviaBatchSize} film...`)
-                  : `⚡ Popola Curiosità (${triviaBatchSize} film)${missingTriviaCount !== null ? ` [${missingTriviaCount}]` : ""}`}
+                  : `⚡ Incrementa Curiosità (${triviaBatchSize} film)${missingTriviaCount !== null ? ` [${missingTriviaCount}]` : ""}`}
               </span>
             </button>
           </div>
@@ -781,7 +781,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                 : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
             }`}
           >
-            Senza Curiosità ({missingTriviaFilmCount})
+            Da Incrementare ({missingTriviaFilmCount})
           </button>
           <button
             onClick={() => setFilterType("missing_poster")}

@@ -16,13 +16,13 @@ envContent.split('\n').forEach(line => {
 
 const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL || "https://gmiwhscbqvadnlqruhjs.supabase.co";
 const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENAI_API_KEY || env.GEMINI_API_KEY || env.GOOGLE_API_KEY || env.GOOGLE_GENAI_API_KEY || process.argv[3];
+const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENAI_API_KEY || env.GEMINI_API_KEY || env.GOOGLE_API_KEY || env.GOOGLE_GENAI_API_KEY || process.argv[4];
 
 if (!geminiApiKey) {
   console.log("\nℹ️  GEMINI_API_KEY non rilevata in .env.local");
   console.log("👉 Puoi avviare il batch direttamente dall'interfaccia Admin (/admin) dove le chiavi Vercel sono attive,");
   console.log("   oppure da terminale passando la chiave come parametro:");
-  console.log("   node scripts/populate-trivia-batch.js <numero_film> <GEMINI_API_KEY>\n");
+  console.log("   node scripts/populate-trivia-batch.js <numero_film> <quota_target> <GEMINI_API_KEY>\n");
   process.exit(1);
 }
 
@@ -61,7 +61,13 @@ function cleanAndParseJson(raw) {
   }
 }
 
-async function generateTrivia(film) {
+async function generateTrivia(film, existingTrivia, countNeeded) {
+  const esclusioneText = existingTrivia.length > 0
+    ? `\nCURIOSITÀ GIÀ REGISTRATE (NON RIPETERE QUESTE O ANEDDOTI SIMILI):\n${existingTrivia.slice(0, 15).map(e => `- ${e.slice(0, 120)}`).join('\n')}`
+    : '';
+
+  const numToGen = Math.min(Math.max(2, countNeeded), 3);
+
   const prompt = `Sei un esperto enciclopedico di storia del cinema, retroscena e aneddoti di produzione cinematografica.
 
 DATI UFFICIALI DEL FILM:
@@ -69,9 +75,10 @@ DATI UFFICIALI DEL FILM:
 - Regia: ${film.regista || "N/D"}
 - Cast: ${film.attori || "N/D"}
 - Sinossi: ${film.trama || "N/D"}
+${esclusioneText}
 
 COMPITO:
-Trova ESATTAMENTE 3 curiosità autentiche, aneddoti inediti dal set o dettagli di backstage affascinanti e documentati su questo film.
+Trova ESATTAMENTE ${numToGen} curiosità autentiche, aneddoti inediti dal set o dettagli di backstage affascinanti e documentati su questo film.
 
 Le categorie ammesse sono ESCLUSIVAMENTE:
 1. "Aneddoti dal set"
@@ -123,9 +130,10 @@ FORMATO OUTPUT:
 
 async function main() {
   const maxToProcess = parseInt(process.argv[2], 10) || 5;
+  const targetCount = parseInt(process.argv[3], 10) || 10;
 
   console.log(`\n===============================================================`);
-  console.log(`✨ AVVIO BATCH GENERAZIONE CURIOSITÀ FILM CON IA`);
+  console.log(`✨ AVVIO BATCH INCREMENTO CURIOSITÀ FILM A QUOTA ${targetCount}`);
   console.log(`===============================================================`);
 
   const { data: allFilms, error } = await supabase
@@ -138,14 +146,20 @@ async function main() {
     return;
   }
 
-  const candidateFilms = (allFilms || []).filter(f => (f.movie_trivia?.[0]?.count || 0) === 0);
+  const candidateFilms = (allFilms || [])
+    .map(f => ({
+      ...f,
+      currentCount: f.movie_trivia?.[0]?.count || 0
+    }))
+    .filter(f => f.currentCount < targetCount)
+    .sort((a, b) => a.currentCount - b.currentCount); // Prima quelli con meno curiosità
 
   console.log(`📊 Film totali nel database: ${allFilms.length}`);
-  console.log(`✨ Film ancora senza curiosità: ${candidateFilms.length}`);
+  console.log(`🎯 Film con meno di ${targetCount} curiosità: ${candidateFilms.length}`);
   console.log(`⚡ Film da elaborare in questa sessione: ${Math.min(candidateFilms.length, maxToProcess)}\n`);
 
   if (candidateFilms.length === 0) {
-    console.log(`✅ Tutti i film del catalogo hanno già almeno una curiosità!`);
+    console.log(`✅ Tutti i film del catalogo hanno già almeno ${targetCount} curiosità!`);
     return;
   }
 
@@ -154,9 +168,19 @@ async function main() {
 
   for (let i = 0; i < batch.length; i++) {
     const film = batch[i];
-    console.log(`[${i + 1}/${batch.length}] 🎥 "${film.titolo}" (${film.anno || 'N/D'}) - Generazione curiosità in corso...`);
+    const countNeeded = targetCount - film.currentCount;
 
-    const { trivia, modelUsed, error: genError } = await generateTrivia(film);
+    console.log(`[${i + 1}/${batch.length}] 🎥 "${film.titolo}" (${film.anno || 'N/D'}) - Attuali: ${film.currentCount} curiosità | Mancanti a quota ${targetCount}: ${countNeeded}`);
+
+    // Recupera curiosità esistenti per non duplicarle
+    const { data: existing } = await supabase
+      .from('movie_trivia')
+      .select('titolo, descrizione')
+      .eq('film_id', film.id);
+
+    const descrizioni = (existing || []).map(e => `${e.titolo}: ${e.descrizione}`);
+
+    const { trivia, modelUsed, error: genError } = await generateTrivia(film, descrizioni, countNeeded);
 
     if (genError || !trivia || trivia.length === 0) {
       console.log(`   ⚠️ Errore o nessuna curiosità generata: ${genError || 'vuoto'}`);
@@ -173,7 +197,7 @@ async function main() {
       inserito_da: "IA (Batch Admin)",
       provenienza: "ia",
       likes: Math.floor(Math.random() * 8) + 1,
-      ordine: idx + 1,
+      ordine: (film.currentCount || 0) + idx + 1,
     }));
 
     const { error: insError } = await supabase.from('movie_trivia').insert(daInserire);
@@ -182,7 +206,8 @@ async function main() {
       console.log(`   ❌ Errore salvataggio DB: ${insError.message}`);
     } else {
       totalAdded += daInserire.length;
-      console.log(`   ✅ Inserite ${daInserire.length} nuove curiosità (via ${modelUsed})`);
+      const newTotal = film.currentCount + daInserire.length;
+      console.log(`   ✅ Inserite ${daInserire.length} nuove curiosità (via ${modelUsed}) -> Totale film: ${newTotal} curiosità`);
     }
 
     // Pausa di 3 secondi tra una chiamata e l'altra per rimanere sotto i 15 RPM
@@ -192,9 +217,8 @@ async function main() {
   }
 
   console.log(`\n===============================================================`);
-  console.log(`🎉 BATCH COMPLETATO: Generate ${totalAdded} curiosità su ${batch.length} film!`);
+  console.log(`🎉 BATCH COMPLETATO: Aggiunte ${totalAdded} curiosità su ${batch.length} film!`);
   console.log(`===============================================================\n`);
 }
 
 main().catch(console.error);
-
