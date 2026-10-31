@@ -168,7 +168,7 @@ async function main() {
       approvato: true,
       conferme: 0,
       contestazioni: 0,
-      inserito_da: "IA (Batch Quota 10)",
+      inserito_da: "IA (Batch Admin)",
       provenienza: "ia"
     }));
 
@@ -179,7 +179,7 @@ async function main() {
     } else {
       totalAdded += daInserire.length;
       const newTotal = film.currentCount + daInserire.length;
-      console.log(`   ✅ Inseriti ${daInserire.length} nuovi bloopers (via ${modelUsed}) -> Totale film: ${newTotal}/${targetCount}`);
+      console.log(`   ✅ Inseriti ${daInserire.length} nuovi bloopers (via ${modelUsed}) -> Totale film: ${newTotal} bloopers`);
     }
 
     // Pausa cortese per rate-limit

@@ -320,8 +320,8 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   // Incrementa bloopers a quota 10 (5 alla volta con IA in modo sequenziale)
   const handleBatchPopulateBloopers = async () => {
     openConfirm(
-      "⚡ Porta a 10 Bloopers con IA (5 Film)",
-      "Avviare la ricerca ed integrazione automatica con Gemini per portare a quota 10 i bloopers di 5 film che ne hanno meno? Verranno generati solo gli errori mancanti evitando duplicati.",
+      "⚡ Incrementa Bloopers con IA (5 Film)",
+      "Avviare la ricerca ed integrazione automatica con Gemini per arricchire i bloopers di 5 film? Verranno generati nuovi errori verificati evitando duplicati.",
       async () => {
         setPopulatingBloopers(true);
         setActionMessage(null);
@@ -369,7 +369,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
 
           if (totalProcessed > 0) {
             setActionMessage(
-              `🎬 IA completata con successo: aggiunti ${totalGenerated} nuovi bloopers portando ${totalProcessed} film a quota 10! (${lastRemaining} film ancora sotto quota 10)`
+              `🎬 IA completata con successo: aggiunti ${totalGenerated} nuovi bloopers su ${totalProcessed} film! (${lastRemaining} film ancora da incrementare)`
             );
             await fetchFilms();
             await fetchMissingBloopersStats();
@@ -568,13 +568,13 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
             onClick={handleBatchPopulateBloopers}
             disabled={populatingBloopers || missingBloopersCount === 0}
             className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-orange-500 to-amber-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-md shadow-orange-500/10 whitespace-nowrap shrink-0"
-            title="Incrementa i bloopers con IA portando a quota 10 i film che ne hanno meno"
+            title="Incrementa i bloopers con IA per i film con meno contenuti"
           >
             <Sparkles className={`h-3.5 w-3.5 ${populatingBloopers ? "animate-spin" : ""}`} />
             <span>
               {populatingBloopers
                 ? (populatingBloopersProgress || "Generazione 5 film...")
-                : `⚡ Porta a 10 Bloopers (5 film)${missingBloopersCount !== null ? ` [${missingBloopersCount}]` : ""}`}
+                : `⚡ Incrementa Bloopers (5 film)${missingBloopersCount !== null ? ` [${missingBloopersCount}]` : ""}`}
             </span>
           </button>
 
@@ -635,7 +635,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                 : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
             }`}
           >
-            <span>🎬 Con ≥10 Bloopers ({withBloopersCount})</span>
+            <span>🎬 Con Bloopers ({withBloopersCount})</span>
           </button>
           <button
             onClick={() => setFilterType("missing_bloopers")}
@@ -645,7 +645,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                 : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
             }`}
           >
-            Meno di 10 Bloopers ({missingBloopersFilmCount})
+            Da Incrementare ({missingBloopersFilmCount})
           </button>
           <button
             onClick={() => setFilterType("with_trivia")}
@@ -776,13 +776,9 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                           </span>
                         )}
 
-                        {(film.bloopers_count || 0) >= 10 ? (
-                          <span className="rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[9px] font-bold px-1.5 py-0.5 flex items-center gap-1">
-                            🎬 {film.bloopers_count} Blooper
-                          </span>
-                        ) : (film.bloopers_count || 0) > 0 ? (
+                        {(film.bloopers_count || 0) > 0 ? (
                           <span className="rounded bg-orange-500/20 text-orange-300 border border-orange-500/30 text-[9px] font-bold px-1.5 py-0.5 flex items-center gap-1">
-                            🎬 {film.bloopers_count}/10 Blooper
+                            🎬 {film.bloopers_count} Blooper
                           </span>
                         ) : (
                           <span className="rounded bg-zinc-800/80 text-zinc-500 border border-zinc-800 text-[9px] font-medium px-1.5 py-0.5">
