@@ -55,7 +55,8 @@ export async function POST(request: Request) {
     const db = hasServiceKey ? createAdminClient() : supabase;
 
     const body = await request.json().catch(() => ({}));
-    const limit = Math.min(Number(body?.limit) || 5, 10); // Massimo 10 per volta per sicurezza timeout
+    const limit = Math.min(Number(body?.limit) || 1, 10);
+    const excludeIds: number[] = Array.isArray(body?.excludeIds) ? body.excludeIds : [];
 
     // 1. Recupera film senza curiosità
     const { data: allFilms, error: errFilms } = await db
@@ -65,15 +66,25 @@ export async function POST(request: Request) {
 
     if (errFilms) throw errFilms;
 
-    const candidateFilms = (allFilms || []).filter((f: any) => (f.movie_trivia?.[0]?.count || 0) === 0);
+    const remainingWithoutTriviaOverall = (allFilms || []).filter(
+      (f: any) => (f.movie_trivia?.[0]?.count || 0) === 0
+    ).length;
+
+    const candidateFilms = (allFilms || [])
+      .filter(
+        (f: any) => (f.movie_trivia?.[0]?.count || 0) === 0 && !excludeIds.includes(f.id)
+      );
 
     if (candidateFilms.length === 0) {
       return NextResponse.json({
         success: true,
-        message: "Tutti i film presenti nel catalogo hanno già almeno una curiosità!",
+        message:
+          remainingWithoutTriviaOverall === 0
+            ? "Tutti i film presenti nel catalogo hanno già almeno una curiosità!"
+            : "Tutti i film disponibili per questa sessione sono stati esaminati.",
         processedCount: 0,
         totalTriviaGenerated: 0,
-        remainingFilmsWithoutTrivia: 0,
+        remainingFilmsWithoutTrivia: remainingWithoutTriviaOverall,
         results: [],
       });
     }
@@ -208,7 +219,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const remainingCount = candidateFilms.length - results.filter((r) => r.generated > 0).length;
+    const remainingCount = (allFilms || []).filter((f: any) => (f.movie_trivia?.[0]?.count || 0) === 0).length;
 
     return NextResponse.json({
       success: true,

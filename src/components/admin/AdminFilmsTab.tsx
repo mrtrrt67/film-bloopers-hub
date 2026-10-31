@@ -40,6 +40,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   const [populatingTrivia, setPopulatingTrivia] = useState(false);
   const [populatingProgress, setPopulatingProgress] = useState<string | null>(null);
   const [missingTriviaCount, setMissingTriviaCount] = useState<number | null>(null);
+  const [triviaBatchSize, setTriviaBatchSize] = useState<number>(5);
 
   const [populatingBloopers, setPopulatingBloopers] = useState(false);
   const [populatingBloopersProgress, setPopulatingBloopersProgress] = useState<string | null>(null);
@@ -246,11 +247,11 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     );
   };
 
-  // Popola curiosità 5 alla volta con IA (in modo sequenziale con progresso in tempo reale)
+  // Popola curiosità con IA in modo sequenziale con protezione rate-limit (3s di pausa) ed esclusione duplicati
   const handleBatchPopulateTrivia = async () => {
     openConfirm(
-      "⚡ Popola Curiosità con IA (5 Film)",
-      "Avviare la generazione automatica con Gemini per 5 film che non hanno ancora curiosità? Verranno generate 3 curiosità e aneddoti verificati per ciascuna pellicola con avanzamento in tempo reale.",
+      `⚡ Popola Curiosità con IA (${triviaBatchSize} Film)`,
+      `Avviare la generazione automatica con Gemini per ${triviaBatchSize} film che non hanno ancora curiosità? Verranno generate 3 curiosità e aneddoti verificati per ciascuna pellicola con ritmo controllato.`,
       async () => {
         setPopulatingTrivia(true);
         setActionMessage(null);
@@ -258,41 +259,76 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
         let totalGenerated = 0;
         let lastRemaining = missingTriviaCount ?? 0;
         let lastError: string | null = null;
+        const processedFilmIds: number[] = [];
 
         try {
-          // Eseguiamo 5 chiamate (limit: 1) in sequenza per eliminare qualsiasi rischio di timeout Vercel
-          for (let step = 1; step <= 5; step++) {
-            setPopulatingProgress(`Film ${step}/5 in elaborazione...`);
-            const res = await fetch("/api/admin/trivia-batch", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ limit: 1 }),
-            });
+          for (let step = 1; step <= triviaBatchSize; step++) {
+            setPopulatingProgress(`Film ${step}/${triviaBatchSize} in elaborazione...`);
 
-            if (!res.ok) {
-              const errJson = await res.json().catch(() => ({}));
-              lastError = errJson.error || `Errore HTTP ${res.status}`;
-              break;
+            let res: Response | null = null;
+            let data: any = null;
+            let retries = 0;
+
+            // Fino a 2 tentativi con raffreddamento automatico in caso di quota 429
+            while (retries < 2) {
+              try {
+                res = await fetch("/api/admin/trivia-batch", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    limit: 1,
+                    excludeIds: processedFilmIds,
+                  }),
+                });
+
+                if (res.status === 429) {
+                  setPopulatingProgress(`Film ${step}/${triviaBatchSize}: limite temporaneo Gemini, raffreddamento in corso (8s)...`);
+                  await new Promise((r) => setTimeout(r, 8000));
+                  retries++;
+                  continue;
+                }
+
+                if (res.ok) {
+                  data = await res.json();
+                  break;
+                } else {
+                  const errJson = await res.json().catch(() => ({}));
+                  lastError = errJson.error || `Errore HTTP ${res.status}`;
+                  break;
+                }
+              } catch (fetchErr: any) {
+                lastError = fetchErr?.message || "Errore di connessione";
+                break;
+              }
             }
 
-            const data = await res.json();
-            if (!data.success) {
-              lastError = data.error || "Generazione non riuscita";
-              break;
+            if (!data || !data.success) {
+              console.warn(`Film curiosità ${step} saltato: ${lastError || "errore sconosciuto"}`);
+            } else {
+              if (data.results && data.results.length > 0) {
+                data.results.forEach((r: any) => {
+                  if (r.film_id) processedFilmIds.push(r.film_id);
+                });
+              }
+
+              if (data.processedCount > 0) {
+                totalProcessed += data.processedCount;
+                totalGenerated += data.totalTriviaGenerated || 0;
+              }
+
+              if (typeof data.remainingFilmsWithoutTrivia === "number") {
+                lastRemaining = data.remainingFilmsWithoutTrivia;
+                setMissingTriviaCount(data.remainingFilmsWithoutTrivia);
+                if (data.remainingFilmsWithoutTrivia === 0) {
+                  break;
+                }
+              }
             }
 
-            if (data.processedCount === 0) {
-              // Tutti i film del catalogo sono completati
-              lastRemaining = 0;
-              setMissingTriviaCount(0);
-              break;
-            }
-
-            totalProcessed += data.processedCount || 0;
-            totalGenerated += data.totalTriviaGenerated || 0;
-            if (typeof data.remainingFilmsWithoutTrivia === "number") {
-              lastRemaining = data.remainingFilmsWithoutTrivia;
-              setMissingTriviaCount(data.remainingFilmsWithoutTrivia);
+            // Pausa cortese di 3 secondi tra una chiamata e l'altra per rimanere stabilmente
+            // sotto il limite di 15 richieste/minuto (RPM) della Free Tier di Google Gemini
+            if (step < triviaBatchSize) {
+              await new Promise((r) => setTimeout(r, 3000));
             }
           }
 
@@ -313,7 +349,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
           setPopulatingProgress(null);
         }
       },
-      "Avvia Generazione 5 Film",
+      `Avvia Generazione (${triviaBatchSize} Film)`,
       "warning"
     );
   };
@@ -637,19 +673,39 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
             </button>
           </div>
 
-          <button
-            onClick={handleBatchPopulateTrivia}
-            disabled={populatingTrivia || missingTriviaCount === 0}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-md shadow-amber-500/10 whitespace-nowrap shrink-0"
-            title="Genera curiosità con IA per 5 film che non ne hanno ancora"
-          >
-            <Sparkles className={`h-3.5 w-3.5 ${populatingTrivia ? "animate-spin" : ""}`} />
-            <span>
-              {populatingTrivia
-                ? (populatingProgress || "Generazione 5 film...")
-                : `⚡ Popola Curiosità (5 film)${missingTriviaCount !== null ? ` [${missingTriviaCount}]` : ""}`}
-            </span>
-          </button>
+          <div className="flex items-center gap-1 shrink-0 bg-zinc-950/60 p-1 rounded-2xl border border-zinc-800">
+            <div className="flex items-center bg-zinc-900 rounded-xl p-0.5 border border-zinc-800">
+              {[5, 20, 50].map((num) => (
+                <button
+                  key={num}
+                  type="button"
+                  onClick={() => setTriviaBatchSize(num)}
+                  disabled={populatingTrivia}
+                  className={`px-2 py-1 text-[11px] font-bold rounded-lg transition ${
+                    triviaBatchSize === num
+                      ? "bg-amber-500 text-zinc-950 shadow-sm"
+                      : "text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  {num}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={handleBatchPopulateTrivia}
+              disabled={populatingTrivia || missingTriviaCount === 0}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-md shadow-amber-500/10 whitespace-nowrap"
+              title={`Genera curiosità con IA per ${triviaBatchSize} film che non ne hanno ancora`}
+            >
+              <Sparkles className={`h-3.5 w-3.5 ${populatingTrivia ? "animate-spin" : ""}`} />
+              <span>
+                {populatingTrivia
+                  ? (populatingProgress || `Generazione ${triviaBatchSize} film...`)
+                  : `⚡ Popola Curiosità (${triviaBatchSize} film)${missingTriviaCount !== null ? ` [${missingTriviaCount}]` : ""}`}
+              </span>
+            </button>
+          </div>
         </div>
       </div>
 

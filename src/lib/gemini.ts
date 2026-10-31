@@ -343,7 +343,7 @@ FORMATO OUTPUT:
       const jsonMatch = text.match(/\[[\s\S]*\]/);
       const cleanJson = jsonMatch ? jsonMatch[0] : text;
 
-      const parsed = JSON.parse(cleanJson) as GeneratedTrivia[];
+      const parsed = cleanAndParseJson<GeneratedTrivia[]>(text);
       if (Array.isArray(parsed) && parsed.length > 0) {
         return {
           trivia: parsed.map((item) => ({
@@ -388,7 +388,7 @@ FORMATO OUTPUT:
       const jsonMatch = text.match(/\[[\s\S]*\]/);
       const cleanJson = jsonMatch ? jsonMatch[0] : text;
 
-      const parsed = JSON.parse(cleanJson) as GeneratedTrivia[];
+      const parsed = cleanAndParseJson<GeneratedTrivia[]>(text);
       if (Array.isArray(parsed) && parsed.length > 0) {
         return {
           trivia: parsed.map((item) => ({
