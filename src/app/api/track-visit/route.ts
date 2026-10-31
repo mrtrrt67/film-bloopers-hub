@@ -8,6 +8,18 @@ const recentVisitsCache = new Map<string, number>();
 
 export async function POST(request: Request) {
   try {
+    const userAgent = request.headers.get("user-agent") || "";
+    const isBot = /bot|crawl|spider|slurp|lighthouse|headless|curl|wget|facebookexternalhit|whatsapp|bingpreview|yandex|semrush/i.test(userAgent);
+    if (isBot) {
+      return NextResponse.json({ ok: true, ignored: true, reason: "bot" });
+    }
+
+    const pagePath = request.headers.get("x-page-path") || "";
+    const referer = request.headers.get("referer") || "";
+    if (pagePath.startsWith("/admin") || referer.includes("/admin")) {
+      return NextResponse.json({ ok: true, ignored: true, reason: "admin_path" });
+    }
+
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
 
