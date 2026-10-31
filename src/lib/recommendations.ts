@@ -14,7 +14,6 @@ let cachedFilms: ScoredFilm[] | null = null;
 let lastCacheTime = 0;
 const CACHE_TTL_MS = 15 * 60 * 1000; // 15 minuti di persistenza in-memory
 
-
 function extractCount(field: any): number {
   if (!field) return 0;
   if (typeof field === "number") return field;
@@ -51,13 +50,6 @@ const STOP_WORDS = new Set([
   "parte", "capitolo", "episodio", "vol", "volume", "the", "of", "and"
 ]);
 
-const GENERIC_TITLE_WORDS = new Set([
-  "ritorno", "nuovo", "grande", "primo", "ultimo", "mondo", "casa",
-  "notte", "amore", "uomo", "ragazzo", "citta", "storia", "vita",
-  "tempo", "giorno", "anni", "via", "sole", "terra", "occhi", "cuore",
-  "bene", "male", "fine", "inizio", "cose", "punto"
-]);
-
 function extractTitleKeywords(title: string | null | undefined): string[] {
   return normalize(title)
     .replace(/[^a-z0-9\s]/g, " ")
@@ -72,25 +64,45 @@ function isSaga(targetTitle: string, candTitle: string): boolean {
   const normTarget = normalize(targetTitle);
   const normCand = normalize(candTitle);
 
-  // Prefisso base identico (es: "Rocky" vs "Rocky II", "Lo squalo" vs "Lo squalo 3")
-  const regexSuffix = /\s+(ii|iii|iv|v|vi|vii|viii|ix|x|\d+|parte.*|chapter.*|reload.*|revolution.*)$/i;
+  if (!normTarget || !normCand) return false;
+  if (normTarget === normCand) return true;
+
+  // 1. Prefisso identico prima del separatore di sottotitolo (es: "Pirati dei Caraibi - ...", "Star Wars: ...")
+  const splitSeparators = /[-:–—]/;
+  const prefixTarget = normTarget.split(splitSeparators)[0].trim();
+  const prefixCand = normCand.split(splitSeparators)[0].trim();
+
+  if (
+    prefixTarget.length >= 4 &&
+    prefixCand.length >= 4 &&
+    prefixTarget === prefixCand
+  ) {
+    return true;
+  }
+
+  // 2. Sequel numerati diretti (es: "Rocky" vs "Rocky II", "Rambo" vs "Rambo 2", "Iron Man 2" vs "Iron Man 3")
+  const regexSuffix = /\s+(ii|iii|iv|v|vi|vii|viii|ix|x|\d+|reloaded|revolutions|resurrections|legacy|origins)(\s*[-:–—].*)?$/i;
   const baseTarget = normTarget.replace(regexSuffix, "").trim();
   const baseCand = normCand.replace(regexSuffix, "").trim();
 
   if (
     baseTarget.length >= 4 &&
     baseCand.length >= 4 &&
-    (baseTarget === baseCand || baseTarget.startsWith(baseCand) || baseCand.startsWith(baseTarget))
+    baseTarget === baseCand
   ) {
     return true;
   }
 
-  const tWords = extractTitleKeywords(targetTitle);
-  const cWords = extractTitleKeywords(candTitle);
-  const shared = tWords.filter((w) => cWords.includes(w));
+  // 3. Stesso incipit di almeno due parole significative all'inizio del titolo (es: "Harry Potter ...")
+  const tLeadingWords = extractTitleKeywords(prefixTarget);
+  const cLeadingWords = extractTitleKeywords(prefixCand);
 
-  if (shared.length >= 2) return true;
-  if (shared.length === 1 && !GENERIC_TITLE_WORDS.has(shared[0]) && shared[0].length >= 5) {
+  if (
+    tLeadingWords.length >= 2 &&
+    cLeadingWords.length >= 2 &&
+    tLeadingWords[0] === cLeadingWords[0] &&
+    tLeadingWords[1] === cLeadingWords[1]
+  ) {
     return true;
   }
 
@@ -268,4 +280,3 @@ export async function getRelatedFilms(targetFilm: Film, limit = 5): Promise<Scor
     return [];
   }
 }
-
