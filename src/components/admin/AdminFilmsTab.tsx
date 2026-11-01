@@ -48,6 +48,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   const [populatingBloopersProgress, setPopulatingBloopersProgress] = useState<string | null>(null);
   const [missingBloopersCount, setMissingBloopersCount] = useState<number | null>(null);
   const [bloopersBatchSize, setBloopersBatchSize] = useState<number>(5);
+  const [cleaningBloopers, setCleaningBloopers] = useState(false);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
 
   const [confirmModal, setConfirmModal] = useState<{
@@ -500,6 +501,38 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     );
   };
 
+  // Ripristina catalogo bloopers autentici rimuovendo i batch sintetici
+  const handleCleanupBatchBloopers = async () => {
+    openConfirm(
+      "🛡️ Ripristina Bloopers Autentici Verificati",
+      "Rimuovere tutti i bloopers sintetici generati automaticamente durante i test delle quote per ripristinare il catalogo ai 974 bloopers originali autentici e verificati? Questa azione eliminerà solo i bloopers generati dal batch recente, preservando intatti i bloopers storici e tutte le curiosità.",
+      async () => {
+        setCleaningBloopers(true);
+        setActionMessage(null);
+        try {
+          const res = await fetch("/api/admin/bloopers-cleanup", {
+            method: "POST",
+          });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            setActionMessage(`✅ ${data.message}`);
+            await fetchFilms();
+            await fetchMissingBloopersStats();
+          } else {
+            setActionMessage(`❌ Errore durante il ripristino: ${data.error || "Operazione non riuscita"}`);
+          }
+        } catch (err: any) {
+          console.error("Errore bloopers cleanup:", err);
+          setActionMessage(`❌ Errore di connessione durante il ripristino: ${err.message}`);
+        } finally {
+          setCleaningBloopers(false);
+        }
+      },
+      "Procedi con il Ripristino Autentico",
+      "danger"
+    );
+  };
+
   // Stato per spiegazione RLS se la cancellazione è bloccata
   const [rlsModalOpen, setRlsModalOpen] = useState(false);
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -789,6 +822,21 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                   : `⚡ Incrementa Bloopers (${bloopersBatchSize} film a quota ${bloopersTarget})`}
               </span>
             </button>
+
+            {/* Azione di Ripristino e Pulizia Anti-Allucinazione */}
+            <div className="flex items-center justify-between pt-2 border-t border-zinc-800/60 text-[11px]">
+              <span className="text-zinc-500 font-medium">Contenuti sintetici:</span>
+              <button
+                type="button"
+                onClick={handleCleanupBatchBloopers}
+                disabled={cleaningBloopers || populatingBloopers}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold text-red-400 bg-red-950/40 border border-red-800/40 hover:bg-red-900/50 hover:text-red-300 active:scale-95 transition disabled:opacity-50 shadow-sm"
+                title="Rimuovi tutti i bloopers sintetici/falsi generati dal batch e ripristina i 974 bloopers autentici verificati"
+              >
+                <Trash2 className={`h-3.5 w-3.5 ${cleaningBloopers ? "animate-spin" : ""}`} />
+                <span>{cleaningBloopers ? "Ripristino in corso..." : "🛡️ Ripristina Bloopers Autentici"}</span>
+              </button>
+            </div>
           </div>
 
           {/* CARD 2: CURIOSITÀ IA */}

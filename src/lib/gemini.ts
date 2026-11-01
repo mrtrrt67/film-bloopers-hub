@@ -109,11 +109,8 @@ export async function generateBloopersForMovie(params: {
   const requested = typeof params.countNeeded === "number" && params.countNeeded > 0
     ? Math.min(params.countNeeded, 10)
     : 5;
-  const countInstruction = requested <= 2
-    ? `Trova esattamente ${requested} o ${requested + 1} errori/bloopers concreti, celebri o documentati per questo film.`
-    : `Trova tra ${Math.max(2, requested - 1)} e ${Math.min(10, requested + 1)} errori/bloopers concreti, celebri o documentati per questo film.`;
 
-  const prompt = `Sei un esperto enciclopedico di bloopers, errori di montaggio, sviste storiche e ciak falsi nella storia del cinema.
+  const prompt = `Sei un archivista e verificatore cinematografico specializzato in bloopers, goofs ed errori di montaggio reali e documentati.
 
 DATI UFFICIALI DEL FILM:
 - Titolo: "${titolo}" (${anno || "N/D"})
@@ -123,24 +120,26 @@ DATI UFFICIALI DEL FILM:
 ${esclusioneText}
 
 COMPITO:
-${countInstruction}
+Identifica fino a un MASSIMO di ${requested} bloopers o errori REALI, CELEBRI e DOCUMENTATI (fonti: MovieMistakes, IMDb Goofs, dibattito pubblico e interviste di produzione).
+
+REGOLE ANTI-ALLUCINAZIONE ASSOLUTE:
+1. DIVIETO ASSOLUTO DI INVENTARE: Non inventare MAI errori fittizi per raggiungere una quota. Se per questo film sono documentati solo 1 o 2 errori reali, restituisci ESCLUSIVAMENTE quelli. Se non ci sono errori documentati, restituisci un array vuoto [].
+2. NIENTE MINUTAGGI INVENTATI: Non tirare a indovinare minutaggi falsi. Se non conosci con certezza il minuto preciso, usa "00:00:00" oppure approssima solo all'inizio della scena specifica.
+3. FATTI CONCRETI: Descrivi solo l'errore oggettivo documentato (es. anacronismo storico confermato, attrezzatura di scena visibile, incongruenza visiva acclarata).
+
 Le categorie ammesse sono ESCLUSIVAMENTE:
 1. "Errori di scena / Posizione"
 2. "Troupe o microfoni visibili"
 3. "Anacronismi"
 4. "Errori storici o fattuali"
 
-REGOLE TASSATIVE:
-- Restituisci ESCLUSIVAMENTE un array JSON valido, senza testo introduttivo né commenti markdown.
-- Formato minuto: indicare una stima plausibile del minutaggio (es. "00:42:15" o "01:15:30").
-- La descrizione deve essere dettagliata in italiano, spiegando esattamente cosa guardare a schermo.
-
 FORMATO OUTPUT:
+Restituisci ESCLUSIVAMENTE un array JSON valido, senza testo introduttivo né commenti markdown:
 [
   {
-    "minuto": "01:05:20",
+    "minuto": "00:00:00",
     "categoria": "Errori di scena / Posizione",
-    "descrizione": "Durante il dialogo a tavola, il livello del bicchiere di vino si alza e si abbassa magicamente tra un cambio di inquadratura e l'altro."
+    "descrizione": "Descrizione chiara e fattuale dell'errore reale riscontrabile nella pellicola."
   }
 ]`;
 
@@ -155,7 +154,7 @@ FORMATO OUTPUT:
         contents: prompt,
         config: {
           responseMimeType: "application/json",
-          temperature: 0.1,
+          temperature: 0.0,
         },
       });
       const t1 = performance.now();
@@ -199,7 +198,7 @@ FORMATO OUTPUT:
         contents: prompt,
         config: {
           responseMimeType: "application/json",
-          temperature: 0.1,
+          temperature: 0.0,
         },
       });
       const t1 = performance.now();
