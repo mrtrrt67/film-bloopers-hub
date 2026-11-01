@@ -725,33 +725,29 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                     Bloopers IA
                   </h4>
                   <p className="text-[11px] text-zinc-400">
-                    Porta i film alla quota target
+                    Scansiona ed integra bloopers mancanti
                   </p>
                 </div>
               </div>
-              <span className={`px-2.5 py-1 rounded-full text-[11px] font-black border whitespace-nowrap ${
-                missingBloopersFilmCount === 0
-                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                  : "bg-amber-500/10 text-amber-300 border-amber-500/30"
-              }`}>
-                {missingBloopersFilmCount === 0 ? "Completati" : `${missingBloopersFilmCount} da fare`}
+              <span className="px-2.5 py-1 rounded-full text-[11px] font-black border whitespace-nowrap bg-orange-500/10 text-orange-400 border-orange-500/30">
+                {films.reduce((acc, f) => acc + (f.bloopers_count || 0), 0)} bloopers totali
               </span>
             </div>
 
-            {/* Controlli Touch: Quota Target & Sessione */}
+            {/* Controlli Touch: Max Bloopers per Film & Blocco Batch */}
             <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1 border-t border-zinc-800/60">
-              {/* Selettore Quota */}
+              {/* Selettore Max Nuovi Bloopers per Film */}
               <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-bold text-zinc-400">Quota:</span>
+                <span className="text-[11px] font-bold text-zinc-400" title="Limite massimo di nuovi bloopers mancanti da cercare per ogni singolo film">Max/Film:</span>
                 <div className="flex items-center bg-zinc-900 rounded-lg p-0.5 border border-zinc-800">
-                  {[10, 15, 20].map((q) => (
+                  {[3, 5, 8].map((q) => (
                     <button
                       key={q}
                       type="button"
-                      onClick={() => handleSetBloopersTarget(q)}
+                      onClick={() => setBloopersMaxNew(q)}
                       disabled={populatingBloopers}
                       className={`px-2.5 py-1 text-xs font-bold rounded-md transition ${
-                        bloopersTarget === q
+                        bloopersMaxNew === q
                           ? "bg-amber-500 text-zinc-950 shadow-sm"
                           : "text-zinc-400 hover:text-white"
                       }`}
@@ -759,22 +755,22 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                       {q}
                     </button>
                   ))}
-                  {![10, 15, 20].includes(bloopersTarget) && (
+                  {![3, 5, 8].includes(bloopersMaxNew) && (
                     <span className="px-2 py-1 text-xs font-bold rounded-md bg-amber-500 text-zinc-950">
-                      {bloopersTarget}
+                      {bloopersMaxNew}
                     </span>
                   )}
                   <button
                     type="button"
                     onClick={() => {
-                      const val = window.prompt("Quota target personalizzata di bloopers per film:", String(bloopersTarget));
+                      const val = window.prompt("Massimo bloopers mancanti per film (1-10):", String(bloopersMaxNew));
                       if (val) {
                         const n = parseInt(val, 10);
-                        if (!isNaN(n) && n > 0 && n <= 50) handleSetBloopersTarget(n);
+                        if (!isNaN(n) && n > 0 && n <= 10) setBloopersMaxNew(n);
                       }
                     }}
                     disabled={populatingBloopers}
-                    title="Imposta quota personalizzata"
+                    title="Imposta limite personalizzato"
                     className="px-2 py-1 text-[11px] font-bold text-zinc-400 hover:text-amber-400 active:scale-95 transition"
                   >
                     ✏️
@@ -782,7 +778,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                 </div>
               </div>
 
-              {/* Selettore Batch Film */}
+              {/* Selettore Blocco Film da Scansionare */}
               <div className="flex items-center gap-1.5">
                 <span className="text-[11px] font-bold text-zinc-400">Batch:</span>
                 <div className="flex items-center bg-zinc-900 rounded-lg p-0.5 border border-zinc-800">
@@ -805,19 +801,17 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
               </div>
             </div>
 
-            {/* Pulsante Azione Touch-Friendly a tutta larghezza */}
+            {/* Pulsante Scansione e Integrazione */}
             <button
               onClick={handleBatchPopulateBloopers}
-              disabled={populatingBloopers || missingBloopersFilmCount === 0}
+              disabled={populatingBloopers}
               className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black bg-gradient-to-r from-orange-500 via-amber-500 to-amber-400 text-zinc-950 hover:brightness-110 active:scale-[0.98] transition disabled:opacity-50 shadow-lg shadow-orange-500/10 min-h-[44px]"
             >
               <Sparkles className={`h-4 w-4 shrink-0 ${populatingBloopers ? "animate-spin" : ""}`} />
               <span className="truncate">
                 {populatingBloopers
-                  ? (populatingBloopersProgress || `Generazione in corso...`)
-                  : missingBloopersFilmCount === 0
-                  ? `Tutti i film hanno già almeno ${bloopersTarget} bloopers!`
-                  : `⚡ Incrementa Bloopers (${bloopersBatchSize} film a quota ${bloopersTarget})`}
+                  ? (populatingBloopersProgress || "Scansione in corso...")
+                  : `⚡ Scansiona & Integra Mancanti (${bloopersBatchSize} film, max ${bloopersMaxNew} nuovi)`}
               </span>
             </button>
 
