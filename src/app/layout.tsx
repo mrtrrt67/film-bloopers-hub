@@ -7,7 +7,7 @@ import PwaInstallPrompt from "@/components/PwaInstallPrompt";
 import RewardCelebrationBanner from "@/components/RewardCelebrationBanner";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import CookieBanner from "@/components/CookieBanner";
-import { Analytics } from "@vercel/analytics/next";
+import VercelAnalytics from "@/components/VercelAnalytics";
 import "./globals.css";
 
 export const viewport: Viewport = {
@@ -140,7 +140,7 @@ export default function RootLayout({
         <RewardCelebrationBanner />
         <main className="flex-1">{children}</main>
         <Footer />
-        <Analytics />
+        <VercelAnalytics />
       </body>
     </html>
   );

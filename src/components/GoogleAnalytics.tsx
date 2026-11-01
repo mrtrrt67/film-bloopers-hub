@@ -18,25 +18,50 @@ export default function GoogleAnalytics({ gaId }: { gaId?: string }) {
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
 
-            var savedConsent = null;
+            // 1. Esclusione Amministratore da Google Analytics
+            var isAdmin = false;
             try {
-              savedConsent = localStorage.getItem('fbh_cookie_consent');
+              if (window.location.pathname.indexOf('/admin') === 0 || localStorage.getItem('fbh_admin_device') === '1') {
+                isAdmin = true;
+              } else {
+                for (var i = 0; i < localStorage.length; i++) {
+                  var k = localStorage.key(i);
+                  if (k && (k.indexOf('sb-') === 0 || k.indexOf('supabase') !== -1)) {
+                    var v = localStorage.getItem(k) || '';
+                    if (v.toLowerCase().indexOf('mrtrrt67') !== -1) {
+                      isAdmin = true;
+                      localStorage.setItem('fbh_admin_device', '1');
+                      break;
+                    }
+                  }
+                }
+              }
             } catch(e) {}
 
-            var consentState = (savedConsent === 'accepted') ? 'granted' : 'denied';
+            if (isAdmin) {
+              // Disabilita completamente il tracciamento GA4 per questa proprietà
+              window['ga-disable-${id}'] = true;
+            } else {
+              var savedConsent = null;
+              try {
+                savedConsent = localStorage.getItem('fbh_cookie_consent');
+              } catch(e) {}
 
-            gtag('consent', 'default', {
-              'analytics_storage': consentState,
-              'ad_storage': 'denied',
-              'ad_user_data': 'denied',
-              'ad_personalization': 'denied',
-              'wait_for_update': 500
-            });
+              var consentState = (savedConsent === 'accepted') ? 'granted' : 'denied';
 
-            gtag('js', new Date());
-            gtag('config', '${id}', {
-              page_path: window.location.pathname,
-            });
+              gtag('consent', 'default', {
+                'analytics_storage': consentState,
+                'ad_storage': 'denied',
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied',
+                'wait_for_update': 500
+              });
+
+              gtag('js', new Date());
+              gtag('config', '${id}', {
+                page_path: window.location.pathname,
+              });
+            }
           `,
         }}
       />
