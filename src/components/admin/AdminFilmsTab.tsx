@@ -913,100 +913,189 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
       )}
 
       {/* FILTRI & RICERCA */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
-        <div className="relative flex-1 sm:max-w-md">
-          <Search className="absolute left-3 top-2.5 h-4 w-4 text-zinc-500" />
+      <div className="flex flex-col gap-3.5">
+        {/* Riga 1: Campo di Ricerca a tutta larghezza con reset rapido */}
+        <div className="relative w-full">
+          <Search className="absolute left-3.5 top-3 h-4 w-4 text-zinc-500" />
           <input
             type="text"
-            placeholder="Cerca per titolo, regista, genere o attori..."
+            placeholder="Cerca per titolo, regista, genere o attori in archivio..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full rounded-xl bg-zinc-900 border border-zinc-800 pl-9 pr-4 py-2 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-amber-500"
+            className="w-full rounded-xl bg-zinc-900 border border-zinc-800 pl-10 pr-10 py-2.5 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-amber-500 transition shadow-inner"
           />
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-2.5 p-1 text-zinc-400 hover:text-white rounded-lg hover:bg-zinc-800 transition"
+              title="Cancella ricerca"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
 
-        {/* Barra Filtri Touch-Friendly a scorrimento orizzontale pulito */}
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 sm:pb-0 scrollbar-none">
+        {/* Riga 2: Badge Filtro con Wrap Naturale (nessun badge tagliato, leggibili su qualsiasi schermo) */}
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Tutti */}
           <button
             onClick={() => setFilterType("all")}
-            className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap min-h-[36px] ${
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
               filterType === "all"
-                ? "bg-amber-500 text-zinc-950 shadow-sm"
-                : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+                ? "bg-amber-500 text-zinc-950 shadow-md font-black"
+                : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
             }`}
           >
-            Tutti ({films.length})
+            <span>Tutti</span>
+            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
+              filterType === "all" ? "bg-zinc-950/20 text-zinc-950" : "bg-zinc-800 text-zinc-400"
+            }`}>
+              {films.length}
+            </span>
           </button>
+
+          {/* Bloopers OK */}
           <button
             onClick={() => setFilterType("with_bloopers")}
-            className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap flex items-center gap-1.5 min-h-[36px] ${
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
               filterType === "with_bloopers"
-                ? "bg-amber-500 text-zinc-950 shadow-sm"
-                : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+                ? "bg-amber-500 text-zinc-950 shadow-md font-black"
+                : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
             }`}
           >
-            <span>🎬 Con Bloopers ≥ {bloopersTarget} ({withBloopersCount})</span>
+            <span>🎬 Con Bloopers ≥ {bloopersTarget}</span>
+            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
+              filterType === "with_bloopers" ? "bg-zinc-950/20 text-zinc-950" : "bg-zinc-800 text-zinc-400"
+            }`}>
+              {withBloopersCount}
+            </span>
           </button>
+
+          {/* Bloopers Da Incrementare */}
           <button
             onClick={() => setFilterType("missing_bloopers")}
-            className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap min-h-[36px] ${
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
               filterType === "missing_bloopers"
-                ? "bg-amber-500 text-zinc-950 shadow-sm"
-                : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+                ? "bg-amber-500 text-zinc-950 shadow-md font-black"
+                : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
             }`}
           >
-            Da Incrementare &lt; {bloopersTarget} ({missingBloopersFilmCount})
+            <span>Da Incrementare &lt; {bloopersTarget}</span>
+            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
+              filterType === "missing_bloopers" 
+                ? "bg-zinc-950/20 text-zinc-950" 
+                : missingBloopersFilmCount > 0 
+                ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" 
+                : "bg-zinc-800 text-zinc-400"
+            }`}>
+              {missingBloopersFilmCount}
+            </span>
           </button>
+
+          {/* Curiosità OK */}
           <button
             onClick={() => setFilterType("with_trivia")}
-            className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap flex items-center gap-1.5 min-h-[36px] ${
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
               filterType === "with_trivia"
-                ? "bg-amber-500 text-zinc-950 shadow-sm"
-                : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+                ? "bg-amber-500 text-zinc-950 shadow-md font-black"
+                : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
             }`}
           >
-            <Sparkles className="h-3 w-3" />
-            <span>Con Curiosità ≥ {triviaTarget} ({withTriviaCount})</span>
+            <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+            <span>Con Curiosità ≥ {triviaTarget}</span>
+            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
+              filterType === "with_trivia" ? "bg-zinc-950/20 text-zinc-950" : "bg-zinc-800 text-zinc-400"
+            }`}>
+              {withTriviaCount}
+            </span>
           </button>
+
+          {/* Curiosità Da Incrementare */}
           <button
             onClick={() => setFilterType("missing_trivia")}
-            className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap min-h-[36px] ${
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
               filterType === "missing_trivia"
-                ? "bg-amber-500 text-zinc-950 shadow-sm"
-                : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+                ? "bg-amber-500 text-zinc-950 shadow-md font-black"
+                : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
             }`}
           >
-            Da Incrementare &lt; {triviaTarget} ({missingTriviaFilmCount})
+            <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+            <span>Da Incrementare &lt; {triviaTarget}</span>
+            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
+              filterType === "missing_trivia" 
+                ? "bg-zinc-950/20 text-zinc-950" 
+                : missingTriviaFilmCount > 0 
+                ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" 
+                : "bg-zinc-800 text-zinc-400"
+            }`}>
+              {missingTriviaFilmCount}
+            </span>
           </button>
+
+          {/* Senza Poster */}
           <button
             onClick={() => setFilterType("missing_poster")}
-            className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap min-h-[36px] ${
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
               filterType === "missing_poster"
-                ? "bg-amber-500 text-zinc-950 shadow-sm"
-                : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+                ? "bg-amber-500 text-zinc-950 shadow-md font-black"
+                : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
             }`}
           >
-            Senza Poster ({missingPostersCount})
+            <ImageIcon className="h-3.5 w-3.5 text-zinc-400" />
+            <span>Senza Poster</span>
+            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
+              filterType === "missing_poster" 
+                ? "bg-zinc-950/20 text-zinc-950" 
+                : missingPostersCount > 0 
+                ? "bg-red-500/20 text-red-300 border border-red-500/30" 
+                : "bg-zinc-800 text-zinc-400"
+            }`}>
+              {missingPostersCount}
+            </span>
           </button>
+
+          {/* Senza Cast */}
           <button
             onClick={() => setFilterType("missing_cast")}
-            className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap min-h-[36px] ${
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
               filterType === "missing_cast"
-                ? "bg-amber-500 text-zinc-950 shadow-sm"
-                : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+                ? "bg-amber-500 text-zinc-950 shadow-md font-black"
+                : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
             }`}
           >
-            Senza Cast ({missingCastCount})
+            <Users className="h-3.5 w-3.5 text-zinc-400" />
+            <span>Senza Cast</span>
+            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
+              filterType === "missing_cast" 
+                ? "bg-zinc-950/20 text-zinc-950" 
+                : missingCastCount > 0 
+                ? "bg-red-500/20 text-red-300 border border-red-500/30" 
+                : "bg-zinc-800 text-zinc-400"
+            }`}>
+              {missingCastCount}
+            </span>
           </button>
+
+          {/* Locandine Condivise */}
           <button
             onClick={() => setFilterType("duplicates")}
-            className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap min-h-[36px] ${
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
               filterType === "duplicates"
-                ? "bg-amber-500 text-zinc-950 shadow-sm"
-                : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+                ? "bg-amber-500 text-zinc-950 shadow-md font-black"
+                : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
             }`}
           >
-            Locandine Condivise ({duplicatePostersCount})
+            <RefreshCw className="h-3.5 w-3.5 text-zinc-400" />
+            <span>Locandine Condivise</span>
+            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
+              filterType === "duplicates" 
+                ? "bg-zinc-950/20 text-zinc-950" 
+                : duplicatePostersCount > 0 
+                ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" 
+                : "bg-zinc-800 text-zinc-400"
+            }`}>
+              {duplicatePostersCount}
+            </span>
           </button>
         </div>
       </div>
