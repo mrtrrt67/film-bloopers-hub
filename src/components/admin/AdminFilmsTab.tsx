@@ -41,6 +41,8 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   const [populatingProgress, setPopulatingProgress] = useState<string | null>(null);
   const [missingTriviaCount, setMissingTriviaCount] = useState<number | null>(null);
   const [triviaBatchSize, setTriviaBatchSize] = useState<number>(5);
+  const [bloopersTarget, setBloopersTarget] = useState<number>(10);
+  const [triviaTarget, setTriviaTarget] = useState<number>(10);
 
   const [populatingBloopers, setPopulatingBloopers] = useState(false);
   const [populatingBloopersProgress, setPopulatingBloopersProgress] = useState<string | null>(null);
@@ -99,9 +101,23 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     }
   };
 
-  const fetchMissingTriviaStats = async () => {
+  const handleSetBloopersTarget = (target: number) => {
+    setBloopersTarget(target);
     try {
-      const res = await fetch("/api/admin/trivia-batch");
+      localStorage.setItem("fbh_admin_bloopers_target", String(target));
+    } catch {}
+  };
+
+  const handleSetTriviaTarget = (target: number) => {
+    setTriviaTarget(target);
+    try {
+      localStorage.setItem("fbh_admin_trivia_target", String(target));
+    } catch {}
+  };
+
+  const fetchMissingTriviaStats = async (target = triviaTarget) => {
+    try {
+      const res = await fetch(`/api/admin/trivia-batch?target=${target}`);
       if (res.ok) {
         const data = await res.json();
         setMissingTriviaCount(typeof data.missingTriviaCount === "number" ? data.missingTriviaCount : null);
@@ -111,9 +127,9 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     }
   };
 
-  const fetchMissingBloopersStats = async () => {
+  const fetchMissingBloopersStats = async (target = bloopersTarget) => {
     try {
-      const res = await fetch("/api/admin/bloopers-batch");
+      const res = await fetch(`/api/admin/bloopers-batch?target=${target}`);
       if (res.ok) {
         const data = await res.json();
         setMissingBloopersCount(typeof data.missingBloopersCount === "number" ? data.missingBloopersCount : null);
@@ -125,9 +141,28 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
 
   useEffect(() => {
     fetchFilms();
-    fetchMissingTriviaStats();
-    fetchMissingBloopersStats();
+    try {
+      const savedBloopers = localStorage.getItem("fbh_admin_bloopers_target");
+      if (savedBloopers) {
+        const n = parseInt(savedBloopers, 10);
+        if (!isNaN(n) && n > 0) setBloopersTarget(n);
+      }
+      const savedTrivia = localStorage.getItem("fbh_admin_trivia_target");
+      if (savedTrivia) {
+        const n = parseInt(savedTrivia, 10);
+        if (!isNaN(n) && n > 0) setTriviaTarget(n);
+      }
+    } catch {}
+    // inizializzazione effettuata dagli useEffect sui target
   }, []);
+
+  useEffect(() => {
+    fetchMissingBloopersStats(bloopersTarget);
+  }, [bloopersTarget]);
+
+  useEffect(() => {
+    fetchMissingTriviaStats(triviaTarget);
+  }, [triviaTarget]);
 
   // Mappa di frequenza dei poster per rilevare duplicati
   const posterFrequency: Record<string, number> = {};
@@ -151,16 +186,16 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
 
     // 2. Filtro categoria
     if (filterType === "with_bloopers") {
-      return (f.bloopers_count || 0) >= 10;
+      return (f.bloopers_count || 0) >= bloopersTarget;
     }
     if (filterType === "missing_bloopers") {
-      return (f.bloopers_count || 0) < 10;
+      return (f.bloopers_count || 0) < bloopersTarget;
     }
     if (filterType === "with_trivia") {
-      return (f.trivia_count || 0) >= 10;
+      return (f.trivia_count || 0) >= triviaTarget;
     }
     if (filterType === "missing_trivia") {
-      return (f.trivia_count || 0) < 10;
+      return (f.trivia_count || 0) < triviaTarget;
     }
     if (filterType === "missing_poster") {
       return !f.poster_url || f.poster_url.trim() === "";
@@ -250,8 +285,8 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   // Popola curiosità con IA in modo sequenziale con protezione rate-limit (3s di pausa) ed esclusione duplicati
   const handleBatchPopulateTrivia = async () => {
     openConfirm(
-      `⚡ Popola Curiosità con IA (${triviaBatchSize} Film)`,
-      `Avviare la generazione automatica con Gemini per ${triviaBatchSize} film per arricchirli con curiosità inedite? Verranno generate 3 nuove curiosità e aneddoti verificati per ciascuna pellicola con ritmo controllato.`,
+      `✨ Incrementa Curiosità con IA (${triviaBatchSize} Film a quota ${triviaTarget})`,
+      `Avviare la generazione automatica con Gemini per arricchire ${triviaBatchSize} film fino a quota ${triviaTarget} curiosità? Le chiamate avvengono con ritmo controllato.`,
       async () => {
         setPopulatingTrivia(true);
         setActionMessage(null);
@@ -277,6 +312,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
                     limit: 1,
+                    targetCount: triviaTarget,
                     excludeIds: processedFilmIds,
                   }),
                 });
@@ -349,7 +385,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
           setPopulatingProgress(null);
         }
       },
-      `Avvia Generazione (${triviaBatchSize} Film)`,
+      `Avvia Generazione (${triviaBatchSize} Film a quota ${triviaTarget})`,
       "warning"
     );
   };
@@ -357,8 +393,8 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   // Incrementa bloopers con IA in modo sequenziale con protezione rate-limit (3s di pausa) ed esclusione duplicati
   const handleBatchPopulateBloopers = async () => {
     openConfirm(
-      `⚡ Incrementa Bloopers con IA (${bloopersBatchSize} Film)`,
-      `Avviare la ricerca ed integrazione automatica con Gemini per arricchire i bloopers di ${bloopersBatchSize} film? Le chiamate avvengono con ritmo controllato per rispettare i limiti API di Gemini ed evitare interruzioni.`,
+      `⚡ Incrementa Bloopers con IA (${bloopersBatchSize} Film a quota ${bloopersTarget})`,
+      `Avviare la ricerca ed integrazione automatica con Gemini per arricchire i bloopers di ${bloopersBatchSize} film fino a quota ${bloopersTarget}? Le chiamate avvengono con ritmo controllato per rispettare i limiti API di Gemini.`,
       async () => {
         setPopulatingBloopers(true);
         setActionMessage(null);
@@ -384,7 +420,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
                     limit: 1,
-                    targetCount: 10,
+                    targetCount: bloopersTarget,
                     excludeIds: processedFilmIds,
                   }),
                 });
@@ -459,7 +495,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
           setPopulatingBloopersProgress(null);
         }
       },
-      `Avvia Generazione (${bloopersBatchSize} Film)`,
+      `Avvia Generazione (${bloopersBatchSize} Film a quota ${bloopersTarget})`,
       "warning"
     );
   };
@@ -596,10 +632,10 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     }
   };
 
-  const withBloopersCount = films.filter((f) => (f.bloopers_count || 0) >= 10).length;
-  const missingBloopersFilmCount = films.filter((f) => (f.bloopers_count || 0) < 10).length;
-  const withTriviaCount = films.filter((f) => (f.trivia_count || 0) >= 10).length;
-  const missingTriviaFilmCount = films.filter((f) => (f.trivia_count || 0) < 10).length;
+  const withBloopersCount = films.filter((f) => (f.bloopers_count || 0) >= bloopersTarget).length;
+  const missingBloopersFilmCount = films.filter((f) => (f.bloopers_count || 0) < bloopersTarget).length;
+  const withTriviaCount = films.filter((f) => (f.trivia_count || 0) >= triviaTarget).length;
+  const missingTriviaFilmCount = films.filter((f) => (f.trivia_count || 0) < triviaTarget).length;
   const missingPostersCount = films.filter((f) => !f.poster_url || f.poster_url.trim() === "").length;
   const missingCastCount = films.filter((f) => !f.attori || f.attori.trim() === "" || f.attori === "N/D").length;
   const duplicatePostersCount = films.filter((f) => f.poster_url && posterFrequency[f.poster_url] > 1).length;
@@ -607,112 +643,263 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   return (
     <div className="space-y-6">
       {/* BARRA SUPERIORE: AZIONI VELOCI & CONTEGGI */}
-      <div className="flex flex-col gap-4 p-5 rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-xl">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-zinc-800/70">
+      <div className="flex flex-col gap-4 p-4 sm:p-5 rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-xl">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800/70">
           <div>
             <h3 className="text-base font-black text-white flex items-center gap-2">
               <Film className="h-5 w-5 text-amber-400 shrink-0" />
               Archivio Film ({films.length} pellicole)
             </h3>
             <p className="text-xs text-zinc-400 mt-0.5">
-              Gestisci schede, correggi locandine errate o duplicate e aggiorna il cast via TMDB.
+              Gestione schede film, correzione locandine TMDB e incremento contenuti con IA.
             </p>
+          </div>
+
+          {/* Azioni rapide di utility: Locandine e Cast */}
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              onClick={handleUpdateAllPosters}
+              disabled={updatingAllPosters || missingPostersCount === 0}
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-amber-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 whitespace-nowrap shadow-sm min-h-[38px]"
+              title="Recupera tutte le locandine mancanti da TMDB"
+            >
+              <ImageIcon className={`h-3.5 w-3.5 ${updatingAllPosters ? "animate-spin" : ""}`} />
+              <span>Locandine Mancanti ({missingPostersCount})</span>
+            </button>
+
+            <button
+              onClick={handleUpdateAllCast}
+              disabled={updatingAllCast || missingCastCount === 0}
+              className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-200 border border-zinc-700 hover:text-white hover:bg-zinc-700 active:scale-95 transition disabled:opacity-50 whitespace-nowrap shadow-sm min-h-[38px]"
+              title="Recupera il cast mancante da TMDB"
+            >
+              <Users className={`h-3.5 w-3.5 ${updatingAllCast ? "animate-spin" : ""}`} />
+              <span>Cast Mancante ({missingCastCount})</span>
+            </button>
           </div>
         </div>
 
-        {/* Toolbar Azioni Rapide con wrap reattivo (non sfora mai i bordi) */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <button
-            onClick={handleUpdateAllPosters}
-            disabled={updatingAllPosters || missingPostersCount === 0}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-amber-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 whitespace-nowrap shadow-sm"
-            title="Recupera tutte le locandine mancanti da TMDB"
-          >
-            <ImageIcon className={`h-3.5 w-3.5 ${updatingAllPosters ? "animate-spin" : ""}`} />
-            <span>Locandine Mancanti ({missingPostersCount})</span>
-          </button>
-
-          <button
-            onClick={handleUpdateAllCast}
-            disabled={updatingAllCast || missingCastCount === 0}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-200 border border-zinc-700 hover:text-white hover:bg-zinc-700 active:scale-95 transition disabled:opacity-50 whitespace-nowrap shadow-sm"
-            title="Recupera il cast mancante da TMDB"
-          >
-            <Users className={`h-3.5 w-3.5 ${updatingAllCast ? "animate-spin" : ""}`} />
-            <span>Cast Mancante ({missingCastCount})</span>
-          </button>
-
-          <div className="hidden sm:block h-6 w-px bg-zinc-800/80 mx-0.5" />
-
-          {/* Bloopers Batch */}
-          <div className="flex items-center gap-1 bg-zinc-950/60 p-1 rounded-2xl border border-zinc-800 shadow-sm">
-            <div className="flex items-center bg-zinc-900 rounded-xl p-0.5 border border-zinc-800">
-              {[5, 20, 50].map((num) => (
-                <button
-                  key={num}
-                  type="button"
-                  onClick={() => setBloopersBatchSize(num)}
-                  disabled={populatingBloopers}
-                  className={`px-2 py-1 text-[11px] font-bold rounded-lg transition ${
-                    bloopersBatchSize === num
-                      ? "bg-amber-500 text-zinc-950 shadow-sm"
-                      : "text-zinc-400 hover:text-white"
-                  }`}
-                >
-                  {num}
-                </button>
-              ))}
+        {/* CENTRO INCREMENTO IA: 2 CARD TOUCH-FRIENDLY & RESPONSIVE (OTTIMIZZATE SMARTPHONE) */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
+          
+          {/* CARD 1: BLOOPERS IA */}
+          <div className="flex flex-col justify-between gap-3 p-3.5 sm:p-4 rounded-xl bg-zinc-950/70 border border-amber-500/20 shadow-md">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="p-1.5 rounded-lg bg-orange-500/20 text-orange-400 border border-orange-500/30">
+                  <Sparkles className="h-4 w-4" />
+                </span>
+                <div>
+                  <h4 className="text-xs font-black text-white uppercase tracking-wider">
+                    Bloopers IA
+                  </h4>
+                  <p className="text-[11px] text-zinc-400">
+                    Porta i film alla quota target
+                  </p>
+                </div>
+              </div>
+              <span className={`px-2.5 py-1 rounded-full text-[11px] font-black border whitespace-nowrap ${
+                missingBloopersFilmCount === 0
+                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                  : "bg-amber-500/10 text-amber-300 border-amber-500/30"
+              }`}>
+                {missingBloopersFilmCount === 0 ? "Completati" : `${missingBloopersFilmCount} da fare`}
+              </span>
             </div>
 
+            {/* Controlli Touch: Quota Target & Sessione */}
+            <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1 border-t border-zinc-800/60">
+              {/* Selettore Quota */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] font-bold text-zinc-400">Quota:</span>
+                <div className="flex items-center bg-zinc-900 rounded-lg p-0.5 border border-zinc-800">
+                  {[10, 15, 20].map((q) => (
+                    <button
+                      key={q}
+                      type="button"
+                      onClick={() => handleSetBloopersTarget(q)}
+                      disabled={populatingBloopers}
+                      className={`px-2.5 py-1 text-xs font-bold rounded-md transition ${
+                        bloopersTarget === q
+                          ? "bg-amber-500 text-zinc-950 shadow-sm"
+                          : "text-zinc-400 hover:text-white"
+                      }`}
+                    >
+                      {q}
+                    </button>
+                  ))}
+                  {![10, 15, 20].includes(bloopersTarget) && (
+                    <span className="px-2 py-1 text-xs font-bold rounded-md bg-amber-500 text-zinc-950">
+                      {bloopersTarget}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const val = window.prompt("Quota target personalizzata di bloopers per film:", String(bloopersTarget));
+                      if (val) {
+                        const n = parseInt(val, 10);
+                        if (!isNaN(n) && n > 0 && n <= 50) handleSetBloopersTarget(n);
+                      }
+                    }}
+                    disabled={populatingBloopers}
+                    title="Imposta quota personalizzata"
+                    className="px-2 py-1 text-[11px] font-bold text-zinc-400 hover:text-amber-400 active:scale-95 transition"
+                  >
+                    ✏️
+                  </button>
+                </div>
+              </div>
+
+              {/* Selettore Batch Film */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] font-bold text-zinc-400">Batch:</span>
+                <div className="flex items-center bg-zinc-900 rounded-lg p-0.5 border border-zinc-800">
+                  {[5, 20, 50].map((num) => (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => setBloopersBatchSize(num)}
+                      disabled={populatingBloopers}
+                      className={`px-2.5 py-1 text-xs font-bold rounded-md transition ${
+                        bloopersBatchSize === num
+                          ? "bg-orange-500 text-zinc-950 shadow-sm"
+                          : "text-zinc-400 hover:text-white"
+                      }`}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Pulsante Azione Touch-Friendly a tutta larghezza */}
             <button
               onClick={handleBatchPopulateBloopers}
-              disabled={populatingBloopers || missingBloopersCount === 0}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-orange-500 to-amber-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-md shadow-orange-500/10 whitespace-nowrap"
-              title={`Incrementa i bloopers con IA per ${bloopersBatchSize} film con meno contenuti`}
+              disabled={populatingBloopers || missingBloopersFilmCount === 0}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black bg-gradient-to-r from-orange-500 via-amber-500 to-amber-400 text-zinc-950 hover:brightness-110 active:scale-[0.98] transition disabled:opacity-50 shadow-lg shadow-orange-500/10 min-h-[44px]"
             >
-              <Sparkles className={`h-3.5 w-3.5 ${populatingBloopers ? "animate-spin" : ""}`} />
-              <span>
+              <Sparkles className={`h-4 w-4 shrink-0 ${populatingBloopers ? "animate-spin" : ""}`} />
+              <span className="truncate">
                 {populatingBloopers
-                  ? (populatingBloopersProgress || `Generazione ${bloopersBatchSize} film...`)
-                  : `⚡ Incrementa Bloopers (${bloopersBatchSize} film)${missingBloopersCount !== null ? ` [${missingBloopersCount}]` : ""}`}
+                  ? (populatingBloopersProgress || `Generazione in corso...`)
+                  : missingBloopersFilmCount === 0
+                  ? `Tutti i film hanno già almeno ${bloopersTarget} bloopers!`
+                  : `⚡ Incrementa Bloopers (${bloopersBatchSize} film a quota ${bloopersTarget})`}
               </span>
             </button>
           </div>
 
-          {/* Trivia Batch */}
-          <div className="flex items-center gap-1 bg-zinc-950/60 p-1 rounded-2xl border border-zinc-800 shadow-sm">
-            <div className="flex items-center bg-zinc-900 rounded-xl p-0.5 border border-zinc-800">
-              {[5, 20, 50].map((num) => (
-                <button
-                  key={num}
-                  type="button"
-                  onClick={() => setTriviaBatchSize(num)}
-                  disabled={populatingTrivia}
-                  className={`px-2 py-1 text-[11px] font-bold rounded-lg transition ${
-                    triviaBatchSize === num
-                      ? "bg-amber-500 text-zinc-950 shadow-sm"
-                      : "text-zinc-400 hover:text-white"
-                  }`}
-                >
-                  {num}
-                </button>
-              ))}
+          {/* CARD 2: CURIOSITÀ IA */}
+          <div className="flex flex-col justify-between gap-3 p-3.5 sm:p-4 rounded-xl bg-zinc-950/70 border border-amber-500/20 shadow-md">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <span className="p-1.5 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                  <Sparkles className="h-4 w-4" />
+                </span>
+                <div>
+                  <h4 className="text-xs font-black text-white uppercase tracking-wider">
+                    Curiosità IA
+                  </h4>
+                  <p className="text-[11px] text-zinc-400">
+                    Aggiungi retroscena e aneddoti
+                  </p>
+                </div>
+              </div>
+              <span className={`px-2.5 py-1 rounded-full text-[11px] font-black border whitespace-nowrap ${
+                missingTriviaFilmCount === 0
+                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                  : "bg-amber-500/10 text-amber-300 border-amber-500/30"
+              }`}>
+                {missingTriviaFilmCount === 0 ? "Completati" : `${missingTriviaFilmCount} da fare`}
+              </span>
             </div>
 
+            {/* Controlli Touch: Quota Target & Sessione */}
+            <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1 border-t border-zinc-800/60">
+              {/* Selettore Quota */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] font-bold text-zinc-400">Quota:</span>
+                <div className="flex items-center bg-zinc-900 rounded-lg p-0.5 border border-zinc-800">
+                  {[10, 15, 20].map((q) => (
+                    <button
+                      key={q}
+                      type="button"
+                      onClick={() => handleSetTriviaTarget(q)}
+                      disabled={populatingTrivia}
+                      className={`px-2.5 py-1 text-xs font-bold rounded-md transition ${
+                        triviaTarget === q
+                          ? "bg-amber-500 text-zinc-950 shadow-sm"
+                          : "text-zinc-400 hover:text-white"
+                      }`}
+                    >
+                      {q}
+                    </button>
+                  ))}
+                  {![10, 15, 20].includes(triviaTarget) && (
+                    <span className="px-2 py-1 text-xs font-bold rounded-md bg-amber-500 text-zinc-950">
+                      {triviaTarget}
+                    </span>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const val = window.prompt("Quota target personalizzata di curiosità per film:", String(triviaTarget));
+                      if (val) {
+                        const n = parseInt(val, 10);
+                        if (!isNaN(n) && n > 0 && n <= 50) handleSetTriviaTarget(n);
+                      }
+                    }}
+                    disabled={populatingTrivia}
+                    title="Imposta quota personalizzata"
+                    className="px-2 py-1 text-[11px] font-bold text-zinc-400 hover:text-amber-400 active:scale-95 transition"
+                  >
+                    ✏️
+                  </button>
+                </div>
+              </div>
+
+              {/* Selettore Batch Film */}
+              <div className="flex items-center gap-1.5">
+                <span className="text-[11px] font-bold text-zinc-400">Batch:</span>
+                <div className="flex items-center bg-zinc-900 rounded-lg p-0.5 border border-zinc-800">
+                  {[5, 20, 50].map((num) => (
+                    <button
+                      key={num}
+                      type="button"
+                      onClick={() => setTriviaBatchSize(num)}
+                      disabled={populatingTrivia}
+                      className={`px-2.5 py-1 text-xs font-bold rounded-md transition ${
+                        triviaBatchSize === num
+                          ? "bg-amber-500 text-zinc-950 shadow-sm"
+                          : "text-zinc-400 hover:text-white"
+                      }`}
+                    >
+                      {num}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Pulsante Azione Touch-Friendly a tutta larghezza */}
             <button
               onClick={handleBatchPopulateTrivia}
-              disabled={populatingTrivia || missingTriviaCount === 0}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-md shadow-amber-500/10 whitespace-nowrap"
-              title={`Genera curiosità con IA per ${triviaBatchSize} film`}
+              disabled={populatingTrivia || missingTriviaFilmCount === 0}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 via-orange-500 to-amber-400 text-zinc-950 hover:brightness-110 active:scale-[0.98] transition disabled:opacity-50 shadow-lg shadow-amber-500/10 min-h-[44px]"
             >
-              <Sparkles className={`h-3.5 w-3.5 ${populatingTrivia ? "animate-spin" : ""}`} />
-              <span>
+              <Sparkles className={`h-4 w-4 shrink-0 ${populatingTrivia ? "animate-spin" : ""}`} />
+              <span className="truncate">
                 {populatingTrivia
-                  ? (populatingProgress || `Generazione ${triviaBatchSize} film...`)
-                  : `⚡ Incrementa Curiosità (${triviaBatchSize} film)${missingTriviaCount !== null ? ` [${missingTriviaCount}]` : ""}`}
+                  ? (populatingProgress || `Generazione in corso...`)
+                  : missingTriviaFilmCount === 0
+                  ? `Tutti i film hanno già almeno ${triviaTarget} curiosità!`
+                  : `✨ Incrementa Curiosità (${triviaBatchSize} film a quota ${triviaTarget})`}
               </span>
             </button>
           </div>
+
         </div>
       </div>
 
@@ -738,12 +925,13 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
           />
         </div>
 
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+        {/* Barra Filtri Touch-Friendly a scorrimento orizzontale pulito */}
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-2 sm:pb-0 scrollbar-none">
           <button
             onClick={() => setFilterType("all")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap ${
+            className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap min-h-[36px] ${
               filterType === "all"
-                ? "bg-amber-500 text-zinc-950"
+                ? "bg-amber-500 text-zinc-950 shadow-sm"
                 : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
             }`}
           >
@@ -751,50 +939,50 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
           </button>
           <button
             onClick={() => setFilterType("with_bloopers")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap flex items-center gap-1.5 ${
+            className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap flex items-center gap-1.5 min-h-[36px] ${
               filterType === "with_bloopers"
-                ? "bg-amber-500 text-zinc-950"
+                ? "bg-amber-500 text-zinc-950 shadow-sm"
                 : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
             }`}
           >
-            <span>🎬 Con Bloopers ({withBloopersCount})</span>
+            <span>🎬 Con Bloopers ≥ {bloopersTarget} ({withBloopersCount})</span>
           </button>
           <button
             onClick={() => setFilterType("missing_bloopers")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap ${
+            className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap min-h-[36px] ${
               filterType === "missing_bloopers"
-                ? "bg-amber-500 text-zinc-950"
+                ? "bg-amber-500 text-zinc-950 shadow-sm"
                 : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
             }`}
           >
-            Da Incrementare ({missingBloopersFilmCount})
+            Da Incrementare &lt; {bloopersTarget} ({missingBloopersFilmCount})
           </button>
           <button
             onClick={() => setFilterType("with_trivia")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap flex items-center gap-1.5 ${
+            className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap flex items-center gap-1.5 min-h-[36px] ${
               filterType === "with_trivia"
-                ? "bg-amber-500 text-zinc-950"
+                ? "bg-amber-500 text-zinc-950 shadow-sm"
                 : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
             }`}
           >
             <Sparkles className="h-3 w-3" />
-            <span>Con Curiosità ({withTriviaCount})</span>
+            <span>Con Curiosità ≥ {triviaTarget} ({withTriviaCount})</span>
           </button>
           <button
             onClick={() => setFilterType("missing_trivia")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap ${
+            className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap min-h-[36px] ${
               filterType === "missing_trivia"
-                ? "bg-amber-500 text-zinc-950"
+                ? "bg-amber-500 text-zinc-950 shadow-sm"
                 : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
             }`}
           >
-            Da Incrementare ({missingTriviaFilmCount})
+            Da Incrementare &lt; {triviaTarget} ({missingTriviaFilmCount})
           </button>
           <button
             onClick={() => setFilterType("missing_poster")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap ${
+            className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap min-h-[36px] ${
               filterType === "missing_poster"
-                ? "bg-amber-500 text-zinc-950"
+                ? "bg-amber-500 text-zinc-950 shadow-sm"
                 : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
             }`}
           >
@@ -802,9 +990,9 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
           </button>
           <button
             onClick={() => setFilterType("missing_cast")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap ${
+            className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap min-h-[36px] ${
               filterType === "missing_cast"
-                ? "bg-amber-500 text-zinc-950"
+                ? "bg-amber-500 text-zinc-950 shadow-sm"
                 : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
             }`}
           >
@@ -812,9 +1000,9 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
           </button>
           <button
             onClick={() => setFilterType("duplicates")}
-            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap ${
+            className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition whitespace-nowrap min-h-[36px] ${
               filterType === "duplicates"
-                ? "bg-amber-500 text-zinc-950"
+                ? "bg-amber-500 text-zinc-950 shadow-sm"
                 : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
             }`}
           >

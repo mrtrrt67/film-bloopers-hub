@@ -16,13 +16,13 @@ envContent.split('\n').forEach(line => {
 
 const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL || "https://gmiwhscbqvadnlqruhjs.supabase.co";
 const supabaseKey = env.SUPABASE_SERVICE_ROLE_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENAI_API_KEY || env.GEMINI_API_KEY || env.GOOGLE_API_KEY || env.GOOGLE_GENAI_API_KEY || process.argv[3];
+const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GENAI_API_KEY || env.GEMINI_API_KEY || env.GOOGLE_API_KEY || env.GOOGLE_GENAI_API_KEY || process.argv[4] || process.argv[3];
 
 if (!geminiApiKey) {
   console.log("\nℹ️  GEMINI_API_KEY non rilevata in .env.local");
   console.log("👉 Puoi avviare il batch direttamente dall'interfaccia Admin (/admin) dove le chiavi Vercel sono attive,");
   console.log("   oppure da terminale passando la chiave come parametro:");
-  console.log("   node scripts/populate-bloopers-to-10.js <numero_film> <GEMINI_API_KEY>\n");
+  console.log("   node scripts/populate-bloopers-to-10.js <numero_film> <quota_target> <GEMINI_API_KEY>\n");
   process.exit(1);
 }
 
@@ -125,7 +125,7 @@ FORMATO OUTPUT:
 
 async function main() {
   const maxToProcess = parseInt(process.argv[2], 10) || 5; // default 5 o tutti se specificato
-  const targetCount = 10;
+  const targetCount = parseInt(process.argv[3], 10) || 10;
 
   console.log(`\n===============================================================`);
   console.log(`🎬 AVVIO BATCH INCREMENTO BLOOPERS A QUOTA ${targetCount}`);

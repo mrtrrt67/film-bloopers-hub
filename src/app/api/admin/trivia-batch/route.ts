@@ -6,7 +6,7 @@ import { generateTriviaForMovie } from "@/lib/gemini";
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -27,7 +27,8 @@ export async function GET() {
 
     if (errFilms) throw errFilms;
 
-    const targetCount = 10;
+    const { searchParams } = new URL(request.url);
+    const targetCount = Math.max(1, parseInt(searchParams.get("target") || "10", 10));
     const underTargetFilms = (allFilms || []).filter((f: any) => (f.movie_trivia?.[0]?.count || 0) < targetCount);
     const atTargetFilms = (allFilms || []).filter((f: any) => (f.movie_trivia?.[0]?.count || 0) >= targetCount);
 
