@@ -84,6 +84,7 @@ export async function generateBloopersForMovie(params: {
   trama?: string | null;
   erroriEsistenti?: string[];
   countNeeded?: number;
+  maxNew?: number;
 }): Promise<GenerateBloopersResult> {
   const ai = getGeminiClient();
   if (!ai) {
@@ -100,15 +101,15 @@ export async function generateBloopersForMovie(params: {
 
   const esclusioneText =
     erroriEsistenti.length > 0
-      ? `\nERRORI GIÀ REGISTRATI (NON RIPETERE QUESTI O ERRORI SIMILI):\n${erroriEsistenti
-          .slice(0, 15)
-          .map((e) => `- ${e.slice(0, 120)}`)
+      ? `\nERRORI GIÀ REGISTRATI NEL NOSTRO ARCHIVIO (NON RIPETERE ASSOLUTAMENTE QUESTI ERRORI O VARIANTI DEGLI STESSI):\n${erroriEsistenti
+          .slice(0, 40)
+          .map((e, idx) => `${idx + 1}. ${e.slice(0, 200)}`)
           .join("\n")}`
-      : "";
+      : "\nNessun errore attualmente registrato in archivio.";
 
-  const requested = typeof params.countNeeded === "number" && params.countNeeded > 0
-    ? Math.min(params.countNeeded, 10)
-    : 5;
+  const requested = typeof params.maxNew === "number" && params.maxNew > 0
+    ? Math.min(params.maxNew, 10)
+    : (typeof params.countNeeded === "number" && params.countNeeded > 0 ? Math.min(params.countNeeded, 10) : 5);
 
   const prompt = `Sei un archivista e verificatore cinematografico specializzato in bloopers, goofs ed errori di montaggio reali e documentati.
 
@@ -120,12 +121,14 @@ DATI UFFICIALI DEL FILM:
 ${esclusioneText}
 
 COMPITO:
-Identifica fino a un MASSIMO di ${requested} bloopers o errori REALI, CELEBRI e DOCUMENTATI (fonti: MovieMistakes, IMDb Goofs, dibattito pubblico e interviste di produzione).
+Analizza attentamente gli errori già registrati per questa pellicola.
+Identifica e restituisci tutti gli ALTRI bloopers, goofs o errori di scena REALI, NOTI e DOCUMENTATI (fonti: MovieMistakes, IMDb Goofs, commenti audio DVD, interviste e making-of) che MANCANO ancora nell'archivio, fino a un MASSIMO di ${requested} nuovi bloopers.
 
 REGOLE ANTI-ALLUCINAZIONE ASSOLUTE:
-1. DIVIETO ASSOLUTO DI INVENTARE: Non inventare MAI errori fittizi per raggiungere una quota. Se per questo film sono documentati solo 1 o 2 errori reali, restituisci ESCLUSIVAMENTE quelli. Se non ci sono errori documentati, restituisci un array vuoto [].
-2. NIENTE MINUTAGGI INVENTATI: Non tirare a indovinare minutaggi falsi. Se non conosci con certezza il minuto preciso, usa "00:00:00" oppure approssima solo all'inizio della scena specifica.
-3. FATTI CONCRETI: Descrivi solo l'errore oggettivo documentato (es. anacronismo storico confermato, attrezzatura di scena visibile, incongruenza visiva acclarata).
+1. DIVIETO ASSOLUTO DI INVENTARE: Non inventare mai errori. Se tutti gli errori noti della pellicola sono già presenti nell'archivio, oppure se non ne esistono altri documentati, restituisci ESCLUSIVAMENTE un array vuoto [].
+2. NESSUNA DUPLICAZIONE: Non ripetere, riassumere o riformulare gli errori già registrati nell'elenco sopra.
+3. NIENTE MINUTAGGI INVENTATI: Se non conosci con certezza il minuto esatto al secondo, usa "00:00:00" oppure approssima solo all'inizio della scena specifica.
+4. FATTI CONCRETI: Descrivi solo l'errore oggettivo documentato riscontrabile nella pellicola.
 
 Le categorie ammesse sono ESCLUSIVAMENTE:
 1. "Errori di scena / Posizione"
@@ -139,7 +142,7 @@ Restituisci ESCLUSIVAMENTE un array JSON valido, senza testo introduttivo né co
   {
     "minuto": "00:00:00",
     "categoria": "Errori di scena / Posizione",
-    "descrizione": "Descrizione chiara e fattuale dell'errore reale riscontrabile nella pellicola."
+    "descrizione": "Descrizione accurata dell'errore oggettivo riscontrabile a schermo."
   }
 ]`;
 

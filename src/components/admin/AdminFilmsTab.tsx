@@ -48,6 +48,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   const [populatingBloopersProgress, setPopulatingBloopersProgress] = useState<string | null>(null);
   const [missingBloopersCount, setMissingBloopersCount] = useState<number | null>(null);
   const [bloopersBatchSize, setBloopersBatchSize] = useState<number>(5);
+  const [bloopersMaxNew, setBloopersMaxNew] = useState<number>(5);
   const [cleaningBloopers, setCleaningBloopers] = useState(false);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
 
@@ -391,29 +392,27 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     );
   };
 
-  // Incrementa bloopers con IA in modo sequenziale con protezione rate-limit (3s di pausa) ed esclusione duplicati
+  // Scansiona i film con IA per rilevare ed aggiungere bloopers autentici mancanti (senza forzare quote)
   const handleBatchPopulateBloopers = async () => {
     openConfirm(
-      `⚡ Incrementa Bloopers con IA (${bloopersBatchSize} Film a quota ${bloopersTarget})`,
-      `Avviare la ricerca ed integrazione automatica con Gemini per arricchire i bloopers di ${bloopersBatchSize} film fino a quota ${bloopersTarget}? Le chiamate avvengono con ritmo controllato per rispettare i limiti API di Gemini.`,
+      `⚡ Scansione Bloopers Mancanti (${bloopersBatchSize} film, max ${bloopersMaxNew} per film)`,
+      `Avviare la scansione di ${bloopersBatchSize} pellicole con Gemini per identificare ed aggiungere eventuali bloopers reali e documentati che mancano ancora nel catalogo (fino a un massimo di ${bloopersMaxNew} nuovi bloopers per film)? L'algoritmo non inventa nulla: se un film è già completo o non ha altri errori documentati, non verrà aggiunto nulla.`,
       async () => {
         setPopulatingBloopers(true);
         setActionMessage(null);
         let totalProcessed = 0;
         let totalGenerated = 0;
-        let lastRemaining = missingBloopersCount ?? 0;
         let lastError: string | null = null;
         const processedFilmIds: number[] = [];
 
         try {
           for (let step = 1; step <= bloopersBatchSize; step++) {
-            setPopulatingBloopersProgress(`Film ${step}/${bloopersBatchSize} in elaborazione...`);
+            setPopulatingBloopersProgress(`Film ${step}/${bloopersBatchSize} in scansione...`);
 
             let res: Response | null = null;
             let data: any = null;
             let retries = 0;
 
-            // Fino a 2 tentativi con raffreddamento automatico in caso di quota 429
             while (retries < 2) {
               try {
                 res = await fetch("/api/admin/bloopers-batch", {
@@ -421,7 +420,8 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
                     limit: 1,
-                    targetCount: bloopersTarget,
+                    mode: "scan_missing",
+                    maxNewPerFilm: bloopersMaxNew,
                     excludeIds: processedFilmIds,
                   }),
                 });
@@ -448,13 +448,16 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
             }
 
             if (!data || !data.success) {
-              // Se questo singolo film ha restituito errore, registralo ma NON interrompere il batch: passa al successivo!
               console.warn(`Film ${step} saltato: ${lastError || "errore sconosciuto"}`);
             } else {
               if (data.results && data.results.length > 0) {
-                data.results.forEach((r: any) => {
-                  if (r.film_id) processedFilmIds.push(r.film_id);
-                });
+                const r0 = data.results[0];
+                if (r0.film_id) processedFilmIds.push(r0.film_id);
+                if (r0.generated > 0) {
+                  setPopulatingBloopersProgress(`Film ${step}/${bloopersBatchSize}: ${r0.titolo} (+${r0.generated} bloopers aggiunti)`);
+                } else {
+                  setPopulatingBloopersProgress(`Film ${step}/${bloopersBatchSize}: ${r0.titolo} (già completo: 0 mancanti)`);
+                }
               }
 
               if (data.processedCount > 0) {
@@ -462,18 +465,11 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                 totalGenerated += data.totalBloopersGenerated || 0;
               }
 
-              if (typeof data.remainingFilmsUnderTarget === "number") {
-                lastRemaining = data.remainingFilmsUnderTarget;
-                setMissingBloopersCount(data.remainingFilmsUnderTarget);
-                // Se tutti i film del catalogo hanno già raggiunto quota 10, possiamo terminare
-                if (data.remainingFilmsUnderTarget === 0) {
-                  break;
-                }
+              if (typeof data.remainingFilmsToScan === "number" && data.remainingFilmsToScan === 0) {
+                break;
               }
             }
 
-            // Pausa cortese di 3 secondi tra una chiamata e l'altra per rimanere stabilmente
-            // sotto il limite di 15 richieste/minuto (RPM) della Free Tier di Google Gemini
             if (step < bloopersBatchSize) {
               await new Promise((r) => setTimeout(r, 3000));
             }
@@ -481,7 +477,9 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
 
           if (totalProcessed > 0) {
             setActionMessage(
-              `🎬 IA completata con successo: aggiunti ${totalGenerated} nuovi bloopers su ${totalProcessed} film! (${lastRemaining} film ancora da incrementare)`
+              totalGenerated > 0
+                ? `🎬 Scansione completata: inseriti ${totalGenerated} nuovi bloopers autentici su ${totalProcessed} film analizzati!`
+                : `🎬 Scansione completata: tutti i ${totalProcessed} film analizzati erano già completi dei loro bloopers documentati!`
             );
             await fetchFilms();
             await fetchMissingBloopersStats();
@@ -489,19 +487,19 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
             setActionMessage(`❌ ${lastError}`);
           }
         } catch (err: any) {
-          console.error("Errore generazione batch bloopers:", err);
-          setActionMessage(`❌ Errore durante la generazione: ${err?.message || "Connessione interrotta"}`);
+          console.error("Errore scansione bloopers mancanti:", err);
+          setActionMessage(`❌ Errore durante la scansione: ${err?.message || "Connessione interrotta"}`);
         } finally {
           setPopulatingBloopers(false);
           setPopulatingBloopersProgress(null);
         }
       },
-      `Avvia Generazione (${bloopersBatchSize} Film a quota ${bloopersTarget})`,
+      `Avvia Scansione (${bloopersBatchSize} film, max ${bloopersMaxNew} nuovi/film)`,
       "warning"
     );
   };
 
-  // Ripristina catalogo bloopers autentici rimuovendo i batch sintetici
+    // Ripristina catalogo bloopers autentici rimuovendo i batch sintetici
   const handleCleanupBatchBloopers = async () => {
     openConfirm(
       "🛡️ Ripristina Bloopers Autentici Verificati",

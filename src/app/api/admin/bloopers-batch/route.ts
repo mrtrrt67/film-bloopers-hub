@@ -36,8 +36,13 @@ export async function GET(request: Request) {
       0
     );
 
+    const totalBloopersCount = (allFilms || []).reduce((acc: number, f: any) => acc + (f.errori?.[0]?.count || 0), 0);
+    const zeroBloopersFilms = (allFilms || []).filter((f: any) => (f.errori?.[0]?.count || 0) === 0).length;
+
     return NextResponse.json({
       totalFilms: allFilms?.length || 0,
+      totalBloopers: totalBloopersCount,
+      zeroBloopersFilms,
       withBloopersCount: atTargetFilms.length,
       missingBloopersCount: underTargetFilms.length,
       underTargetFilmsCount: underTargetFilms.length,
@@ -65,10 +70,12 @@ export async function POST(request: Request) {
 
     const body = await request.json().catch(() => ({}));
     const limit = Math.min(Number(body?.limit) || 1, 10);
+    const maxNewPerFilm = Math.min(Math.max(1, Number(body?.maxNewPerFilm) || 5), 10);
+    const mode = body?.mode || "scan_missing"; // "scan_missing" (predefinito) oppure "quota"
     const targetCount = Number(body?.targetCount) || 10;
     const excludeIds: number[] = Array.isArray(body?.excludeIds) ? body.excludeIds : [];
 
-    // 1. Recupera film che hanno meno di targetCount bloopers
+    // 1. Recupera film dal database
     const { data: allFilms, error: errFilms } = await db
       .from("films")
       .select("id, titolo, anno, regista, attori, trama, errori(count)")
@@ -76,41 +83,48 @@ export async function POST(request: Request) {
 
     if (errFilms) throw errFilms;
 
-    const remainingUnderTargetOverall = (allFilms || []).filter(
-      (f: any) => (f.errori?.[0]?.count || 0) < targetCount
-    ).length;
+    // Seleziona i film candidati
+    const mappedFilms = (allFilms || []).map((f: any) => ({
+      ...f,
+      currentCount: f.errori?.[0]?.count || 0,
+    }));
 
-    // Ordina i film per minor numero di bloopers esistenti (prima chi ne ha 1, 2, 3...)
-    const candidateFilms = (allFilms || [])
-      .map((f: any) => ({
-        ...f,
-        currentCount: f.errori?.[0]?.count || 0,
-      }))
-      .filter((f: any) => f.currentCount < targetCount && !excludeIds.includes(f.id))
-      .sort((a: any, b: any) => a.currentCount - b.currentCount);
+    const candidateFilms = mappedFilms
+      .filter((f: any) => {
+        if (excludeIds.includes(f.id)) return false;
+        if (mode === "quota") {
+          return f.currentCount < targetCount;
+        }
+        return true; // in modalità scan_missing esamina qualsiasi film indipendentemente dal totale attuale
+      })
+      .sort((a: any, b: any) => a.currentCount - b.currentCount); // Priorità a chi ne ha meno (es. 0, 1, 2...)
 
     if (candidateFilms.length === 0) {
       return NextResponse.json({
         success: true,
-        message:
-          remainingUnderTargetOverall === 0
-            ? `Tutti i film presenti nel catalogo hanno già almeno ${targetCount} bloopers!`
-            : `Tutti i film disponibili per questa sessione sono stati esaminati.`,
+        message: mode === "quota"
+          ? `Tutti i film presenti nel catalogo hanno già almeno ${targetCount} bloopers!`
+          : `Tutti i film del catalogo sono stati scansionati per questa sessione.`,
         processedCount: 0,
         totalBloopersGenerated: 0,
-        remainingFilmsWithoutBloopers: remainingUnderTargetOverall,
-        remainingFilmsUnderTarget: remainingUnderTargetOverall,
+        remainingFilmsToScan: 0,
         results: [],
       });
     }
 
     const batch = candidateFilms.slice(0, limit);
-    const results: Array<{ film_id: number; titolo: string; generated: number; currentCount: number; targetCount: number; error?: string }> = [];
+    const results: Array<{
+      film_id: number;
+      titolo: string;
+      generated: number;
+      currentCount: number;
+      error?: string;
+      note?: string;
+    }> = [];
     let totalGenerated = 0;
 
     for (let i = 0; i < batch.length; i++) {
       const film = batch[i];
-      const countNeeded = Math.max(1, targetCount - film.currentCount);
 
       try {
         const { data: existingBloopers } = await db
@@ -127,12 +141,12 @@ export async function POST(request: Request) {
           attori: film.attori,
           trama: film.trama,
           erroriEsistenti: descrizioniEsistenti,
-          countNeeded,
+          maxNew: maxNewPerFilm,
+          countNeeded: mode === "quota" ? Math.max(1, targetCount - film.currentCount) : undefined,
         });
 
         const { bloopers, modelUsed, executionTimeSec, error: genError, errorsLog } = genResult;
 
-        // Traccia ogni eventuale errore per modello in log_errori_ia
         if (errorsLog && errorsLog.length > 0) {
           for (const errItem of errorsLog) {
             try {
@@ -140,7 +154,7 @@ export async function POST(request: Request) {
                 utente: user?.email || "admin",
                 film: film.titolo,
                 modello: errItem.model,
-                operazione: "Generazione Bloopers (Batch)",
+                operazione: "Scansione Bloopers Mancanti (Batch)",
                 errore_dettaglio: errItem.error,
               });
             } catch (e) {
@@ -149,24 +163,25 @@ export async function POST(request: Request) {
           }
         }
 
-        if (genError || !bloopers || bloopers.length === 0) {
-          try {
-            await db.from("log_errori_ia").insert({
-              utente: user?.email || "admin",
-              film: film.titolo,
-              modello: modelUsed || "gemini",
-              operazione: "Generazione Bloopers (Batch)",
-              errore_dettaglio: genError || "Nessun blooper generato",
-            });
-          } catch {}
-
+        if (genError) {
           results.push({
             film_id: film.id,
             titolo: film.titolo,
             generated: 0,
             currentCount: film.currentCount,
-            targetCount,
-            error: genError || "Nessun blooper generato",
+            error: genError,
+          });
+          continue;
+        }
+
+        // Se Gemini restituisce 0 bloopers con prompt anti-allucinazione, significa che l'archivio ha già tutti gli errori noti
+        if (!bloopers || bloopers.length === 0) {
+          results.push({
+            film_id: film.id,
+            titolo: film.titolo,
+            generated: 0,
+            currentCount: film.currentCount,
+            note: "Archivio completo (nessun altro blooper reale documentato)",
           });
           continue;
         }
@@ -179,7 +194,7 @@ export async function POST(request: Request) {
           approvato: true,
           conferme: 0,
           contestazioni: 0,
-          inserito_da: "IA (Batch Admin)",
+          inserito_da: "IA (Archivio)",
           provenienza: "ia",
         }));
 
@@ -200,7 +215,6 @@ export async function POST(request: Request) {
             titolo: film.titolo,
             generated: 0,
             currentCount: film.currentCount,
-            targetCount,
             error: insertErr.message,
           });
         } else {
@@ -210,58 +224,46 @@ export async function POST(request: Request) {
             titolo: film.titolo,
             generated: bloopers.length,
             currentCount: film.currentCount + bloopers.length,
-            targetCount,
           });
 
-          // Log statistiche
+          // Traccia statistiche IA
           if (modelUsed) {
             try {
               await db.from("statistiche_ia").insert({
                 modello: modelUsed,
-                tempo_esecuzione: executionTimeSec || 1.5,
+                tempo_esecuzione_sec: executionTimeSec || 0,
+                successo: true,
+                tipo_chiamata: "bloopers_batch_missing",
               });
             } catch {}
           }
         }
-      } catch (err: any) {
-        try {
-          await db.from("log_errori_ia").insert({
-            utente: user?.email || "admin",
-            film: film.titolo,
-            modello: "gemini",
-            operazione: "Generazione Bloopers (Batch)",
-            errore_dettaglio: err.message || "Errore imprevisto",
-          });
-        } catch {}
-
+      } catch (loopErr: any) {
+        console.error(`Errore batch su film ${film.id}:`, loopErr);
         results.push({
           film_id: film.id,
           titolo: film.titolo,
           generated: 0,
           currentCount: film.currentCount,
-          targetCount,
-          error: err.message,
+          error: loopErr.message,
         });
-      }
-
-      // Pausa di 1 secondo tra le chiamate per rispetto dei rate limit
-      if (i < batch.length - 1) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
 
-    const remainingCount = candidateFilms.length - results.filter((r) => r.generated > 0).length;
+    const remainingToScan = Math.max(0, candidateFilms.length - batch.length);
 
     return NextResponse.json({
       success: true,
-      processedCount: results.filter((r) => r.generated > 0).length,
+      message: totalGenerated > 0
+        ? `Scansione completata: inseriti ${totalGenerated} nuovi bloopers autentici su ${batch.length} film analizzati.`
+        : `Scansione completata su ${batch.length} film: i film analizzati contengono già tutti i bloopers reali noti.`,
+      processedCount: batch.length,
       totalBloopersGenerated: totalGenerated,
-      remainingFilmsWithoutBloopers: Math.max(0, remainingCount),
-      remainingFilmsUnderTarget: Math.max(0, remainingCount),
+      remainingFilmsToScan: remainingToScan,
       results,
     });
   } catch (err: any) {
-    console.error("Errore batch bloopers:", err);
-    return NextResponse.json({ error: err.message || "Errore elaborazione batch" }, { status: 500 });
+    console.error("Errore generale batch bloopers:", err);
+    return NextResponse.json({ error: err.message || "Errore interno durante il batch" }, { status: 500 });
   }
 }
