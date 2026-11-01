@@ -70,7 +70,7 @@ export async function POST(request: Request) {
 
     const body = await request.json().catch(() => ({}));
     const limit = Math.min(Number(body?.limit) || 1, 10);
-    const maxNewPerFilm = Math.min(Math.max(1, Number(body?.maxNewPerFilm) || 5), 10);
+    const maxNewPerFilm = Math.min(Math.max(1, Number(body?.maxNewPerFilm) || 5), 50);
     const mode = body?.mode || "scan_missing"; // "scan_missing" (predefinito) oppure "quota"
     const targetCount = Number(body?.targetCount) || 10;
     const excludeIds: number[] = Array.isArray(body?.excludeIds) ? body.excludeIds : [];

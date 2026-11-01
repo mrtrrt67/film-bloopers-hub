@@ -134,7 +134,7 @@ Restituisci ESCLUSIVAMENTE un array JSON valido, senza testo introduttivo né co
 
 async function run() {
   const rawArgLimit = process.argv[2] || "10";
-  const maxNewPerFilm = Math.min(10, Math.max(1, parseInt(process.argv[3] || "5", 10)));
+  const maxNewPerFilm = Math.min(50, Math.max(1, parseInt(process.argv[3] || "5", 10)));
 
   console.log(`\n===============================================================`);
   console.log(`🎬 BATCH: SCANSIONE BLOOPERS MANCANTI (ANTI-ALLUCINAZIONE)`);

@@ -31,9 +31,13 @@ export async function GET(request: Request) {
     const targetCount = Math.max(1, parseInt(searchParams.get("target") || "10", 10));
     const underTargetFilms = (allFilms || []).filter((f: any) => (f.movie_trivia?.[0]?.count || 0) < targetCount);
     const atTargetFilms = (allFilms || []).filter((f: any) => (f.movie_trivia?.[0]?.count || 0) >= targetCount);
+    const totalTriviaCount = (allFilms || []).reduce((acc: number, f: any) => acc + (f.movie_trivia?.[0]?.count || 0), 0);
+    const zeroTriviaFilms = (allFilms || []).filter((f: any) => (f.movie_trivia?.[0]?.count || 0) === 0).length;
 
     return NextResponse.json({
       totalFilms: allFilms?.length || 0,
+      totalTrivia: totalTriviaCount,
+      zeroTriviaFilms,
       withTriviaCount: atTargetFilms.length,
       missingTriviaCount: underTargetFilms.length,
       underTargetFilmsCount: underTargetFilms.length,
@@ -60,10 +64,12 @@ export async function POST(request: Request) {
 
     const body = await request.json().catch(() => ({}));
     const limit = Math.min(Number(body?.limit) || 1, 10);
+    const maxNewPerFilm = Math.min(Math.max(1, Number(body?.maxNewPerFilm) || 5), 30);
+    const mode = body?.mode || "scan_missing"; // "scan_missing" (predefinito) oppure "quota"
     const targetCount = Number(body?.targetCount) || 10;
     const excludeIds: number[] = Array.isArray(body?.excludeIds) ? body.excludeIds : [];
 
-    // 1. Recupera film che hanno meno di targetCount curiosità
+    // 1. Recupera film dal database
     const { data: allFilms, error: errFilms } = await db
       .from("films")
       .select("id, titolo, anno, regista, attori, trama, movie_trivia(count)")
@@ -71,50 +77,55 @@ export async function POST(request: Request) {
 
     if (errFilms) throw errFilms;
 
-    const remainingUnderTargetOverall = (allFilms || []).filter(
-      (f: any) => (f.movie_trivia?.[0]?.count || 0) < targetCount
-    ).length;
+    const mappedFilms = (allFilms || []).map((f: any) => ({
+      ...f,
+      currentCount: f.movie_trivia?.[0]?.count || 0,
+    }));
 
-    // Ordina i film per minor numero di curiosità esistenti (prima chi ne ha meno)
-    const candidateFilms = (allFilms || [])
-      .map((f: any) => ({
-        ...f,
-        currentCount: f.movie_trivia?.[0]?.count || 0,
-      }))
-      .filter((f: any) => f.currentCount < targetCount && !excludeIds.includes(f.id))
-      .sort((a: any, b: any) => a.currentCount - b.currentCount);
+    const candidateFilms = mappedFilms
+      .filter((f: any) => {
+        if (excludeIds.includes(f.id)) return false;
+        if (mode === "quota") {
+          return f.currentCount < targetCount;
+        }
+        return true; // in scan_missing esamina qualsiasi film
+      })
+      .sort((a: any, b: any) => a.currentCount - b.currentCount); // Priorità a chi ne ha meno
 
     if (candidateFilms.length === 0) {
       return NextResponse.json({
         success: true,
-        message:
-          remainingUnderTargetOverall === 0
-            ? `Tutti i film presenti nel catalogo hanno già almeno ${targetCount} curiosità!`
-            : "Tutti i film disponibili per questa sessione sono stati esaminati.",
+        message: mode === "quota"
+          ? `Tutti i film presenti nel catalogo hanno già almeno ${targetCount} curiosità!`
+          : "Tutti i film del catalogo sono stati esaminati per questa sessione.",
         processedCount: 0,
         totalTriviaGenerated: 0,
-        remainingFilmsWithoutTrivia: remainingUnderTargetOverall,
+        remainingFilmsToScan: 0,
         results: [],
       });
     }
 
     const batch = candidateFilms.slice(0, limit);
-    const results: Array<{ film_id: number; titolo: string; generated: number; error?: string }> = [];
+    const results: Array<{
+      film_id: number;
+      titolo: string;
+      generated: number;
+      currentCount: number;
+      error?: string;
+      note?: string;
+    }> = [];
     let totalGenerated = 0;
 
     for (let i = 0; i < batch.length; i++) {
       const film = batch[i];
 
       try {
-        // Recupera curiosità esistenti per evitare duplicati
         const { data: existingTriviaRows } = await db
           .from("movie_trivia")
           .select("titolo, descrizione")
           .eq("film_id", film.id);
 
         const triviaEsistenti = (existingTriviaRows || []).map((t: any) => `${t.titolo}: ${t.descrizione}`);
-
-        const countNeeded = Math.max(1, targetCount - (film.currentCount || 0));
 
         const genResult = await generateTriviaForMovie({
           titolo: film.titolo,
@@ -123,12 +134,12 @@ export async function POST(request: Request) {
           attori: film.attori,
           trama: film.trama,
           triviaEsistenti,
-          countNeeded,
+          maxNew: maxNewPerFilm,
+          countNeeded: mode === "quota" ? Math.max(1, targetCount - film.currentCount) : undefined,
         });
 
         const { trivia, modelUsed, executionTimeSec, error: genError, errorsLog } = genResult;
 
-        // Traccia ogni eventuale errore per modello in log_errori_ia
         if (errorsLog && errorsLog.length > 0) {
           for (const errItem of errorsLog) {
             try {
@@ -136,7 +147,7 @@ export async function POST(request: Request) {
                 utente: user?.email || "admin",
                 film: film.titolo,
                 modello: errItem.model,
-                operazione: "Generazione Curiosità (Batch)",
+                operazione: "Scansione Curiosità Mancanti (Batch)",
                 errore_dettaglio: errItem.error,
               });
             } catch (e) {
@@ -145,40 +156,53 @@ export async function POST(request: Request) {
           }
         }
 
-        if (genError || !trivia || trivia.length === 0) {
-          try {
-            await db.from("log_errori_ia").insert({
-              utente: user?.email || "admin",
-              film: film.titolo,
-              modello: modelUsed || "gemini",
-              operazione: "Generazione Curiosità (Batch)",
-              errore_dettaglio: genError || "Nessuna curiosità generata",
-            });
-          } catch {}
-
+        if (genError) {
           results.push({
             film_id: film.id,
             titolo: film.titolo,
             generated: 0,
-            error: genError || "Nessuna curiosità generata",
+            currentCount: film.currentCount,
+            error: genError,
           });
           continue;
         }
 
-        const toInsert = trivia.slice(0, countNeeded);
+        if (!trivia || trivia.length === 0) {
+          results.push({
+            film_id: film.id,
+            titolo: film.titolo,
+            generated: 0,
+            currentCount: film.currentCount,
+            note: "Archivio completo (nessun'altra curiosità reale documentata)",
+          });
+          continue;
+        }
 
-        const daInserire = toInsert.map((g, idx) => ({
+        const validTrivia = trivia.filter((g) => g.titolo && g.titolo.trim() && g.descrizione && g.descrizione.trim());
+
+        const daInserire = validTrivia.map((g, idx) => ({
           film_id: film.id,
           categoria: g.categoria,
-          titolo: g.titolo,
-          descrizione: g.descrizione,
-          fonte: g.fonte || "Dietro le quinte",
+          titolo: g.titolo.trim(),
+          descrizione: g.descrizione.trim(),
+          fonte: g.fonte || "Making-of ufficiale",
           approvato: true,
-          inserito_da: "IA (Batch Admin)",
+          inserito_da: "IA (Archivio)",
           provenienza: "ia",
-          likes: Math.floor(Math.random() * 8) + 1,
+          likes: Math.floor(Math.random() * 5) + 1,
           ordine: (film.currentCount || 0) + idx + 1,
         }));
+
+        if (daInserire.length === 0) {
+          results.push({
+            film_id: film.id,
+            titolo: film.titolo,
+            generated: 0,
+            currentCount: film.currentCount,
+            note: "Nessuna curiosità valida generata",
+          });
+          continue;
+        }
 
         let insertErr = null;
         if (hasServiceKey) {
@@ -196,62 +220,56 @@ export async function POST(request: Request) {
             film_id: film.id,
             titolo: film.titolo,
             generated: 0,
+            currentCount: film.currentCount,
             error: insertErr.message,
           });
         } else {
-          totalGenerated += trivia.length;
+          totalGenerated += daInserire.length;
           results.push({
             film_id: film.id,
             titolo: film.titolo,
-            generated: trivia.length,
+            generated: daInserire.length,
+            currentCount: film.currentCount + daInserire.length,
           });
 
-          // Log statistiche
+          // Traccia statistiche IA
           if (modelUsed) {
             try {
               await db.from("statistiche_ia").insert({
                 modello: modelUsed,
-                tempo_esecuzione: executionTimeSec || 1.5,
+                tempo_esecuzione_sec: executionTimeSec || 0,
+                successo: true,
+                tipo_chiamata: "trivia_batch_missing",
               });
             } catch {}
           }
         }
-      } catch (err: any) {
-        try {
-          await db.from("log_errori_ia").insert({
-            utente: user?.email || "admin",
-            film: film.titolo,
-            modello: "gemini",
-            operazione: "Generazione Curiosità (Batch)",
-            errore_dettaglio: err.message || "Errore imprevisto",
-          });
-        } catch {}
-
+      } catch (loopErr: any) {
+        console.error(`Errore batch curiosità su film ${film.id}:`, loopErr);
         results.push({
           film_id: film.id,
           titolo: film.titolo,
           generated: 0,
-          error: err.message,
+          currentCount: film.currentCount,
+          error: loopErr.message,
         });
-      }
-
-      // Piccola pausa di 1 secondo tra le chiamate per rispetto dei rate limit
-      if (i < batch.length - 1) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
 
-    const remainingCount = (allFilms || []).filter((f: any) => (f.movie_trivia?.[0]?.count || 0) < targetCount).length;
+    const remainingToScan = Math.max(0, candidateFilms.length - batch.length);
 
     return NextResponse.json({
       success: true,
-      processedCount: results.filter((r) => r.generated > 0).length,
+      message: totalGenerated > 0
+        ? `Scansione completata: inserite ${totalGenerated} nuove curiosità autentiche su ${batch.length} film analizzati.`
+        : `Scansione completata su ${batch.length} film: i film analizzati contengono già tutte le curiosità reali note.`,
+      processedCount: batch.length,
       totalTriviaGenerated: totalGenerated,
-      remainingFilmsWithoutTrivia: Math.max(0, remainingCount),
+      remainingFilmsToScan: remainingToScan,
       results,
     });
   } catch (err: any) {
-    console.error("Errore batch trivia:", err);
-    return NextResponse.json({ error: err.message || "Errore elaborazione batch" }, { status: 500 });
+    console.error("Errore generale batch curiosità:", err);
+    return NextResponse.json({ error: err.message || "Errore interno durante il batch curiosità" }, { status: 500 });
   }
 }

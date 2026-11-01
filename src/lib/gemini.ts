@@ -108,8 +108,8 @@ export async function generateBloopersForMovie(params: {
       : "\nNessun errore attualmente registrato in archivio.";
 
   const requested = typeof params.maxNew === "number" && params.maxNew > 0
-    ? Math.min(params.maxNew, 10)
-    : (typeof params.countNeeded === "number" && params.countNeeded > 0 ? Math.min(params.countNeeded, 10) : 5);
+    ? Math.min(params.maxNew, 50)
+    : (typeof params.countNeeded === "number" && params.countNeeded > 0 ? Math.min(params.countNeeded, 50) : 5);
 
   const prompt = `Sei un archivista e verificatore cinematografico specializzato in bloopers, goofs ed errori di montaggio reali e documentati.
 
@@ -265,6 +265,7 @@ export async function generateTriviaForMovie(params: {
   trama?: string | null;
   triviaEsistenti?: string[];
   countNeeded?: number;
+  maxNew?: number;
 }): Promise<GenerateTriviaResult> {
   const ai = getGeminiClient();
   if (!ai) {
@@ -277,17 +278,21 @@ export async function generateTriviaForMovie(params: {
     };
   }
 
-  const { titolo, anno, regista, attori, trama, triviaEsistenti = [], countNeeded } = params;
+  const { titolo, anno, regista, attori, trama, triviaEsistenti = [], countNeeded, maxNew } = params;
 
   const esclusioneText =
     triviaEsistenti.length > 0
-      ? `\nCURIOSITÀ GIÀ REGISTRATE (NON RIPETERE QUESTE O FATTI IDENTICI):\n${triviaEsistenti
-          .slice(0, 15)
-          .map((e) => `- ${e.slice(0, 120)}`)
+      ? `\nCURIOSITÀ GIÀ REGISTRATE NEL NOSTRO ARCHIVIO (NON RIPETERE ASSOLUTAMENTE QUESTE O FATTI IDENTICI):\n${triviaEsistenti
+          .slice(0, 40)
+          .map((e, idx) => `${idx + 1}. ${e.slice(0, 180)}`)
           .join("\n")}`
-      : "";
+      : "\nNessuna curiosità attualmente registrata in archivio.";
 
-  const prompt = `Sei un enciclopedico e appassionato storico del cinema, specializzato in aneddoti di backstage, retroscena di produzione, curiosità sul casting, easter egg e segreti dal set cinematografico.
+  const requested = typeof maxNew === "number" && maxNew > 0
+    ? Math.min(maxNew, 30)
+    : (typeof countNeeded === "number" && countNeeded > 0 ? Math.min(countNeeded, 30) : 5);
+
+  const prompt = `Sei un rigoroso storico del cinema e documentarista specializzato in retroscena di produzione, aneddoti di casting e segreti dal set reali, comprovati e verificabili.
 
 DATI UFFICIALI DEL FILM:
 - Titolo: "${titolo}" (${anno || "N/D"})
@@ -297,7 +302,14 @@ DATI UFFICIALI DEL FILM:
 ${esclusioneText}
 
 COMPITO:
-${countNeeded ? `Trova ESATTAMENTE ${Math.max(2, countNeeded)}` : "Trova tra 5 e 8"} curiosità, retroscena, aneddoti memorabili o segreti di produzione concreti e verificati su questo film.
+Analizza attentamente le curiosità già registrate per questa pellicola.
+Identifica fino a un MASSIMO di ${requested} curiosità, retroscena o aneddoti storici REALI, NOTI e DOCUMENTATI che MANCANO ancora nell'archivio.
+
+REGOLE ANTI-ALLUCINAZIONE ASSOLUTE:
+1. DIVIETO ASSOLUTO DI INVENTARE O GENERALIZZARE: Non inventare MAI aneddoti generici o verosimili (vietate frasi generiche come "il cast ha legato molto sul set", "le riprese sono state impegnative", "il regista ha voluto dare autenticità"). Ogni curiosità DEVE contenere fatti specifici, nomi propri, cifre concrete o eventi realmente accaduti e verificabili (es. interviste ufficiali, note di produzione, Making-of, commenti audio DVD).
+2. SE NON CI SONO ALTRI FATTI DOCUMENTATI, RESTITUISCI []: Non forzare mai il numero. Se per questo film sono noti solo 1 o 2 fatti reali, restituisci solo quelli. Se non ce ne sono di documentati, restituisci tassativamente un array vuoto [].
+3. NESSUNA DUPLICAZIONE: Non ripetere né parafrasare curiosità già elencate sopra.
+4. DESCRIZIONI COMPATTE E COMPLETE: 2-3 frasi chiare ed esaustive in italiano corretto. Non lasciare MAI campi vuoti né testi fittizi.
 
 Le categorie ammesse sono ESCLUSIVAMENTE:
 1. "Curiosità & Retroscena"
@@ -307,19 +319,14 @@ Le categorie ammesse sono ESCLUSIVAMENTE:
 5. "Effetti speciali & Trucco"
 6. "Citazioni & Easter Egg"
 
-REGOLE TASSATIVE:
-- Restituisci ESCLUSIVAMENTE un array JSON valido, senza testo introduttivo né blocchi o commenti aggiuntivi al di fuori del JSON.
-- "titolo": un titolo breve, incisivo e accattivante (4-10 parole).
-- "descrizione": spiegazione dettagliata, coinvolgente e in italiano corretto (2-4 frasi appassionanti che raccontano il retroscena reale).
-- "fonte": fonte indicativa o contesto (es. "Intervista al regista", "Making-of ufficiale", "Commento audio DVD", "Autobiografia dell'attore").
-
 FORMATO OUTPUT:
+Restituisci ESCLUSIVAMENTE un array JSON valido, senza testo introduttivo né commenti:
 [
   {
-    "categoria": "Aneddoti dal set",
-    "titolo": "L'improvvisazione memorabile durante la scena madre",
-    "descrizione": "Durante le riprese della celebre sequenza, l'attore protagonista ha improvvisato la battuta iconica cogliendo di sorpresa l'intero cast. Il regista decise sul momento di tenere quel ciak nel montaggio finale.",
-    "fonte": "Making-of ufficiale"
+    "categoria": "Casting & Scelte",
+    "titolo": "Titolo specifico e incisivo (4-8 parole)",
+    "descrizione": "Descrizione fattuale dettagliata con nomi propri, numeri o circostanze reali documentate.",
+    "fonte": "Fonte reale indicativa (es. Making-of ufficiale, Intervista al regista, Commento audio DVD)"
   }
 ]`;
 
@@ -334,7 +341,7 @@ FORMATO OUTPUT:
         contents: prompt,
         config: {
           responseMimeType: "application/json",
-          temperature: 0.2,
+          temperature: 0.0,
         },
       });
       const t1 = performance.now();
@@ -379,7 +386,7 @@ FORMATO OUTPUT:
         contents: prompt,
         config: {
           responseMimeType: "application/json",
-          temperature: 0.2,
+          temperature: 0.0,
         },
       });
       const t1 = performance.now();

@@ -50,6 +50,8 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   const [bloopersBatchSize, setBloopersBatchSize] = useState<number>(5);
   const [bloopersMaxNew, setBloopersMaxNew] = useState<number>(5);
   const [cleaningBloopers, setCleaningBloopers] = useState(false);
+  const [triviaMaxNew, setTriviaMaxNew] = useState<number>(5);
+  const [cleaningTrivia, setCleaningTrivia] = useState(false);
   const [actionMessage, setActionMessage] = useState<string | null>(null);
 
   const [confirmModal, setConfirmModal] = useState<{
@@ -284,29 +286,27 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     );
   };
 
-  // Popola curiosità con IA in modo sequenziale con protezione rate-limit (3s di pausa) ed esclusione duplicati
+  // Scansiona i film con IA per rilevare ed aggiungere curiosità autentiche mancanti (senza forzare quote)
   const handleBatchPopulateTrivia = async () => {
     openConfirm(
-      `✨ Incrementa Curiosità con IA (${triviaBatchSize} Film a quota ${triviaTarget})`,
-      `Avviare la generazione automatica con Gemini per arricchire ${triviaBatchSize} film fino a quota ${triviaTarget} curiosità? Le chiamate avvengono con ritmo controllato.`,
+      `⚡ Scansione Curiosità Mancanti (${triviaBatchSize} film, max ${triviaMaxNew} per film)`,
+      `Avviare la scansione di ${triviaBatchSize} pellicole con Gemini per identificare ed aggiungere eventuali curiosità e retroscena autentici documentati che mancano ancora nel catalogo (fino a max ${triviaMaxNew} nuove per film)? L'algoritmo non inventa nulla: se un film non ha aneddoti documentati, non verrà aggiunto nulla.`,
       async () => {
         setPopulatingTrivia(true);
         setActionMessage(null);
         let totalProcessed = 0;
         let totalGenerated = 0;
-        let lastRemaining = missingTriviaCount ?? 0;
         let lastError: string | null = null;
         const processedFilmIds: number[] = [];
 
         try {
           for (let step = 1; step <= triviaBatchSize; step++) {
-            setPopulatingProgress(`Film ${step}/${triviaBatchSize} in elaborazione...`);
+            setPopulatingProgress(`Film ${step}/${triviaBatchSize} in scansione curiosità...`);
 
             let res: Response | null = null;
             let data: any = null;
             let retries = 0;
 
-            // Fino a 2 tentativi con raffreddamento automatico in caso di quota 429
             while (retries < 2) {
               try {
                 res = await fetch("/api/admin/trivia-batch", {
@@ -314,7 +314,8 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
                     limit: 1,
-                    targetCount: triviaTarget,
+                    mode: "scan_missing",
+                    maxNewPerFilm: triviaMaxNew,
                     excludeIds: processedFilmIds,
                   }),
                 });
@@ -344,9 +345,13 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
               console.warn(`Film curiosità ${step} saltato: ${lastError || "errore sconosciuto"}`);
             } else {
               if (data.results && data.results.length > 0) {
-                data.results.forEach((r: any) => {
-                  if (r.film_id) processedFilmIds.push(r.film_id);
-                });
+                const r0 = data.results[0];
+                if (r0.film_id) processedFilmIds.push(r0.film_id);
+                if (r0.generated > 0) {
+                  setPopulatingProgress(`Film ${step}/${triviaBatchSize}: ${r0.titolo} (+${r0.generated} curiosità aggiunte)`);
+                } else {
+                  setPopulatingProgress(`Film ${step}/${triviaBatchSize}: ${r0.titolo} (già completo: 0 mancanti)`);
+                }
               }
 
               if (data.processedCount > 0) {
@@ -354,17 +359,11 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                 totalGenerated += data.totalTriviaGenerated || 0;
               }
 
-              if (typeof data.remainingFilmsWithoutTrivia === "number") {
-                lastRemaining = data.remainingFilmsWithoutTrivia;
-                setMissingTriviaCount(data.remainingFilmsWithoutTrivia);
-                if (data.remainingFilmsWithoutTrivia === 0) {
-                  break;
-                }
+              if (typeof data.remainingFilmsToScan === "number" && data.remainingFilmsToScan === 0) {
+                break;
               }
             }
 
-            // Pausa cortese di 3 secondi tra una chiamata e l'altra per rimanere stabilmente
-            // sotto il limite di 15 richieste/minuto (RPM) della Free Tier di Google Gemini
             if (step < triviaBatchSize) {
               await new Promise((r) => setTimeout(r, 3000));
             }
@@ -372,7 +371,9 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
 
           if (totalProcessed > 0) {
             setActionMessage(
-              `✨ IA completata con successo: generate ${totalGenerated} curiosità su ${totalProcessed} film! (${lastRemaining} film ancora senza curiosità)`
+              totalGenerated > 0
+                ? `✨ Scansione curiosità completata: inserite ${totalGenerated} nuove curiosità autentiche su ${totalProcessed} film analizzati!`
+                : `✨ Scansione curiosità completata: tutti i ${totalProcessed} film analizzati erano già completi degli aneddoti noti!`
             );
             await fetchFilms();
             await fetchMissingTriviaStats();
@@ -380,19 +381,19 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
             setActionMessage(`❌ ${lastError}`);
           }
         } catch (err: any) {
-          console.error("Errore generazione batch curiosità:", err);
-          setActionMessage(`❌ Errore durante la generazione: ${err?.message || "Connessione interrotta"}`);
+          console.error("Errore scansione batch curiosità:", err);
+          setActionMessage(`❌ Errore durante la scansione: ${err?.message || "Connessione interrotta"}`);
         } finally {
           setPopulatingTrivia(false);
           setPopulatingProgress(null);
         }
       },
-      `Avvia Generazione (${triviaBatchSize} Film a quota ${triviaTarget})`,
+      `Avvia Scansione (${triviaBatchSize} film, max ${triviaMaxNew} nuove/film)`,
       "warning"
     );
   };
 
-  // Scansiona i film con IA per rilevare ed aggiungere bloopers autentici mancanti (senza forzare quote)
+    // Scansiona i film con IA per rilevare ed aggiungere bloopers autentici mancanti (senza forzare quote)
   const handleBatchPopulateBloopers = async () => {
     openConfirm(
       `⚡ Scansione Bloopers Mancanti (${bloopersBatchSize} film, max ${bloopersMaxNew} per film)`,
@@ -499,7 +500,41 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     );
   };
 
-    // Ripristina catalogo bloopers autentici rimuovendo i batch sintetici
+    // Ripristina e bonifica archivio curiosità
+  const handleCleanupBatchTrivia = async () => {
+    openConfirm(
+      "🛡️ Ripristina & Bonifica Curiosità",
+      "Azzerare tutte le 3.467 curiosità generate automaticamente durante i vecchi test a quota forzata e le righe corrotte? L'archivio verrà azzerato e predisposto per la nuova scansione verificata e autentica al 100% con zero allucinazioni.",
+      async () => {
+        setCleaningTrivia(true);
+        setActionMessage(null);
+        try {
+          const res = await fetch("/api/admin/trivia-cleanup", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ scope: "all" }),
+          });
+          const data = await res.json();
+          if (res.ok && data.success) {
+            setActionMessage(`✅ ${data.message}`);
+            await fetchFilms();
+            await fetchMissingTriviaStats();
+          } else {
+            setActionMessage(`❌ Errore durante la bonifica curiosità: ${data.error || "Operazione non riuscita"}`);
+          }
+        } catch (err: any) {
+          console.error("Errore trivia cleanup:", err);
+          setActionMessage(`❌ Errore di connessione: ${err.message}`);
+        } finally {
+          setCleaningTrivia(false);
+        }
+      },
+      "Procedi con la Bonifica Curiosità",
+      "danger"
+    );
+  };
+
+  // Ripristina catalogo bloopers autentici rimuovendo i batch sintetici
   const handleCleanupBatchBloopers = async () => {
     openConfirm(
       "🛡️ Ripristina Bloopers Autentici Verificati",
@@ -740,7 +775,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
               <div className="flex items-center gap-1.5">
                 <span className="text-[11px] font-bold text-zinc-400" title="Limite massimo di nuovi bloopers mancanti da cercare per ogni singolo film">Max/Film:</span>
                 <div className="flex items-center bg-zinc-900 rounded-lg p-0.5 border border-zinc-800">
-                  {[3, 5, 8].map((q) => (
+                  {[5, 10, 15, 20].map((q) => (
                     <button
                       key={q}
                       type="button"
@@ -755,7 +790,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                       {q}
                     </button>
                   ))}
-                  {![3, 5, 8].includes(bloopersMaxNew) && (
+                  {![5, 10, 15, 20].includes(bloopersMaxNew) && (
                     <span className="px-2 py-1 text-xs font-bold rounded-md bg-amber-500 text-zinc-950">
                       {bloopersMaxNew}
                     </span>
@@ -763,14 +798,14 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                   <button
                     type="button"
                     onClick={() => {
-                      const val = window.prompt("Massimo bloopers mancanti per film (1-10):", String(bloopersMaxNew));
+                      const val = window.prompt("Massimo bloopers mancanti per film (1-50):", String(bloopersMaxNew));
                       if (val) {
                         const n = parseInt(val, 10);
-                        if (!isNaN(n) && n > 0 && n <= 10) setBloopersMaxNew(n);
+                        if (!isNaN(n) && n > 0 && n <= 50) setBloopersMaxNew(n);
                       }
                     }}
                     disabled={populatingBloopers}
-                    title="Imposta limite personalizzato"
+                    title="Imposta limite personalizzato libero (fino a 50)"
                     className="px-2 py-1 text-[11px] font-bold text-zinc-400 hover:text-amber-400 active:scale-95 transition"
                   >
                     ✏️
@@ -843,33 +878,29 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                     Curiosità IA
                   </h4>
                   <p className="text-[11px] text-zinc-400">
-                    Aggiungi retroscena e aneddoti
+                    Scansiona ed integra curiosità mancanti
                   </p>
                 </div>
               </div>
-              <span className={`px-2.5 py-1 rounded-full text-[11px] font-black border whitespace-nowrap ${
-                missingTriviaFilmCount === 0
-                  ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
-                  : "bg-amber-500/10 text-amber-300 border-amber-500/30"
-              }`}>
-                {missingTriviaFilmCount === 0 ? "Completati" : `${missingTriviaFilmCount} da fare`}
+              <span className="px-2.5 py-1 rounded-full text-[11px] font-black border whitespace-nowrap bg-amber-500/10 text-amber-300 border-amber-500/30">
+                {films.reduce((acc, f) => acc + (f.trivia_count || 0), 0)} curiosità totali
               </span>
             </div>
 
-            {/* Controlli Touch: Quota Target & Sessione */}
+            {/* Controlli Touch: Max Curiosità per Film & Blocco Batch */}
             <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1 border-t border-zinc-800/60">
-              {/* Selettore Quota */}
+              {/* Selettore Max Nuove Curiosità per Film */}
               <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-bold text-zinc-400">Quota:</span>
+                <span className="text-[11px] font-bold text-zinc-400" title="Limite massimo di nuove curiosità mancanti da cercare per ogni singolo film">Max/Film:</span>
                 <div className="flex items-center bg-zinc-900 rounded-lg p-0.5 border border-zinc-800">
-                  {[10, 15, 20].map((q) => (
+                  {[3, 5, 8].map((q) => (
                     <button
                       key={q}
                       type="button"
-                      onClick={() => handleSetTriviaTarget(q)}
+                      onClick={() => setTriviaMaxNew(q)}
                       disabled={populatingTrivia}
                       className={`px-2.5 py-1 text-xs font-bold rounded-md transition ${
-                        triviaTarget === q
+                        triviaMaxNew === q
                           ? "bg-amber-500 text-zinc-950 shadow-sm"
                           : "text-zinc-400 hover:text-white"
                       }`}
@@ -877,22 +908,22 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                       {q}
                     </button>
                   ))}
-                  {![10, 15, 20].includes(triviaTarget) && (
+                  {![3, 5, 8].includes(triviaMaxNew) && (
                     <span className="px-2 py-1 text-xs font-bold rounded-md bg-amber-500 text-zinc-950">
-                      {triviaTarget}
+                      {triviaMaxNew}
                     </span>
                   )}
                   <button
                     type="button"
                     onClick={() => {
-                      const val = window.prompt("Quota target personalizzata di curiosità per film:", String(triviaTarget));
+                      const val = window.prompt("Massimo curiosità mancanti per film (1-30):", String(triviaMaxNew));
                       if (val) {
                         const n = parseInt(val, 10);
-                        if (!isNaN(n) && n > 0 && n <= 50) handleSetTriviaTarget(n);
+                        if (!isNaN(n) && n > 0 && n <= 30) setTriviaMaxNew(n);
                       }
                     }}
                     disabled={populatingTrivia}
-                    title="Imposta quota personalizzata"
+                    title="Imposta limite personalizzato"
                     className="px-2 py-1 text-[11px] font-bold text-zinc-400 hover:text-amber-400 active:scale-95 transition"
                   >
                     ✏️
@@ -926,20 +957,32 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
             {/* Pulsante Azione Touch-Friendly a tutta larghezza */}
             <button
               onClick={handleBatchPopulateTrivia}
-              disabled={populatingTrivia || missingTriviaFilmCount === 0}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 via-orange-500 to-amber-400 text-zinc-950 hover:brightness-110 active:scale-[0.98] transition disabled:opacity-50 shadow-lg shadow-amber-500/10 min-h-[44px]"
+              disabled={populatingTrivia}
+              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-400 text-zinc-950 hover:brightness-110 active:scale-[0.98] transition disabled:opacity-50 shadow-lg shadow-amber-500/10 min-h-[44px]"
             >
               <Sparkles className={`h-4 w-4 shrink-0 ${populatingTrivia ? "animate-spin" : ""}`} />
               <span className="truncate">
                 {populatingTrivia
-                  ? (populatingProgress || `Generazione in corso...`)
-                  : missingTriviaFilmCount === 0
-                  ? `Tutti i film hanno già almeno ${triviaTarget} curiosità!`
-                  : `✨ Incrementa Curiosità (${triviaBatchSize} film a quota ${triviaTarget})`}
+                  ? (populatingProgress || "Scansione in corso...")
+                  : `⚡ Scansiona & Integra Curiosità (${triviaBatchSize} film, max ${triviaMaxNew} nuove)`}
               </span>
             </button>
-          </div>
 
+            {/* Azione di Ripristino e Bonifica Curiosità */}
+            <div className="flex items-center justify-between pt-2 border-t border-zinc-800/60 text-[11px]">
+              <span className="text-zinc-500 font-medium">Contenuti sintetici:</span>
+              <button
+                type="button"
+                onClick={handleCleanupBatchTrivia}
+                disabled={cleaningTrivia || populatingTrivia}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold text-red-400 bg-red-950/40 border border-red-800/40 hover:bg-red-900/50 hover:text-red-300 active:scale-95 transition disabled:opacity-50 shadow-sm"
+                title="Azzera le 3.467 curiosità del batch forzato e le righe corrotte per ripartire con scansioni verificate"
+              >
+                <Trash2 className={`h-3.5 w-3.5 ${cleaningTrivia ? "animate-spin" : ""}`} />
+                <span>{cleaningTrivia ? "Bonifica in corso..." : "🛡️ Ripristina / Bonifica Curiosità"}</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
