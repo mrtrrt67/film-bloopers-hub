@@ -177,8 +177,7 @@ async function callGeminiZeroTemp(prompt) {
         model,
         contents: prompt,
         config: {
-          temperature: 0.0,
-          topP: 0.1,
+          temperature: 0.2,
           responseMimeType: "application/json",
         },
       });
@@ -223,15 +222,16 @@ async function scanBloopersForFilm(film, existingBloopers, maxNew) {
   const prompt = `Sei un archivista e verificatore cinematografico specializzato in bloopers, goofs ed errori di montaggio reali e documentati.
 
 DATI UFFICIALI DEL FILM:
-- Titolo: "${film.titolo}" (${film.anno || "N/D"})
+- Titolo registrato: "${film.titolo}" (${film.anno || "N/D"})
 - Regia: ${film.regista || "N/D"}
 - Cast: ${film.attori || "N/D"}
 - Sinossi: ${film.trama || "N/D"}
+- RICONOSCIMENTO TITOLI INTERNAZIONALI: Se il film è straniero o noto internazionalmente con titolo differente da quello italiano (es. Psycho per Psyco, The Birds per Gli Uccelli, Despicable Me per Cattivissimo me, Home Alone per Mamma ho perso l'aereo, ecc.), fai riferimento sia al titolo italiano che a quello originale/inglese per attingere all'intero catalogo globale di errori (IMDb Goofs, MovieMistakes, Bloopers.it per film italiani, commenti DVD, making-of).
 ${esclusioneText}
 
 COMPITO:
 Analizza attentamente gli errori già registrati per questa pellicola.
-Identifica e restituisci tutti gli ALTRI bloopers, goofs, errori di continuità o di scena REALI, NOTI e DOCUMENTATI (fonti: MovieMistakes, IMDb Goofs, Bloopers.it per il cinema italiano ed europeo, commenti audio DVD, making-of) che MANCANO ancora nell'archivio, fino a un MASSIMO di ${maxNew} nuovi bloopers per questa passata.
+Identifica e restituisci tutti gli ALTRI bloopers, goofs, errori di continuità visiva (bicchieri/oggetti che si spostano, ferite o vestiti incoerenti tra tagli), microfoni o operatori visibili, anacronismi ed errori storici REALI, NOTI e DOCUMENTATI che MANCANO ancora nell'archivio, fino a un MASSIMO di ${maxNew} nuovi bloopers per questa passata.
 
 REGOLE ANTI-ALLUCINAZIONE:
 1. DIVIETO ASSOLUTO DI INVENTARE: Riporta solo errori, sviste di continuità o microfoni realmente documentati da fonti note. Se non esistono altri bloopers documentati, restituisci un array vuoto [].
@@ -271,10 +271,11 @@ async function scanTriviaForFilm(film, existingTrivia, maxNew) {
   const prompt = `Sei un rigoroso storico del cinema e documentarista specializzato in retroscena di produzione, aneddoti di casting e segreti dal set reali, comprovati e verificabili.
 
 DATI UFFICIALI DEL FILM:
-- Titolo: "${film.titolo}" (${film.anno || "N/D"})
+- Titolo registrato: "${film.titolo}" (${film.anno || "N/D"})
 - Regia: ${film.regista || "N/D"}
 - Cast: ${film.attori || "N/D"}
 - Sinossi: ${film.trama || "N/D"}
+- NOTA TITOLI: Considera sia il titolo italiano che il titolo originale/internazionale per attingere all'intero archivio globale di aneddoti, retroscena di produzione, casting e curiosità documentate.
 ${esclusioneText}
 
 COMPITO:
@@ -367,7 +368,7 @@ async function main() {
 
   const { data: allFilms, error: errFilms } = await supabase
     .from('films')
-    .select('id, titolo, anno, regista, attori, trama')
+    .select('id, titolo, anno, regista, attori, trama, movie_trivia(count), errori(count)')
     .order('id', { ascending: true });
 
   if (errFilms || !allFilms) {
@@ -375,7 +376,18 @@ async function main() {
     process.exit(1);
   }
 
-  // Carichiamo lo stato attuale delle curiosità per capire chi ha ancora contenuti vecchi fittizi
+  function extractCount(val) {
+  if (!val) return 0;
+  if (typeof val === 'number') return val;
+  if (Array.isArray(val)) {
+    if (val.length > 0 && typeof val[0]?.count === 'number') return val[0].count;
+    return val.length;
+  }
+  if (typeof val?.count === 'number') return val.count;
+  return 0;
+}
+
+// Carichiamo lo stato attuale delle curiosità per capire chi ha ancora contenuti vecchi fittizi
   const { data: triviaStats } = await supabase
     .from('movie_trivia')
     .select('film_id, provenienza');
@@ -392,55 +404,55 @@ async function main() {
     }
   }
 
-  // CLASSIFICAZIONE INTELLIGENTE:
-  // Gruppo A: Film con curiosità fittizie residue da bonificare (FASE 1 - Massiva)
-  // Gruppo B: Film nuovi mai verificati
-  // Gruppo C: Film con verifiche parziali (che potrebbero avere altri bloopers mancanti)
-  // Gruppo D: Film recenti (ultimi 10 anni, >= 2016)
-  // Gruppo E: Film vecchi consolidati (< 2016 già completati al 100%) -> DA SALTARE!
+  // CLASSIFICAZIONE INTELLIGENTE PERFETTA:
+  // 1. Film con 0 bloopers o 0 curiosità (URGENZA MASSIMA: nessun film deve rimanere vuoto!)
+  // 2. Film con vecchie curiosità fittizie da bonificare (stats.oldGenericCount > 0)
+  // 3. Film parziali in accumulo (< 10 bloopers o < 10 curiosità non ancora esauriti)
+  // 4. Film recenti per rotazione periodica
+  // 5. Film consolidati già completi ed esauriti al 100%
 
+  const zeroContentFilms = [];
   const needBonifica = [];
-  const neverVerified = [];
   const mayHaveMore = [];
   const recentFilmsToRefresh = [];
-  const consolidatedOldFilms = [];
+  const consolidatedFilms = [];
 
   for (const film of allFilms) {
     const stats = triviaByFilm[film.id] || { verifiedCount: 0, oldGenericCount: 0 };
+    const bCount = extractCount(film.errori);
+    const tCount = extractCount(film.movie_trivia);
     const state = verifiedMap[film.id] || {};
     const filmYear = Number(film.anno) || 0;
     const isRecent = filmYear >= RECENT_YEAR_THRESHOLD;
 
-    if (stats.oldGenericCount > 0) {
+    // Se un film ha 0 bloopers O 0 curiosità, è prioritario al 100%!
+    if (bCount === 0 || tCount === 0) {
+      zeroContentFilms.push(film);
+    } else if (stats.oldGenericCount > 0) {
       needBonifica.push(film);
-    } else if (!state.verifiedAt && stats.verifiedCount === 0) {
-      neverVerified.push(film);
     } else if (!state.bloopersExhausted || !state.triviaExhausted) {
       mayHaveMore.push(film);
     } else if (isRecent) {
       recentFilmsToRefresh.push(film);
     } else {
-      consolidatedOldFilms.push(film);
+      consolidatedFilms.push(film);
     }
   }
 
-  const isPhase1Active = needBonifica.length > 0;
   console.log(`   Stato Attuale Catalogo (${allFilms.length} film complessivi):`);
-  console.log(`   - 🔴 Da Bonificare (con curiosità generiche vecchie da sostituire): ${needBonifica.length}`);
-  console.log(`   - 🆕 Nuovi film mai verificati: ${neverVerified.length}`);
-  console.log(`   - 🔄 In accumulo (possibili bloopers/curiosità ulteriori): ${mayHaveMore.length}`);
+  console.log(`   - 🚨 PRIORITÀ ASSOLUTA (Film con 0 bloopers o 0 curiosità): ${zeroContentFilms.length}`);
+  console.log(`   - 🔴 Da Bonificare (con curiosità generiche residue da sostituire): ${needBonifica.length}`);
+  console.log(`   - 🔄 In accumulo (bloopers o curiosità documentati ulteriori): ${mayHaveMore.length}`);
   console.log(`   - 🌟 Recenti (ultimi 10 anni, rotazione periodica): ${recentFilmsToRefresh.length}`);
-  console.log(`   - 🧊 Storici consolidati (< ${RECENT_YEAR_THRESHOLD}, completi al 100%): ${consolidatedOldFilms.length} (CONGELATI - zero sprechi)`);
+  console.log(`   - 🧊 Consolidati (completi ed esauriti al 100%): ${consolidatedFilms.length}`);
 
-  // CODA DI LAVORO ORDINATA PER PRIORITÀ:
-  let candidateQueue = [];
-  if (isPhase1Active) {
-    console.log(`\n⚡ FASE 1 ATTIVA: Priorità assoluta alla bonifica massiva dei ${needBonifica.length} film rimanenti.`);
-    candidateQueue = [...needBonifica, ...neverVerified];
-  } else {
-    console.log(`\n✨ FASE 2 A REGIME: Bonifica completata al 100%! Monitoraggio intelligente dei nuovi arrivi e film recenti.`);
-    candidateQueue = [...neverVerified, ...mayHaveMore, ...recentFilmsToRefresh];
-  }
+  // CODA DI LAVORO: I film a zero bloopers/curiosità VENGONO SEMPRE ELABORATI PRIMA DI TUTTI!
+  const candidateQueue = [
+    ...zeroContentFilms,
+    ...needBonifica.filter(f => !zeroContentFilms.some(z => z.id === f.id)),
+    ...mayHaveMore.filter(f => !zeroContentFilms.some(z => z.id === f.id)),
+    ...recentFilmsToRefresh.filter(f => !zeroContentFilms.some(z => z.id === f.id))
+  ];
 
   const filmsToProcess = limitFilms > 0 ? candidateQueue.slice(0, limitFilms) : candidateQueue;
   console.log(`\n📋 [3/4] Pellicole selezionate per questa sessione: ${filmsToProcess.length}/${candidateQueue.length}\n`);
