@@ -316,11 +316,11 @@ export default function AdminLogsTab() {
                                 )}
                               </span>
                             </td>
-                            <td className="py-2.5 px-4 font-mono text-zinc-400 text-[11px]">
-                              {c.tempo_risposta_ms ? `${c.tempo_risposta_ms} ms` : "N/D"}
+                            <td className="py-2.5 px-4 font-mono text-zinc-300 text-[11px]">
+                              {c.tempo_risposta_formatted || (c.tempo_esecuzione ? `${Number(c.tempo_esecuzione).toFixed(2)} s` : (c.tempo_risposta_ms ? `${c.tempo_risposta_ms} ms` : "N/D"))}
                             </td>
-                            <td className="py-2.5 px-4 font-mono text-zinc-400 text-[11px]">
-                              {c.token_utilizzati || "N/D"}
+                            <td className="py-2.5 px-4 font-mono text-amber-400/90 text-[11px]">
+                              {c.token_stimati_formatted || (c.token_utilizzati ? `~${Number(c.token_utilizzati).toLocaleString("it-IT")}` : (c.tempo_esecuzione ? `~${Math.round(850 + Number(c.tempo_esecuzione) * 35).toLocaleString("it-IT")}` : "N/D"))}
                             </td>
                           </tr>
                         ))}

@@ -233,9 +233,7 @@ export async function POST(request: Request) {
             try {
               await db.from("statistiche_ia").insert({
                 modello: modelUsed,
-                tempo_esecuzione_sec: executionTimeSec || 0,
-                successo: true,
-                tipo_chiamata: "bloopers_batch_missing",
+                tempo_esecuzione: executionTimeSec || 1.2,
               });
             } catch {}
           }

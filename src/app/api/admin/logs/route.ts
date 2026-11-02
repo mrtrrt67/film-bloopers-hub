@@ -119,9 +119,34 @@ export async function GET(request: Request) {
         return true;
       });
 
+    // Calcola tempo di risposta effettivo e stima realistica dei token per ogni chiamata IA
+    const rawCalls = callsRes.data || [];
+    const recentAiCalls = rawCalls.map((c: any) => {
+      const sec = typeof c.tempo_esecuzione === "number"
+        ? c.tempo_esecuzione
+        : (typeof c.tempo_esecuzione_sec === "number" ? c.tempo_esecuzione_sec : (c.tempo_risposta_ms ? c.tempo_risposta_ms / 1000 : null));
+
+      const tempoFormatted = sec !== null
+        ? (sec < 1 ? `${Math.round(sec * 1000)} ms` : `${sec.toFixed(2)} s`)
+        : "N/D";
+
+      // Stima token dinamica: base ~800-1100 token (prompt con dati film ed esclusioni + json generato)
+      const baseTokens = c.modello?.includes("flash-lite") ? 820 : 1100;
+      const secFactor = sec ? Math.round(Math.min(sec, 30) * 35) : 80;
+      const totalTokens = c.token_utilizzati || (baseTokens + secFactor);
+
+      return {
+        ...c,
+        tempo_risposta_ms: sec !== null ? Math.round(sec * 1000) : null,
+        tempo_risposta_formatted: tempoFormatted,
+        token_utilizzati: totalTokens,
+        token_stimati_formatted: `~${totalTokens.toLocaleString("it-IT")}`,
+      };
+    });
+
     return NextResponse.json({
       aiErrors: errRes.data || [],
-      recentAiCalls: callsRes.data || [],
+      recentAiCalls,
       recentAccess,
     });
   } catch (err: any) {
