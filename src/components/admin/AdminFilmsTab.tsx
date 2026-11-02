@@ -108,12 +108,11 @@ export default function AdminFilmsTab({ initialFilter = "all", onNavigateToConfi
 
       const [dataB, dataT] = await Promise.all([resB.json(), resT.json()]);
 
-      if (!resB.ok && dataB.error) {
-        setActionMessage(`❌ Errore bloopers: ${dataB.error}`);
-        return;
-      }
-      if (!resT.ok && dataT.error) {
-        setActionMessage(`❌ Errore curiosità: ${dataT.error}`);
+      const errB = dataB.error || dataB.results?.[0]?.error;
+      const errT = dataT.error || dataT.results?.[0]?.error;
+
+      if (errB && errT) {
+        setActionMessage(`❌ Errore scansione IA: ${errB || errT}`);
         return;
       }
 
@@ -123,12 +122,19 @@ export default function AdminFilmsTab({ initialFilter = "all", onNavigateToConfi
       const noteT = dataT.results?.[0]?.note || "";
 
       if (addedB === 0 && addedT === 0) {
-        setActionMessage(
-          `ℹ️ "${film.titolo}": ${noteB || noteT || "Nessun nuovo elemento da aggiungere (archivio completo)"}`
-        );
+        if (errB || errT) {
+          setActionMessage(`⚠️ "${film.titolo}": Rilevato avviso IA (${errB || errT})`);
+        } else {
+          setActionMessage(
+            `ℹ️ "${film.titolo}": Archivio già completo (nessun altro blooper o curiosità reale documentato).`
+          );
+        }
       } else {
+        const parts = [];
+        if (addedB > 0) parts.push(`+${addedB} blooper`);
+        if (addedT > 0) parts.push(`+${addedT} curiosità`);
         setActionMessage(
-          `✨ "${film.titolo}" arricchito con successo: +${addedB} blooper e +${addedT} curiosità verificate!`
+          `✨ "${film.titolo}" arricchito con successo: ${parts.join(" e ")} verificate!`
         );
       }
       await fetchFilms();
