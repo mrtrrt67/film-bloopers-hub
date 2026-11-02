@@ -45,20 +45,22 @@ function hasFlag(name) {
 const targetEnv = (getArg('target', process.env.TARGET_ENV || 'staging') || 'staging').toLowerCase();
 const isStaging = targetEnv === 'staging';
 
-// Caricamento variabili d'ambiente (preferenza per .env.staging se target è staging)
-const envFile = isStaging && fs.existsSync('.env.staging') ? '.env.staging' : '.env.local';
+// Caricamento variabili d'ambiente (.env.local e opzionale .env.staging)
 let env = {};
-if (fs.existsSync(envFile)) {
-  const envContent = fs.readFileSync(envFile, 'utf8');
-  envContent.split('\n').forEach(line => {
-    const match = line.match(/^([^=]+)=(.*)$/);
-    if (match) {
-      const k = match[1].trim();
-      const v = match[2].trim().replace(/^["']|["']$/g, '');
-      env[k] = v;
-    }
-  });
+function loadEnvFile(file) {
+  if (fs.existsSync(file)) {
+    fs.readFileSync(file, 'utf8').split('\n').forEach(line => {
+      const match = line.match(/^([^=]+)=(.*)$/);
+      if (match) {
+        const k = match[1].trim();
+        const v = match[2].trim().replace(/^["']|["']$/g, '');
+        if (!env[k]) env[k] = v;
+      }
+    });
+  }
 }
+if (isStaging) loadEnvFile('.env.staging');
+loadEnvFile('.env.local');
 
 let supabaseUrl = "";
 let anonKey = "";
@@ -270,7 +272,11 @@ Restituisci ESCLUSIVAMENTE un array JSON valido, senza testo introduttivo né co
 async function scanBloopersForFilm(film, existingBloopers, maxNew) {
   const p1 = buildBloopersSyncPrompt(film, existingBloopers, maxNew, false);
   const res1 = await callGeminiZeroTemp(p1);
-  let bloopers = Array.isArray(res1) ? res1 : [];
+  if (!res1 || !res1.success) {
+    return res1 || { success: false, error: "Risposta non valida da Gemini" };
+  }
+  let bloopers = Array.isArray(res1.data) ? res1.data : [];
+  let modelUsed = res1.modelUsed;
 
   // Se la prima passata ha trovato pochi bloopers (< 4) e ne erano richiesti almeno 5,
   // esegue subito la seconda passata di approfondimento escludendo i primi
@@ -282,8 +288,8 @@ async function scanBloopersForFilm(film, existingBloopers, maxNew) {
       ];
       const p2 = buildBloopersSyncPrompt(film, combinedExclusions, Math.min(maxNew, 8), true);
       const res2 = await callGeminiZeroTemp(p2);
-      if (Array.isArray(res2) && res2.length > 0) {
-        for (const nb of res2) {
+      if (res2 && res2.success && Array.isArray(res2.data) && res2.data.length > 0) {
+        for (const nb of res2.data) {
           const isDupe = bloopers.some(
             (ex) => ex.descrizione && nb.descrizione && ex.descrizione.toLowerCase().slice(0, 50) === nb.descrizione.toLowerCase().slice(0, 50)
           );
@@ -297,7 +303,7 @@ async function scanBloopersForFilm(film, existingBloopers, maxNew) {
     }
   }
 
-  return bloopers;
+  return { success: true, data: bloopers, modelUsed };
 }
 
 function buildTriviaSyncPrompt(film, esclusioni, requested, isPass2 = false) {
@@ -357,7 +363,11 @@ Restituisci ESCLUSIVAMENTE un array JSON valido, senza testo introduttivo né co
 async function scanTriviaForFilm(film, existingTrivia, maxNew) {
   const p1 = buildTriviaSyncPrompt(film, existingTrivia, maxNew, false);
   const res1 = await callGeminiZeroTemp(p1);
-  let trivia = Array.isArray(res1) ? res1 : [];
+  if (!res1 || !res1.success) {
+    return res1 || { success: false, error: "Risposta non valida da Gemini" };
+  }
+  let trivia = Array.isArray(res1.data) ? res1.data : [];
+  let modelUsed = res1.modelUsed;
 
   if (trivia.length > 0 && trivia.length < 4 && maxNew >= 5) {
     try {
@@ -367,8 +377,8 @@ async function scanTriviaForFilm(film, existingTrivia, maxNew) {
       ];
       const p2 = buildTriviaSyncPrompt(film, combinedExclusions, Math.min(maxNew, 8), true);
       const res2 = await callGeminiZeroTemp(p2);
-      if (Array.isArray(res2) && res2.length > 0) {
-        for (const nt of res2) {
+      if (res2 && res2.success && Array.isArray(res2.data) && res2.data.length > 0) {
+        for (const nt of res2.data) {
           const isDupe = trivia.some(
             (ex) => ex.titolo && nt.titolo && ex.titolo.toLowerCase().slice(0, 30) === nt.titolo.toLowerCase().slice(0, 30)
           );
@@ -382,7 +392,7 @@ async function scanTriviaForFilm(film, existingTrivia, maxNew) {
     }
   }
 
-  return trivia;
+  return { success: true, data: trivia, modelUsed };
 }
 
 // Gestione stato sincronizzazione e memorizzazione avanzamento
