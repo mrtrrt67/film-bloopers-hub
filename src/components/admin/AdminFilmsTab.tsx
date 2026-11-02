@@ -92,21 +92,21 @@ export default function AdminFilmsTab({ initialFilter = "all", onNavigateToConfi
     setScanningFilmId(film.id);
     setActionMessage(null);
     try {
-      // 1. Scansiona bloopers
-      const resB = await fetch("/api/admin/bloopers-batch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ filmId: film.id, limit: 1, maxNewPerFilm: 10 }),
-      });
-      const dataB = await resB.json();
+      // Esecuzione parallela ultra-veloce per bloopers e curiosità (Zero attesa)
+      const [resB, resT] = await Promise.all([
+        fetch("/api/admin/bloopers-batch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filmId: film.id, limit: 1, maxNewPerFilm: 8 }),
+        }),
+        fetch("/api/admin/trivia-batch", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filmId: film.id, limit: 1, maxNewPerFilm: 8 }),
+        }),
+      ]);
 
-      // 2. Scansiona curiosità
-      const resT = await fetch("/api/admin/trivia-batch", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ filmId: film.id, limit: 1, maxNewPerFilm: 10 }),
-      });
-      const dataT = await resT.json();
+      const [dataB, dataT] = await Promise.all([resB.json(), resT.json()]);
 
       if (!resB.ok && dataB.error) {
         setActionMessage(`❌ Errore bloopers: ${dataB.error}`);
