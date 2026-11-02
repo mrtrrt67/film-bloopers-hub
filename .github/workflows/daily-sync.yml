@@ -77,5 +77,5 @@ jobs:
           MAX_BLOOPERS: ${{ github.event.inputs.max_bloopers || '10' }}
           MAX_TRIVIA: ${{ github.event.inputs.max_trivia || '10' }}
           REPLACE_TRIVIA: ${{ github.event.inputs.replace_trivia || 'true' }}
-          PAUSE_MS: '1200'
+          PAUSE_MS: '350'
         run: node scripts/daily-sync.js
