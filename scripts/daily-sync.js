@@ -29,25 +29,6 @@ if (typeof globalThis.WebSocket === 'undefined') {
 const { createClient } = require('@supabase/supabase-js');
 const { GoogleGenAI } = require('@google/genai');
 
-// 1. Caricamento variabili d'ambiente (process.env con fallback a .env.local)
-let env = {};
-if (fs.existsSync('.env.local')) {
-  const envContent = fs.readFileSync('.env.local', 'utf8');
-  envContent.split('\n').forEach(line => {
-    const match = line.match(/^([^=]+)=(.*)$/);
-    if (match) {
-      const k = match[1].trim();
-      const v = match[2].trim().replace(/^["']|["']$/g, '');
-      env[k] = v;
-    }
-  });
-}
-
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || env.NEXT_PUBLIC_SUPABASE_URL || "https://gmiwhscbqvadnlqruhjs.supabase.co";
-const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_ROLE_KEY;
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || env.GEMINI_API_KEY || env.GOOGLE_API_KEY;
-
 // Parametri CLI & Environment
 const args = process.argv.slice(2);
 function getArg(name, defaultVal) {
@@ -59,6 +40,41 @@ function getArg(name, defaultVal) {
 function hasFlag(name) {
   return args.includes(`--${name}`);
 }
+
+// 1. Rilevamento Ambiente Target (Staging vs Produzione)
+const targetEnv = (getArg('target', process.env.TARGET_ENV || 'staging') || 'staging').toLowerCase();
+const isStaging = targetEnv === 'staging';
+
+// Caricamento variabili d'ambiente (preferenza per .env.staging se target è staging)
+const envFile = isStaging && fs.existsSync('.env.staging') ? '.env.staging' : '.env.local';
+let env = {};
+if (fs.existsSync(envFile)) {
+  const envContent = fs.readFileSync(envFile, 'utf8');
+  envContent.split('\n').forEach(line => {
+    const match = line.match(/^([^=]+)=(.*)$/);
+    if (match) {
+      const k = match[1].trim();
+      const v = match[2].trim().replace(/^["']|["']$/g, '');
+      env[k] = v;
+    }
+  });
+}
+
+let supabaseUrl = "";
+let anonKey = "";
+let serviceRoleKey = "";
+
+if (isStaging) {
+  supabaseUrl = process.env.STAGING_SUPABASE_URL || env.NEXT_PUBLIC_SUPABASE_URL || "https://hktzscarmerpbgxgxliq.supabase.co";
+  anonKey = process.env.STAGING_SUPABASE_ANON_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrdHpzY2FybWVycGJneGd4bGlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5MzE2MTcsImV4cCI6MjEwODUwNzYxN30.ufFb1-mVRGD0RU03gaeCghzdnRtbucCaU4LuBvymFZs";
+  serviceRoleKey = process.env.STAGING_SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_ROLE_KEY || "";
+} else {
+  supabaseUrl = process.env.PROD_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || env.NEXT_PUBLIC_SUPABASE_URL || "https://gmiwhscbqvadnlqruhjs.supabase.co";
+  anonKey = process.env.PROD_SUPABASE_ANON_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+  serviceRoleKey = process.env.PROD_SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SERVICE_ROLE_KEY || "";
+}
+
+const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || env.GEMINI_API_KEY || env.GOOGLE_API_KEY;
 
 const mode = process.env.SYNC_MODE || getArg('mode', 'both') || 'both';
 // Di default 0 = elabora tutti i film necessari per la sessione corrente
@@ -78,6 +94,8 @@ const RECENT_YEAR_THRESHOLD = CURRENT_YEAR - 10;
 console.log("==================================================================");
 console.log("🎬 DAILY SYNC INTELLIGENTE - BLOOPERS & TRIVIA HUB");
 console.log(`🕒 Avvio: ${new Date().toISOString()}`);
+console.log(`🎯 AMBIENTE TARGET DATABASE: [ ${isStaging ? "🟡 STAGING (TEST SEGURO)" : "🔴 PRODUZIONE (LIVE)"} ]`);
+console.log(`🌐 Supabase URL collegato: ${supabaseUrl}`);
 console.log(`⚙️  Modalità: ${mode} | Limite film: ${limitFilms === 0 ? "TUTTI I CANDIDATI" : limitFilms}`);
 console.log(`🎯 Max Bloopers a passata: ${maxBloopersPerFilm} | Max Curiosità a passata: ${maxTriviaPerFilm}`);
 console.log(`🧹 Bonifica & Sostituzione automatica falsi: ${replaceTriviaFilmByFilm ? "ATTIVA" : "DISATTIVA"}`);
@@ -86,9 +104,10 @@ console.log("=================================================================="
 
 // Diagnostica credenziali
 console.log("\n🔍 Diagnostica Credenziali Ambiente:");
-console.log(`- NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl ? "✅ Configurato (" + supabaseUrl + ")" : "❌ MANCANTE"}`);
-console.log(`- SUPABASE_SERVICE_ROLE_KEY: ${serviceRoleKey ? "✅ Presente (Bypass RLS attivo)" : "⚠️ NON CONFIGURATO (sarà usata anon key)"}`);
-console.log(`- NEXT_PUBLIC_SUPABASE_ANON_KEY: ${anonKey ? "✅ Presente" : "⚠️ Assente"}`);
+console.log(`- TARGET_ENV: ${targetEnv.toUpperCase()}`);
+console.log(`- Supabase URL: ${supabaseUrl ? "✅ " + supabaseUrl : "❌ MANCANTE"}`);
+console.log(`- Service Role Key: ${serviceRoleKey ? "✅ Presente (Bypass RLS attivo)" : "⚠️ NON CONFIGURATO (sarà usata anon key)"}`);
+console.log(`- Anon Key: ${anonKey ? "✅ Presente" : "⚠️ Assente"}`);
 console.log(`- GEMINI_API_KEY: ${geminiApiKey ? "✅ Presente (" + geminiApiKey.slice(0, 6) + "...)" : "❌ MANCANTE"}`);
 
 if (!supabaseUrl) {

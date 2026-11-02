@@ -2,10 +2,18 @@ name: Daily Sync Bloopers & Trivia
 
 on:
   schedule:
-    # Esegue ogni notte alle 03:00 UTC (04:00 ora italiana)
+    # Esegue ogni notte alle 03:00 UTC (04:00 ora italiana) su PRODUZIONE
     - cron: '0 3 * * *'
   workflow_dispatch:
     inputs:
+      target_env:
+        description: '🎯 Database Target (staging = Staging sicuro | production = Produzione live)'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - 'staging'
+          - 'production'
       mode:
         description: 'Cosa scansionare'
         required: true
@@ -35,7 +43,7 @@ on:
 
 jobs:
   daily-sync:
-    name: Scansione Giornaliera Bloopers & Trivia
+    name: Sync Bloopers & Trivia (${{ github.event.inputs.target_env || 'production' }})
     runs-on: ubuntu-latest
     timeout-minutes: 180
 
@@ -54,14 +62,20 @@ jobs:
 
       - name: 🚀 Esegui Daily Sync
         env:
-          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
-          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          TARGET_ENV: ${{ github.event.inputs.target_env || 'production' }}
+          # PRODUZIONE (gmiwhscbqvadnlqruhjs)
+          PROD_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          PROD_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          PROD_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          # STAGING (hktzscarmerpbgxgxliq)
+          STAGING_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL || 'https://hktzscarmerpbgxgxliq.supabase.co' }}
+          STAGING_SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhrdHpzY2FybWVycGJneGd4bGlxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI5MzE2MTcsImV4cCI6MjEwODUwNzYxN30.ufFb1-mVRGD0RU03gaeCghzdnRtbucCaU4LuBvymFZs' }}
+          STAGING_SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.STAGING_SUPABASE_SERVICE_ROLE_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SYNC_MODE: ${{ github.event.inputs.mode || 'both' }}
           SYNC_LIMIT: ${{ github.event.inputs.limit || '0' }}
           MAX_BLOOPERS: ${{ github.event.inputs.max_bloopers || '10' }}
           MAX_TRIVIA: ${{ github.event.inputs.max_trivia || '10' }}
           REPLACE_TRIVIA: ${{ github.event.inputs.replace_trivia || 'true' }}
-          PAUSE_MS: '3000'
+          PAUSE_MS: '1200'
         run: node scripts/daily-sync.js

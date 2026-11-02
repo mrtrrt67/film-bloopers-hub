@@ -34,6 +34,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   const [filterType, setFilterType] = useState<string>(initialFilter); // 'all', 'missing_poster', 'missing_cast', 'duplicates'
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(18);
+  const [isStagingHost, setIsStagingHost] = useState(false);
   
   // Azioni bulk
   const [updatingAllPosters, setUpdatingAllPosters] = useState(false);
@@ -186,6 +187,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   };
 
   useEffect(() => {
+    setIsStagingHost(window.location.hostname.includes("staging") || window.location.hostname.includes("localhost"));
     fetchFilms();
     try {
       const savedBloopers = localStorage.getItem("fbh_admin_bloopers_target");
@@ -777,6 +779,15 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                 <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin text-amber-400" : ""}`} />
                 <span>Aggiorna Dati</span>
               </button>
+              <span
+                className={`px-2 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider ${
+                  isStagingHost
+                    ? "bg-amber-500/15 text-amber-400 border border-amber-500/30"
+                    : "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
+                }`}
+              >
+                {isStagingHost ? "DB: Staging" : "DB: Produzione"}
+              </span>
             </div>
             <p className="text-xs text-zinc-400 mt-0.5">
               Gestione schede film, verifica fattuale con IA e monitoraggio automatico notturno.
