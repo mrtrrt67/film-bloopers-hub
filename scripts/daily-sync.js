@@ -136,10 +136,10 @@ const ai = new GoogleGenAI({ apiKey: geminiApiKey });
 
 // Modelli Gemini con fallback automatico
 const GEMINI_MODELS = [
-  "gemini-2.5-flash",
-  "gemini-2.0-flash",
-  "gemini-1.5-flash",
-  "gemini-flash-latest"
+  "gemini-3.5-flash-lite",
+  "gemini-3.6-flash",
+  "gemini-3-flash-preview",
+  "gemini-3.8-flash"
 ];
 
 function sleep(ms) {
@@ -191,13 +191,24 @@ async function callGeminiZeroTemp(prompt) {
     } catch (err) {
       lastErr = err;
       const status = err?.status || err?.statusCode;
+      const msg = err?.message || "";
+      const isDailyLimit = msg.includes("limit exceeded on Free Tier") || msg.includes("GenerateRequestsPerDay");
+      if (isDailyLimit) {
+        console.log(`      ⚠️ Quota GIORNALIERA Free Tier esaurita per ${model}, passaggio immediato al modello successivo...`);
+        continue;
+      }
       if (status === 429) {
-        console.log(`      ⏳ Quota temporanea raggiunta su ${model}, attesa 8s...`);
+        console.log(`      ⏳ Quota al minuto raggiunta su ${model}, attesa 8s...`);
         await sleep(8000);
       }
     }
   }
-  return { success: false, error: lastErr?.message || "Impossibile ottenere risposta valida dai modelli Gemini." };
+  const isDailyTotal = (lastErr?.message || "").includes("limit exceeded on Free Tier");
+  return { 
+    success: false, 
+    isDailyQuotaExhausted: isDailyTotal,
+    error: lastErr?.message || "Impossibile ottenere risposta valida dai modelli Gemini." 
+  };
 }
 
 // Scansione Bloopers mancanti (senza limite artificiale, fino al cap di passata)
@@ -220,19 +231,19 @@ ${esclusioneText}
 
 COMPITO:
 Analizza attentamente gli errori già registrati per questa pellicola.
-Identifica e restituisci tutti gli ALTRI bloopers, goofs o errori di scena REALI, NOTI e DOCUMENTATI (fonti: MovieMistakes, IMDb Goofs, commenti audio DVD, interviste e making-of) che MANCANO ancora nell'archivio, fino a un MASSIMO di ${maxNew} nuovi bloopers per questa passata.
+Identifica e restituisci tutti gli ALTRI bloopers, goofs, errori di continuità o di scena REALI, NOTI e DOCUMENTATI (fonti: MovieMistakes, IMDb Goofs, Bloopers.it per il cinema italiano ed europeo, commenti audio DVD, making-of) che MANCANO ancora nell'archivio, fino a un MASSIMO di ${maxNew} nuovi bloopers per questa passata.
 
-REGOLE ANTI-ALLUCINAZIONE ASSOLUTE:
-1. DIVIETO ASSOLUTO DI INVENTARE: Non inventare mai errori. Se tutti gli errori noti della pellicola sono già presenti nell'archivio, oppure se non ne esistono altri documentati, restituisci ESCLUSIVAMENTE un array vuoto [].
-2. NESSUNA DUPLICAZIONE: Non ripetere, riassumere o riformulare gli errori già registrati nell'elenco sopra.
-3. NIENTE MINUTAGGI INVENTATI: Se non conosci con certezza il minuto esatto al secondo, usa "00:00:00" oppure approssima solo all'inizio della scena specifica.
-4. FATTI CONCRETI: Descrivi solo l'errore oggettivo documentato riscontrabile nella pellicola.
+REGOLE ANTI-ALLUCINAZIONE:
+1. DIVIETO ASSOLUTO DI INVENTARE: Riporta solo errori, sviste di continuità o microfoni realmente documentati da fonti note. Se non esistono altri bloopers documentati, restituisci un array vuoto [].
+2. NESSUNA DUPLICAZIONE: Non ripetere gli errori già registrati.
+3. MINUTAGGIO: Se non noto esattamente al secondo, usa "00:00:00".
 
-Le categorie ammesse sono ESCLUSIVAMENTE:
-1. "Errori di scena / Posizione"
-2. "Troupe o microfoni visibili"
-3. "Anacronismi"
+Le categorie ammesse sono:
+1. "Errori di scena / Posizione" (errori di continuità tra inquadrature, oggetti/bicchieri che cambiano posizione, vestiti o tagli)
+2. "Troupe o microfoni visibili" (microfoni boom, telecamere, ombre o riflessi di troupe)
+3. "Anacronismi" (oggetti o elementi storicamente incongruenti)
 4. "Errori storici o fattuali"
+5. "Audio / Doppiaggio / Sync"
 
 FORMATO OUTPUT:
 Restituisci ESCLUSIVAMENTE un array JSON valido, senza testo introduttivo né commenti markdown:
@@ -456,6 +467,12 @@ async function main() {
     const regText = film.regista ? `, Regia: ${film.regista}` : "";
     console.log(`\n${indexStr} 📽️ "${film.titolo}" (${filmYear}${regText}) - ID: ${film.id}`);
 
+    const numYear = Number(film.anno) || 0;
+    if (numYear > CURRENT_YEAR) {
+      console.log(`   ⏭️ Film con uscita futura (${numYear}): nessun blooper o retroscena verificabile prima della distribuzione nelle sale.`);
+      continue;
+    }
+
     const filmState = verifiedMap[film.id] || { year: filmYear };
 
     try {
@@ -478,6 +495,13 @@ async function main() {
           ? scanTriviaForFilm(film, existingTexts, maxTriviaPerFilm)
           : Promise.resolve(null)
       ]);
+
+      if (resBloopers?.isDailyQuotaExhausted || resTrivia?.isDailyQuotaExhausted) {
+        console.log(`\n🛑 LIMITE GIORNALIERO GOOGLE GEMINI RAGGIUNTO (Piano Free: max 500 chiamate/giorno).`);
+        console.log(`💾 Stato di avanzamento salvato: il batch riprenderà dai film rimanenti al prossimo ciclo.`);
+        await saveSyncState({ verifiedFilms: verifiedMap });
+        break;
+      }
 
       // --- ELABORAZIONE BLOOPERS ---
       if (resBloopers) {
