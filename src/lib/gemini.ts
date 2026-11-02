@@ -99,6 +99,10 @@ function buildBlooperPromptText(params: {
 
   return `Sei un archivista e verificatore cinematografico specializzato in bloopers, goofs ed errori di montaggio reali e documentati.
 
+CONTESTO TEMPORALE DI RIFERIMENTO:
+- Data di riferimento: Novembre 2026.
+- Tutti i film presenti a catalogo (compresi i titoli usciti nel 2024, 2025 e 2026) sono già regolarmente usciti nelle sale e distribuiti, ed esistono già bloopers, goofs, making-of ed errori documentati su IMDb, MovieMistakes, recensioni e video analisi. Non considerare mai i film del 2025 o 2026 come inediti o futuri.
+
 DATI UFFICIALI DEL FILM:
 - Titolo registrato: "${titolo}" (${anno || "N/D"})
 - Regia: ${regista || "N/D"}
@@ -366,6 +370,10 @@ function buildTriviaPromptText(params: {
       : "\nNessuna curiosità attualmente registrata in archivio.";
 
   return `Sei un rigoroso storico del cinema e documentarista specializzato in retroscena di produzione, aneddoti di casting e segreti dal set reali, comprovati e verificabili.
+
+CONTESTO TEMPORALE DI RIFERIMENTO:
+- Data di riferimento: Novembre 2026.
+- Tutti i film presenti a catalogo (compresi i titoli usciti nel 2024, 2025 e 2026) sono già regolarmente usciti nelle sale e distribuiti, ed esistono già interviste, aneddoti di lavorazione, dettagli sul casting e curiosità documentate. Non considerare mai i film del 2025 o 2026 come inediti o futuri.
 
 DATI UFFICIALI DEL FILM:
 - Titolo registrato: "${titolo}" (${anno || "N/D"})
