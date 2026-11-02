@@ -28,9 +28,9 @@ on:
         required: false
         default: '5'
       replace_trivia:
-        description: 'Sostituisci progressivamente le vecchie curiosità generiche (Zero Downtime)'
+        description: 'Cancella e sostituisce le vecchie curiosità generiche/false per ciascun film (Zero Downtime)'
         required: false
-        default: 'false'
+        default: 'true'
         type: boolean
 
 jobs:

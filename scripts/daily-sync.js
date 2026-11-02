@@ -62,7 +62,7 @@ const maxBloopersPerFilm = Math.min(parseInt(process.env.MAX_BLOOPERS || getArg(
 const maxTriviaPerFilm = Math.min(parseInt(process.env.MAX_TRIVIA || getArg('max-trivia', '5') || '5', 10) || 5, 30);
 const pauseMs = parseInt(process.env.PAUSE_MS || getArg('pause', '3000') || '3000', 10) || 3000;
 const cleanJunkAtStart = hasFlag('clean-junk') || getArg('clean-junk', 'true') === 'true';
-const replaceTriviaFilmByFilm = (process.env.REPLACE_TRIVIA === 'true') || hasFlag('replace-trivia') || getArg('replace-trivia', 'false') === 'true';
+const replaceTriviaFilmByFilm = process.env.REPLACE_TRIVIA !== 'false' && getArg('replace-trivia', 'true') !== 'false';
 
 console.log("==================================================================");
 console.log("🎬 DAILY SYNC - FILM BLOOPERS & TRIVIA HUB");
@@ -416,7 +416,16 @@ async function main() {
               }
             }
           } else {
-            console.log(`   ✨ Curiosità: già completo (0 nuove curiosità documentate)`);
+            console.log(`   ✨ Curiosità: nessun retroscena reale documentato (0 aggiunte)`);
+            if (replaceTriviaFilmByFilm && existingTrivia && existingTrivia.length > 0) {
+              const oldIds = existingTrivia
+                .filter(r => r.provenienza !== "IA Verificata")
+                .map(r => r.id);
+              if (oldIds.length > 0) {
+                await supabase.from('movie_trivia').delete().in('id', oldIds);
+                console.log(`      🧹 Bonifica: rimosse ${oldIds.length} vecchie curiosità generiche/fittizie per questo film.`);
+              }
+            }
           }
         } else {
           console.warn(`   ⚠️ Scansione curiosità fallita:`, resTrivia.error);
