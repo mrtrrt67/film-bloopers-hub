@@ -145,7 +145,9 @@ REGOLE DI ACCURATEZZA:
 2. NESSUNA DUPLICAZIONE: Non ripetere né parafrasare bloopers già registrati sopra.
 3. MINUTAGGIO: Se non noto al secondo esatto, usa il minutaggio approssimativo della scena oppure "00:00:00".
 4. FATTI CONCRETI: Descrivi con precisione cosa si vede a schermo e qual è la discrepanza oggettiva.
-5. COPERTURA ARCHIVIO PER PELLICOLE SENZA ERRORI O RECENTI (2024-2026): Se il film ha 0 bloopers in archivio (o è una pellicola recente/2026), non restituire MAI un array vuoto []. Effettua un'analisi visiva accurata delle scene principali, sequenze d'azione/spaziali, tagli di montaggio e riprese: identifica e riporta sempre almeno 4-6 sviste tecniche autentiche, disallineamenti di oggetti tra campi/controcampi, riflessi di attrezzature/operatori, anomalie fisiche/scientifiche o discrepanze di scena riscontrabili a schermo.
+5. RIGOROSA AUTENTICITÀ & GESTIONE ARCHIVIO:
+   a) SE L'ARCHIVIO CONTIENE GIÀ BLOOPERS (esclusioni > 0): Se per questo film non esistono ulteriori sviste, goofs o errori reali documentati oltre a quelli già registrati, restituisci TASSATIVAMENTE un array vuoto []. DIVIETO ASSOLUTO DI INVENTARE O FORZARE BLOOPERS FIITTIZI O PRESUNTI per soddisfare la richiesta.
+   b) SE IL FILM HA 0 BLOOPERS IN ARCHIVIO: Solo in questo caso di prima catalogazione, esamina accuratamente le sequenze chiave, i tagli di montaggio, i riflessi di produzione e le scene della pellicola per identificare le sviste tecniche e di continuità oggettive documentate.
 6. Restituisci fino a un MASSIMO di ${requested} nuovi bloopers in formato JSON.
 
 Le categorie ammesse sono ESCLUSIVAMENTE:
@@ -412,7 +414,9 @@ NON fermarti a 1 o 2 curiosità generiche: esplora sistematicamente i diversi am
 
 REGOLE ANTI-ALLUCINAZIONE ASSOLUTE:
 1. DIVIETO ASSOLUTO DI INVENTARE O GENERALIZZARE: Non inventare MAI aneddoti generici o verosimili (vietate frasi generiche come "il cast ha legato molto sul set", "le riprese sono state impegnative", "il regista ha voluto dare autenticità"). Ogni curiosità DEVE contenere fatti specifici, nomi propri, cifre concrete o eventi realmente accaduti e verificabili (es. interviste ufficiali, note di produzione, Making-of, commenti audio DVD).
-2. COPERTURA ARCHIVIO PER PELLICOLE SENZA CURIOSITÀ O RECENTI (2024-2026): Se il film ha 0 curiosità in archivio (o è una pellicola recente/2026), non restituire MAI un array vuoto []. Riporta sempre la genesi dell'opera, le scelte di casting comprovate (attori provinati o considerati), le location di ripresa, le sfide tecniche documentate, le macchine da presa (IMAX/70mm) e gli accordi produttivi attestati.
+2. RIGOROSA AUTENTICITÀ & GESTIONE ARCHIVIO:
+   a) SE L'ARCHIVIO CONTIENE GIÀ CURIOSITÀ (esclusioni > 0): Se per questo film sono già stati registrati tutti gli aneddoti e retroscena storici noti e non esistono ulteriori fatti comprovati, restituisci TASSATIVAMENTE un array vuoto []. DIVIETO ASSOLUTO DI GENERALIZZARE O INVENTARE fatti non documentati.
+   b) SE IL FILM HA 0 CURIOSITÀ IN ARCHIVIO: Solo in questo caso di prima catalogazione, riporta i fatti fondanti e comprovati della produzione (genesi del soggetto o adattamento, trattative di casting reali, location ufficiali, macchine da presa e tecnologie speciali impiegate).
 3. NESSUNA DUPLICAZIONE: Non ripetere né parafrasare curiosità già elencate sopra.
 4. DESCRIZIONI COMPATTE E COMPLETE: 2-3 frasi chiare ed esaustive in italiano corretto. Non lasciare MAI campi vuoti né testi fittizi.
 5. Restituisci fino a un MASSIMO di ${requested} nuove curiosità reali documentate.
