@@ -78,12 +78,12 @@ if (isStaging) {
 
 const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || env.GEMINI_API_KEY || env.GOOGLE_API_KEY;
 
-const mode = process.env.SYNC_MODE || getArg('mode', 'both') || 'both';
+let mode = process.env.SYNC_MODE || getArg('mode', 'both') || 'both';
 // Di default 0 = elabora tutti i film necessari per la sessione corrente
 const limitFilms = parseInt(process.env.SYNC_LIMIT || getArg('limit', '0') || '0', 10) || 0;
-// Max 10 blooper e 10 curiosità a passata (accumulativi nelle passate successive)
-const maxBloopersPerFilm = Math.min(parseInt(process.env.MAX_BLOOPERS || getArg('max-bloopers', '10') || '10', 10) || 10, 50);
-const maxTriviaPerFilm = Math.min(parseInt(process.env.MAX_TRIVIA || getArg('max-trivia', '10') || '10', 10) || 10, 30);
+// Max 15 blooper e 15 curiosità a passata (accumulativi nelle passate successive)
+let maxBloopersPerFilm = Math.min(parseInt(process.env.MAX_BLOOPERS || getArg('max-bloopers', '15') || '15', 10) || 15, 50);
+let maxTriviaPerFilm = Math.min(parseInt(process.env.MAX_TRIVIA || getArg('max-trivia', '15') || '15', 10) || 15, 30);
 const pauseMs = parseInt(process.env.PAUSE_MS || getArg('pause', '350') || '350', 10) || 350;
 const cleanJunkAtStart = hasFlag('clean-junk') || getArg('clean-junk', 'true') === 'true';
 // Sostituzione automatica delle vecchie curiosità generiche/false attiva di default
@@ -452,6 +452,42 @@ async function saveSyncState(state) {
 
 // Funzione Principale
 async function main() {
+  // 0. Verifica stato automazione e configurazioni impostate da Pannello Admin
+  let dbConfig = {};
+  try {
+    const { data: cfgRows } = await supabase.from('configurazioni').select('chiave, valore');
+    if (cfgRows && Array.isArray(cfgRows)) {
+      dbConfig = cfgRows.reduce((acc, c) => ({ ...acc, [c.chiave]: c.valore }), {});
+    }
+  } catch (e) {
+    // Non bloccante
+  }
+
+  const isEnabledInDb = dbConfig['daily_sync_attivo'] !== 'false';
+  const isScheduledRun = !process.env.GITHUB_EVENT_NAME || process.env.GITHUB_EVENT_NAME === 'schedule';
+  const isForceRun = hasFlag('force-run') || getArg('force-run', 'false') === 'true';
+
+  if (!isEnabledInDb && isScheduledRun && !isForceRun) {
+    console.log("\n==================================================================");
+    console.log("⏸️ DAILY SYNC NOTTURNO DISATTIVATO DA PANNELLO ADMIN");
+    console.log("   La chiave 'daily_sync_attivo' è impostata su 'false' nel database.");
+    console.log("   Nessuna elaborazione notturna eseguita (0 chiamate IA, 0 token consumati).");
+    console.log("   Per riattivarlo: Pannello Admin -> Tab 'Configurazioni' -> 'Batch Notturno: ATTIVO'.");
+    console.log("==================================================================");
+    return;
+  }
+
+  // Se non esplicitati da riga di comando o input workflow, usiamo i valori salvati nel pannello Admin
+  if (!getArg('max-bloopers', '') && !process.env.MAX_BLOOPERS && dbConfig['daily_sync_max_bloopers']) {
+    maxBloopersPerFilm = Math.min(parseInt(dbConfig['daily_sync_max_bloopers'], 10) || 15, 50);
+  }
+  if (!getArg('max-trivia', '') && !process.env.MAX_TRIVIA && dbConfig['daily_sync_max_trivia']) {
+    maxTriviaPerFilm = Math.min(parseInt(dbConfig['daily_sync_max_trivia'], 10) || 15, 30);
+  }
+  if (!getArg('mode', '') && !process.env.SYNC_MODE && dbConfig['daily_sync_mode']) {
+    mode = dbConfig['daily_sync_mode'];
+  }
+
   // 1. Pulizia righe corrotte (Zero Downtime)
   if (cleanJunkAtStart) {
     console.log("\n🧹 [1/4] Verifica e rimozione righe corrotte/di test...");

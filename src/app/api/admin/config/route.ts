@@ -49,11 +49,11 @@ export async function PATCH(request: Request) {
       if (item.chiave) {
         const { error: updErr } = await adminDb
           .from("configurazioni")
-          .update({
+          .upsert({
+            chiave: item.chiave,
             valore: item.valore,
             visibile: item.visibile !== undefined ? item.visibile : true,
-          })
-          .eq("chiave", item.chiave);
+          }, { onConflict: "chiave" });
 
         if (updErr) {
           console.error("Errore aggiornamento configurazione:", item.chiave, updErr);

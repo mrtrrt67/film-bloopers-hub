@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sliders, Save, Check, Calendar, Eye, EyeOff, Sparkles, Trash2 } from "lucide-react";
+import { Sliders, Save, Check, Calendar, Eye, EyeOff, Sparkles, Trash2, Moon, Power } from "lucide-react";
 import { formatDateItalian } from "@/lib/utils";
 import ConfirmModal from "@/components/ConfirmModal";
 
@@ -168,8 +168,42 @@ export default function AdminConfigTab() {
     );
   }
 
+  const getVal = (key: string, defaultVal: string) => {
+    const found = configs.find((c) => c.chiave === key);
+    return found ? found.valore : defaultVal;
+  };
+
+  const setConfigValue = (chiave: string, valore: string) => {
+    setConfigs((prev) => {
+      const exists = prev.some((c) => c.chiave === chiave);
+      if (exists) {
+        return prev.map((c) => (c.chiave === chiave ? { ...c, valore } : c));
+      }
+      return [...prev, { chiave, valore, visibile: true }];
+    });
+  };
+
+  const syncActive = getVal("daily_sync_attivo", "true") !== "false";
+  const syncMaxBloopers = getVal("daily_sync_max_bloopers", "15");
+  const syncMaxTrivia = getVal("daily_sync_max_trivia", "15");
+  const syncMode = getVal("daily_sync_mode", "both");
+
+  const handleToggleSync = () => {
+    const nextVal = syncActive ? "false" : "true";
+    setConfigValue("daily_sync_attivo", nextVal);
+  };
+
+  const DEDICATED_KEYS = [
+    "promo_lifetime_deadline",
+    "daily_sync_attivo",
+    "daily_sync_max_bloopers",
+    "daily_sync_max_trivia",
+    "daily_sync_mode",
+    "sync_state_v2",
+  ];
+
   const promoConfig = configs.find((c) => c.chiave === "promo_lifetime_deadline");
-  const otherConfigs = configs.filter((c) => c.chiave !== "promo_lifetime_deadline");
+  const otherConfigs = configs.filter((c) => !DEDICATED_KEYS.includes(c.chiave));
 
   return (
     <div className="space-y-6">
@@ -270,7 +304,94 @@ export default function AdminConfigTab() {
         </div>
       )}
 
-      {/* 2. ALTRE CONFIGURAZIONI & TESTI */}
+      {/* 2. AUTOMAZIONE NOTTURNA IA (DAILY SYNC) */}
+      <div className="rounded-2xl border border-zinc-800 bg-gradient-to-r from-zinc-900 via-zinc-900/90 to-zinc-950 p-5 sm:p-6 space-y-4 shadow-xl">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h4 className="text-xs font-black uppercase tracking-wider text-amber-400 flex items-center gap-1.5">
+                <Moon className="h-4 w-4 text-amber-400" />
+                Sincronizzazione Notturna Automatica IA (Daily Sync)
+              </h4>
+              <span
+                className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border transition ${
+                  syncActive
+                    ? "bg-emerald-500/15 text-emerald-400 border-emerald-500/30"
+                    : "bg-rose-500/15 text-rose-400 border-rose-500/30"
+                }`}
+              >
+                {syncActive ? "● ATTIVO OGNI NOTTE (04:00)" : "○ DISATTIVATO"}
+              </span>
+            </div>
+            <p className="text-xs text-zinc-300 leading-relaxed max-w-2xl">
+              Imposta il target di bloopers/curiosità e controlla l&apos;esecuzione notturna automatica delle 04:00 su GitHub Actions. Se disattivato, il processo notturno si arresta all&apos;avvio senza eseguire scansioni né consumare token o crediti.
+            </p>
+          </div>
+
+          <button
+            type="button"
+            onClick={handleToggleSync}
+            className={`shrink-0 flex items-center gap-2 px-4 py-2 rounded-xl font-bold text-xs transition shadow-md active:scale-95 ${
+              syncActive
+                ? "bg-emerald-500 text-zinc-950 hover:bg-emerald-400"
+                : "bg-zinc-800 text-zinc-300 hover:bg-zinc-700 border border-zinc-700"
+            }`}
+          >
+            <Power className="h-4 w-4" />
+            <span>{syncActive ? "Batch Notturno: ATTIVO" : "Batch Notturno: DISATTIVATO"}</span>
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+          <div className="p-3.5 rounded-xl bg-zinc-950/70 border border-zinc-800/80 space-y-1.5">
+            <label className="text-[11px] font-semibold text-zinc-400 block">
+              Target Bloopers per film
+            </label>
+            <input
+              type="number"
+              min={1}
+              max={50}
+              value={syncMaxBloopers}
+              onChange={(e) => setConfigValue("daily_sync_max_bloopers", e.target.value)}
+              className="w-full rounded-lg bg-zinc-900 border border-zinc-700 px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500"
+            />
+            <span className="text-[10px] text-zinc-500 block">Predefinito: 15 bloopers</span>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-zinc-950/70 border border-zinc-800/80 space-y-1.5">
+            <label className="text-[11px] font-semibold text-zinc-400 block">
+              Target Curiosità per film
+            </label>
+            <input
+              type="number"
+              min={1}
+              max={30}
+              value={syncMaxTrivia}
+              onChange={(e) => setConfigValue("daily_sync_max_trivia", e.target.value)}
+              className="w-full rounded-lg bg-zinc-900 border border-zinc-700 px-3 py-1.5 text-xs text-white font-mono focus:outline-none focus:border-amber-500"
+            />
+            <span className="text-[10px] text-zinc-500 block">Predefinito: 15 curiosità</span>
+          </div>
+
+          <div className="p-3.5 rounded-xl bg-zinc-950/70 border border-zinc-800/80 space-y-1.5">
+            <label className="text-[11px] font-semibold text-zinc-400 block">
+              Cosa Scansionare Notte
+            </label>
+            <select
+              value={syncMode}
+              onChange={(e) => setConfigValue("daily_sync_mode", e.target.value)}
+              className="w-full rounded-lg bg-zinc-900 border border-zinc-700 px-3 py-1.5 text-xs text-white focus:outline-none focus:border-amber-500"
+            >
+              <option value="both">Bloopers & Curiosità</option>
+              <option value="bloopers">Solo Bloopers</option>
+              <option value="trivia">Solo Curiosità</option>
+            </select>
+            <span className="text-[10px] text-zinc-500 block">Predefinito: Bloopers & Curiosità</span>
+          </div>
+        </div>
+      </div>
+
+      {/* 3. ALTRE CONFIGURAZIONI & TESTI */}
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 space-y-4">
         <h4 className="text-xs font-black uppercase tracking-wider text-white">
           💬 Testi e Visibilità delle Sezioni del Portale

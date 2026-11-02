@@ -30,11 +30,11 @@ on:
       max_bloopers:
         description: 'Massimo bloopers per passata (accumulativi fino a totale reale)'
         required: false
-        default: '10'
+        default: '15'
       max_trivia:
         description: 'Massimo curiosità per passata (accumulativi fino a totale reale)'
         required: false
-        default: '10'
+        default: '15'
       replace_trivia:
         description: 'Elimina le vecchie curiosità generiche/false per ciascun film (Zero Downtime)'
         required: false
@@ -83,5 +83,6 @@ jobs:
           MAX_TRIVIA: ${{ github.event.inputs.max_trivia || '10' }}
           REPLACE_TRIVIA: ${{ github.event.inputs.replace_trivia || 'true' }}
           FORCE_ALL: ${{ github.event.inputs.force_all || 'true' }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
           PAUSE_MS: '350'
         run: node scripts/daily-sync.js
