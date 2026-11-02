@@ -211,7 +211,7 @@ export async function POST(request: Request) {
           const res = await db.from("movie_trivia").insert(daInserire);
           insertErr = res.error;
           if (!insertErr && filmId) {
-            await db.from("movie_trivia").delete().eq("film_id", film.id).neq("provenienza", "IA Verificata");
+            await db.from("movie_trivia").delete().eq("film_id", film.id).neq("provenienza", "IA Verificata").neq("provenienza", "utente");
           }
         }
 

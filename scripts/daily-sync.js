@@ -482,7 +482,7 @@ async function main() {
     if (!triviaByFilm[t.film_id]) {
       triviaByFilm[t.film_id] = { verifiedCount: 0, oldGenericCount: 0 };
     }
-    if (t.provenienza === 'IA Verificata') {
+    if (t.provenienza === 'IA Verificata' || t.provenienza === 'utente') {
       triviaByFilm[t.film_id].verifiedCount++;
     } else {
       triviaByFilm[t.film_id].oldGenericCount++;
@@ -662,7 +662,7 @@ async function main() {
               // Eliminazione automatica vecchie curiosità generiche fittizie
               if (replaceTriviaFilmByFilm && existingTrivia && existingTrivia.length > 0) {
                 const oldIds = existingTrivia
-                  .filter(r => r.provenienza !== "IA Verificata")
+                  .filter(r => r.provenienza !== "IA Verificata" && r.provenienza !== "utente")
                   .map(r => r.id);
                 if (oldIds.length > 0) {
                   await supabase.from('movie_trivia').delete().in('id', oldIds);
@@ -680,7 +680,7 @@ async function main() {
             // Anche se non ci sono nuove curiosità, eliminiamo quelle vecchie fittizie per ripulire la scheda
             if (replaceTriviaFilmByFilm && existingTrivia && existingTrivia.length > 0) {
               const oldIds = existingTrivia
-                .filter(r => r.provenienza !== "IA Verificata")
+                .filter(r => r.provenienza !== "IA Verificata" && r.provenienza !== "utente")
                 .map(r => r.id);
               if (oldIds.length > 0) {
                 await supabase.from('movie_trivia').delete().in('id', oldIds);

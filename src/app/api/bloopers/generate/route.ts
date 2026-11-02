@@ -161,7 +161,7 @@ export async function POST(request: Request) {
       conferme: 0,
       contestazioni: 0,
       inserito_da: emailInserimento,
-      provenienza: "ia",
+      provenienza: "IA Verificata",
     }));
 
     let inserted = null;

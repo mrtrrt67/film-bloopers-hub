@@ -160,7 +160,7 @@ export async function POST(request: Request) {
       fonte: g.fonte || "Dietro le quinte",
       approvato: true,
       inserito_da: emailInserimento,
-      provenienza: "ia",
+      provenienza: "IA Verificata",
       likes: 0,
       ordine: (existingTrivia?.length || 0) + idx + 1,
     }));
