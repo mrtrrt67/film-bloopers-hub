@@ -1,0 +1,68 @@
+name: Daily Sync Bloopers & Trivia
+
+on:
+  schedule:
+    # Esegue ogni notte alle 03:00 UTC (04:00 ora italiana)
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: 'Cosa scansionare'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - 'both'
+          - 'bloopers'
+          - 'trivia'
+      limit:
+        description: 'Numero massimo di film da elaborare (0 = tutti i 326)'
+        required: false
+        default: '0'
+      max_bloopers:
+        description: 'Massimo bloopers nuovi per film'
+        required: false
+        default: '5'
+      max_trivia:
+        description: 'Massimo curiosità nuove per film'
+        required: false
+        default: '5'
+      replace_trivia:
+        description: 'Sostituisci progressivamente le vecchie curiosità generiche (Zero Downtime)'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  daily-sync:
+    name: Scansione Giornaliera Bloopers & Trivia
+    runs-on: ubuntu-latest
+    timeout-minutes: 180 # Fino a 3 ore di esecuzione libera senza rischi di timeout
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: ⚙️ Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: 📦 Installa dipendenze
+        run: npm ci --omit=dev
+
+      - name: 🚀 Esegui Daily Sync
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          node scripts/daily-sync.js \
+            --mode="${{ github.event.inputs.mode || 'both' }}" \
+            --limit="${{ github.event.inputs.limit || '0' }}" \
+            --max-bloopers="${{ github.event.inputs.max_bloopers || '5' }}" \
+            --max-trivia="${{ github.event.inputs.max_trivia || '5' }}" \
+            --replace-trivia="${{ github.event.inputs.replace_trivia || 'false' }}" \
+            --pause=3000
+

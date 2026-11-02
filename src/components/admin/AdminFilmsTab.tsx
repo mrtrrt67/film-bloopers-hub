@@ -15,7 +15,8 @@ import {
   Check, 
   X, 
   ExternalLink,
-  Sparkles
+  Sparkles,
+  Bot
 } from "lucide-react";
 import { normalizePosterUrl } from "@/lib/tmdb";
 import { slugify } from "@/lib/utils";
@@ -743,6 +744,39 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
               <span>Cast Mancante ({missingCastCount})</span>
             </button>
           </div>
+        </div>
+
+        {/* BANNER AUTOMAZIONE CLOUD GITHUB ACTIONS */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-xl bg-gradient-to-r from-zinc-950 via-zinc-900 to-zinc-950 border border-amber-500/30 shadow-md">
+          <div className="flex items-start sm:items-center gap-3">
+            <span className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 shrink-0">
+              <Bot className="h-5 w-5" />
+            </span>
+            <div>
+              <div className="flex flex-wrap items-center gap-2">
+                <h4 className="text-xs font-black text-white uppercase tracking-wider">
+                  Automazione Notturna Cloud (GitHub Actions)
+                </h4>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">
+                  Attivo ogni notte alle 04:00
+                </span>
+              </div>
+              <p className="text-[11px] text-zinc-400 mt-0.5">
+                Scansione continua dei 326 film senza limiti di tempo: ricerca nuovi blooper e curiosità autentici (Zero Downtime).
+              </p>
+            </div>
+          </div>
+
+          <a
+            href="https://github.com/mrtrrt67/film-bloopers-hub/actions/workflows/daily-sync.yml"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-black bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-500/40 hover:border-amber-400 active:scale-95 transition shadow-sm whitespace-nowrap min-h-[38px]"
+            title="Apri GitHub Actions per avviare la scansione manuale estemporanea su cloud"
+          >
+            <span>⚡ Lancia Batch Estemporaneo</span>
+            <ExternalLink className="h-3.5 w-3.5" />
+          </a>
         </div>
 
         {/* CENTRO INCREMENTO IA: 2 CARD TOUCH-FRIENDLY & RESPONSIVE (OTTIMIZZATE SMARTPHONE) */}
