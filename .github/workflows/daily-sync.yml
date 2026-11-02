@@ -16,19 +16,19 @@ on:
           - 'bloopers'
           - 'trivia'
       limit:
-        description: 'Numero massimo di film da elaborare (0 = tutti i 326)'
+        description: 'Numero massimo di film da elaborare (0 = tutti i candidati prioritari)'
         required: false
-        default: '2'
+        default: '0'
       max_bloopers:
-        description: 'Massimo bloopers nuovi per film'
+        description: 'Massimo bloopers per passata (accumulativi fino a totale reale)'
         required: false
-        default: '5'
+        default: '10'
       max_trivia:
-        description: 'Massimo curiosità nuove per film'
+        description: 'Massimo curiosità per passata (accumulativi fino a totale reale)'
         required: false
-        default: '5'
+        default: '10'
       replace_trivia:
-        description: 'Cancella e sostituisce le vecchie curiosità generiche/false per ciascun film (Zero Downtime)'
+        description: 'Elimina le vecchie curiosità generiche/false per ciascun film (Zero Downtime)'
         required: false
         default: 'true'
         type: boolean
@@ -58,10 +58,10 @@ jobs:
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-          SYNC_MODE: ${{ github.event.inputs.mode }}
-          SYNC_LIMIT: ${{ github.event.inputs.limit }}
-          MAX_BLOOPERS: ${{ github.event.inputs.max_bloopers }}
-          MAX_TRIVIA: ${{ github.event.inputs.max_trivia }}
-          REPLACE_TRIVIA: ${{ github.event.inputs.replace_trivia }}
+          SYNC_MODE: ${{ github.event.inputs.mode || 'both' }}
+          SYNC_LIMIT: ${{ github.event.inputs.limit || '0' }}
+          MAX_BLOOPERS: ${{ github.event.inputs.max_bloopers || '10' }}
+          MAX_TRIVIA: ${{ github.event.inputs.max_trivia || '10' }}
+          REPLACE_TRIVIA: ${{ github.event.inputs.replace_trivia || 'true' }}
           PAUSE_MS: '3000'
         run: node scripts/daily-sync.js
