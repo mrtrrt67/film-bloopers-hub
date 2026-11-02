@@ -653,12 +653,12 @@ async function main() {
       const bloopersNeeded = Math.max(0, maxBloopersPerFilm - existingDescriptions.length);
       const triviaNeeded = Math.max(0, maxTriviaPerFilm - verifiedTrivia.length);
 
-      const shouldScanBloopers = (mode === 'both' || mode === 'bloopers') && bloopersNeeded > 0;
-      const shouldScanTrivia = (mode === 'both' || mode === 'trivia') && (triviaNeeded > 0 || oldGenericTrivia.length > 0);
+      const shouldScanBloopers = (mode === 'both' || mode === 'bloopers') && bloopersNeeded > 0 && !filmState.bloopersExhausted;
+      const shouldScanTrivia = (mode === 'both' || mode === 'trivia') && ((triviaNeeded > 0 && !filmState.triviaExhausted) || oldGenericTrivia.length > 0);
 
-      // Se il film ha già raggiunto o superato il target richiesto e non ha contenuti da bonificare:
+      // Se il film ha già raggiunto o superato il target richiesto, o è già verificato ed esaurito (0 chiamate IA, 0 token):
       if (!shouldScanBloopers && !shouldScanTrivia) {
-        console.log(`   ✅ Archivio già completo al target (${existingDescriptions.length}/${maxBloopersPerFilm} bloopers, ${verifiedTrivia.length}/${maxTriviaPerFilm} curiosità verificate). Salto chiamate IA.`);
+        console.log(`   ✅ Archivio completo/verificato (${existingDescriptions.length}/${maxBloopersPerFilm} bloopers, ${verifiedTrivia.length}/${maxTriviaPerFilm} curiosità). Salto chiamate IA (0 token).`);
         filmState.bloopersExhausted = true;
         filmState.triviaExhausted = true;
         filmState.verifiedAt = new Date().toISOString();
