@@ -33,26 +33,57 @@ const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || env.SUPABASE_SER
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const geminiApiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || env.GEMINI_API_KEY || env.GOOGLE_API_KEY;
 
+// Parametri CLI & Environment
+const args = process.argv.slice(2);
+function getArg(name, defaultVal) {
+  const prefix = `--${name}=`;
+  const found = args.find(a => a.startsWith(prefix));
+  if (found) return found.slice(prefix.length);
+  return defaultVal;
+}
+function hasFlag(name) {
+  return args.includes(`--${name}`);
+}
+
+const mode = process.env.SYNC_MODE || getArg('mode', 'both') || 'both';
+const limitFilms = parseInt(process.env.SYNC_LIMIT || getArg('limit', '0') || '0', 10) || 0;
+const maxBloopersPerFilm = Math.min(parseInt(process.env.MAX_BLOOPERS || getArg('max-bloopers', '5') || '5', 10) || 5, 50);
+const maxTriviaPerFilm = Math.min(parseInt(process.env.MAX_TRIVIA || getArg('max-trivia', '5') || '5', 10) || 5, 30);
+const pauseMs = parseInt(process.env.PAUSE_MS || getArg('pause', '3000') || '3000', 10) || 3000;
+const cleanJunkAtStart = hasFlag('clean-junk') || getArg('clean-junk', 'true') === 'true';
+const replaceTriviaFilmByFilm = (process.env.REPLACE_TRIVIA === 'true') || hasFlag('replace-trivia') || getArg('replace-trivia', 'false') === 'true';
+
+console.log("==================================================================");
+console.log("🎬 DAILY SYNC - FILM BLOOPERS & TRIVIA HUB");
+console.log(`🕒 Avvio: ${new Date().toISOString()}`);
+console.log(`⚙️  Modalità: ${mode} | Limite film: ${limitFilms === 0 ? "TUTTI I 326" : limitFilms}`);
+console.log(`🎯 Max Bloopers/film: ${maxBloopersPerFilm} | Max Curiosità/film: ${maxTriviaPerFilm}`);
+console.log("==================================================================");
+
+// Diagnostica credenziali
+console.log("\n🔍 Diagnostica Credenziali Ambiente:");
+console.log(`- NEXT_PUBLIC_SUPABASE_URL: ${supabaseUrl ? "✅ Configurato (" + supabaseUrl + ")" : "❌ MANCANTE"}`);
+console.log(`- SUPABASE_SERVICE_ROLE_KEY: ${serviceRoleKey ? "✅ Presente (Bypass RLS attivo)" : "⚠️ NON CONFIGURATO (sarà usata anon key)"}`);
+console.log(`- NEXT_PUBLIC_SUPABASE_ANON_KEY: ${anonKey ? "✅ Presente" : "⚠️ Assente"}`);
+console.log(`- GEMINI_API_KEY: ${geminiApiKey ? "✅ Presente (" + geminiApiKey.slice(0, 6) + "...)" : "❌ MANCANTE"}`);
+
 if (!supabaseUrl) {
-  console.error("❌ Errore: NEXT_PUBLIC_SUPABASE_URL mancante.");
+  console.error("\n❌ ERRORE: NEXT_PUBLIC_SUPABASE_URL mancante.");
+  console.error("👉 Aggiungila nei repository secrets di GitHub: Settings > Secrets and variables > Actions > New repository secret\n");
+  process.exit(1);
+}
+
+const effectiveSupabaseKey = serviceRoleKey || anonKey;
+if (!effectiveSupabaseKey) {
+  console.error("\n❌ ERRORE: Nessuna chiave Supabase configurata.");
+  console.error("👉 Aggiungi SUPABASE_SERVICE_ROLE_KEY nei repository secrets di GitHub.\n");
   process.exit(1);
 }
 
 if (!geminiApiKey) {
-  console.error("❌ Errore: GEMINI_API_KEY mancante. Configurala nei secrets di GitHub o in .env.local.");
+  console.error("\n❌ ERRORE: GEMINI_API_KEY mancante.");
+  console.error("👉 Aggiungi GEMINI_API_KEY nei repository secrets di GitHub.\n");
   process.exit(1);
-}
-
-// Per inserire e aggiornare i record sul DB serve il client con service_role (per bypassare le policy RLS)
-const effectiveSupabaseKey = serviceRoleKey || anonKey;
-if (!effectiveSupabaseKey) {
-  console.error("❌ Errore: Chiave Supabase mancante.");
-  process.exit(1);
-}
-
-if (!serviceRoleKey) {
-  console.warn("⚠️ ATTENZIONE: SUPABASE_SERVICE_ROLE_KEY non rilevata. Verrà usata anon key.");
-  console.warn("👉 Se gli inserimenti falliscono con errore RLS, aggiungi SUPABASE_SERVICE_ROLE_KEY nei GitHub Secrets o in .env.local.");
 }
 
 const supabase = createClient(supabaseUrl, effectiveSupabaseKey, {
@@ -73,26 +104,6 @@ const GEMINI_MODELS = [
   "gemini-3.7-flash",
   "gemini-flash-latest"
 ];
-
-// Parametri CLI
-const args = process.argv.slice(2);
-function getArg(name, defaultVal) {
-  const prefix = `--${name}=`;
-  const found = args.find(a => a.startsWith(prefix));
-  if (found) return found.slice(prefix.length);
-  return defaultVal;
-}
-function hasFlag(name) {
-  return args.includes(`--${name}`);
-}
-
-const mode = getArg('mode', 'both'); // 'both', 'bloopers', 'trivia'
-const limitFilms = parseInt(getArg('limit', '0'), 10); // 0 = tutti i film
-const maxBloopersPerFilm = Math.min(parseInt(getArg('max-bloopers', '5'), 10), 50);
-const maxTriviaPerFilm = Math.min(parseInt(getArg('max-trivia', '5'), 10), 30);
-const pauseMs = parseInt(getArg('pause', '3000'), 10);
-const cleanJunkAtStart = hasFlag('clean-junk') || getArg('clean-junk', 'true') === 'true';
-const replaceTriviaFilmByFilm = hasFlag('replace-trivia') || getArg('replace-trivia', 'false') === 'true';
 
 function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
@@ -207,7 +218,7 @@ async function scanTriviaForFilm(film, existingTrivia, maxNew) {
         .slice(0, 40)
         .map((e, idx) => `${idx + 1}. ${e.slice(0, 180)}`)
         .join("\n")}`
-    : "\nNessun curiosità attualmente registrata in archivio.";
+    : "\nNessuna curiosità attualmente registrata in archivio.";
 
   const prompt = `Sei un rigoroso storico del cinema e documentarista specializzato in retroscena di produzione, aneddoti di casting e segreti dal set reali, comprovati e verificabili.
 
@@ -252,17 +263,9 @@ Restituisci ESCLUSIVAMENTE un array JSON valido, senza testo introduttivo né co
 
 // Funzione Principale
 async function main() {
-  console.log("==================================================================");
-  console.log("🎬 DAILY SYNC - FILM BLOOPERS & TRIVIA HUB");
-  console.log(`🕒 Avvio: ${new Date().toISOString()}`);
-  console.log(`⚙️  Modalità: ${mode} | Limite film: ${limitFilms === 0 ? "TUTTI I 326" : limitFilms}`);
-  console.log(`🎯 Max Bloopers/film: ${maxBloopersPerFilm} | Max Curiosità/film: ${maxTriviaPerFilm}`);
-  console.log(`🛡️  Bypass RLS (Service Key): ${Boolean(serviceRoleKey) ? "ATTIVO" : "NON CONFIGURATO (anon key)"}`);
-  console.log("==================================================================\n");
-
   // 1. Pulizia righe corrotte (Zero Downtime)
   if (cleanJunkAtStart) {
-    console.log("🧹 [1/3] Verifica e rimozione righe corrotte/di test...");
+    console.log("\n🧹 [1/3] Verifica e rimozione righe corrotte/di test...");
     try {
       const { data: junkTrivia } = await supabase
         .from('movie_trivia')
@@ -343,7 +346,7 @@ async function main() {
             } else {
               console.warn(`   ⚠️ Errore salvataggio bloopers: ${errIns.message}`);
               if (errIns.message.includes("violates row-level security policy")) {
-                console.warn(`      👉 Per risolvere l'errore RLS: aggiungi SUPABASE_SERVICE_ROLE_KEY nei GitHub Secrets o in .env.local`);
+                console.warn(`      👉 Per risolvere l'errore RLS: aggiungi SUPABASE_SERVICE_ROLE_KEY nei GitHub Secrets.`);
               }
             }
           } else {
@@ -362,7 +365,7 @@ async function main() {
           .eq('film_id', film.id);
         const existingTexts = (existingTrivia || []).map(t => `${t.titolo}: ${t.descrizione}`);
 
-        const resTrivia = await scanTriviaForFilm(film, existingTexts, maxTriviaPerFilm);
+        const resTrivia = await scanTriviaForFilm(film, existingTrivia ? existingTexts : [], maxTriviaPerFilm);
         if (resTrivia.success && Array.isArray(resTrivia.data)) {
           const valid = resTrivia.data.filter(t => t.titolo && t.descrizione && t.descrizione.length > 20);
           if (valid.length > 0) {
@@ -398,7 +401,7 @@ async function main() {
             } else {
               console.warn(`   ⚠️ Errore salvataggio curiosità: ${errIns.message}`);
               if (errIns.message.includes("violates row-level security policy")) {
-                console.warn(`      👉 Per risolvere l'errore RLS: aggiungi SUPABASE_SERVICE_ROLE_KEY nei GitHub Secrets o in .env.local`);
+                console.warn(`      👉 Per risolvere l'errore RLS: aggiungi SUPABASE_SERVICE_ROLE_KEY nei GitHub Secrets.`);
               }
             }
           } else {

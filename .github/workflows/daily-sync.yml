@@ -18,7 +18,7 @@ on:
       limit:
         description: 'Numero massimo di film da elaborare (0 = tutti i 326)'
         required: false
-        default: '0'
+        default: '2'
       max_bloopers:
         description: 'Massimo bloopers nuovi per film'
         required: false
@@ -37,7 +37,7 @@ jobs:
   daily-sync:
     name: Scansione Giornaliera Bloopers & Trivia
     runs-on: ubuntu-latest
-    timeout-minutes: 180 # Fino a 3 ore di esecuzione libera senza rischi di timeout
+    timeout-minutes: 180
 
     steps:
       - name: 📥 Checkout repository
@@ -55,14 +55,13 @@ jobs:
       - name: 🚀 Esegui Daily Sync
         env:
           NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
           SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
-        run: |
-          node scripts/daily-sync.js \
-            --mode="${{ github.event.inputs.mode || 'both' }}" \
-            --limit="${{ github.event.inputs.limit || '0' }}" \
-            --max-bloopers="${{ github.event.inputs.max_bloopers || '5' }}" \
-            --max-trivia="${{ github.event.inputs.max_trivia || '5' }}" \
-            --replace-trivia="${{ github.event.inputs.replace_trivia || 'false' }}" \
-            --pause=3000
-
+          SYNC_MODE: ${{ github.event.inputs.mode }}
+          SYNC_LIMIT: ${{ github.event.inputs.limit }}
+          MAX_BLOOPERS: ${{ github.event.inputs.max_bloopers }}
+          MAX_TRIVIA: ${{ github.event.inputs.max_trivia }}
+          REPLACE_TRIVIA: ${{ github.event.inputs.replace_trivia }}
+          PAUSE_MS: '3000'
+        run: node scripts/daily-sync.js
