@@ -89,9 +89,31 @@ const cleanJunkAtStart = hasFlag('clean-junk') || getArg('clean-junk', 'true') =
 // Sostituzione automatica delle vecchie curiosità generiche/false attiva di default
 const replaceTriviaFilmByFilm = process.env.REPLACE_TRIVIA !== 'false' && getArg('replace-trivia', 'true') !== 'false';
 
-// Anno soglia per film recenti (ultimi 10 anni: dal 2016 in poi)
-const CURRENT_YEAR = 2026;
+// Helper temporale dinamico: calcola data e anno correnti reali garantendo coerenza anti-cutoff
+function getDynamicTemporalAnchor() {
+  const now = new Date();
+  const year = Math.max(2026, now.getFullYear());
+  const monthNames = [
+    "gennaio", "febbraio", "marzo", "aprile", "maggio", "giugno",
+    "luglio", "agosto", "settembre", "ottobre", "novembre", "dicembre"
+  ];
+  const monthName = monthNames[now.getMonth()];
+  const capitalizedMonth = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+
+  return {
+    year,
+    monthName: capitalizedMonth,
+    anchorText: `CONTESTO TEMPORALE DINAMICO:
+- Data corrente di riferimento: ${capitalizedMonth} ${year}.
+- Tutti i film presenti a catalogo (compresi i titoli usciti fino all'anno ${year}) sono già regolarmente usciti nelle sale cinematografiche e nelle piattaforme home video/streaming da tempo.
+- Per tutti questi titoli esistono già bloopers, goofs, making-of ed errori documentati su IMDb, MovieMistakes, recensioni e video analisi. Non considerare mai i film usciti fino all'anno ${year} come inediti o futuri.`
+  };
+}
+
+// Anno soglia per film recenti calcolato dinamicamente (almeno 2026, sempre aggiornato nel tempo)
+const CURRENT_YEAR = Math.max(2026, new Date().getFullYear());
 const RECENT_YEAR_THRESHOLD = CURRENT_YEAR - 10;
+const forceAll = process.env.FORCE_ALL !== 'false' && getArg('force-all', 'true') !== 'false';
 
 console.log("==================================================================");
 console.log("🎬 DAILY SYNC INTELLIGENTE - BLOOPERS & TRIVIA HUB");
@@ -226,9 +248,7 @@ function buildBloopersSyncPrompt(film, esclusioni, requested, isPass2 = false) {
 
   return `Sei un archivista e verificatore cinematografico specializzato in bloopers, goofs ed errori di montaggio reali e documentati.
 
-CONTESTO TEMPORALE DI RIFERIMENTO:
-- Data di riferimento: Novembre 2026.
-- Tutti i film presenti a catalogo (compresi i titoli usciti nel 2024, 2025 e 2026) sono già regolarmente usciti nelle sale e distribuiti, ed esistono già bloopers, goofs, making-of ed errori documentati su IMDb, MovieMistakes, recensioni e video analisi. Non considerare mai i film del 2025 o 2026 come inediti o futuri.
+${getDynamicTemporalAnchor().anchorText}
 
 DATI UFFICIALI DEL FILM:
 - Titolo registrato: "${film.titolo}" (${film.anno || "N/D"})
@@ -320,9 +340,7 @@ function buildTriviaSyncPrompt(film, esclusioni, requested, isPass2 = false) {
 
   return `Sei un rigoroso storico del cinema e documentarista specializzato in retroscena di produzione, aneddoti di casting e segreti dal set reali, comprovati e verificabili.
 
-CONTESTO TEMPORALE DI RIFERIMENTO:
-- Data di riferimento: Novembre 2026.
-- Tutti i film presenti a catalogo (compresi i titoli usciti nel 2024, 2025 e 2026) sono già regolarmente usciti nelle sale e distribuiti, ed esistono già interviste, aneddoti di lavorazione, dettagli sul casting e curiosità documentate. Non considerare mai i film del 2025 o 2026 come inediti o futuri.
+${getDynamicTemporalAnchor().anchorText}
 
 DATI UFFICIALI DEL FILM:
 - Titolo registrato: "${film.titolo}" (${film.anno || "N/D"})
@@ -497,58 +515,57 @@ async function main() {
     }
   }
 
-  // CLASSIFICAZIONE INTELLIGENTE PERFETTA:
-  // 1. Film con 0 bloopers o 0 curiosità (URGENZA MASSIMA: nessun film deve rimanere vuoto!)
-  // 2. Film con vecchie curiosità fittizie da bonificare (stats.oldGenericCount > 0)
-  // 3. Film parziali in accumulo (< 10 bloopers o < 10 curiosità non ancora esauriti)
-  // 4. Film recenti per rotazione periodica
-  // 5. Film consolidati già completi ed esauriti al 100%
+  // CLASSIFICAZIONE INTELLIGENTE E TRASPARENTE:
+  // Nessun film viene escluso se non ha ancora raggiunto il target massimo impostato!
+  // 1. Priorità 1: Film con 0 bloopers o 0 curiosità (nessun film deve rimanere vuoto!)
+  // 2. Priorità 2: Film con vecchie curiosità generiche da bonificare
+  // 3. Priorità 3: Film sotto il target richiesto (bloopers < ${maxBloopersPerFilm} o curiosità verificate < ${maxTriviaPerFilm})
+  // 4. Priorità 4: Film già al target o completi
 
   const zeroContentFilms = [];
   const needBonifica = [];
-  const mayHaveMore = [];
-  const recentFilmsToRefresh = [];
-  const consolidatedFilms = [];
+  const underTargetLimit = [];
+  const satisfiedFilms = [];
 
   for (const film of allFilms) {
     const stats = triviaByFilm[film.id] || { verifiedCount: 0, oldGenericCount: 0 };
     const bCount = extractCount(film.errori);
     const tCount = extractCount(film.movie_trivia);
-    const state = verifiedMap[film.id] || {};
-    const filmYear = Number(film.anno) || 0;
-    const isRecent = filmYear >= RECENT_YEAR_THRESHOLD;
 
-    // Se un film ha 0 bloopers O 0 curiosità, è prioritario al 100%!
     if (bCount === 0 || tCount === 0) {
       zeroContentFilms.push(film);
     } else if (stats.oldGenericCount > 0) {
       needBonifica.push(film);
-    } else if (!state.bloopersExhausted || !state.triviaExhausted) {
-      mayHaveMore.push(film);
-    } else if (isRecent) {
-      recentFilmsToRefresh.push(film);
+    } else if (bCount < maxBloopersPerFilm || stats.verifiedCount < maxTriviaPerFilm) {
+      underTargetLimit.push(film);
     } else {
-      consolidatedFilms.push(film);
+      satisfiedFilms.push(film);
     }
   }
 
   console.log(`   Stato Attuale Catalogo (${allFilms.length} film complessivi):`);
-  console.log(`   - 🚨 PRIORITÀ ASSOLUTA (Film con 0 bloopers o 0 curiosità): ${zeroContentFilms.length}`);
-  console.log(`   - 🔴 Da Bonificare (con curiosità generiche residue da sostituire): ${needBonifica.length}`);
-  console.log(`   - 🔄 In accumulo (bloopers o curiosità documentati ulteriori): ${mayHaveMore.length}`);
-  console.log(`   - 🌟 Recenti (ultimi 10 anni, rotazione periodica): ${recentFilmsToRefresh.length}`);
-  console.log(`   - 🧊 Consolidati (completi ed esauriti al 100%): ${consolidatedFilms.length}`);
+  console.log(`   - 🚨 PRIORITÀ 1 (Film con 0 bloopers o 0 curiosità): ${zeroContentFilms.length}`);
+  console.log(`   - 🔴 PRIORITÀ 2 (Con curiosità generiche residue da bonificare): ${needBonifica.length}`);
+  console.log(`   - 🔄 PRIORITÀ 3 (Sotto il target di ${maxBloopersPerFilm} bloopers o ${maxTriviaPerFilm} curiosità): ${underTargetLimit.length}`);
+  console.log(`   - 🧊 PRIORITÀ 4 (Archivio già al target o oltre): ${satisfiedFilms.length}`);
 
-  // CODA DI LAVORO: I film a zero bloopers/curiosità VENGONO SEMPRE ELABORATI PRIMA DI TUTTI!
-  const candidateQueue = [
-    ...zeroContentFilms,
-    ...needBonifica.filter(f => !zeroContentFilms.some(z => z.id === f.id)),
-    ...mayHaveMore.filter(f => !zeroContentFilms.some(z => z.id === f.id)),
-    ...recentFilmsToRefresh.filter(f => !zeroContentFilms.some(z => z.id === f.id))
-  ];
+  // CODA DI LAVORO COMPLETA: NESSUN FILM ESCLUSO!
+  // Se forceAll è attivo (default true), TUTTI i film a catalogo vengono inclusi in ordine di urgenza.
+  const candidateQueue = forceAll
+    ? [
+        ...zeroContentFilms,
+        ...needBonifica.filter(f => !zeroContentFilms.some(z => z.id === f.id)),
+        ...underTargetLimit.filter(f => !zeroContentFilms.some(z => z.id === f.id) && !needBonifica.some(n => n.id === f.id)),
+        ...satisfiedFilms.filter(f => !zeroContentFilms.some(z => z.id === f.id) && !needBonifica.some(n => n.id === f.id) && !underTargetLimit.some(u => u.id === f.id))
+      ]
+    : [
+        ...zeroContentFilms,
+        ...needBonifica.filter(f => !zeroContentFilms.some(z => z.id === f.id)),
+        ...underTargetLimit.filter(f => !zeroContentFilms.some(z => z.id === f.id) && !needBonifica.some(n => n.id === f.id))
+      ];
 
   const filmsToProcess = limitFilms > 0 ? candidateQueue.slice(0, limitFilms) : candidateQueue;
-  console.log(`\n📋 [3/4] Pellicole selezionate per questa sessione: ${filmsToProcess.length}/${candidateQueue.length}\n`);
+  console.log(`\n📋 [3/4] Pellicole selezionate per questa sessione: ${filmsToProcess.length}/${allFilms.length} (Rielaborazione totale: ${forceAll ? "ATTIVA - 100% catalogo" : "SOLO DA COMPLETARE"})\n`);
 
   if (filmsToProcess.length === 0) {
     console.log("🎉 Tutti i film sono già verificati, bonificati e completi al 100%! Nessuna elaborazione necessaria per oggi.");
@@ -589,15 +606,39 @@ async function main() {
 
       const existingDescriptions = (errRes.data || []).map(e => e.descrizione);
       const existingTrivia = triviaRes.data || [];
+      const verifiedTrivia = existingTrivia.filter(t => t.provenienza === "IA Verificata" || t.provenienza === "utente");
+      const oldGenericTrivia = existingTrivia.filter(t => t.provenienza !== "IA Verificata" && t.provenienza !== "utente");
       const existingTexts = existingTrivia.map(t => `${t.titolo}: ${t.descrizione}`);
+
+      // Calcolo esatto di quanti elementi mancano rispetto al target richiesto
+      const bloopersNeeded = Math.max(0, maxBloopersPerFilm - existingDescriptions.length);
+      const triviaNeeded = Math.max(0, maxTriviaPerFilm - verifiedTrivia.length);
+
+      const shouldScanBloopers = (mode === 'both' || mode === 'bloopers') && bloopersNeeded > 0;
+      const shouldScanTrivia = (mode === 'both' || mode === 'trivia') && (triviaNeeded > 0 || oldGenericTrivia.length > 0);
+
+      // Se il film ha già raggiunto o superato il target richiesto e non ha contenuti da bonificare:
+      if (!shouldScanBloopers && !shouldScanTrivia) {
+        console.log(`   ✅ Archivio già completo al target (${existingDescriptions.length}/${maxBloopersPerFilm} bloopers, ${verifiedTrivia.length}/${maxTriviaPerFilm} curiosità verificate). Salto chiamate IA.`);
+        filmState.bloopersExhausted = true;
+        filmState.triviaExhausted = true;
+        filmState.verifiedAt = new Date().toISOString();
+        verifiedMap[film.id] = filmState;
+        globalStats.processed++;
+        continue;
+      }
+
+      // Quanti richiederne a Gemini
+      const countBloopersToRequest = Math.min(bloopersNeeded, maxBloopersPerFilm);
+      const countTriviaToRequest = Math.min(triviaNeeded > 0 ? triviaNeeded : maxTriviaPerFilm, maxTriviaPerFilm);
 
       // 2. Chiamate IA parallele concorrenti (velocità raddoppiata!)
       const [resBloopers, resTrivia] = await Promise.all([
-        (mode === 'both' || mode === 'bloopers')
-          ? scanBloopersForFilm(film, existingDescriptions, maxBloopersPerFilm)
+        shouldScanBloopers
+          ? scanBloopersForFilm(film, existingDescriptions, countBloopersToRequest)
           : Promise.resolve(null),
-        (mode === 'both' || mode === 'trivia')
-          ? scanTriviaForFilm(film, existingTexts, maxTriviaPerFilm)
+        shouldScanTrivia
+          ? scanTriviaForFilm(film, existingTexts, countTriviaToRequest)
           : Promise.resolve(null)
       ]);
 
@@ -627,9 +668,10 @@ async function main() {
             }));
             const { error: errIns } = await supabase.from('errori').insert(rows);
             if (!errIns) {
-              console.log(`   🎯 Bloopers: +${valid.length} autentici aggiunti (Totale film: ${existingDescriptions.length + valid.length})`);
+              const newTotal = existingDescriptions.length + valid.length;
+              console.log(`   🎯 Bloopers: +${valid.length} autentici aggiunti (Totale film: ${newTotal}/${maxBloopersPerFilm})`);
               globalStats.bloopersAdded += valid.length;
-              filmState.bloopersExhausted = valid.length < maxBloopersPerFilm;
+              filmState.bloopersExhausted = newTotal >= maxBloopersPerFilm;
             } else {
               console.warn(`   ⚠️ Errore salvataggio bloopers: ${errIns.message}`);
             }
@@ -667,9 +709,10 @@ async function main() {
             // Inserimento con strategia Zero-Downtime: inserisce prima le autentiche
             const { error: errIns } = await supabase.from('movie_trivia').insert(rows);
             if (!errIns) {
-              console.log(`   ✨ Curiosità: +${valid.length} autentiche aggiunte`);
+              const newTotal = verifiedTrivia.length + valid.length;
+              console.log(`   ✨ Curiosità: +${valid.length} autentiche aggiunte (Totale verificate: ${newTotal}/${maxTriviaPerFilm})`);
               globalStats.triviaAdded += valid.length;
-              filmState.triviaExhausted = valid.length < maxTriviaPerFilm;
+              filmState.triviaExhausted = newTotal >= maxTriviaPerFilm;
 
               // Eliminazione automatica vecchie curiosità generiche fittizie
               if (replaceTriviaFilmByFilm && existingTrivia && existingTrivia.length > 0) {

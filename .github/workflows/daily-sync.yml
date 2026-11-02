@@ -40,6 +40,11 @@ on:
         required: false
         default: 'true'
         type: boolean
+      force_all:
+        description: 'Rielabora TUTTI i film a catalogo (nessuna esclusione di film sotto il target)'
+        required: false
+        default: 'true'
+        type: boolean
 
 jobs:
   daily-sync:
@@ -77,5 +82,6 @@ jobs:
           MAX_BLOOPERS: ${{ github.event.inputs.max_bloopers || '10' }}
           MAX_TRIVIA: ${{ github.event.inputs.max_trivia || '10' }}
           REPLACE_TRIVIA: ${{ github.event.inputs.replace_trivia || 'true' }}
+          FORCE_ALL: ${{ github.event.inputs.force_all || 'true' }}
           PAUSE_MS: '350'
         run: node scripts/daily-sync.js
