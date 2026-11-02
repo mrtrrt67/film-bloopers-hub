@@ -2,6 +2,22 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+function extractCount(field: any): number {
+  if (!field) return 0;
+  if (typeof field === "number") return field;
+  if (Array.isArray(field)) {
+    if (field.length > 0 && typeof field[0]?.count === "number") {
+      return field[0].count;
+    }
+    return field.length;
+  }
+  if (typeof field?.count === "number") return field.count;
+  return 0;
+}
+
 export async function GET(request: Request) {
   try {
     const supabase = await createClient();
@@ -12,11 +28,13 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Accesso non autorizzato" }, { status: 403 });
     }
 
+    const db = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
+
     const { searchParams } = new URL(request.url);
     const query = searchParams.get("q") || "";
     const filter = searchParams.get("filter") || "all";
 
-    let req = supabase
+    let req = db
       .from("films")
       .select("id, titolo, anno, regista, genere, trama, poster_url, attori, creato_il, movie_trivia(count), errori(count)");
 
@@ -46,8 +64,8 @@ export async function GET(request: Request) {
       poster_url: film.poster_url,
       attori: film.attori,
       creato_il: film.creato_il,
-      trivia_count: film.movie_trivia?.[0]?.count ?? 0,
-      bloopers_count: film.errori?.[0]?.count ?? 0,
+      trivia_count: extractCount(film.movie_trivia),
+      bloopers_count: extractCount(film.errori),
     }));
 
     if (filter === "with_trivia") {
@@ -60,7 +78,16 @@ export async function GET(request: Request) {
       films = films.filter((f: any) => f.bloopers_count < 10);
     }
 
-    return NextResponse.json({ films });
+    return NextResponse.json(
+      { films },
+      {
+        headers: {
+          "Cache-Control": "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+          "CDN-Cache-Control": "no-store",
+          "Vercel-CDN-Cache-Control": "no-store",
+        },
+      }
+    );
   } catch (err: any) {
     console.error("Errore recupero archivio film:", err);
     return NextResponse.json({ error: err.message || "Errore film" }, { status: 500 });

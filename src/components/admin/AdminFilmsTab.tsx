@@ -132,7 +132,10 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   const fetchFilms = async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/admin/films");
+      const res = await fetch(`/api/admin/films?_t=${Date.now()}`, {
+        cache: "no-store",
+        headers: { "Cache-Control": "no-cache" },
+      });
       if (res.ok) {
         const json = await res.json();
         setFilms(json.films || []);
@@ -760,10 +763,21 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
       <div className="flex flex-col gap-4 p-4 sm:p-5 rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800/70">
           <div>
-            <h3 className="text-base font-black text-white flex items-center gap-2">
-              <Film className="h-5 w-5 text-amber-400 shrink-0" />
-              Archivio Film ({films.length} pellicole)
-            </h3>
+            <div className="flex items-center gap-3">
+              <h3 className="text-base font-black text-white flex items-center gap-2">
+                <Film className="h-5 w-5 text-amber-400 shrink-0" />
+                Archivio Film ({films.length} pellicole)
+              </h3>
+              <button
+                onClick={() => fetchFilms()}
+                disabled={loading}
+                className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white border border-zinc-700/80 transition active:scale-95 disabled:opacity-50"
+                title="Ricarica i dati freschi dal database"
+              >
+                <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin text-amber-400" : ""}`} />
+                <span>Aggiorna Dati</span>
+              </button>
+            </div>
             <p className="text-xs text-zinc-400 mt-0.5">
               Gestione schede film, verifica fattuale con IA e monitoraggio automatico notturno.
             </p>

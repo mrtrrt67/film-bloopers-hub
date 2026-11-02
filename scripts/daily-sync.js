@@ -66,7 +66,7 @@ const limitFilms = parseInt(process.env.SYNC_LIMIT || getArg('limit', '0') || '0
 // Max 10 blooper e 10 curiosità a passata (accumulativi nelle passate successive)
 const maxBloopersPerFilm = Math.min(parseInt(process.env.MAX_BLOOPERS || getArg('max-bloopers', '10') || '10', 10) || 10, 50);
 const maxTriviaPerFilm = Math.min(parseInt(process.env.MAX_TRIVIA || getArg('max-trivia', '10') || '10', 10) || 10, 30);
-const pauseMs = parseInt(process.env.PAUSE_MS || getArg('pause', '3000') || '3000', 10) || 3000;
+const pauseMs = parseInt(process.env.PAUSE_MS || getArg('pause', '1200') || '1200', 10) || 1200;
 const cleanJunkAtStart = hasFlag('clean-junk') || getArg('clean-junk', 'true') === 'true';
 // Sostituzione automatica delle vecchie curiosità generiche/false attiva di default
 const replaceTriviaFilmByFilm = process.env.REPLACE_TRIVIA !== 'false' && getArg('replace-trivia', 'true') !== 'false';
@@ -117,12 +117,9 @@ const ai = new GoogleGenAI({ apiKey: geminiApiKey });
 
 // Modelli Gemini con fallback automatico
 const GEMINI_MODELS = [
-  "gemini-flash-lite-latest",
-  "gemini-3.5-flash",
-  "gemini-3-flash-preview",
-  "gemini-3.6-flash",
-  "gemini-3.8-flash",
-  "gemini-3.7-flash",
+  "gemini-2.5-flash",
+  "gemini-2.0-flash",
+  "gemini-1.5-flash",
   "gemini-flash-latest"
 ];
 
@@ -437,20 +434,34 @@ async function main() {
     const film = filmsToProcess[i];
     const indexStr = `[${i + 1}/${filmsToProcess.length}]`;
     const filmYear = film.anno || "N/D";
-    console.log(`\n${indexStr} 📽️ "${film.titolo}" (${filmYear}) - ID: ${film.id}`);
+    const regText = film.regista ? `, Regia: ${film.regista}` : "";
+    console.log(`\n${indexStr} 📽️ "${film.titolo}" (${filmYear}${regText}) - ID: ${film.id}`);
 
     const filmState = verifiedMap[film.id] || { year: filmYear };
 
     try {
-      // --- BLOOPERS ---
-      if (mode === 'both' || mode === 'bloopers') {
-        const { data: existingErr } = await supabase
-          .from('errori')
-          .select('descrizione')
-          .eq('film_id', film.id);
-        const existingDescriptions = (existingErr || []).map(e => e.descrizione);
+      // 1. Recupero parallelo stato esistente
+      const [errRes, triviaRes] = await Promise.all([
+        (mode === 'both' || mode === 'bloopers') ? supabase.from('errori').select('descrizione').eq('film_id', film.id) : Promise.resolve({ data: [] }),
+        (mode === 'both' || mode === 'trivia') ? supabase.from('movie_trivia').select('id, titolo, descrizione, provenienza').eq('film_id', film.id) : Promise.resolve({ data: [] })
+      ]);
 
-        const resBloopers = await scanBloopersForFilm(film, existingDescriptions, maxBloopersPerFilm);
+      const existingDescriptions = (errRes.data || []).map(e => e.descrizione);
+      const existingTrivia = triviaRes.data || [];
+      const existingTexts = existingTrivia.map(t => `${t.titolo}: ${t.descrizione}`);
+
+      // 2. Chiamate IA parallele concorrenti (velocità raddoppiata!)
+      const [resBloopers, resTrivia] = await Promise.all([
+        (mode === 'both' || mode === 'bloopers')
+          ? scanBloopersForFilm(film, existingDescriptions, maxBloopersPerFilm)
+          : Promise.resolve(null),
+        (mode === 'both' || mode === 'trivia')
+          ? scanTriviaForFilm(film, existingTexts, maxTriviaPerFilm)
+          : Promise.resolve(null)
+      ]);
+
+      // --- ELABORAZIONE BLOOPERS ---
+      if (resBloopers) {
         if (resBloopers.success && Array.isArray(resBloopers.data)) {
           const valid = resBloopers.data.filter(b => b.descrizione && b.descrizione.length > 15);
           if (valid.length > 0) {
@@ -470,7 +481,6 @@ async function main() {
             if (!errIns) {
               console.log(`   🎯 Bloopers: +${valid.length} autentici aggiunti (Totale film: ${existingDescriptions.length + valid.length})`);
               globalStats.bloopersAdded += valid.length;
-              // Se ne ha aggiunti meno del cap, significa che non ce ne sono altri noti
               filmState.bloopersExhausted = valid.length < maxBloopersPerFilm;
             } else {
               console.warn(`   ⚠️ Errore salvataggio bloopers: ${errIns.message}`);
@@ -484,15 +494,8 @@ async function main() {
         }
       }
 
-      // --- TRIVIA / CURIOSITÀ ---
-      if (mode === 'both' || mode === 'trivia') {
-        const { data: existingTrivia } = await supabase
-          .from('movie_trivia')
-          .select('id, titolo, descrizione, provenienza')
-          .eq('film_id', film.id);
-        const existingTexts = (existingTrivia || []).map(t => `${t.titolo}: ${t.descrizione}`);
-
-        const resTrivia = await scanTriviaForFilm(film, existingTrivia ? existingTexts : [], maxTriviaPerFilm);
+      // --- ELABORAZIONE TRIVIA / CURIOSITÀ ---
+      if (resTrivia) {
         if (resTrivia.success && Array.isArray(resTrivia.data)) {
           const valid = resTrivia.data.filter(t => t.titolo && t.descrizione && t.descrizione.length > 20);
           if (valid.length > 0) {
