@@ -11,6 +11,17 @@
  */
 
 const fs = require('fs');
+// Salvaguardia WebSocket per Node (previene crash Realtime)
+if (typeof globalThis.WebSocket === 'undefined') {
+  try {
+    globalThis.WebSocket = class DummyWebSocket {
+      constructor() {}
+      close() {}
+      send() {}
+    };
+  } catch (e) {}
+}
+
 const { createClient } = require('@supabase/supabase-js');
 const { GoogleGenAI } = require('@google/genai');
 
