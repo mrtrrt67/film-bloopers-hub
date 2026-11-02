@@ -210,38 +210,43 @@ async function callGeminiZeroTemp(prompt) {
   };
 }
 
-// Scansione Bloopers mancanti (senza limite artificiale, fino al cap di passata)
-async function scanBloopersForFilm(film, existingBloopers, maxNew) {
-  const esclusioneText = existingBloopers.length > 0
-    ? `\nERRORI GIÀ REGISTRATI NEL NOSTRO ARCHIVIO (NON RIPETERE ASSOLUTAMENTE QUESTI ERRORI O VARIANTI DEGLI STESSI):\n${existingBloopers
+function buildBloopersSyncPrompt(film, esclusioni, requested, isPass2 = false) {
+  const esclusioneText = esclusioni.length > 0
+    ? `\nERRORI GIÀ REGISTRATI NEL NOSTRO ARCHIVIO (NON RIPETERE ASSOLUTAMENTE QUESTI ERRORI O VARIANTI DEGLI STESSI):\n${esclusioni
         .slice(0, 50)
         .map((e, idx) => `${idx + 1}. ${e.slice(0, 200)}`)
         .join("\n")}`
     : "\nNessun errore attualmente registrato in archivio.";
 
-  const prompt = `Sei un archivista e verificatore cinematografico specializzato in bloopers, goofs ed errori di montaggio reali e documentati.
+  return `Sei un archivista e verificatore cinematografico specializzato in bloopers, goofs ed errori di montaggio reali e documentati.
 
 DATI UFFICIALI DEL FILM:
 - Titolo registrato: "${film.titolo}" (${film.anno || "N/D"})
 - Regia: ${film.regista || "N/D"}
 - Cast: ${film.attori || "N/D"}
 - Sinossi: ${film.trama || "N/D"}
-- RICONOSCIMENTO TITOLI INTERNAZIONALI: Se il film è straniero o noto internazionalmente con titolo differente da quello italiano (es. Psycho per Psyco, The Birds per Gli Uccelli, Despicable Me per Cattivissimo me, Home Alone per Mamma ho perso l'aereo, ecc.), fai riferimento sia al titolo italiano che a quello originale/inglese per attingere all'intero catalogo globale di errori (IMDb Goofs, MovieMistakes, Bloopers.it per film italiani, commenti DVD, making-of).
+- RICONOSCIMENTO TITOLI INTERNAZIONALI: Se il film è straniero o noto internazionalmente con titolo differente da quello italiano (es. Psycho per Psyco, The Birds per Gli Uccelli, Despicable Me per Cattivissimo me, Home Alone per Mamma ho perso l'aereo, Gladiator per Il gladiatore, The Perfect Storm per La tempesta perfetta, ecc.), fai riferimento sia al titolo italiano che a quello originale/inglese per attingere all'intero catalogo globale di errori (IMDb Goofs, MovieMistakes, Bloopers.it per film italiani, commenti DVD, making-of).
 ${esclusioneText}
 
-COMPITO:
-Analizza attentamente gli errori già registrati per questa pellicola.
-Identifica e restituisci tutti gli ALTRI bloopers, goofs, errori di continuità visiva (bicchieri/oggetti che si spostano, ferite o vestiti incoerenti tra tagli), microfoni o operatori visibili, anacronismi ed errori storici REALI, NOTI e DOCUMENTATI che MANCANO ancora nell'archivio, fino a un MASSIMO di ${maxNew} nuovi bloopers per questa passata.
+COMPITO E SCANSIONE ESAUSTIVA A 360 GRADI${isPass2 ? " (SECONDA PASSATA APPROFONDITA)" : ""}:
+Esegui una scansione approfondita e completa di TUTTI i bloopers, goofs ed errori documentati per questo film che MANCANO ancora nell'archivio.
+NON fermarti a 1 o 2 errori generici: esplora sistematicamente le diverse categorie e momenti del film:
+1. Errori di continuità di scena (oggetti, armi, abiti o ferite che cambiano posizione tra i tagli, vetri rotti che tornano intatti, luce/meteo incoerente tra inquadrature consecutive).
+2. Anacronismi ed errori storici/tecnologici (veicoli, marche, tecnologie, costumi o eventi posteriori all'anno di ambientazione o incongruenti con la realtà storica).
+3. Errori storici o fattuali documentati (incongruenze geografiche, procedure operative reali o discrepanze tecniche su mezzi/ambientazioni reali).
+4. Troupe o attrezzature visibili (microfoni boom, cavi di sicurezza degli stuntman, cameraman/operatori o riflessi visibili nelle inquadrature).
 
-REGOLE ANTI-ALLUCINAZIONE:
-1. DIVIETO ASSOLUTO DI INVENTARE: Riporta solo errori, sviste di continuità o microfoni realmente documentati da fonti note. Se non esistono altri bloopers documentati, restituisci un array vuoto [].
-2. NESSUNA DUPLICAZIONE: Non ripetere gli errori già registrati.
-3. MINUTAGGIO: Se non noto esattamente al secondo, usa "00:00:00".
+REGOLE ANTI-ALLUCINAZIONE ASSOLUTE:
+1. Riporta ESCLUSIVAMENTE errori reali, noti e riscontrabili nella pellicola o documentati su fonti autorevoli.
+2. DIVIETO ASSOLUTO DI INVENTARE: Riporta solo fatti reali. Se per questo film non esistono ulteriori bloopers documentati, restituisci ESCLUSIVAMENTE un array vuoto [].
+3. NESSUNA DUPLICAZIONE: Non ripetere gli errori già registrati.
+4. MINUTAGGIO: Se non noto esattamente al secondo, usa "00:00:00" oppure la scena iniziale.
+5. Restituisci fino a un MASSIMO di ${requested} nuovi bloopers autentici documentati.
 
-Le categorie ammesse sono:
-1. "Errori di scena / Posizione" (errori di continuità tra inquadrature, oggetti/bicchieri che cambiano posizione, vestiti o tagli)
-2. "Troupe o microfoni visibili" (microfoni boom, telecamere, ombre o riflessi di troupe)
-3. "Anacronismi" (oggetti o elementi storicamente incongruenti)
+Le categorie ammesse sono ESCLUSIVAMENTE:
+1. "Errori di scena / Posizione"
+2. "Troupe o microfoni visibili"
+3. "Anacronismi"
 4. "Errori storici o fattuali"
 5. "Audio / Doppiaggio / Sync"
 
@@ -255,20 +260,51 @@ Restituisci ESCLUSIVAMENTE un array JSON valido, senza testo introduttivo né co
     "youtube_query": "${film.titolo} blooper scene"
   }
 ]`;
-
-  return await callGeminiZeroTemp(prompt);
 }
 
-// Scansione Curiosità mancanti (senza limite artificiale, fino al cap di passata)
-async function scanTriviaForFilm(film, existingTrivia, maxNew) {
-  const esclusioneText = existingTrivia.length > 0
-    ? `\nCURIOSITÀ GIÀ REGISTRATE NEL NOSTRO ARCHIVIO (NON RIPETERE ASSOLUTAMENTE QUESTE O FATTI IDENTICI):\n${existingTrivia
+// Scansione Bloopers con Scansione esaustiva e Passata 2 Automatica (Auto Deep-Scan)
+async function scanBloopersForFilm(film, existingBloopers, maxNew) {
+  const p1 = buildBloopersSyncPrompt(film, existingBloopers, maxNew, false);
+  const res1 = await callGeminiZeroTemp(p1);
+  let bloopers = Array.isArray(res1) ? res1 : [];
+
+  // Se la prima passata ha trovato pochi bloopers (< 4) e ne erano richiesti almeno 5,
+  // esegue subito la seconda passata di approfondimento escludendo i primi
+  if (bloopers.length > 0 && bloopers.length < 4 && maxNew >= 5) {
+    try {
+      const combinedExclusions = [
+        ...existingBloopers,
+        ...bloopers.map((b) => b.descrizione),
+      ];
+      const p2 = buildBloopersSyncPrompt(film, combinedExclusions, Math.min(maxNew, 8), true);
+      const res2 = await callGeminiZeroTemp(p2);
+      if (Array.isArray(res2) && res2.length > 0) {
+        for (const nb of res2) {
+          const isDupe = bloopers.some(
+            (ex) => ex.descrizione && nb.descrizione && ex.descrizione.toLowerCase().slice(0, 50) === nb.descrizione.toLowerCase().slice(0, 50)
+          );
+          if (!isDupe && nb.descrizione && nb.descrizione.trim().length > 10) {
+            bloopers.push(nb);
+          }
+        }
+      }
+    } catch (e) {
+      // Passata 2 non bloccante
+    }
+  }
+
+  return bloopers;
+}
+
+function buildTriviaSyncPrompt(film, esclusioni, requested, isPass2 = false) {
+  const esclusioneText = esclusioni.length > 0
+    ? `\nCURIOSITÀ GIÀ REGISTRATE NEL NOSTRO ARCHIVIO (NON RIPETERE ASSOLUTAMENTE QUESTE O FATTI IDENTICI):\n${esclusioni
         .slice(0, 50)
         .map((e, idx) => `${idx + 1}. ${e.slice(0, 180)}`)
         .join("\n")}`
-    : "\nNessun curiosità attualmente registrata in archivio.";
+    : "\nNessuna curiosità attualmente registrata in archivio.";
 
-  const prompt = `Sei un rigoroso storico del cinema e documentarista specializzato in retroscena di produzione, aneddoti di casting e segreti dal set reali, comprovati e verificabili.
+  return `Sei un rigoroso storico del cinema e documentarista specializzato in retroscena di produzione, aneddoti di casting e segreti dal set reali, comprovati e verificabili.
 
 DATI UFFICIALI DEL FILM:
 - Titolo registrato: "${film.titolo}" (${film.anno || "N/D"})
@@ -278,15 +314,20 @@ DATI UFFICIALI DEL FILM:
 - NOTA TITOLI: Considera sia il titolo italiano che il titolo originale/internazionale per attingere all'intero archivio globale di aneddoti, retroscena di produzione, casting e curiosità documentate.
 ${esclusioneText}
 
-COMPITO:
-Analizza attentamente le curiosità già registrate per questa pellicola.
-Identifica fino a un MASSIMO di ${maxNew} curiosità, retroscena o aneddoti storici REALI, NOTI e DOCUMENTATI che MANCANO ancora nell'archivio per questa passata.
+COMPITO E SCANSIONE ESAUSTIVA A 360 GRADI${isPass2 ? " (SECONDA PASSATA APPROFONDITA)" : ""}:
+Esegui una scansione approfondita di TUTTE le curiosità, aneddoti e retroscena storici REALI documentati per questo film.
+NON fermarti a 1 o 2 curiosità generiche: esplora sistematicamente i diversi ambiti:
+1. Casting & Scelte (attori provinati o scartati, rinunce celebri, cambi di sceneggiatura).
+2. Retroscena dal set e aneddoti di lavorazione reali (difficoltà tecniche, incidenti non gravi, improvvisazioni storiche).
+3. Segreti di produzione ed effetti speciali (tecniche artigianali, modelli in scala, trucchi di regia).
+4. Citazioni, omaggi ed Easter Egg documentati.
 
 REGOLE ANTI-ALLUCINAZIONE ASSOLUTE:
-1. DIVIETO ASSOLUTO DI INVENTARE O GENERALIZZARE: Non inventare MAI aneddoti generici o verosimili (vietate frasi generiche come "il cast ha legato molto sul set", "le riprese sono state impegnative", "il regista ha voluto dare autenticità"). Ogni curiosità DEVE contenere fatti specifici, nomi propri, cifre concrete o eventi realmente accaduti e verificabili (es. interviste ufficiali, note di produzione, Making-of, commenti audio DVD).
-2. SE NON CI SONO ALTRI FATTI DOCUMENTATI, RESTITUISCI []: Non forzare mai il numero. Se per questo film sono noti solo 1 o 2 fatti reali, restituisci solo quelli. Se non ce ne sono di documentati, restituisci tassativamente un array vuoto [].
+1. DIVIETO ASSOLUTO DI INVENTARE O GENERALIZZARE: Non inventare MAI aneddoti generici o verosimili. Ogni curiosità DEVE contenere fatti specifici, nomi propri, cifre concrete o eventi realmente accaduti e verificabili (es. interviste ufficiali, note di produzione, Making-of, commenti audio DVD).
+2. SE NON CI SONO ALTRI FATTI DOCUMENTATI, RESTITUISCI []: Se per questo film non ci sono altri fatti documentati, restituisci tassativamente un array vuoto [].
 3. NESSUNA DUPLICAZIONE: Non ripetere né parafrasare curiosità già elencate sopra.
 4. DESCRIZIONI COMPATTE E COMPLETE: 2-3 frasi chiare ed esaustive in italiano corretto. Non lasciare MAI campi vuoti né testi fittizi.
+5. Restituisci fino a un MASSIMO di ${requested} nuove curiosità reali documentate.
 
 Le categorie ammesse sono ESCLUSIVAMENTE:
 1. "Curiosità & Retroscena"
@@ -306,8 +347,38 @@ Restituisci ESCLUSIVAMENTE un array JSON valido, senza testo introduttivo né co
     "fonte": "Intervista al regista / Making-of ufficiale"
   }
 ]`;
+}
 
-  return await callGeminiZeroTemp(prompt);
+// Scansione Curiosità con Scansione esaustiva e Passata 2 Automatica (Auto Deep-Scan)
+async function scanTriviaForFilm(film, existingTrivia, maxNew) {
+  const p1 = buildTriviaSyncPrompt(film, existingTrivia, maxNew, false);
+  const res1 = await callGeminiZeroTemp(p1);
+  let trivia = Array.isArray(res1) ? res1 : [];
+
+  if (trivia.length > 0 && trivia.length < 4 && maxNew >= 5) {
+    try {
+      const combinedExclusions = [
+        ...existingTrivia,
+        ...trivia.map((t) => `${t.titolo}: ${t.descrizione}`),
+      ];
+      const p2 = buildTriviaSyncPrompt(film, combinedExclusions, Math.min(maxNew, 8), true);
+      const res2 = await callGeminiZeroTemp(p2);
+      if (Array.isArray(res2) && res2.length > 0) {
+        for (const nt of res2) {
+          const isDupe = trivia.some(
+            (ex) => ex.titolo && nt.titolo && ex.titolo.toLowerCase().slice(0, 30) === nt.titolo.toLowerCase().slice(0, 30)
+          );
+          if (!isDupe && nt.titolo && nt.titolo.trim().length > 3 && nt.descrizione && nt.descrizione.trim().length > 10) {
+            trivia.push(nt);
+          }
+        }
+      }
+    } catch (e) {
+      // Passata 2 non bloccante
+    }
+  }
+
+  return trivia;
 }
 
 // Gestione stato sincronizzazione e memorizzazione avanzamento
