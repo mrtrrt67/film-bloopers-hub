@@ -189,6 +189,15 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   useEffect(() => {
     setIsStagingHost(window.location.hostname.includes("staging") || window.location.hostname.includes("localhost"));
     fetchFilms();
+
+    // Ricaricamento automatico quando la finestra riprende il focus (es. dopo aver controllato il batch GitHub)
+    const handleFocus = () => {
+      fetchFilms();
+      fetchMissingBloopersStats();
+      fetchMissingTriviaStats();
+    };
+    window.addEventListener("focus", handleFocus);
+
     try {
       const savedBloopers = localStorage.getItem("fbh_admin_bloopers_target");
       if (savedBloopers) {
@@ -201,7 +210,10 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
         if (!isNaN(n) && n > 0) setTriviaTarget(n);
       }
     } catch {}
-    // inizializzazione effettuata dagli useEffect sui target
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
   }, []);
 
   useEffect(() => {
