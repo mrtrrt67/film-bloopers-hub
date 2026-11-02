@@ -82,7 +82,7 @@ const limitFilms = parseInt(process.env.SYNC_LIMIT || getArg('limit', '0') || '0
 // Max 10 blooper e 10 curiosità a passata (accumulativi nelle passate successive)
 const maxBloopersPerFilm = Math.min(parseInt(process.env.MAX_BLOOPERS || getArg('max-bloopers', '10') || '10', 10) || 10, 50);
 const maxTriviaPerFilm = Math.min(parseInt(process.env.MAX_TRIVIA || getArg('max-trivia', '10') || '10', 10) || 10, 30);
-const pauseMs = parseInt(process.env.PAUSE_MS || getArg('pause', '1200') || '1200', 10) || 1200;
+const pauseMs = parseInt(process.env.PAUSE_MS || getArg('pause', '350') || '350', 10) || 350;
 const cleanJunkAtStart = hasFlag('clean-junk') || getArg('clean-junk', 'true') === 'true';
 // Sostituzione automatica delle vecchie curiosità generiche/false attiva di default
 const replaceTriviaFilmByFilm = process.env.REPLACE_TRIVIA !== 'false' && getArg('replace-trivia', 'true') !== 'false';
@@ -137,9 +137,13 @@ const ai = new GoogleGenAI({ apiKey: geminiApiKey });
 // Modelli Gemini con fallback automatico
 const GEMINI_MODELS = [
   "gemini-3.5-flash-lite",
-  "gemini-3.6-flash",
+  "gemini-flash-lite-latest",
+  "gemini-3.5-flash",
+  "gemini-3.1-flash-lite",
+  "gemini-flash-latest",
   "gemini-3-flash-preview",
-  "gemini-3.8-flash"
+  "gemini-3.8-flash",
+  "gemini-3.7-flash"
 ];
 
 function sleep(ms) {
