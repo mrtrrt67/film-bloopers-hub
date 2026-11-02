@@ -7,13 +7,13 @@ on:
   workflow_dispatch:
     inputs:
       target_env:
-        description: '🎯 Database Target (staging = Staging sicuro | production = Produzione live)'
+        description: '🎯 Database Target (production = Produzione live | staging = Staging test)'
         required: true
-        default: 'staging'
+        default: 'production'
         type: choice
         options:
-          - 'staging'
           - 'production'
+          - 'staging'
       mode:
         description: 'Cosa scansionare'
         required: true
@@ -79,8 +79,8 @@ jobs:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           SYNC_MODE: ${{ github.event.inputs.mode || 'both' }}
           SYNC_LIMIT: ${{ github.event.inputs.limit || '0' }}
-          MAX_BLOOPERS: ${{ github.event.inputs.max_bloopers || '10' }}
-          MAX_TRIVIA: ${{ github.event.inputs.max_trivia || '10' }}
+          MAX_BLOOPERS: ${{ github.event.inputs.max_bloopers || '15' }}
+          MAX_TRIVIA: ${{ github.event.inputs.max_trivia || '15' }}
           REPLACE_TRIVIA: ${{ github.event.inputs.replace_trivia || 'true' }}
           FORCE_ALL: ${{ github.event.inputs.force_all || 'true' }}
           GITHUB_EVENT_NAME: ${{ github.event_name }}

@@ -108,12 +108,29 @@ export default function AdminFilmsTab({ initialFilter = "all", onNavigateToConfi
       });
       const dataT = await resT.json();
 
+      if (!resB.ok && dataB.error) {
+        setActionMessage(`❌ Errore bloopers: ${dataB.error}`);
+        return;
+      }
+      if (!resT.ok && dataT.error) {
+        setActionMessage(`❌ Errore curiosità: ${dataT.error}`);
+        return;
+      }
+
       const addedB = dataB.results?.[0]?.generated || 0;
       const addedT = dataT.results?.[0]?.generated || 0;
+      const noteB = dataB.results?.[0]?.note || "";
+      const noteT = dataT.results?.[0]?.note || "";
 
-      setActionMessage(
-        `✨ "${film.titolo}" aggiornato con successo: +${addedB} blooper e +${addedT} curiosità verificate!`
-      );
+      if (addedB === 0 && addedT === 0) {
+        setActionMessage(
+          `ℹ️ "${film.titolo}": ${noteB || noteT || "Nessun nuovo elemento da aggiungere (archivio completo)"}`
+        );
+      } else {
+        setActionMessage(
+          `✨ "${film.titolo}" arricchito con successo: +${addedB} blooper e +${addedT} curiosità verificate!`
+        );
+      }
       await fetchFilms();
     } catch (err: any) {
       console.error("Errore scansione singolo film:", err);

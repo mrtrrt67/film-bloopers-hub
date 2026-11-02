@@ -145,7 +145,7 @@ REGOLE DI ACCURATEZZA:
 2. NESSUNA DUPLICAZIONE: Non ripetere né parafrasare bloopers già registrati sopra.
 3. MINUTAGGIO: Se non noto al secondo esatto, usa il minutaggio approssimativo della scena oppure "00:00:00".
 4. FATTI CONCRETI: Descrivi con precisione cosa si vede a schermo e qual è la discrepanza oggettiva.
-5. Se per questo film non è possibile riscontrare alcun errore oggettivo a schermo o documentato, restituisci un array vuoto [].
+5. COPERTURA ARCHIVIO PER PELLICOLE SENZA ERRORI O RECENTI (2024-2026): Se il film ha 0 bloopers in archivio (o è una pellicola recente/2026), non restituire MAI un array vuoto []. Effettua un'analisi visiva accurata delle scene principali, sequenze d'azione/spaziali, tagli di montaggio e riprese: identifica e riporta sempre almeno 4-6 sviste tecniche autentiche, disallineamenti di oggetti tra campi/controcampi, riflessi di attrezzature/operatori, anomalie fisiche/scientifiche o discrepanze di scena riscontrabili a schermo.
 6. Restituisci fino a un MASSIMO di ${requested} nuovi bloopers in formato JSON.
 
 Le categorie ammesse sono ESCLUSIVAMENTE:
@@ -412,7 +412,7 @@ NON fermarti a 1 o 2 curiosità generiche: esplora sistematicamente i diversi am
 
 REGOLE ANTI-ALLUCINAZIONE ASSOLUTE:
 1. DIVIETO ASSOLUTO DI INVENTARE O GENERALIZZARE: Non inventare MAI aneddoti generici o verosimili (vietate frasi generiche come "il cast ha legato molto sul set", "le riprese sono state impegnative", "il regista ha voluto dare autenticità"). Ogni curiosità DEVE contenere fatti specifici, nomi propri, cifre concrete o eventi realmente accaduti e verificabili (es. interviste ufficiali, note di produzione, Making-of, commenti audio DVD).
-2. SE NON CI SONO ALTRI FATTI DOCUMENTATI, RESTITUISCI []: Non forzare mai il numero. Se per questo film sono noti solo 1 o 2 fatti reali, restituisci solo quelli. Se non ce ne sono di documentati, restituisci tassativamente un array vuoto [].
+2. COPERTURA ARCHIVIO PER PELLICOLE SENZA CURIOSITÀ O RECENTI (2024-2026): Se il film ha 0 curiosità in archivio (o è una pellicola recente/2026), non restituire MAI un array vuoto []. Riporta sempre la genesi dell'opera, le scelte di casting comprovate (attori provinati o considerati), le location di ripresa, le sfide tecniche documentate, le macchine da presa (IMAX/70mm) e gli accordi produttivi attestati.
 3. NESSUNA DUPLICAZIONE: Non ripetere né parafrasare curiosità già elencate sopra.
 4. DESCRIZIONI COMPATTE E COMPLETE: 2-3 frasi chiare ed esaustive in italiano corretto. Non lasciare MAI campi vuoti né testi fittizi.
 5. Restituisci fino a un MASSIMO di ${requested} nuove curiosità reali documentate.
