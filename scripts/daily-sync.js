@@ -626,7 +626,11 @@ async function main() {
               console.warn(`   ⚠️ Errore salvataggio bloopers: ${errIns.message}`);
             }
           } else {
-            console.log(`   🎯 Bloopers: archivio già completo al 100% (nessun altro blooper reale documentato)`);
+            if (existingDescriptions.length > 0) {
+              console.log(`   🎯 Bloopers: archivio già completo al 100% (${existingDescriptions.length} bloopers autentici già registrati)`);
+            } else {
+              console.log(`   ⚪ Bloopers: nessun blooper reale documentato su fonti note per questo titolo (0 presenti)`);
+            }
             filmState.bloopersExhausted = true;
           }
         } else {
@@ -674,7 +678,11 @@ async function main() {
               console.warn(`   ⚠️ Errore salvataggio curiosità: ${errIns.message}`);
             }
           } else {
-            console.log(`   ✨ Curiosità: nessun ulteriore fatto reale documentato (archivio completo)`);
+            if (existingTrivia.length > 0) {
+              console.log(`   ✨ Curiosità: archivio già completo al 100% (${existingTrivia.length} curiosità autentiche già registrate)`);
+            } else {
+              console.log(`   ⚪ Curiosità: nessun retroscena verificato documentato su fonti note per questo titolo (0 presenti)`);
+            }
             filmState.triviaExhausted = true;
 
             // Anche se non ci sono nuove curiosità, eliminiamo quelle vecchie fittizie per ripulire la scheda
