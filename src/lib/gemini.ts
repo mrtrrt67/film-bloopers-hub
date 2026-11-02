@@ -134,20 +134,19 @@ DATI UFFICIALI DEL FILM:
 ${esclusioneText}
 
 COMPITO E SCANSIONE ESAUSTIVA A 360 GRADI${isSecondPass ? " (SECONDA PASSATA APPROFONDITA)" : ""}:
-Esegui una scansione approfondita e completa di TUTTI i bloopers, goofs ed errori documentati per questo film che MANCANO ancora nell'archivio.
-NON fermarti a 1 o 2 errori generici: esplora sistematicamente le diverse categorie e momenti del film:
-1. Errori di continuità di scena (oggetti, armi, abiti o ferite che cambiano posizione tra i tagli, vetri rotti che tornano intatti, luce/meteo incoerente tra inquadrature consecutive).
-2. Anacronismi ed errori storici/tecnologici (veicoli, marche, tecnologie, costumi o eventi posteriori all'anno di ambientazione o incongruenti con la realtà storica).
-3. Errori storici o fattuali documentati (incongruenze geografiche, procedure operative reali o discrepanze tecniche su mezzi/ambientazioni reali).
-4. Troupe o attrezzature visibili (microfoni boom, cavi di sicurezza degli stuntman, cameraman/operatori o riflessi visibili nelle inquadrature).
+Esegui una scansione di bloopers, goofs, errori di continuità e sviste tecniche riscontrabili nella pellicola o documentate da fonti cinematografiche (IMDb Goofs, MovieMistakes, recensioni tecniche, analisi visive, making-of e commenti di regia):
+1. Errori di continuità di scena (oggetti, armi, bicchieri, vestiti, ferite, pettinature o tagli di luce che cambiano tra inquadrature consecutive).
+2. Anacronismi ed errori scientifici o fattuali visibili (discrepanze tecnologiche, formule errate, comportamenti fisici anomali a schermo).
+3. Attrezzature o troupe visibili (cavi di sicurezza o stunt, microfoni boom, riflessi di operatori o cineprese su caschi, vetri o carrozzerie).
+4. Errori di montaggio, audio e sincronizzazione labiale.
 
-REGOLE ANTI-ALLUCINAZIONE ASSOLUTE:
-1. Riporta ESCLUSIVAMENTE errori reali, noti e riscontrabili nella pellicola o documentati su fonti autorevoli (IMDb, MovieMistakes, ecc.).
-2. DIVIETO ASSOLUTO DI INVENTARE: Riporta solo fatti reali. Se per questo film non esistono ulteriori bloopers documentati, restituisci ESCLUSIVAMENTE un array vuoto [].
-3. NESSUNA DUPLICAZIONE: Non ripetere, riassumere o riformulare gli errori già registrati nell'elenco sopra.
-4. NIENTE MINUTAGGI INVENTATI: Se non conosci con certezza il minuto esatto al secondo, usa "00:00:00" oppure approssima solo all'inizio della scena specifica.
-5. FATTI CONCRETI: Descrivi solo l'errore oggettivo documentato riscontrabile nella pellicola.
-6. Restituisci fino a un MASSIMO di ${requested} nuovi bloopers autentici documentati.
+REGOLE DI ACCURATEZZA:
+1. Riporta errori e incongruenze oggettive e riscontrabili a schermo.
+2. NESSUNA DUPLICAZIONE: Non ripetere né parafrasare bloopers già registrati sopra.
+3. MINUTAGGIO: Se non noto al secondo esatto, usa il minutaggio approssimativo della scena oppure "00:00:00".
+4. FATTI CONCRETI: Descrivi con precisione cosa si vede a schermo e qual è la discrepanza oggettiva.
+5. Se per questo film non è possibile riscontrare alcun errore oggettivo a schermo o documentato, restituisci un array vuoto [].
+6. Restituisci fino a un MASSIMO di ${requested} nuovi bloopers in formato JSON.
 
 Le categorie ammesse sono ESCLUSIVAMENTE:
 1. "Errori di scena / Posizione"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Sparkles, PlusCircle, AlertCircle, Filter, Send, Trophy, CheckCircle } from "lucide-react";
+import { Sparkles, PlusCircle, AlertCircle, Filter, Send, Trophy, CheckCircle, X, Check, AlertTriangle } from "lucide-react";
 import { Film, Blooper, BlooperCategoria } from "@/lib/types";
 import BlooperItem from "@/components/BlooperItem";
 import AuthModal from "@/components/AuthModal";
@@ -32,6 +32,12 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
   const [descrizione, setDescrizione] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(false);
+  const [toast, setToast] = useState<{ type: "success" | "error" | "info"; message: string } | null>(null);
+
+  const showToast = (type: "success" | "error" | "info", message: string) => {
+    setToast({ type, message });
+    setTimeout(() => setToast(null), 4500);
+  };
 
   const supabase = createClient();
 
@@ -92,18 +98,19 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
       });
 
       const data = await res.json();
-      if (res.ok && data.bloopers) {
+      if (res.ok && data.bloopers && data.bloopers.length > 0) {
         setBloopers((prev) => {
           const next = [...prev, ...data.bloopers];
           onBloopersUpdate?.(next);
           return next;
         });
+        showToast("success", `✨ Trovati e aggiunti con successo ${data.bloopers.length} nuovi blooper verificati!`);
       } else {
-        alert(data.error || "Impossibile generare bloopers con l'IA al momento.");
+        showToast("info", data.error || "Nessun nuovo blooper trovato per questa pellicola.");
       }
     } catch (err) {
       console.error(err);
-      alert("Si è verificato un errore di connessione.");
+      showToast("error", "Si è verificato un errore di connessione.");
     } finally {
       setGenerating(false);
     }
@@ -113,7 +120,7 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
   const handleSubmitReport = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user) {
-      alert("Devi essere loggato per inviare segnalazioni!");
+      showToast("error", "Devi effettuare l'accesso per inviare una segnalazione!");
       return;
     }
 
@@ -145,7 +152,7 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
         setShowSubmitModal(false);
       }, 2000);
     } catch (err: any) {
-      alert(err.message || "Errore durante l'invio della segnalazione.");
+      showToast("error", err.message || "Errore durante l'invio della segnalazione.");
     } finally {
       setSubmitting(false);
     }
@@ -456,6 +463,40 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
       />
+
+      {/* Notifica Toast Fluttuante Elegante Dark */}
+      {toast && (
+        <div className="fixed bottom-6 right-6 z-50 max-w-md animate-in fade-in slide-in-from-bottom-4 duration-300">
+          <div
+            className={`flex items-start gap-3 p-4 rounded-2xl border shadow-2xl backdrop-blur-md ${
+              toast.type === "success"
+                ? "bg-zinc-900/95 border-emerald-500/40 text-emerald-200 shadow-emerald-500/10"
+                : toast.type === "error"
+                ? "bg-zinc-900/95 border-rose-500/40 text-rose-200 shadow-rose-500/10"
+                : "bg-zinc-900/95 border-amber-500/40 text-amber-200 shadow-amber-500/10"
+            }`}
+          >
+            <div className="shrink-0 mt-0.5">
+              {toast.type === "success" ? (
+                <Check className="h-5 w-5 text-emerald-400" />
+              ) : toast.type === "error" ? (
+                <AlertTriangle className="h-5 w-5 text-rose-400" />
+              ) : (
+                <Sparkles className="h-5 w-5 text-amber-400" />
+              )}
+            </div>
+            <div className="flex-1 text-xs leading-relaxed font-medium">
+              {toast.message}
+            </div>
+            <button
+              onClick={() => setToast(null)}
+              className="text-zinc-400 hover:text-white transition -mr-1 -mt-1 p-1"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

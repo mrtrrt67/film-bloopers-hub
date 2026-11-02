@@ -102,7 +102,7 @@ export default function AdminPage() {
     { id: "users", label: "Gestione Utenti", icon: Users },
     { id: "moderation", label: "Moderazione Bloopers", icon: AlertTriangle },
     { id: "suggestions", label: "Suggerimenti", icon: MessageSquare },
-    { id: "config", label: "Testi & Promo", icon: Sliders },
+    { id: "config", label: "Configurazioni & Batch", icon: Sliders },
   ];
 
   return (
@@ -169,7 +169,7 @@ export default function AdminPage() {
         )}
 
         {activeTab === "films" && (
-          <AdminFilmsTab initialFilter={filmsFilter} />
+          <AdminFilmsTab initialFilter={filmsFilter} onNavigateToConfig={() => setActiveTab("config")} />
         )}
 
         {activeTab === "users" && (

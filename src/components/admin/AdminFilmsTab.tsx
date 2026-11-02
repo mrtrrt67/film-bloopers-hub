@@ -25,9 +25,10 @@ import AdminPagination from "./AdminPagination";
 
 interface AdminFilmsTabProps {
   initialFilter?: string;
+  onNavigateToConfig?: () => void;
 }
 
-export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabProps) {
+export default function AdminFilmsTab({ initialFilter = "all", onNavigateToConfig }: AdminFilmsTabProps) {
   const [films, setFilms] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -856,16 +857,28 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
             </div>
           </div>
 
-          <a
-            href="https://github.com/mrtrrt67/film-bloopers-hub/actions/workflows/daily-sync.yml"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-400 text-zinc-950 hover:brightness-110 active:scale-95 transition shadow-lg shadow-amber-500/10 whitespace-nowrap min-h-[38px]"
-            title="Apri GitHub Actions per avviare la scansione manuale estemporanea"
-          >
-            <span>⚡ Lancia Scansione Cloud</span>
-            <ExternalLink className="h-3.5 w-3.5" />
-          </a>
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            {onNavigateToConfig && (
+              <button
+                type="button"
+                onClick={onNavigateToConfig}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 hover:border-amber-500/40 transition whitespace-nowrap"
+                title="Apri la scheda Configurazioni per attivare/disattivare il batch o modificare i target di bloopers e curiosità"
+              >
+                <span>⚙️ Configura o Disattiva Batch</span>
+              </button>
+            )}
+            <a
+              href="https://github.com/mrtrrt67/film-bloopers-hub/actions/workflows/daily-sync.yml"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-400 text-zinc-950 hover:brightness-110 active:scale-95 transition shadow-lg shadow-amber-500/10 whitespace-nowrap"
+              title="Apri GitHub Actions per avviare la scansione manuale estemporanea"
+            >
+              <span>⚡ Lancia Scansione Cloud</span>
+              <ExternalLink className="h-3.5 w-3.5" />
+            </a>
+          </div>
         </div>
 
         {/* METRICHE STATO ARCHIVIO (4 BOX COMPATTI) */}
