@@ -69,6 +69,7 @@ export async function POST(request: Request) {
     const db = hasServiceKey ? createAdminClient() : supabase;
 
     const body = await request.json().catch(() => ({}));
+    const filmId = body?.filmId ? Number(body.filmId) : null;
     const limit = Math.min(Number(body?.limit) || 1, 10);
     const maxNewPerFilm = Math.min(Math.max(1, Number(body?.maxNewPerFilm) || 5), 50);
     const mode = body?.mode || "scan_missing"; // "scan_missing" (predefinito) oppure "quota"
@@ -91,6 +92,7 @@ export async function POST(request: Request) {
 
     const candidateFilms = mappedFilms
       .filter((f: any) => {
+        if (filmId) return f.id === filmId;
         if (excludeIds.includes(f.id)) return false;
         if (mode === "quota") {
           return f.currentCount < targetCount;
@@ -194,8 +196,8 @@ export async function POST(request: Request) {
           approvato: true,
           conferme: 0,
           contestazioni: 0,
-          inserito_da: "IA (Archivio)",
-          provenienza: "ia",
+          inserito_da: "IA (Admin)",
+          provenienza: "IA Verificata",
         }));
 
         let insertErr = null;

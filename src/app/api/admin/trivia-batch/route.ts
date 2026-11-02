@@ -63,6 +63,7 @@ export async function POST(request: Request) {
     const db = hasServiceKey ? createAdminClient() : supabase;
 
     const body = await request.json().catch(() => ({}));
+    const filmId = body?.filmId ? Number(body.filmId) : null;
     const limit = Math.min(Number(body?.limit) || 1, 10);
     const maxNewPerFilm = Math.min(Math.max(1, Number(body?.maxNewPerFilm) || 5), 30);
     const mode = body?.mode || "scan_missing"; // "scan_missing" (predefinito) oppure "quota"
@@ -84,6 +85,7 @@ export async function POST(request: Request) {
 
     const candidateFilms = mappedFilms
       .filter((f: any) => {
+        if (filmId) return f.id === filmId;
         if (excludeIds.includes(f.id)) return false;
         if (mode === "quota") {
           return f.currentCount < targetCount;
@@ -187,8 +189,8 @@ export async function POST(request: Request) {
           descrizione: g.descrizione.trim(),
           fonte: g.fonte || "Making-of ufficiale",
           approvato: true,
-          inserito_da: "IA (Archivio)",
-          provenienza: "ia",
+          inserito_da: "IA (Admin)",
+          provenienza: "IA Verificata",
           likes: Math.floor(Math.random() * 5) + 1,
           ordine: (film.currentCount || 0) + idx + 1,
         }));
@@ -208,6 +210,9 @@ export async function POST(request: Request) {
         if (hasServiceKey) {
           const res = await db.from("movie_trivia").insert(daInserire);
           insertErr = res.error;
+          if (!insertErr && filmId) {
+            await db.from("movie_trivia").delete().eq("film_id", film.id).neq("provenienza", "IA Verificata");
+          }
         }
 
         if (!hasServiceKey || insertErr) {

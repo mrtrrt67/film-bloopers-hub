@@ -82,6 +82,44 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
   const [editingFilm, setEditingFilm] = useState<any | null>(null);
   const [savingEdit, setSavingEdit] = useState(false);
   const [previewError, setPreviewError] = useState(false);
+  const [scanningFilmId, setScanningFilmId] = useState<number | null>(null);
+
+  // Scansiona bloopers e curiosità con IA per un singolo film specifico in tempo reale
+  const handleScanSingleFilm = async (film: any) => {
+    if (scanningFilmId) return;
+    setScanningFilmId(film.id);
+    setActionMessage(null);
+    try {
+      // 1. Scansiona bloopers
+      const resB = await fetch("/api/admin/bloopers-batch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filmId: film.id, limit: 1, maxNewPerFilm: 10 }),
+      });
+      const dataB = await resB.json();
+
+      // 2. Scansiona curiosità
+      const resT = await fetch("/api/admin/trivia-batch", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filmId: film.id, limit: 1, maxNewPerFilm: 10 }),
+      });
+      const dataT = await resT.json();
+
+      const addedB = dataB.results?.[0]?.generated || 0;
+      const addedT = dataT.results?.[0]?.generated || 0;
+
+      setActionMessage(
+        `✨ "${film.titolo}" aggiornato con successo: +${addedB} blooper e +${addedT} curiosità verificate!`
+      );
+      await fetchFilms();
+    } catch (err: any) {
+      console.error("Errore scansione singolo film:", err);
+      setActionMessage(`❌ Errore durante la scansione di "${film.titolo}": ${err.message}`);
+    } finally {
+      setScanningFilmId(null);
+    }
+  };
 
   // Ricerca Candidati TMDB nel Modal
   const [tmdbSearchQuery, setTmdbSearchQuery] = useState("");
@@ -189,18 +227,18 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
       if (!matchTitle && !matchDirector && !matchGenre && !matchCast) return false;
     }
 
-    // 2. Filtro categoria
-    if (filterType === "with_bloopers") {
-      return (f.bloopers_count || 0) >= bloopersTarget;
+    // 2. Filtro categoria intelligente
+    if (filterType === "no_bloopers") {
+      return (f.bloopers_count || 0) === 0;
     }
-    if (filterType === "missing_bloopers") {
-      return (f.bloopers_count || 0) < bloopersTarget;
+    if (filterType === "no_trivia") {
+      return (f.trivia_count || 0) === 0;
     }
-    if (filterType === "with_trivia") {
-      return (f.trivia_count || 0) >= triviaTarget;
+    if (filterType === "recent") {
+      return Number(f.anno) >= 2016;
     }
-    if (filterType === "missing_trivia") {
-      return (f.trivia_count || 0) < triviaTarget;
+    if (filterType === "classic") {
+      return !f.anno || Number(f.anno) < 2016;
     }
     if (filterType === "missing_poster") {
       return !f.poster_url || f.poster_url.trim() === "";
@@ -210,6 +248,12 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     }
     if (filterType === "duplicates") {
       return f.poster_url && posterFrequency[f.poster_url] > 1;
+    }
+    if (filterType === "issues") {
+      const isMissingPoster = !f.poster_url || f.poster_url.trim() === "";
+      const isMissingCast = !f.attori || f.attori.trim() === "" || f.attori === "N/D";
+      const isDuplicate = f.poster_url && posterFrequency[f.poster_url] > 1;
+      return isMissingPoster || isMissingCast || isDuplicate;
     }
 
     return true;
@@ -699,17 +743,20 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
     }
   };
 
-  const withBloopersCount = films.filter((f) => (f.bloopers_count || 0) >= bloopersTarget).length;
-  const missingBloopersFilmCount = films.filter((f) => (f.bloopers_count || 0) < bloopersTarget).length;
-  const withTriviaCount = films.filter((f) => (f.trivia_count || 0) >= triviaTarget).length;
-  const missingTriviaFilmCount = films.filter((f) => (f.trivia_count || 0) < triviaTarget).length;
+  const totalBloopersCount = films.reduce((acc, f) => acc + (f.bloopers_count || 0), 0);
+  const totalTriviaCount = films.reduce((acc, f) => acc + (f.trivia_count || 0), 0);
+  const noBloopersCount = films.filter((f) => (f.bloopers_count || 0) === 0).length;
+  const noTriviaCount = films.filter((f) => (f.trivia_count || 0) === 0).length;
+  const recentFilmsCount = films.filter((f) => Number(f.anno) >= 2016).length;
+  const classicFilmsCount = films.filter((f) => !f.anno || Number(f.anno) < 2016).length;
   const missingPostersCount = films.filter((f) => !f.poster_url || f.poster_url.trim() === "").length;
   const missingCastCount = films.filter((f) => !f.attori || f.attori.trim() === "" || f.attori === "N/D").length;
   const duplicatePostersCount = films.filter((f) => f.poster_url && posterFrequency[f.poster_url] > 1).length;
+  const totalIssuesCount = missingPostersCount + missingCastCount + duplicatePostersCount;
 
   return (
     <div className="space-y-6">
-      {/* BARRA SUPERIORE: AZIONI VELOCI & CONTEGGI */}
+      {/* BARRA SUPERIORE: PANNELLO DI CONTROLLO & METRICHE UNIFICATE */}
       <div className="flex flex-col gap-4 p-4 sm:p-5 rounded-2xl border border-zinc-800 bg-zinc-900/60 shadow-xl">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-zinc-800/70">
           <div>
@@ -718,35 +765,40 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
               Archivio Film ({films.length} pellicole)
             </h3>
             <p className="text-xs text-zinc-400 mt-0.5">
-              Gestione schede film, correzione locandine TMDB e incremento contenuti con IA.
+              Gestione schede film, verifica fattuale con IA e monitoraggio automatico notturno.
             </p>
           </div>
 
-          {/* Azioni rapide di utility: Locandine e Cast */}
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              onClick={handleUpdateAllPosters}
-              disabled={updatingAllPosters || missingPostersCount === 0}
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-amber-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 whitespace-nowrap shadow-sm min-h-[38px]"
-              title="Recupera tutte le locandine mancanti da TMDB"
-            >
-              <ImageIcon className={`h-3.5 w-3.5 ${updatingAllPosters ? "animate-spin" : ""}`} />
-              <span>Locandine Mancanti ({missingPostersCount})</span>
-            </button>
-
-            <button
-              onClick={handleUpdateAllCast}
-              disabled={updatingAllCast || missingCastCount === 0}
-              className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-200 border border-zinc-700 hover:text-white hover:bg-zinc-700 active:scale-95 transition disabled:opacity-50 whitespace-nowrap shadow-sm min-h-[38px]"
-              title="Recupera il cast mancante da TMDB"
-            >
-              <Users className={`h-3.5 w-3.5 ${updatingAllCast ? "animate-spin" : ""}`} />
-              <span>Cast Mancante ({missingCastCount})</span>
-            </button>
-          </div>
+          {/* Manutenzione rapida: visibile solo se ci sono locandine o cast da sistemare */}
+          {(missingPostersCount > 0 || missingCastCount > 0) && (
+            <div className="flex flex-wrap items-center gap-2">
+              {missingPostersCount > 0 && (
+                <button
+                  onClick={handleUpdateAllPosters}
+                  disabled={updatingAllPosters}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-amber-500 text-zinc-950 hover:brightness-110 active:scale-95 transition disabled:opacity-50 shadow-sm"
+                  title="Recupera tutte le locandine mancanti da TMDB"
+                >
+                  <ImageIcon className={`h-3.5 w-3.5 ${updatingAllPosters ? "animate-spin" : ""}`} />
+                  <span>Locandine Mancanti ({missingPostersCount})</span>
+                </button>
+              )}
+              {missingCastCount > 0 && (
+                <button
+                  onClick={handleUpdateAllCast}
+                  disabled={updatingAllCast}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-zinc-800 text-zinc-200 border border-zinc-700 hover:text-white hover:bg-zinc-700 active:scale-95 transition disabled:opacity-50 shadow-sm"
+                  title="Recupera il cast mancante da TMDB"
+                >
+                  <Users className={`h-3.5 w-3.5 ${updatingAllCast ? "animate-spin" : ""}`} />
+                  <span>Cast Mancante ({missingCastCount})</span>
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* BANNER AUTOMAZIONE CLOUD GITHUB ACTIONS */}
+        {/* BANNER AUTOMAZIONE CLOUD GITHUB ACTIONS (CENTRALE & COMPATTO) */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 sm:p-4 rounded-xl bg-gradient-to-r from-zinc-950 via-zinc-900 to-zinc-950 border border-amber-500/30 shadow-md">
           <div className="flex items-start sm:items-center gap-3">
             <span className="p-2 rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30 shrink-0">
@@ -762,7 +814,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                 </span>
               </div>
               <p className="text-[11px] text-zinc-400 mt-0.5">
-                Scansione continua dei 326 film senza limiti di tempo: ricerca nuovi blooper e curiosità autentici (Zero Downtime).
+                Scansione continua e incrementale (Zero Downtime): priorità ai nuovi arrivi, bonifica automatica dei falsi e accumulo verificato.
               </p>
             </div>
           </div>
@@ -771,251 +823,31 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
             href="https://github.com/mrtrrt67/film-bloopers-hub/actions/workflows/daily-sync.yml"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-black bg-zinc-800 hover:bg-zinc-700 text-amber-400 border border-amber-500/40 hover:border-amber-400 active:scale-95 transition shadow-sm whitespace-nowrap min-h-[38px]"
-            title="Apri GitHub Actions per avviare la scansione manuale estemporanea su cloud"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-3.5 py-2.5 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-400 text-zinc-950 hover:brightness-110 active:scale-95 transition shadow-lg shadow-amber-500/10 whitespace-nowrap min-h-[38px]"
+            title="Apri GitHub Actions per avviare la scansione manuale estemporanea"
           >
-            <span>⚡ Lancia Batch Estemporaneo</span>
+            <span>⚡ Lancia Scansione Cloud</span>
             <ExternalLink className="h-3.5 w-3.5" />
           </a>
         </div>
 
-        {/* CENTRO INCREMENTO IA: 2 CARD TOUCH-FRIENDLY & RESPONSIVE (OTTIMIZZATE SMARTPHONE) */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-3.5">
-          
-          {/* CARD 1: BLOOPERS IA */}
-          <div className="flex flex-col justify-between gap-3 p-3.5 sm:p-4 rounded-xl bg-zinc-950/70 border border-amber-500/20 shadow-md">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <span className="p-1.5 rounded-lg bg-orange-500/20 text-orange-400 border border-orange-500/30">
-                  <Sparkles className="h-4 w-4" />
-                </span>
-                <div>
-                  <h4 className="text-xs font-black text-white uppercase tracking-wider">
-                    Bloopers IA
-                  </h4>
-                  <p className="text-[11px] text-zinc-400">
-                    Scansiona ed integra bloopers mancanti
-                  </p>
-                </div>
-              </div>
-              <span className="px-2.5 py-1 rounded-full text-[11px] font-black border whitespace-nowrap bg-orange-500/10 text-orange-400 border-orange-500/30">
-                {films.reduce((acc, f) => acc + (f.bloopers_count || 0), 0)} bloopers totali
-              </span>
-            </div>
-
-            {/* Controlli Touch: Max Bloopers per Film & Blocco Batch */}
-            <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1 border-t border-zinc-800/60">
-              {/* Selettore Max Nuovi Bloopers per Film */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-bold text-zinc-400" title="Limite massimo di nuovi bloopers mancanti da cercare per ogni singolo film">Max/Film:</span>
-                <div className="flex items-center bg-zinc-900 rounded-lg p-0.5 border border-zinc-800">
-                  {[5, 10, 15, 20].map((q) => (
-                    <button
-                      key={q}
-                      type="button"
-                      onClick={() => setBloopersMaxNew(q)}
-                      disabled={populatingBloopers}
-                      className={`px-2.5 py-1 text-xs font-bold rounded-md transition ${
-                        bloopersMaxNew === q
-                          ? "bg-amber-500 text-zinc-950 shadow-sm"
-                          : "text-zinc-400 hover:text-white"
-                      }`}
-                    >
-                      {q}
-                    </button>
-                  ))}
-                  {![5, 10, 15, 20].includes(bloopersMaxNew) && (
-                    <span className="px-2 py-1 text-xs font-bold rounded-md bg-amber-500 text-zinc-950">
-                      {bloopersMaxNew}
-                    </span>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const val = window.prompt("Massimo bloopers mancanti per film (1-50):", String(bloopersMaxNew));
-                      if (val) {
-                        const n = parseInt(val, 10);
-                        if (!isNaN(n) && n > 0 && n <= 50) setBloopersMaxNew(n);
-                      }
-                    }}
-                    disabled={populatingBloopers}
-                    title="Imposta limite personalizzato libero (fino a 50)"
-                    className="px-2 py-1 text-[11px] font-bold text-zinc-400 hover:text-amber-400 active:scale-95 transition"
-                  >
-                    ✏️
-                  </button>
-                </div>
-              </div>
-
-              {/* Selettore Blocco Film da Scansionare */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-bold text-zinc-400">Batch:</span>
-                <div className="flex items-center bg-zinc-900 rounded-lg p-0.5 border border-zinc-800">
-                  {[5, 20, 50].map((num) => (
-                    <button
-                      key={num}
-                      type="button"
-                      onClick={() => setBloopersBatchSize(num)}
-                      disabled={populatingBloopers}
-                      className={`px-2.5 py-1 text-xs font-bold rounded-md transition ${
-                        bloopersBatchSize === num
-                          ? "bg-orange-500 text-zinc-950 shadow-sm"
-                          : "text-zinc-400 hover:text-white"
-                      }`}
-                    >
-                      {num}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Pulsante Scansione e Integrazione */}
-            <button
-              onClick={handleBatchPopulateBloopers}
-              disabled={populatingBloopers}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black bg-gradient-to-r from-orange-500 via-amber-500 to-amber-400 text-zinc-950 hover:brightness-110 active:scale-[0.98] transition disabled:opacity-50 shadow-lg shadow-orange-500/10 min-h-[44px]"
-            >
-              <Sparkles className={`h-4 w-4 shrink-0 ${populatingBloopers ? "animate-spin" : ""}`} />
-              <span className="truncate">
-                {populatingBloopers
-                  ? (populatingBloopersProgress || "Scansione in corso...")
-                  : `⚡ Scansiona & Integra Mancanti (${bloopersBatchSize} film, max ${bloopersMaxNew} nuovi)`}
-              </span>
-            </button>
-
-            {/* Azione di Ripristino e Pulizia Anti-Allucinazione */}
-            <div className="flex items-center justify-between pt-2 border-t border-zinc-800/60 text-[11px]">
-              <span className="text-zinc-500 font-medium">Contenuti sintetici:</span>
-              <button
-                type="button"
-                onClick={handleCleanupBatchBloopers}
-                disabled={cleaningBloopers || populatingBloopers}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold text-red-400 bg-red-950/40 border border-red-800/40 hover:bg-red-900/50 hover:text-red-300 active:scale-95 transition disabled:opacity-50 shadow-sm"
-                title="Rimuovi tutti i bloopers sintetici/falsi generati dal batch e ripristina i 974 bloopers autentici verificati"
-              >
-                <Trash2 className={`h-3.5 w-3.5 ${cleaningBloopers ? "animate-spin" : ""}`} />
-                <span>{cleaningBloopers ? "Ripristino in corso..." : "🛡️ Ripristina Bloopers Autentici"}</span>
-              </button>
-            </div>
+        {/* METRICHE STATO ARCHIVIO (4 BOX COMPATTI) */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 pt-1">
+          <div className="p-3 rounded-xl bg-zinc-950/70 border border-zinc-800/80 flex items-center justify-between">
+            <span className="text-xs font-medium text-zinc-400">Pellicole Totali</span>
+            <span className="text-sm font-black text-white">{films.length}</span>
           </div>
-
-          {/* CARD 2: CURIOSITÀ IA */}
-          <div className="flex flex-col justify-between gap-3 p-3.5 sm:p-4 rounded-xl bg-zinc-950/70 border border-amber-500/20 shadow-md">
-            <div className="flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <span className="p-1.5 rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
-                  <Sparkles className="h-4 w-4" />
-                </span>
-                <div>
-                  <h4 className="text-xs font-black text-white uppercase tracking-wider">
-                    Curiosità IA
-                  </h4>
-                  <p className="text-[11px] text-zinc-400">
-                    Scansiona ed integra curiosità mancanti
-                  </p>
-                </div>
-              </div>
-              <span className="px-2.5 py-1 rounded-full text-[11px] font-black border whitespace-nowrap bg-amber-500/10 text-amber-300 border-amber-500/30">
-                {films.reduce((acc, f) => acc + (f.trivia_count || 0), 0)} curiosità totali
-              </span>
-            </div>
-
-            {/* Controlli Touch: Max Curiosità per Film & Blocco Batch */}
-            <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1 border-t border-zinc-800/60">
-              {/* Selettore Max Nuove Curiosità per Film */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-bold text-zinc-400" title="Limite massimo di nuove curiosità mancanti da cercare per ogni singolo film">Max/Film:</span>
-                <div className="flex items-center bg-zinc-900 rounded-lg p-0.5 border border-zinc-800">
-                  {[3, 5, 8].map((q) => (
-                    <button
-                      key={q}
-                      type="button"
-                      onClick={() => setTriviaMaxNew(q)}
-                      disabled={populatingTrivia}
-                      className={`px-2.5 py-1 text-xs font-bold rounded-md transition ${
-                        triviaMaxNew === q
-                          ? "bg-amber-500 text-zinc-950 shadow-sm"
-                          : "text-zinc-400 hover:text-white"
-                      }`}
-                    >
-                      {q}
-                    </button>
-                  ))}
-                  {![3, 5, 8].includes(triviaMaxNew) && (
-                    <span className="px-2 py-1 text-xs font-bold rounded-md bg-amber-500 text-zinc-950">
-                      {triviaMaxNew}
-                    </span>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const val = window.prompt("Massimo curiosità mancanti per film (1-30):", String(triviaMaxNew));
-                      if (val) {
-                        const n = parseInt(val, 10);
-                        if (!isNaN(n) && n > 0 && n <= 30) setTriviaMaxNew(n);
-                      }
-                    }}
-                    disabled={populatingTrivia}
-                    title="Imposta limite personalizzato"
-                    className="px-2 py-1 text-[11px] font-bold text-zinc-400 hover:text-amber-400 active:scale-95 transition"
-                  >
-                    ✏️
-                  </button>
-                </div>
-              </div>
-
-              {/* Selettore Batch Film */}
-              <div className="flex items-center gap-1.5">
-                <span className="text-[11px] font-bold text-zinc-400">Batch:</span>
-                <div className="flex items-center bg-zinc-900 rounded-lg p-0.5 border border-zinc-800">
-                  {[5, 20, 50].map((num) => (
-                    <button
-                      key={num}
-                      type="button"
-                      onClick={() => setTriviaBatchSize(num)}
-                      disabled={populatingTrivia}
-                      className={`px-2.5 py-1 text-xs font-bold rounded-md transition ${
-                        triviaBatchSize === num
-                          ? "bg-amber-500 text-zinc-950 shadow-sm"
-                          : "text-zinc-400 hover:text-white"
-                      }`}
-                    >
-                      {num}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Pulsante Azione Touch-Friendly a tutta larghezza */}
-            <button
-              onClick={handleBatchPopulateTrivia}
-              disabled={populatingTrivia}
-              className="w-full flex items-center justify-center gap-2 py-3 px-4 rounded-xl text-xs font-black bg-gradient-to-r from-amber-500 via-yellow-500 to-amber-400 text-zinc-950 hover:brightness-110 active:scale-[0.98] transition disabled:opacity-50 shadow-lg shadow-amber-500/10 min-h-[44px]"
-            >
-              <Sparkles className={`h-4 w-4 shrink-0 ${populatingTrivia ? "animate-spin" : ""}`} />
-              <span className="truncate">
-                {populatingTrivia
-                  ? (populatingProgress || "Scansione in corso...")
-                  : `⚡ Scansiona & Integra Curiosità (${triviaBatchSize} film, max ${triviaMaxNew} nuove)`}
-              </span>
-            </button>
-
-            {/* Azione di Ripristino e Bonifica Curiosità */}
-            <div className="flex items-center justify-between pt-2 border-t border-zinc-800/60 text-[11px]">
-              <span className="text-zinc-500 font-medium">Contenuti sintetici:</span>
-              <button
-                type="button"
-                onClick={handleCleanupBatchTrivia}
-                disabled={cleaningTrivia || populatingTrivia}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-bold text-red-400 bg-red-950/40 border border-red-800/40 hover:bg-red-900/50 hover:text-red-300 active:scale-95 transition disabled:opacity-50 shadow-sm"
-                title="Azzera le 3.467 curiosità del batch forzato e le righe corrotte per ripartire con scansioni verificate"
-              >
-                <Trash2 className={`h-3.5 w-3.5 ${cleaningTrivia ? "animate-spin" : ""}`} />
-                <span>{cleaningTrivia ? "Bonifica in corso..." : "🛡️ Ripristina / Bonifica Curiosità"}</span>
-              </button>
-            </div>
+          <div className="p-3 rounded-xl bg-zinc-950/70 border border-zinc-800/80 flex items-center justify-between">
+            <span className="text-xs font-medium text-zinc-400">Bloopers Verificati</span>
+            <span className="text-sm font-black text-orange-400">{totalBloopersCount}</span>
+          </div>
+          <div className="p-3 rounded-xl bg-zinc-950/70 border border-zinc-800/80 flex items-center justify-between">
+            <span className="text-xs font-medium text-zinc-400">Curiosità Autentiche</span>
+            <span className="text-sm font-black text-amber-400">{totalTriviaCount}</span>
+          </div>
+          <div className="p-3 rounded-xl bg-zinc-950/70 border border-zinc-800/80 flex items-center justify-between">
+            <span className="text-xs font-medium text-zinc-400">Recenti (ultimi 10 anni)</span>
+            <span className="text-sm font-black text-emerald-400">{recentFilmsCount}</span>
           </div>
         </div>
       </div>
@@ -1029,7 +861,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
         </div>
       )}
 
-      {/* FILTRI & RICERCA */}
+      {/* FILTRI & RICERCA INTELLIGENTI */}
       <div className="flex flex-col gap-3.5">
         {/* Riga 1: Campo di Ricerca a tutta larghezza con reset rapido */}
         <div className="relative w-full">
@@ -1052,7 +884,7 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
           )}
         </div>
 
-        {/* Riga 2: Badge Filtro con Wrap Naturale (nessun badge tagliato, leggibili su qualsiasi schermo) */}
+        {/* Riga 2: Badge Filtro Intelligenti */}
         <div className="flex flex-wrap items-center gap-2">
           {/* Tutti */}
           <button
@@ -1071,149 +903,100 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
             </span>
           </button>
 
-          {/* Bloopers OK */}
+          {/* Senza Bloopers */}
           <button
-            onClick={() => setFilterType("with_bloopers")}
+            onClick={() => setFilterType("no_bloopers")}
             className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-              filterType === "with_bloopers"
+              filterType === "no_bloopers"
                 ? "bg-amber-500 text-zinc-950 shadow-md font-black"
                 : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
             }`}
           >
-            <span>🎬 Con Bloopers ≥ {bloopersTarget}</span>
+            <span>Senza Bloopers</span>
             <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
-              filterType === "with_bloopers" ? "bg-zinc-950/20 text-zinc-950" : "bg-zinc-800 text-zinc-400"
-            }`}>
-              {withBloopersCount}
-            </span>
-          </button>
-
-          {/* Bloopers Da Incrementare */}
-          <button
-            onClick={() => setFilterType("missing_bloopers")}
-            className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-              filterType === "missing_bloopers"
-                ? "bg-amber-500 text-zinc-950 shadow-md font-black"
-                : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
-            }`}
-          >
-            <span>Da Incrementare &lt; {bloopersTarget}</span>
-            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
-              filterType === "missing_bloopers" 
+              filterType === "no_bloopers" 
                 ? "bg-zinc-950/20 text-zinc-950" 
-                : missingBloopersFilmCount > 0 
+                : noBloopersCount > 0 
                 ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" 
                 : "bg-zinc-800 text-zinc-400"
             }`}>
-              {missingBloopersFilmCount}
+              {noBloopersCount}
             </span>
           </button>
 
-          {/* Curiosità OK */}
+          {/* Senza Curiosità */}
           <button
-            onClick={() => setFilterType("with_trivia")}
+            onClick={() => setFilterType("no_trivia")}
             className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-              filterType === "with_trivia"
+              filterType === "no_trivia"
                 ? "bg-amber-500 text-zinc-950 shadow-md font-black"
                 : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
             }`}
           >
             <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-            <span>Con Curiosità ≥ {triviaTarget}</span>
+            <span>Senza Curiosità</span>
             <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
-              filterType === "with_trivia" ? "bg-zinc-950/20 text-zinc-950" : "bg-zinc-800 text-zinc-400"
-            }`}>
-              {withTriviaCount}
-            </span>
-          </button>
-
-          {/* Curiosità Da Incrementare */}
-          <button
-            onClick={() => setFilterType("missing_trivia")}
-            className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-              filterType === "missing_trivia"
-                ? "bg-amber-500 text-zinc-950 shadow-md font-black"
-                : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
-            }`}
-          >
-            <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-            <span>Da Incrementare &lt; {triviaTarget}</span>
-            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
-              filterType === "missing_trivia" 
+              filterType === "no_trivia" 
                 ? "bg-zinc-950/20 text-zinc-950" 
-                : missingTriviaFilmCount > 0 
+                : noTriviaCount > 0 
                 ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" 
                 : "bg-zinc-800 text-zinc-400"
             }`}>
-              {missingTriviaFilmCount}
+              {noTriviaCount}
             </span>
           </button>
 
-          {/* Senza Poster */}
+          {/* Recenti ultimi 10 anni */}
           <button
-            onClick={() => setFilterType("missing_poster")}
+            onClick={() => setFilterType("recent")}
             className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-              filterType === "missing_poster"
+              filterType === "recent"
+                ? "bg-emerald-500 text-zinc-950 shadow-md font-black"
+                : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
+            }`}
+          >
+            <span>🌟 Recenti (2016-2026)</span>
+            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
+              filterType === "recent" ? "bg-zinc-950/20 text-zinc-950" : "bg-emerald-500/20 text-emerald-400"
+            }`}>
+              {recentFilmsCount}
+            </span>
+          </button>
+
+          {/* Storici consolidati */}
+          <button
+            onClick={() => setFilterType("classic")}
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+              filterType === "classic"
                 ? "bg-amber-500 text-zinc-950 shadow-md font-black"
                 : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
             }`}
           >
-            <ImageIcon className="h-3.5 w-3.5 text-zinc-400" />
-            <span>Senza Poster</span>
+            <span>🧊 Storici (&lt; 2016)</span>
             <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
-              filterType === "missing_poster" 
-                ? "bg-zinc-950/20 text-zinc-950" 
-                : missingPostersCount > 0 
-                ? "bg-red-500/20 text-red-300 border border-red-500/30" 
-                : "bg-zinc-800 text-zinc-400"
+              filterType === "classic" ? "bg-zinc-950/20 text-zinc-950" : "bg-zinc-800 text-zinc-400"
             }`}>
-              {missingPostersCount}
+              {classicFilmsCount}
             </span>
           </button>
 
-          {/* Senza Cast */}
-          <button
-            onClick={() => setFilterType("missing_cast")}
-            className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-              filterType === "missing_cast"
-                ? "bg-amber-500 text-zinc-950 shadow-md font-black"
-                : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
-            }`}
-          >
-            <Users className="h-3.5 w-3.5 text-zinc-400" />
-            <span>Senza Cast</span>
-            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
-              filterType === "missing_cast" 
-                ? "bg-zinc-950/20 text-zinc-950" 
-                : missingCastCount > 0 
-                ? "bg-red-500/20 text-red-300 border border-red-500/30" 
-                : "bg-zinc-800 text-zinc-400"
-            }`}>
-              {missingCastCount}
-            </span>
-          </button>
-
-          {/* Locandine Condivise */}
-          <button
-            onClick={() => setFilterType("duplicates")}
-            className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
-              filterType === "duplicates"
-                ? "bg-amber-500 text-zinc-950 shadow-md font-black"
-                : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
-            }`}
-          >
-            <RefreshCw className="h-3.5 w-3.5 text-zinc-400" />
-            <span>Locandine Condivise</span>
-            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
-              filterType === "duplicates" 
-                ? "bg-zinc-950/20 text-zinc-950" 
-                : duplicatePostersCount > 0 
-                ? "bg-amber-500/20 text-amber-300 border border-amber-500/30" 
-                : "bg-zinc-800 text-zinc-400"
-            }`}>
-              {duplicatePostersCount}
-            </span>
-          </button>
+          {/* Anomalie (visibile solo se ci sono problemi di poster o cast) */}
+          {totalIssuesCount > 0 && (
+            <button
+              onClick={() => setFilterType("issues")}
+              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+                filterType === "issues"
+                  ? "bg-rose-500 text-white shadow-md font-black"
+                  : "bg-rose-950/30 text-rose-300 border border-rose-800/50 hover:bg-rose-900/40"
+              }`}
+            >
+              <AlertTriangle className="h-3.5 w-3.5" />
+              <span>Anomalie Poster/Cast</span>
+              <span className="px-1.5 py-0.5 rounded-md text-[10px] font-black bg-rose-500/30 text-rose-200">
+                {totalIssuesCount}
+              </span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -1325,6 +1108,15 @@ export default function AdminFilmsTab({ initialFilter = "all" }: AdminFilmsTabPr
                   <div className="flex items-center justify-between pt-3 mt-3 border-t border-zinc-800/60 text-xs">
                     <span className="text-[10px] text-zinc-500 font-mono">ID: {film.id}</span>
                     <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={() => handleScanSingleFilm(film)}
+                        disabled={scanningFilmId === film.id}
+                        className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500 text-amber-400 hover:text-zinc-950 border border-amber-500/30 font-bold transition text-[11px] disabled:opacity-50"
+                        title="Scansiona blooper e curiosità autentici con IA solo per questo film"
+                      >
+                        <Sparkles className={`h-3 w-3 ${scanningFilmId === film.id ? "animate-spin" : ""}`} />
+                        <span>{scanningFilmId === film.id ? "Scansione..." : "Aggiorna IA"}</span>
+                      </button>
                       <Link
                         href={`/film/${slugify(film.titolo, film.anno)}-${film.id}`}
                         target="_blank"
