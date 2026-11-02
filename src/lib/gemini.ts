@@ -2,11 +2,12 @@ import { GoogleGenAI } from "@google/genai";
 import { BlooperCategoria, TriviaCategoria } from "./types";
 
 const DEFAULT_MODELS = [
+  "gemini-3.5-flash-lite",
   "gemini-flash-lite-latest",
-  "gemini-3.5-flash",
-  "gemini-3-flash-preview",
   "gemini-3.6-flash",
+  "gemini-3-flash-preview",
   "gemini-3.8-flash",
+  "gemini-3.5-flash",
   "gemini-3.7-flash",
   "gemini-flash-latest",
 ];
@@ -114,18 +115,19 @@ export async function generateBloopersForMovie(params: {
   const prompt = `Sei un archivista e verificatore cinematografico specializzato in bloopers, goofs ed errori di montaggio reali e documentati.
 
 DATI UFFICIALI DEL FILM:
-- Titolo: "${titolo}" (${anno || "N/D"})
+- Titolo registrato: "${titolo}" (${anno || "N/D"})
 - Regia: ${regista || "N/D"}
 - Cast: ${attori || "N/D"}
 - Sinossi: ${trama || "N/D"}
+- RICONOSCIMENTO TITOLI INTERNAZIONALI: Se il film è straniero o noto internazionalmente con titolo differente da quello italiano (es. Psycho per Psyco, The Birds per Gli Uccelli, Despicable Me per Cattivissimo me, Home Alone per Mamma ho perso l'aereo, Gladiator per Il gladiatore, ecc.), fai riferimento sia al titolo italiano che a quello originale/inglese per attingere all'intero catalogo globale di errori (IMDb Goofs, MovieMistakes, Bloopers.it per film italiani, commenti DVD, making-of).
 ${esclusioneText}
 
 COMPITO:
 Analizza attentamente gli errori già registrati per questa pellicola.
-Identifica e restituisci tutti gli ALTRI bloopers, goofs o errori di scena REALI, NOTI e DOCUMENTATI (fonti: MovieMistakes, IMDb Goofs, commenti audio DVD, interviste e making-of) che MANCANO ancora nell'archivio, fino a un MASSIMO di ${requested} nuovi bloopers.
+Identifica e restituisci tutti gli ALTRI bloopers, goofs, errori di continuità visiva (bicchieri/oggetti che si spostano, ferite o vestiti incoerenti tra tagli), microfoni o operatori visibili, anacronismi ed errori storici REALI, NOTI e DOCUMENTATI che MANCANO ancora nell'archivio, fino a un MASSIMO di ${requested} nuovi bloopers.
 
 REGOLE ANTI-ALLUCINAZIONE ASSOLUTE:
-1. DIVIETO ASSOLUTO DI INVENTARE: Non inventare mai errori. Se tutti gli errori noti della pellicola sono già presenti nell'archivio, oppure se non ne esistono altri documentati, restituisci ESCLUSIVAMENTE un array vuoto [].
+1. DIVIETO ASSOLUTO DI INVENTARE: Non inventare mai errori. Riporta solo sviste di continuità, errori tecnici o fattuali realmente documentati. Se tutti gli errori noti della pellicola sono già presenti nell'archivio, oppure se non ne esistono altri documentati, restituisci ESCLUSIVAMENTE un array vuoto [].
 2. NESSUNA DUPLICAZIONE: Non ripetere, riassumere o riformulare gli errori già registrati nell'elenco sopra.
 3. NIENTE MINUTAGGI INVENTATI: Se non conosci con certezza il minuto esatto al secondo, usa "00:00:00" oppure approssima solo all'inizio della scena specifica.
 4. FATTI CONCRETI: Descrivi solo l'errore oggettivo documentato riscontrabile nella pellicola.
@@ -157,7 +159,7 @@ Restituisci ESCLUSIVAMENTE un array JSON valido, senza testo introduttivo né co
         contents: prompt,
         config: {
           responseMimeType: "application/json",
-          temperature: 0.0,
+          temperature: 0.2,
         },
       });
       const t1 = performance.now();
@@ -201,7 +203,7 @@ Restituisci ESCLUSIVAMENTE un array JSON valido, senza testo introduttivo né co
         contents: prompt,
         config: {
           responseMimeType: "application/json",
-          temperature: 0.0,
+          temperature: 0.2,
         },
       });
       const t1 = performance.now();
@@ -295,10 +297,11 @@ export async function generateTriviaForMovie(params: {
   const prompt = `Sei un rigoroso storico del cinema e documentarista specializzato in retroscena di produzione, aneddoti di casting e segreti dal set reali, comprovati e verificabili.
 
 DATI UFFICIALI DEL FILM:
-- Titolo: "${titolo}" (${anno || "N/D"})
+- Titolo registrato: "${titolo}" (${anno || "N/D"})
 - Regia: ${regista || "N/D"}
 - Cast: ${attori || "N/D"}
 - Sinossi: ${trama || "N/D"}
+- NOTA TITOLI INTERNAZIONALI: Considera sia il titolo italiano che il titolo originale/internazionale (es. Gladiator per Il gladiatore, Pulp Fiction, The Shining, ecc.) per attingere all'intero archivio globale di aneddoti, retroscena di produzione, casting e curiosità documentate.
 ${esclusioneText}
 
 COMPITO:
@@ -341,7 +344,7 @@ Restituisci ESCLUSIVAMENTE un array JSON valido, senza testo introduttivo né co
         contents: prompt,
         config: {
           responseMimeType: "application/json",
-          temperature: 0.0,
+          temperature: 0.2,
         },
       });
       const t1 = performance.now();
@@ -386,7 +389,7 @@ Restituisci ESCLUSIVAMENTE un array JSON valido, senza testo introduttivo né co
         contents: prompt,
         config: {
           responseMimeType: "application/json",
-          temperature: 0.0,
+          temperature: 0.2,
         },
       });
       const t1 = performance.now();
