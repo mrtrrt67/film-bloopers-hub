@@ -441,6 +441,60 @@ async function getSyncState() {
   return { verifiedFilms: {} };
 }
 
+async function recordBatchRunLog(entry) {
+  try {
+    try {
+      await supabase.from('log_batch_sync').insert({
+        id: entry.id,
+        started_at: entry.started_at,
+        ended_at: entry.ended_at,
+        duration_sec: entry.duration_sec,
+        status: entry.status,
+        status_label: entry.status_label,
+        trigger: entry.trigger,
+        target_env: entry.target_env,
+        mode: entry.mode,
+        films_total_catalog: entry.films_total_catalog,
+        films_scanned: entry.films_scanned,
+        films_modified_count: entry.films_modified_count,
+        films_skipped_count: entry.films_skipped_count,
+        bloopers_added: entry.bloopers_added,
+        trivia_added: entry.trivia_added,
+        old_trivia_cleaned: entry.old_trivia_cleaned,
+        errors_count: entry.errors_count,
+        ai_calls_count: entry.ai_calls_count,
+        estimated_tokens: entry.estimated_tokens,
+        estimated_cost_eur: entry.estimated_cost_eur,
+        model_primary: entry.model_primary,
+        modified_films: entry.modified_films || [],
+        notes: entry.notes || ''
+      });
+    } catch (tblErr) {}
+
+    const { data: cfgRow } = await supabase
+      .from('configurazioni')
+      .select('valore')
+      .eq('chiave', 'daily_sync_history')
+      .maybeSingle();
+
+    let history = [];
+    if (cfgRow?.valore) {
+      try {
+        history = JSON.parse(cfgRow.valore);
+      } catch (err) {}
+    }
+    history = [entry, ...history.filter(h => h.id !== entry.id)].slice(0, 50);
+
+    await supabase.from('configurazioni').upsert({
+      chiave: 'daily_sync_history',
+      valore: JSON.stringify(history),
+      visibile: false,
+    }, { onConflict: 'chiave' });
+  } catch (err) {
+    console.warn("⚠️ Avviso salvataggio log batch:", err.message);
+  }
+}
+
 async function saveSyncState(state) {
   try {
     await supabase.from('configurazioni').upsert({
@@ -470,6 +524,7 @@ async function main() {
   const isScheduledRun = !process.env.GITHUB_EVENT_NAME || process.env.GITHUB_EVENT_NAME === 'schedule';
   const isForceRun = hasFlag('force-run') || getArg('force-run', 'false') === 'true';
 
+  const batchStartTime = new Date();
   if (!isEnabledInDb && isScheduledRun && !isForceRun) {
     console.log("\n==================================================================");
     console.log("⏸️ DAILY SYNC NOTTURNO DISATTIVATO DA PANNELLO ADMIN");
@@ -477,6 +532,31 @@ async function main() {
     console.log("   Nessuna elaborazione notturna eseguita (0 chiamate IA, 0 token consumati).");
     console.log("   Per riattivarlo: Pannello Admin -> Tab 'Configurazioni' -> 'Batch Notturno: ATTIVO'.");
     console.log("==================================================================");
+    await recordBatchRunLog({
+      id: 'batch_' + Date.now(),
+      started_at: batchStartTime.toISOString(),
+      ended_at: new Date().toISOString(),
+      duration_sec: 1,
+      status: 'disabled',
+      status_label: 'Disattivato da Admin',
+      trigger: isScheduledRun ? 'Cron Notturno (04:00)' : 'Manuale',
+      target_env: targetEnv,
+      mode: mode,
+      films_total_catalog: 0,
+      films_scanned: 0,
+      films_modified_count: 0,
+      films_skipped_count: 0,
+      bloopers_added: 0,
+      trivia_added: 0,
+      old_trivia_cleaned: 0,
+      errors_count: 0,
+      ai_calls_count: 0,
+      estimated_tokens: 0,
+      estimated_cost_eur: 0,
+      model_primary: 'Nessuno (Processo arrestato)',
+      modified_films: [],
+      notes: "Il batch notturno è impostato su 'Disattivato' nel pannello Admin. Nessuna chiamata effettuata (0 token, 0,00 €)."
+    });
     return;
   }
 
@@ -618,6 +698,10 @@ async function main() {
     oldTriviaCleaned: 0,
     errors: 0,
   };
+  const modifiedFilms = [];
+  let totalAiCalls = 0;
+  let estimatedTokens = 0;
+  let primaryModelUsed = GEMINI_MODELS[0] || 'gemini-flash-lite-latest';
 
   // 4. Scansione film per film
   console.log("🚀 [4/4] Avvio scansione con modello a temperatura 0.0...");
@@ -671,6 +755,9 @@ async function main() {
       const countBloopersToRequest = Math.min(bloopersNeeded, maxBloopersPerFilm);
       const countTriviaToRequest = Math.min(triviaNeeded > 0 ? triviaNeeded : maxTriviaPerFilm, maxTriviaPerFilm);
 
+      if (shouldScanBloopers) { totalAiCalls++; estimatedTokens += 1050; }
+      if (shouldScanTrivia) { totalAiCalls++; estimatedTokens += 1150; }
+
       // 2. Chiamate IA parallele concorrenti (velocità raddoppiata!)
       const [resBloopers, resTrivia] = await Promise.all([
         shouldScanBloopers
@@ -710,6 +797,12 @@ async function main() {
               const newTotal = existingDescriptions.length + valid.length;
               console.log(`   🎯 Bloopers: +${valid.length} autentici aggiunti (Totale film: ${newTotal}/${maxBloopersPerFilm})`);
               globalStats.bloopersAdded += valid.length;
+              const fIdx = modifiedFilms.findIndex(m => m.id === film.id);
+              if (fIdx !== -1) {
+                modifiedFilms[fIdx].bloopersAdded += valid.length;
+              } else {
+                modifiedFilms.push({ id: film.id, titolo: film.titolo, anno: film.anno, bloopersAdded: valid.length, triviaAdded: 0 });
+              }
               filmState.bloopersExhausted = newTotal >= maxBloopersPerFilm;
             } else {
               console.warn(`   ⚠️ Errore salvataggio bloopers: ${errIns.message}`);
@@ -751,6 +844,12 @@ async function main() {
               const newTotal = verifiedTrivia.length + valid.length;
               console.log(`   ✨ Curiosità: +${valid.length} autentiche aggiunte (Totale verificate: ${newTotal}/${maxTriviaPerFilm})`);
               globalStats.triviaAdded += valid.length;
+              const fIdx = modifiedFilms.findIndex(m => m.id === film.id);
+              if (fIdx !== -1) {
+                modifiedFilms[fIdx].triviaAdded += valid.length;
+              } else {
+                modifiedFilms.push({ id: film.id, titolo: film.titolo, anno: film.anno, bloopersAdded: 0, triviaAdded: valid.length });
+              }
               filmState.triviaExhausted = newTotal >= maxTriviaPerFilm;
 
               // Eliminazione automatica vecchie curiosità generiche fittizie
@@ -812,6 +911,39 @@ async function main() {
   }
 
   await saveSyncState({ verifiedFilms: verifiedMap });
+
+  const batchEndTime = new Date();
+  const durationSec = Math.round((batchEndTime.getTime() - batchStartTime.getTime()) / 1000);
+  const estimatedCostEur = Number(((estimatedTokens / 1000000) * 0.15).toFixed(4));
+  const skippedCount = filmsToProcess.length - modifiedFilms.length;
+  const status = globalStats.errors > 0 ? 'completed_with_warnings' : 'success';
+  const statusLabel = globalStats.errors > 0 ? 'Completato con Avvisi' : 'Riuscito (Flash-Lite)';
+
+  await recordBatchRunLog({
+    id: 'batch_' + batchStartTime.getTime(),
+    started_at: batchStartTime.toISOString(),
+    ended_at: batchEndTime.toISOString(),
+    duration_sec: durationSec,
+    status: status,
+    status_label: statusLabel,
+    trigger: isScheduledRun ? 'Cron Notturno (04:00)' : 'Manuale',
+    target_env: targetEnv,
+    mode: mode,
+    films_total_catalog: allFilms.length,
+    films_scanned: filmsToProcess.length,
+    films_modified_count: modifiedFilms.length,
+    films_skipped_count: skippedCount,
+    bloopers_added: globalStats.bloopersAdded,
+    trivia_added: globalStats.triviaAdded,
+    old_trivia_cleaned: globalStats.oldTriviaCleaned,
+    errors_count: globalStats.errors,
+    ai_calls_count: totalAiCalls,
+    estimated_tokens: estimatedTokens,
+    estimated_cost_eur: estimatedCostEur,
+    model_primary: primaryModelUsed,
+    modified_films: modifiedFilms,
+    notes: `Sincronizzazione completata: ${modifiedFilms.length} film arricchiti, ${skippedCount} film saltati perché già completi (0 token). Spesa stimata: ~${estimatedCostEur.toFixed(4)} €.`
+  });
 
   console.log("\n==================================================================");
   console.log("🏁 DAILY SYNC COMPLETATO!");

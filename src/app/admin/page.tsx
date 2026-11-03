@@ -96,9 +96,9 @@ export default function AdminPage() {
   }
 
   const tabsConfig: Array<{ id: AdminTab; label: string; icon: any }> = [
-    { id: "stats", label: "Traffico & Statistiche", icon: BarChart3 },
+    { id: "stats", label: "Statistiche", icon: BarChart3 },
     { id: "logs", label: "Log di Sistema", icon: FileText },
-    { id: "films", label: "Archivio Film & Manutenzione", icon: Film },
+    { id: "films", label: "Catalogo Film", icon: Film },
     { id: "users", label: "Gestione Utenti", icon: Users },
     { id: "moderation", label: "Moderazione Bloopers", icon: AlertTriangle },
     { id: "suggestions", label: "Suggerimenti", icon: MessageSquare },
@@ -136,26 +136,28 @@ export default function AdminPage() {
         </div>
       </div>
 
-      {/* BARRA TAB DI NAVIGAZIONE */}
-      <div className="flex items-center gap-2 border-b border-zinc-800 pb-4 mb-8 overflow-x-auto scrollbar-none">
-        {tabsConfig.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          return (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap ${
-                isActive
-                  ? "bg-amber-500 text-zinc-950 shadow-md shadow-amber-500/20"
-                  : "bg-zinc-900/80 text-zinc-400 border border-zinc-800 hover:text-white hover:border-zinc-700"
-              }`}
-            >
-              <Icon className="h-4 w-4" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
+      {/* BARRA TAB DI NAVIGAZIONE RESPONSIVA (MAI FUORI SCHERMO) */}
+      <div className="border-b border-zinc-800 pb-4 mb-8">
+        <div className="flex flex-wrap items-center gap-2">
+          {tabsConfig.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-2 px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl text-xs font-bold transition shrink-0 ${
+                  isActive
+                    ? "bg-amber-500 text-zinc-950 shadow-md shadow-amber-500/20"
+                    : "bg-zinc-900/80 text-zinc-400 border border-zinc-800 hover:text-white hover:border-zinc-700"
+                }`}
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                <span>{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* CONTENUTO DELLE TAB */}

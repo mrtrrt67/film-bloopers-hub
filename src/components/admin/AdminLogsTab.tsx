@@ -12,15 +12,17 @@ import {
   ChevronUp,
   Users,
   Ghost,
-  UserCheck
+  UserCheck,
+  Bot
 } from "lucide-react";
 import AdminPagination from "./AdminPagination";
+import AdminBatchLogsTable from "./AdminBatchLogsTable";
 import { deduplicateAccessRecords } from "@/lib/dedup-visits";
 
 export default function AdminLogsTab() {
-  const [subTab, setSubTab] = useState<"errors" | "calls" | "access">("errors");
+  const [subTab, setSubTab] = useState<"errors" | "calls" | "access" | "batch">("errors");
   const [accessFilter, setAccessFilter] = useState<"all" | "registered" | "guest">("all");
-  const [data, setData] = useState<any>({ aiErrors: [], recentAiCalls: [], recentAccess: [] });
+  const [data, setData] = useState<any>({ aiErrors: [], recentAiCalls: [], recentAccess: [], batchLogs: [] });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [expandedErrorId, setExpandedErrorId] = useState<number | string | null>(null);
@@ -101,7 +103,7 @@ export default function AdminLogsTab() {
     <div className="space-y-6">
       {/* HEADER & FILTRI */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             onClick={() => setSubTab("errors")}
             className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition ${
@@ -135,19 +137,32 @@ export default function AdminLogsTab() {
             <LogIn className="h-3.5 w-3.5" />
             Accessi ({rawAccess.length})
           </button>
+          <button
+            onClick={() => setSubTab("batch")}
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition ${
+              subTab === "batch"
+                ? "bg-amber-500/20 text-amber-300 border border-amber-500/40"
+                : "bg-zinc-900 text-zinc-400 border border-zinc-800 hover:text-white"
+            }`}
+          >
+            <Bot className="h-3.5 w-3.5 text-amber-400" />
+            Batch Sync ({(data?.batchLogs || []).length})
+          </button>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="relative flex-1 sm:w-64">
-            <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-zinc-500" />
-            <input
-              type="text"
-              placeholder={subTab === "access" ? "Cerca per username, ospite..." : "Filtra per film, modello..."}
-              value={filterText}
-              onChange={(e) => setFilterText(e.target.value)}
-              className="w-full rounded-xl bg-zinc-900 border border-zinc-800 pl-9 pr-3 py-1.5 text-xs text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500"
-            />
-          </div>
+          {subTab !== "batch" && (
+            <div className="relative flex-1 sm:w-64">
+              <Search className="absolute left-3 top-2.5 h-3.5 w-3.5 text-zinc-500" />
+              <input
+                type="text"
+                placeholder={subTab === "access" ? "Cerca per username, ospite..." : "Filtra per film, modello..."}
+                value={filterText}
+                onChange={(e) => setFilterText(e.target.value)}
+                className="w-full rounded-xl bg-zinc-900 border border-zinc-800 pl-9 pr-3 py-1.5 text-xs text-zinc-200 placeholder:text-zinc-600 focus:outline-none focus:border-amber-500"
+              />
+            </div>
+          )}
           <button
             onClick={fetchLogs}
             disabled={refreshing}
@@ -186,7 +201,7 @@ export default function AdminLogsTab() {
                           <th className="py-3 px-4">Dettagli Errore</th>
                         </tr>
                       </thead>
-                      <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
+                      <tbody className="divide-y border-zinc-800/60 text-zinc-300">
                         {paginatedErrors.map((e: any) => {
                           const isExpanded = expandedErrorId === e.id;
                           const detailText = typeof e.errore_dettaglio === "string" 
@@ -471,6 +486,15 @@ export default function AdminLogsTab() {
                 )}
               </div>
             </div>
+          )}
+
+          {/* 4. LOG BATCH SYNC */}
+          {subTab === "batch" && (
+            <AdminBatchLogsTable
+              logs={data?.batchLogs || []}
+              loading={refreshing}
+              onRefresh={fetchLogs}
+            />
           )}
         </>
       )}

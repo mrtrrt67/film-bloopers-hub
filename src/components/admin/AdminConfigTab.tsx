@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Sliders, Save, Check, Calendar, Eye, EyeOff, Sparkles, Trash2, Moon, Power } from "lucide-react";
 import { formatDateItalian } from "@/lib/utils";
 import ConfirmModal from "@/components/ConfirmModal";
+import AdminBatchLogsTable from "./AdminBatchLogsTable";
 
 const CONFIG_METADATA: Record<string, { label: string; desc?: string }> = {
   home_banner_top_testo: {
@@ -57,6 +58,8 @@ const CONFIG_METADATA: Record<string, { label: string; desc?: string }> = {
 
 export default function AdminConfigTab() {
   const [configs, setConfigs] = useState<any[]>([]);
+  const [batchLogs, setBatchLogs] = useState<any[]>([]);
+  const [loadingBatchLogs, setLoadingBatchLogs] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
@@ -122,8 +125,24 @@ export default function AdminConfigTab() {
     }
   };
 
+  const fetchBatchLogs = async () => {
+    try {
+      setLoadingBatchLogs(true);
+      const res = await fetch("/api/admin/logs?limit=50");
+      if (res.ok) {
+        const json = await res.json();
+        setBatchLogs(json.batchLogs || []);
+      }
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoadingBatchLogs(false);
+    }
+  };
+
   useEffect(() => {
     fetchConfigs();
+    fetchBatchLogs();
   }, []);
 
   const handleTextChange = (chiave: string, valore: string) => {
@@ -391,6 +410,14 @@ export default function AdminConfigTab() {
         </div>
       </div>
 
+      {/* 2.1 CRONOLOGIA & LOG DEL BATCH NOTTURNO */}
+      <AdminBatchLogsTable
+        logs={batchLogs}
+        loading={loadingBatchLogs}
+        onRefresh={fetchBatchLogs}
+        title="Cronologia & Log Esecuzioni Batch Notturno"
+      />
+
       {/* 3. ALTRE CONFIGURAZIONI & TESTI */}
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 p-5 space-y-4">
         <h4 className="text-xs font-black uppercase tracking-wider text-white">
@@ -513,4 +540,3 @@ export default function AdminConfigTab() {
     </div>
   );
 }
-
