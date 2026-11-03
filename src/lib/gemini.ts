@@ -6,9 +6,9 @@ const DEFAULT_MODELS = [
   "gemini-3.1-flash-lite",
   "gemini-3.5-flash-lite",
   "gemini-flash-latest",
-  "gemini-3.8-flash",
   "gemini-3.5-flash",
   "gemini-3.7-flash",
+  "gemini-3.8-flash",
 ];
 
 function getGeminiClient(): GoogleGenAI | null {
@@ -144,9 +144,9 @@ REGOLE DI ACCURATEZZA:
 2. NESSUNA DUPLICAZIONE: Non ripetere né parafrasare bloopers già registrati sopra.
 3. MINUTAGGIO: Se non noto al secondo esatto, usa il minutaggio approssimativo della scena oppure "00:00:00".
 4. FATTI CONCRETI: Descrivi con precisione cosa si vede a schermo e qual è la discrepanza oggettiva.
-5. RIGOROSA AUTENTICITÀ & GESTIONE ARCHIVIO:
-   a) SE L'ARCHIVIO CONTIENE GIÀ BLOOPERS (esclusioni > 0): Se per questo film non esistono ulteriori sviste, goofs o errori reali documentati oltre a quelli già registrati, restituisci TASSATIVAMENTE un array vuoto []. DIVIETO ASSOLUTO DI INVENTARE O FORZARE BLOOPERS FIITTIZI O PRESUNTI per soddisfare la richiesta.
-   b) SE IL FILM HA 0 BLOOPERS IN ARCHIVIO: Solo in questo caso di prima catalogazione, esamina accuratamente le sequenze chiave, i tagli di montaggio, i riflessi di produzione e le scene della pellicola per identificare le sviste tecniche e di continuità oggettive documentate.
+5. RIGOROSA AUTENTICITÀ & ARRICCHIMENTO CONTINUO:
+   - Esamina attentamente le altre sequenze del film, i cambi di inquadratura, i tagli di montaggio, i riflessi di produzione e le scene della pellicola per identificare ULTERIORI sviste tecniche e goofs reali documentati dalle fonti (IMDb Goofs, MovieMistakes, Bloopers.it) non ancora presenti tra quelli già registrati sopra.
+   - NON inventare bloopers fittizi: se e solo se per questa pellicola non esiste davvero alcun altro errore reale documentato oltre a quelli già registrati, restituisci []. Altrimenti estrai fino a ${requested} nuovi errori autentici documentati.
 6. Restituisci fino a un MASSIMO di ${requested} nuovi bloopers in formato JSON.
 
 Le categorie ammesse sono ESCLUSIVAMENTE:
@@ -189,7 +189,7 @@ async function executeSingleCallBloopers(
       if (!text) continue;
 
       const parsed = cleanAndParseJson<GeneratedBlooper[]>(text);
-      if (Array.isArray(parsed)) {
+      if (Array.isArray(parsed) && parsed.length > 0) {
         return {
           bloopers: parsed.map((item) => ({
             minuto: item.minuto || "00:00:00",
@@ -463,7 +463,7 @@ async function executeSingleCallTrivia(
       if (!text) continue;
 
       const parsed = cleanAndParseJson<GeneratedTrivia[]>(text);
-      if (Array.isArray(parsed)) {
+      if (Array.isArray(parsed) && parsed.length > 0) {
         return {
           trivia: parsed.map((item) => ({
             categoria: (item.categoria as TriviaCategoria) || "Curiosità & Retroscena",
