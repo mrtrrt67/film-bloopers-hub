@@ -19,6 +19,8 @@ import FilmContentSwitcher from "@/components/FilmContentSwitcher";
 import { getRelatedFilms } from "@/lib/recommendations";
 import { getFilmRatingInfo } from "@/lib/tmdb";
 import { StreamingAvailabilityCard } from "@/components/film/StreamingAvailabilityCard";
+import { headers, cookies } from "next/headers";
+import { getDictionary, isSupportedLocale, Locale, DEFAULT_LOCALE, getLocalizedDbText } from "@/i18n";
 
 export const dynamic = "force-dynamic";
 
@@ -107,7 +109,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const { film, bloopers, trivia } = data;
-  const title = `${film.titolo} (${film.anno || "N/D"}) — Errori, Bloopers e Curiosità`;
+  const headerList = await headers();
+  const cookieStore = await cookies();
+  const localeFromHeader = headerList.get("x-locale");
+  const localeFromCookie = cookieStore.get("fbh_locale")?.value;
+  const locale: Locale = isSupportedLocale(localeFromHeader)
+    ? localeFromHeader
+    : (isSupportedLocale(localeFromCookie) ? localeFromCookie : DEFAULT_LOCALE);
+  const dict = getDictionary(locale);
+  const localizedTitle = getLocalizedDbText(film.titoli_i18n, locale, film.titolo);
+  const title = `${localizedTitle} (${film.anno || "N/D"}) — ${dict.film.tabBloopers} & ${dict.film.tabTrivia}`;
   
   const countParts: string[] = [];
   if (bloopers?.length) countParts.push(`${bloopers.length} bloopers al minuto esatto`);
@@ -141,7 +152,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       film.genere || "",
     ].filter(Boolean),
     alternates: {
-      canonical: `/film/${slug}`,
+      canonical: locale === DEFAULT_LOCALE ? `/film/${slug}` : `/${locale}/film/${slug}`,
+      languages: {
+        "it": `/film/${slug}`,
+        "en": `/en/film/${slug}`,
+        "es": `/es/film/${slug}`,
+        "fr": `/fr/film/${slug}`,
+        "de": `/de/film/${slug}`,
+        "x-default": `/en/film/${slug}`,
+      },
     },
     openGraph: {
       title: `${title} | FilmBloopers Hub`,
@@ -175,6 +194,16 @@ export default async function FilmDetailPage({ params }: PageProps) {
   }
 
   const { film, bloopers: rawBloopers, trivia = [], relatedFilms = [], ratingInfo } = data;
+  const headerList = await headers();
+  const cookieStore = await cookies();
+  const localeFromHeader = headerList.get("x-locale");
+  const localeFromCookie = cookieStore.get("fbh_locale")?.value;
+  const locale: Locale = isSupportedLocale(localeFromHeader)
+    ? localeFromHeader
+    : (isSupportedLocale(localeFromCookie) ? localeFromCookie : DEFAULT_LOCALE);
+  const dict = getDictionary(locale);
+  const localizedTitle = getLocalizedDbText(film.titoli_i18n, locale, film.titolo);
+  const localizedPlot = getLocalizedDbText(film.trame_i18n, locale, film.trama);
 
   // Normalizza i bloopers calcolando conferme e contestazioni
   // (l'eventuale voto dell'utente connesso viene idratato client-side in modo trasparente senza rompere la cache Edge)
@@ -186,9 +215,22 @@ export default async function FilmDetailPage({ params }: PageProps) {
       ...b,
       conferme,
       contestazioni,
+      descrizione: getLocalizedDbText(b.descrizione_i18n, locale, b.descrizione),
       voto_utente: null,
     };
   });
+
+  const localizedBloopers = bloopers;
+  const localizedTrivia = trivia.map((t: any) => ({
+    ...t,
+    titolo: getLocalizedDbText(t.titolo_i18n, locale, t.titolo),
+    descrizione: getLocalizedDbText(t.descrizione_i18n, locale, t.descrizione),
+  }));
+  const localizedFilm = {
+    ...film,
+    titolo: localizedTitle,
+    trama: localizedPlot,
+  };
 
   const amazonTag = process.env.NEXT_PUBLIC_AMAZON_TAG || "filmbloopers-21";
   const amazonUrl = getAmazonSearchUrl(film.titolo, film.anno, amazonTag);
@@ -308,7 +350,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
               href="/esplora"
               className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900/80 backdrop-blur-md border border-zinc-800 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:text-white transition-colors"
             >
-              <ArrowLeft className="h-3.5 w-3.5" /> Torna al catalogo
+              <ArrowLeft className="h-3.5 w-3.5" /> {dict.common.back}
             </Link>
           </div>
         </div>
@@ -360,7 +402,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
                 </div>
 
                 <h1 className="text-xl font-black text-white tracking-tight leading-tight line-clamp-2">
-                  {film.titolo}
+                  {localizedTitle}
                 </h1>
                 
                 {film.regista && (
@@ -399,11 +441,11 @@ export default async function FilmDetailPage({ params }: PageProps) {
             {film.trama && (
               <details className="group rounded-xl border border-zinc-800/80 bg-zinc-900/30 p-3 text-xs">
                 <summary className="font-bold text-amber-400 cursor-pointer flex items-center justify-between">
-                  <span>Sinossi del Film</span>
+                  <span>{dict.film.plot}</span>
                   <span className="text-[10px] text-zinc-500 group-open:hidden">Mostra trama ▼</span>
                 </summary>
                 <p className="mt-2 text-zinc-300 leading-relaxed font-normal">
-                  {film.trama}
+                  {localizedPlot}
                 </p>
               </details>
             )}
@@ -499,7 +541,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight">
-                  {film.titolo}
+                  {localizedTitle}
                 </h1>
                 {film.original_title && film.original_title !== film.titolo && (
                   <p className="text-sm font-medium text-zinc-400 italic mt-0.5">
@@ -530,19 +572,19 @@ export default async function FilmDetailPage({ params }: PageProps) {
                 {/* Sinossi Trama Desktop */}
                 <div className="mt-5 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 p-5">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
-                    Sinossi del Film
+                    {dict.film.plot}
                   </h3>
                   <p className="text-sm text-zinc-300 leading-relaxed font-normal">
-                    {film.trama || "Trama al momento non disponibile."}
+                    {localizedPlot || "Trama al momento non disponibile."}
                   </p>
                 </div>
               </div>
 
               {/* Sezione Switcher Interattiva: Bloopers & Curiosità (In primo piano per tutti i dispositivi) */}
               <FilmContentSwitcher
-                film={film}
-                initialBloopers={bloopers}
-                initialTrivia={trivia}
+                film={localizedFilm}
+                initialBloopers={localizedBloopers}
+                initialTrivia={localizedTrivia}
               />
 
               {/* Sezione Film Correlati & Consigliati per SEO ed esplorazione */}

@@ -12,6 +12,8 @@ export interface Film {
   backdrop_url?: string | null;
   tmdb_collection_id?: number | null;
   slug?: string;
+  titoli_i18n?: Record<string, string> | null;
+  trame_i18n?: Record<string, string> | null;
   creato_il?: string;
   created_at?: string;
 }
@@ -29,6 +31,7 @@ export interface Blooper {
   minuto: string;
   categoria: BlooperCategoria;
   descrizione: string;
+  descrizione_i18n?: Record<string, string> | null;
   approvato: boolean;
   inserito_da?: string | null;
   provenienza?: "ia" | "utente";
@@ -54,7 +57,9 @@ export interface MovieTrivia {
   film_id: string | number;
   categoria: TriviaCategoria;
   titolo: string;
+  titolo_i18n?: Record<string, string> | null;
   descrizione: string;
+  descrizione_i18n?: Record<string, string> | null;
   fonte?: string | null;
   approvato: boolean;
   inserito_da?: string | null;

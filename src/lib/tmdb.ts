@@ -169,6 +169,55 @@ export async function getTMDBMovieDetails(
   }
 }
 
+/**
+ * Recupera i titoli e le trame ufficiali in tutte le 5 lingue supportate (IT, EN, ES, FR, DE)
+ */
+export async function fetchTMDBMultiLanguage(
+  tmdbId: number,
+  mediaType: "movie" | "tv" = "movie"
+): Promise<{
+  titoli: Record<string, string>;
+  trame: Record<string, string>;
+}> {
+  const apiKey = getApiKey();
+  const result = {
+    titoli: {} as Record<string, string>,
+    trame: {} as Record<string, string>,
+  };
+
+  if (!apiKey || !tmdbId) return result;
+
+  const languages = [
+    { code: "en", tmdb: "en-US" },
+    { code: "es", tmdb: "es-ES" },
+    { code: "fr", tmdb: "fr-FR" },
+    { code: "de", tmdb: "de-DE" },
+    { code: "it", tmdb: "it-IT" },
+  ];
+
+  const endpoint = mediaType === "tv" ? "tv" : "movie";
+
+  await Promise.all(
+    languages.map(async ({ code, tmdb }) => {
+      try {
+        const url = `${TMDB_API_BASE}/${endpoint}/${tmdbId}?api_key=${apiKey}&language=${tmdb}`;
+        const res = await fetch(url, { next: { revalidate: 86400 } });
+        if (res.ok) {
+          const data = await res.json();
+          const title = data.title || data.name || data.original_title || "";
+          const overview = data.overview || "";
+          if (title) result.titoli[code] = title;
+          if (overview) result.trame[code] = overview;
+        }
+      } catch (e) {
+        console.warn(`TMDB translation fetch error for ${code}:`, e);
+      }
+    })
+  );
+
+  return result;
+}
+
 export async function getTMDBCollection(collectionId: number) {
   const apiKey = getApiKey();
   if (!apiKey || !collectionId) return null;

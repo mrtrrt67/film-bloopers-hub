@@ -5,6 +5,7 @@ import { Film as FilmIcon, Lightbulb, Sparkles } from "lucide-react";
 import { Film, Blooper, MovieTrivia } from "@/lib/types";
 import BloopersSection from "@/app/film/[slug]/BloopersSection";
 import TriviaSection from "@/components/TriviaSection";
+import { useTranslation } from "@/i18n";
 
 import { createClient } from "@/lib/supabase/client";
 
@@ -19,6 +20,7 @@ export default function FilmContentSwitcher({
   initialBloopers,
   initialTrivia,
 }: FilmContentSwitcherProps) {
+  const { dict } = useTranslation();
   const [activeTab, setActiveTab] = useState<"bloopers" | "trivia">("bloopers");
   const [bloopers, setBloopers] = useState<Blooper[]>(initialBloopers);
   const [trivia, setTrivia] = useState<MovieTrivia[]>(initialTrivia);
@@ -130,7 +132,7 @@ export default function FilmContentSwitcher({
               }`}
             >
               <FilmIcon className="h-4 w-4" />
-              <span>Bloopers & Errori</span>
+              <span>{dict.film.tabBloopers}</span>
               <span
                 className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
                   activeTab === "bloopers"
@@ -153,7 +155,7 @@ export default function FilmContentSwitcher({
               }`}
             >
               <Lightbulb className="h-4 w-4" />
-              <span>Curiosità & Retroscena</span>
+              <span>{dict.film.tabTrivia}</span>
               <span
                 className={`px-2 py-0.5 rounded-full text-[11px] font-bold ${
                   activeTab === "trivia"
