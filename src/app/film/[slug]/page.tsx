@@ -407,7 +407,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
                 
                 {film.regista && (
                   <p className="text-xs text-zinc-400 mt-1 line-clamp-1">
-                    Regia: <span className="text-zinc-200 font-semibold">{film.regista}</span>
+                    {dict.film.director}: <span className="text-zinc-200 font-semibold">{film.regista}</span>
                   </p>
                 )}
 
@@ -553,7 +553,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
                 <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-3 rounded-2xl border border-zinc-800/80 bg-zinc-900/40 p-4 text-xs">
                   <div>
                     <span className="text-zinc-500 font-semibold block uppercase tracking-wider text-[10px]">
-                      Regia
+                      {dict.film.director}
                     </span>
                     <span className="text-zinc-200 font-bold text-sm">
                       {film.regista || "Non indicato"}
@@ -561,7 +561,7 @@ export default async function FilmDetailPage({ params }: PageProps) {
                   </div>
                   <div>
                     <span className="text-zinc-500 font-semibold block uppercase tracking-wider text-[10px]">
-                      Cast Principale
+                      {dict.film.cast}
                     </span>
                     <span className="text-zinc-300 line-clamp-1">
                       {film.attori || "Non indicato"}

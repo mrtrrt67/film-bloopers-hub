@@ -1,8 +1,11 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 import { Film as FilmIcon, AlertCircle, Sparkles } from "lucide-react";
 import { Film } from "@/lib/types";
 import { slugify } from "@/lib/utils";
+import { useTranslation, getLocalizedDbText } from "@/i18n";
 
 interface MovieCardProps {
   film: Film & {
@@ -13,8 +16,12 @@ interface MovieCardProps {
 }
 
 export default function MovieCard({ film }: MovieCardProps) {
-  const filmSlug = slugify(film.titolo, film.anno);
-  const href = `/film/${filmSlug}-${String(film.id)}`;
+  const { locale, dict, localizeHref } = useTranslation();
+
+  const localizedTitle = getLocalizedDbText(film.titoli_i18n, locale, film.titolo);
+  const filmSlug = slugify(localizedTitle || film.titolo, film.anno);
+  const rawHref = `/film/${filmSlug}-${String(film.id)}`;
+  const href = localizeHref(rawHref);
 
   return (
     <Link
@@ -26,7 +33,7 @@ export default function MovieCard({ film }: MovieCardProps) {
         {film.poster_url ? (
           <Image
             src={film.poster_url}
-            alt={film.titolo}
+            alt={localizedTitle}
             fill
             unoptimized
             sizes="(max-width: 768px) 50vw, (max-width: 1200px) 25vw, 20vw"
@@ -37,7 +44,7 @@ export default function MovieCard({ film }: MovieCardProps) {
           <div className="flex h-full w-full flex-col items-center justify-center p-4 text-center">
             <FilmIcon className="h-10 w-10 text-zinc-700 mb-2" />
             <span className="text-xs font-semibold text-zinc-500 line-clamp-2">
-              {film.titolo}
+              {localizedTitle}
             </span>
           </div>
         )}
@@ -68,12 +75,12 @@ export default function MovieCard({ film }: MovieCardProps) {
           {film.trivia_count !== undefined && film.trivia_count > 0 ? (
             <div className="flex items-center gap-1 rounded-lg bg-zinc-950/85 text-amber-300 border border-amber-500/40 backdrop-blur-md px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] font-bold shadow-md">
               <Sparkles className="h-3 w-3 shrink-0 text-amber-400" />
-              <span>{film.trivia_count} Curiosità</span>
+              <span>{film.trivia_count} {dict.film.tabTrivia.split("&")[0].trim()}</span>
             </div>
           ) : film.trivia_count === 0 ? (
             <div className="flex items-center gap-1 rounded-lg bg-zinc-950/75 text-zinc-400 border border-zinc-800 backdrop-blur-md px-2 py-0.5 sm:px-2.5 sm:py-1 text-[11px] font-medium shadow-md">
               <Sparkles className="h-3 w-3 shrink-0 text-zinc-400" />
-              <span>0 Curiosità</span>
+              <span>0 {dict.film.tabTrivia.split("&")[0].trim()}</span>
             </div>
           ) : null}
         </div>
@@ -82,10 +89,10 @@ export default function MovieCard({ film }: MovieCardProps) {
       {/* Info */}
       <div className="flex flex-col p-3.5">
         <h3 className="text-sm font-bold text-zinc-100 line-clamp-1 group-hover:text-amber-400 transition-colors">
-          {film.titolo}
+          {localizedTitle}
         </h3>
         <p className="text-xs text-zinc-400 line-clamp-1 mt-0.5">
-          {film.regista ? `Regia: ${film.regista}` : film.genere || "Cinema"}
+          {film.regista ? `${dict.film.director}: ${film.regista}` : film.genere || "Cinema"}
         </p>
       </div>
     </Link>

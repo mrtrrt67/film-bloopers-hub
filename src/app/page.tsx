@@ -6,7 +6,7 @@ import PromoBanner from "@/components/PromoBanner";
 import BlooperItem from "@/components/BlooperItem";
 import { Film, Blooper } from "@/lib/types";
 import { headers, cookies } from "next/headers";
-import { getDictionary, isSupportedLocale, Locale, DEFAULT_LOCALE } from "@/i18n";
+import { getDictionary, isSupportedLocale, Locale, DEFAULT_LOCALE, getLocalizedDbText } from "@/i18n";
 
 export const dynamic = "force-dynamic";
 function extractCount(field: any): number {
@@ -32,6 +32,7 @@ export default async function HomePage() {
     ? localeFromHeader
     : (isSupportedLocale(localeFromCookie) ? localeFromCookie : DEFAULT_LOCALE);
   const dict = getDictionary(locale);
+  const localizeUrl = (path: string) => (locale === DEFAULT_LOCALE ? path : `/${locale}${path}`);
 
   const supabase = createPublicClient();
 
@@ -46,7 +47,7 @@ export default async function HomePage() {
   ] = await Promise.all([
     supabase.from("configurazioni").select("chiave, valore, visibile"),
     supabase.from("films").select("*, errori(count), movie_trivia(count)").order("creato_il", { ascending: false }).limit(8),
-    supabase.from("errori").select("*, films(titolo, anno, id), voti_bloopers(tipo)").eq("approvato", true).order("creato_il", { ascending: false }).limit(4),
+    supabase.from("errori").select("*, films(titolo, anno, id, titoli_i18n), voti_bloopers(tipo)").eq("approvato", true).order("creato_il", { ascending: false }).limit(4),
     supabase.from("films").select("*", { count: "exact", head: true }),
     supabase.from("errori").select("*", { count: "exact", head: true }).eq("approvato", true),
     supabase.from("movie_trivia").select("*", { count: "exact", head: true }).eq("approvato", true),
@@ -78,6 +79,7 @@ export default async function HomePage() {
     const contestazioni = voti.filter((v: any) => v.tipo === "contestazione").length;
     return {
       ...b,
+      descrizione: getLocalizedDbText(b.descrizione_i18n, locale, b.descrizione),
       conferme,
       contestazioni,
     };
@@ -181,14 +183,14 @@ export default async function HomePage() {
           {/* Search CTA Box */}
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 max-w-xl mx-auto">
             <Link
-              href="/esplora"
+              href={localizeUrl("/esplora")}
               className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 px-4 sm:px-6 py-3.5 sm:py-4 text-sm sm:text-base font-black text-zinc-950 shadow-xl shadow-orange-500/20 hover:brightness-110 active:scale-98 transition-all whitespace-nowrap"
             >
               <Search className="h-4.5 w-4.5 sm:h-5 sm:w-5 shrink-0" />
               <span>{dict.home.exploreCta}</span>
             </Link>
             <Link
-              href="/classifica"
+              href={localizeUrl("/classifica")}
               className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-2xl border border-zinc-700 bg-zinc-900/80 px-4 sm:px-6 py-3.5 sm:py-4 text-sm sm:text-base font-bold text-white hover:bg-zinc-800 active:scale-98 transition-colors whitespace-nowrap"
             >
               <Trophy className="h-4.5 w-4.5 sm:h-5 sm:w-5 text-amber-400 shrink-0" />
@@ -231,17 +233,17 @@ export default async function HomePage() {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 mb-6">
           <div>
             <span className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
-              Esplora i Titoli
+              {dict.nav.explore}
             </span>
             <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-0.5 leading-tight">
               {dict.home.trendingFilms}
             </h2>
           </div>
           <Link
-            href="/esplora"
+            href={localizeUrl("/esplora")}
             className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors shrink-0 self-start sm:self-auto py-1"
           >
-            <span>Vedi tutti ({countFilms || 0})</span>
+            <span>{dict.common.all} ({countFilms || 0})</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
         </div>
@@ -265,17 +267,17 @@ export default async function HomePage() {
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 sm:gap-4 mb-6">
             <div>
               <span className="text-xs font-bold text-amber-400 uppercase tracking-wider block">
-                Ultime Novità
+                {dict.home.latestBloopers}
               </span>
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-0.5 leading-tight">
                 {dict.home.latestBloopers}
               </h2>
             </div>
             <Link
-              href="/esplora"
+              href={localizeUrl("/esplora")}
               className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors shrink-0 self-start sm:self-auto py-1"
             >
-              <span>Esplora tutti i bloopers</span>
+              <span>{dict.home.exploreCta}</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
@@ -287,7 +289,7 @@ export default async function HomePage() {
                   <div className="text-xs font-bold text-amber-400 mb-1 flex items-center gap-1.5">
                     <FilmIcon className="h-3.5 w-3.5" />
                     <span>
-                      {blooper.films.titolo} ({blooper.films.anno || "N/D"})
+                      {getLocalizedDbText(blooper.films.titoli_i18n, locale, blooper.films.titolo)} ({blooper.films.anno || "N/D"})
                     </span>
                   </div>
                 )}

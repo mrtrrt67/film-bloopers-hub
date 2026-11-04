@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Film, TMDBMovieResult } from "@/lib/types";
 import MovieCard from "@/components/MovieCard";
 import { slugify } from "@/lib/utils";
+import { useTranslation, getLocalizedDbText } from "@/i18n";
 
 
 function extractCount(field: any): number {
@@ -25,6 +26,7 @@ function extractCount(field: any): number {
 }
 
 export default function EsploraPage() {
+  const { locale, dict, localizeHref } = useTranslation();
   const [searchTerm, setSearchTerm] = useState("");
   const [dbFilms, setDbFilms] = useState<(Film & { bloopers_count?: number; trivia_count?: number })[]>([]);
   const [tmdbResults, setTmdbResults] = useState<TMDBMovieResult[]>([]);
@@ -138,7 +140,7 @@ export default function EsploraPage() {
       if (res.ok) {
         const data = await res.json();
         const filmSlug = slugify(data.film.titolo, data.film.anno);
-        router.push(`/film/${filmSlug}-${String(data.film.id)}`);
+        router.push(localizeHref(`/film/${filmSlug}-${String(data.film.id)}`));
       } else {
         const errData = await res.json().catch(() => ({}));
         alert(errData.error || "Impossibile importare la scheda del film.");
@@ -155,6 +157,7 @@ export default function EsploraPage() {
     const term = searchTerm.toLowerCase();
     return (
       (f.titolo && f.titolo.toLowerCase().includes(term)) ||
+      (getLocalizedDbText(f.titoli_i18n, locale, f.titolo).toLowerCase().includes(term)) ||
       (f.anno && String(f.anno).includes(term)) ||
       (f.regista && f.regista.toLowerCase().includes(term)) ||
       (f.attori && f.attori.toLowerCase().includes(term))
@@ -188,7 +191,7 @@ export default function EsploraPage() {
             }`}
           >
             <Database className="h-3.5 w-3.5" />
-            Catalogo Film ({filteredDbFilms.length})
+            {dict.nav.explore} ({filteredDbFilms.length})
           </button>
           <button
             onClick={() => setActiveTab("tmdb")}
@@ -221,13 +224,13 @@ export default function EsploraPage() {
               logSearchTerm(searchTerm);
             }
           }}
-          placeholder="Cerca per titolo, anno, regista o attore (es. Matrix, Il Gladiatore, Nolan)..."
+          placeholder={dict.common.searchPlaceholder}
           className="w-full rounded-2xl border border-zinc-800 bg-zinc-900/60 pl-12 pr-4 py-4 text-base text-white placeholder-zinc-500 backdrop-blur-md focus:border-amber-500 focus:outline-none focus:ring-2 focus:ring-amber-500/20 shadow-lg"
         />
         {loading && (
           <div className="absolute right-4 top-1/2 -translate-y-1/2 flex items-center gap-2 text-xs text-amber-400">
             <span className="h-4 w-4 animate-spin rounded-full border-2 border-amber-400 border-t-transparent" />
-            <span>Ricerca...</span>
+            <span>{dict.common.loading}</span>
           </div>
         )}
       </div>
