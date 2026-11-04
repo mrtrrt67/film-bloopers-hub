@@ -20,12 +20,13 @@ import { getRelatedFilms } from "@/lib/recommendations";
 import { getFilmRatingInfo } from "@/lib/tmdb";
 import { StreamingAvailabilityCard } from "@/components/film/StreamingAvailabilityCard";
 import { headers, cookies } from "next/headers";
-import { getDictionary, isSupportedLocale, Locale, DEFAULT_LOCALE, getLocalizedDbText } from "@/i18n";
+import { getDictionary, isSupportedLocale, Locale, DEFAULT_LOCALE, getLocalizedDbText, resolveLocale } from "@/i18n";
 
 export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
 async function getFilmData(slug: string) {
@@ -97,7 +98,7 @@ async function getFilmData(slug: string) {
   };
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const data = await getFilmData(slug);
 
@@ -109,13 +110,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   }
 
   const { film, bloopers, trivia } = data;
+
+  const resolvedSearchParams = searchParams ? await searchParams : {};
   const headerList = await headers();
   const cookieStore = await cookies();
-  const localeFromHeader = headerList.get("x-locale");
-  const localeFromCookie = cookieStore.get("fbh_locale")?.value;
-  const locale: Locale = isSupportedLocale(localeFromHeader)
-    ? localeFromHeader
-    : (isSupportedLocale(localeFromCookie) ? localeFromCookie : DEFAULT_LOCALE);
+  const locale = resolveLocale({ searchParams: resolvedSearchParams, headerList, cookieStore });
+
+
+
+
   const dict = getDictionary(locale);
   const localizedTitle = getLocalizedDbText(film.titoli_i18n, locale, film.titolo);
   const title = `${localizedTitle} (${film.anno || "N/D"}) — ${dict.film.tabBloopers} & ${dict.film.tabTrivia}`;
@@ -185,7 +188,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
-export default async function FilmDetailPage({ params }: PageProps) {
+export default async function FilmDetailPage({ params, searchParams }: PageProps) {
   const { slug } = await params;
   const data = await getFilmData(slug);
 
@@ -194,13 +197,16 @@ export default async function FilmDetailPage({ params }: PageProps) {
   }
 
   const { film, bloopers: rawBloopers, trivia = [], relatedFilms = [], ratingInfo } = data;
+
+
+  const resolvedSearchParams = searchParams ? await searchParams : {};
   const headerList = await headers();
   const cookieStore = await cookies();
-  const localeFromHeader = headerList.get("x-locale");
-  const localeFromCookie = cookieStore.get("fbh_locale")?.value;
-  const locale: Locale = isSupportedLocale(localeFromHeader)
-    ? localeFromHeader
-    : (isSupportedLocale(localeFromCookie) ? localeFromCookie : DEFAULT_LOCALE);
+  const locale = resolveLocale({
+    searchParams: resolvedSearchParams,
+    headerList,
+    cookieStore,
+  });
   const dict = getDictionary(locale);
   const localizedTitle = getLocalizedDbText(film.titoli_i18n, locale, film.titolo);
   const localizedPlot = getLocalizedDbText(film.trame_i18n, locale, film.trama);

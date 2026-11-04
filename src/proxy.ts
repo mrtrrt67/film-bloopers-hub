@@ -60,6 +60,7 @@ export function proxy(request: NextRequest) {
     // Esegui rewrite interno: l'URL nel browser rimane /en/film/... mentre Next renderizza la pagina /film/...
     const rewriteUrl = new URL(internalPath, request.url);
     rewriteUrl.search = request.nextUrl.search;
+    rewriteUrl.searchParams.set("locale", locale);
 
     const response = NextResponse.rewrite(rewriteUrl, {
       request: {

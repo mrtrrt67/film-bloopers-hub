@@ -6,7 +6,7 @@ import PromoBanner from "@/components/PromoBanner";
 import BlooperItem from "@/components/BlooperItem";
 import { Film, Blooper } from "@/lib/types";
 import { headers, cookies } from "next/headers";
-import { getDictionary, isSupportedLocale, Locale, DEFAULT_LOCALE, getLocalizedDbText } from "@/i18n";
+import { getDictionary, isSupportedLocale, Locale, DEFAULT_LOCALE, getLocalizedDbText, resolveLocale } from "@/i18n";
 
 export const dynamic = "force-dynamic";
 function extractCount(field: any): number {
@@ -23,14 +23,19 @@ function extractCount(field: any): number {
 }
 
 
-export default async function HomePage() {
+export default async function HomePage({ searchParams }: { searchParams?: Promise<{ [key: string]: string | string[] | undefined }> } = {}) {
+  const resolvedSearchParams = searchParams ? await searchParams : {};
   const headerList = await headers();
   const cookieStore = await cookies();
-  const localeFromHeader = headerList.get("x-locale");
-  const localeFromCookie = cookieStore.get("fbh_locale")?.value;
-  const locale: Locale = isSupportedLocale(localeFromHeader)
-    ? localeFromHeader
-    : (isSupportedLocale(localeFromCookie) ? localeFromCookie : DEFAULT_LOCALE);
+  const locale = resolveLocale({
+    searchParams: resolvedSearchParams,
+    headerList,
+    cookieStore,
+  });
+
+
+
+
   const dict = getDictionary(locale);
   const localizeUrl = (path: string) => (locale === DEFAULT_LOCALE ? path : `/${locale}${path}`);
 

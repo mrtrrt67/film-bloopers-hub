@@ -149,3 +149,67 @@ export function getLocalizedDbText(
   return original;
 }
 
+/**
+ * Risolve la lingua attiva da tutte le fonti possibili (searchParams, headers, URL system headers, cookies)
+ */
+export function resolveLocale({
+  searchParams,
+  headerList,
+  cookieStore,
+  pathname,
+}: {
+  searchParams?: Record<string, any> | null;
+  headerList?: { get(name: string): string | null } | null;
+  cookieStore?: { get(name: string): { value: string } | undefined } | null;
+  pathname?: string | null;
+} = {}): Locale {
+  // 1. Dalla query string (passata deterministicamente dal rewrite di proxy.ts)
+  const q = searchParams?.locale || searchParams?.__locale;
+  if (typeof q === "string" && isSupportedLocale(q)) {
+    return q;
+  }
+
+  // 2. Dagli header di richiesta
+  if (headerList) {
+    const h = headerList.get("x-locale");
+    if (isSupportedLocale(h)) {
+      return h;
+    }
+
+    const pathsToCheck = [
+      headerList.get("x-pathname"),
+      headerList.get("x-forwarded-uri"),
+      headerList.get("x-invoke-path"),
+      headerList.get("x-matched-path"),
+      headerList.get("next-url"),
+    ];
+
+    for (const p of pathsToCheck) {
+      if (p) {
+        const loc = extractLocaleFromPathname(p);
+        if (loc && loc !== DEFAULT_LOCALE) {
+          return loc;
+        }
+      }
+    }
+  }
+
+  // 3. Dal pathname fornito
+  if (pathname) {
+    const loc = extractLocaleFromPathname(pathname);
+    if (loc && loc !== DEFAULT_LOCALE) {
+      return loc;
+    }
+  }
+
+  // 4. Dal cookie del browser
+  if (cookieStore) {
+    const c = cookieStore.get("fbh_locale")?.value;
+    if (isSupportedLocale(c)) {
+      return c;
+    }
+  }
+
+  return DEFAULT_LOCALE;
+}
+

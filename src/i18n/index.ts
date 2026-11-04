@@ -12,6 +12,7 @@ import {
   buildLocalizedPath,
   getLocalizedDbText,
   isSupportedLocale,
+  resolveLocale,
 } from "./config";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback, useMemo } from "react";
