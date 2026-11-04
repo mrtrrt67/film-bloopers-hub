@@ -5,6 +5,8 @@ import MovieCard from "@/components/MovieCard";
 import PromoBanner from "@/components/PromoBanner";
 import BlooperItem from "@/components/BlooperItem";
 import { Film, Blooper } from "@/lib/types";
+import { headers, cookies } from "next/headers";
+import { getDictionary, isSupportedLocale, Locale, DEFAULT_LOCALE } from "@/i18n";
 
 export const dynamic = "force-dynamic";
 function extractCount(field: any): number {
@@ -22,6 +24,15 @@ function extractCount(field: any): number {
 
 
 export default async function HomePage() {
+  const headerList = await headers();
+  const cookieStore = await cookies();
+  const localeFromHeader = headerList.get("x-locale");
+  const localeFromCookie = cookieStore.get("fbh_locale")?.value;
+  const locale: Locale = isSupportedLocale(localeFromHeader)
+    ? localeFromHeader
+    : (isSupportedLocale(localeFromCookie) ? localeFromCookie : DEFAULT_LOCALE);
+  const dict = getDictionary(locale);
+
   const supabase = createPublicClient();
 
   // Caricamento parallelo ad alte prestazioni e dati in tempo reale
@@ -156,15 +167,15 @@ export default async function HomePage() {
         <div className="mx-auto max-w-3xl">
           <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-amber-500/30 px-3.5 sm:px-4 py-1.5 text-[11px] sm:text-xs font-black text-amber-400 mb-6 max-w-full">
             <Flame className="h-4 w-4" />
-            <span>L&apos;Archivio Ufficiale di Bloopers, Curiosità & Retroscena del Cinema</span>
+            <span>{dict.home.heroBadge}</span>
           </div>
 
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black text-white tracking-tight leading-[1.15] mb-6">
-            Bloopers, Errori e Curiosità nella Storia del Cinema
+            {dict.home.heroTitle}
           </h1>
 
           <p className="text-base sm:text-lg text-zinc-300 leading-relaxed font-normal mb-8">
-            Microfoni nell&apos;inquadratura, oggetti che cambiano posizione, aneddoti esclusivi di backstage e segreti di produzione: scopri gli errori più clamorosi e le curiosità più affascinanti sfuggiti al montaggio finale.
+            {dict.home.heroSubtitle}
           </p>
 
           {/* Search CTA Box */}
@@ -174,14 +185,14 @@ export default async function HomePage() {
               className="w-full sm:w-auto flex-1 flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 px-4 sm:px-6 py-3.5 sm:py-4 text-sm sm:text-base font-black text-zinc-950 shadow-xl shadow-orange-500/20 hover:brightness-110 active:scale-98 transition-all whitespace-nowrap"
             >
               <Search className="h-4.5 w-4.5 sm:h-5 sm:w-5 shrink-0" />
-              <span>Cerca o Aggiungi un Film</span>
+              <span>{dict.home.exploreCta}</span>
             </Link>
             <Link
               href="/classifica"
               className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-2xl border border-zinc-700 bg-zinc-900/80 px-4 sm:px-6 py-3.5 sm:py-4 text-sm sm:text-base font-bold text-white hover:bg-zinc-800 active:scale-98 transition-colors whitespace-nowrap"
             >
               <Trophy className="h-4.5 w-4.5 sm:h-5 sm:w-5 text-amber-400 shrink-0" />
-              <span>Classifica Community</span>
+              <span>{dict.nav.huntersRanking}</span>
             </Link>
           </div>
         </div>
@@ -193,7 +204,7 @@ export default async function HomePage() {
               {countFilms || 250}+
             </div>
             <div className="text-xs text-zinc-400 font-medium uppercase tracking-wider mt-0.5">
-              Film Archiviati
+              {dict.home.statFilms}
             </div>
           </div>
           <div>
@@ -201,7 +212,7 @@ export default async function HomePage() {
               {((countBloopers || 1000) + (countTrivia || 0))}+
             </div>
             <div className="text-xs text-zinc-400 font-medium uppercase tracking-wider mt-0.5">
-              Bloopers & Curiosità
+              {dict.home.statBloopers} & {dict.home.statTrivia}
             </div>
           </div>
           <div className="col-span-2 sm:col-span-1">
@@ -223,7 +234,7 @@ export default async function HomePage() {
               Esplora i Titoli
             </span>
             <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-0.5 leading-tight">
-              Pellicole con Bloopers e Curiosità da Non Perdere
+              {dict.home.trendingFilms}
             </h2>
           </div>
           <Link
@@ -257,7 +268,7 @@ export default async function HomePage() {
                 Ultime Novità
               </span>
               <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight mt-0.5 leading-tight">
-                Bloopers Rilevati di Recente
+                {dict.home.latestBloopers}
               </h2>
             </div>
             <Link

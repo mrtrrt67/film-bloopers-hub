@@ -66,9 +66,12 @@ export function useTranslation() {
         document.cookie = `fbh_locale=${newLocale}; path=/; max-age=31536000; SameSite=Lax`;
         localStorage.setItem("fbh_locale", newLocale);
       } catch {}
-      router.push(newPath);
+      // Navigazione completa per attivare il proxy server-side e aggiornare tutti i componenti
+      if (typeof window !== "undefined") {
+        window.location.href = newPath;
+      }
     },
-    [locale, pathname, router]
+    [locale, pathname]
   );
 
   /**
