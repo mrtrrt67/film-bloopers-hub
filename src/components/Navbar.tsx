@@ -20,6 +20,8 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import AuthModal from "./AuthModal";
+import { useTranslation } from "@/i18n";
+import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -32,6 +34,7 @@ export default function Navbar() {
   const userMenuRef = useRef<HTMLDivElement>(null);
   const supabase = createClient();
   const [isStaging, setIsStaging] = useState(false);
+  const { dict, localizeHref } = useTranslation();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -162,11 +165,11 @@ export default function Navbar() {
 
   // Navigazione principale leggera, tipografica e ariosa
   const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/esplora", label: "Esplora" },
-    { href: "/classifica", label: "Classifica" },
-    { href: "/pricing", label: "Premium & Supporto", isHighlight: true },
-    { href: "/suggerimenti", label: "Suggerimenti" },
+    { href: "/", label: dict.nav.home },
+    { href: "/esplora", label: dict.nav.explore },
+    { href: "/classifica", label: dict.nav.ranking },
+    { href: "/pricing", label: dict.nav.pricing, isHighlight: true },
+    { href: "/suggerimenti", label: dict.nav.suggestions },
   ];
 
   return (
@@ -215,11 +218,12 @@ export default function Navbar() {
           {/* Navigazione Desktop Tipografica (Ariosa, senza icone ingombranti) */}
           <nav className="hidden md:flex items-center gap-1 lg:gap-2">
             {navLinks.map((link) => {
-              const isActive = pathname === link.href;
+              const targetHref = localizeHref(link.href);
+              const isActive = pathname === targetHref || pathname === link.href;
               return (
                 <Link
                   key={link.href}
-                  href={link.href}
+                  href={targetHref}
                   className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-all ${
                     isActive
                       ? "bg-zinc-800/90 text-white shadow-sm border border-zinc-700/60"
@@ -236,6 +240,8 @@ export default function Navbar() {
 
           {/* Sezione Azioni Utente (Raggruppata e ordinata) */}
           <div className="hidden md:flex items-center gap-3">
+            {/* Selettore Lingua Desktop */}
+            <LanguageSwitcher variant="desktop" />
             {user ? (
               <div className="relative" ref={userMenuRef}>
                 {/* Trigger Profilo Utente Unificato */}
@@ -281,7 +287,7 @@ export default function Navbar() {
                   <div className="absolute right-0 mt-2.5 w-72 rounded-2xl border border-zinc-800 bg-zinc-950/95 p-2 shadow-2xl backdrop-blur-2xl z-50 text-xs animate-in fade-in slide-in-from-top-2 duration-150">
                     {/* Header Utente nel Dropdown */}
                     <div className="p-3 bg-zinc-900/50 rounded-xl mb-1.5 border border-zinc-800/60">
-                      <p className="text-[11px] text-zinc-500">Account Connesso</p>
+                      <p className="text-[11px] text-zinc-500">{dict.nav.connectedAccount}</p>
                       <p className="font-bold text-white truncate text-xs mt-0.5">{user.email}</p>
                       <div className="flex items-center justify-between pt-2 mt-2 border-t border-zinc-800 text-[11px]">
                         <span className="text-zinc-400">
@@ -350,7 +356,7 @@ export default function Navbar() {
                         className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-zinc-300 hover:bg-zinc-900 hover:text-white transition-colors"
                       >
                         <Lightbulb className="h-4 w-4 text-zinc-400" />
-                        <span>Invia un Suggerimento</span>
+                        <span>{dict.nav.sendSuggestion}</span>
                       </Link>
 
                       <Link
@@ -359,7 +365,7 @@ export default function Navbar() {
                         className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-zinc-300 hover:bg-zinc-900 hover:text-white transition-colors"
                       >
                         <Trophy className="h-4 w-4 text-amber-400" />
-                        <span>Classifica Cacciatori</span>
+                        <span>{dict.nav.huntersRanking}</span>
                       </Link>
                     </div>
 
@@ -371,7 +377,7 @@ export default function Navbar() {
                         className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-zinc-400 hover:text-red-400 hover:bg-red-500/10 transition-colors text-left"
                       >
                         <LogOut className="h-4 w-4" />
-                        <span>Disconnetti</span>
+                        <span>{dict.nav.logout}</span>
                       </button>
                     </div>
                   </div>
@@ -411,6 +417,10 @@ export default function Navbar() {
         {/* Menu Mobile Pulito & Ordinato */}
         {mobileMenuOpen && (
           <div className="md:hidden border-b border-zinc-800 bg-zinc-950/95 px-4 pt-3 pb-5 space-y-1 backdrop-blur-2xl">
+            {/* Selettore Lingua Mobile */}
+            <div className="mb-3 pb-3 border-b border-zinc-800/80">
+              <LanguageSwitcher variant="mobile" />
+            </div>
             {isStaging && (
               <div className="mb-2 px-3 py-1.5 rounded-lg bg-cyan-950/70 border border-cyan-500/30 flex items-center justify-between text-[11px] text-cyan-300 font-bold">
                 <span className="flex items-center gap-1.5">
