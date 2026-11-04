@@ -182,7 +182,7 @@ export default function Navbar() {
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           
           {/* Logo Minimalista & Moderno (con variante Staging Cyan/Emerald) */}
-          <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+          <Link href={localizeHref("/")} className="flex items-center gap-2.5 group shrink-0">
             <div className={`flex h-9 w-9 items-center justify-center rounded-xl transition-all group-hover:scale-105 ${
               isStaging
                 ? "bg-gradient-to-tr from-cyan-500 via-teal-500 to-emerald-400 shadow-md shadow-cyan-500/25 ring-1 ring-cyan-400/40"

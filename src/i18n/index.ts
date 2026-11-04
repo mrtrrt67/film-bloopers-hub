@@ -15,7 +15,7 @@ import {
   resolveLocale,
 } from "./config";
 import { usePathname, useRouter } from "next/navigation";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState, useEffect } from "react";
 
 export type Dictionary = typeof it;
 
@@ -41,12 +41,32 @@ export function getDictionary(locale?: Locale | string | null): Dictionary {
  * Hook client-side reattivo per accedere al dizionario e cambiare lingua
  */
 export function useTranslation() {
-  const pathname = usePathname() || "/";
+  const routerPathname = usePathname() || "/";
   const router = useRouter();
 
-  const locale = useMemo(() => {
-    return extractLocaleFromPathname(pathname);
-  }, [pathname]);
+  // Risolve la lingua tenendo conto del fatto che Next.js rewrite maschera il prefisso in usePathname()
+  const detectLocale = useCallback((): Locale => {
+    if (typeof window !== "undefined") {
+      // 1. Pathname reale visibile nella barra degli indirizzi del browser (es. /en/film/...)
+      const fromBrowser = extractLocaleFromPathname(window.location.pathname);
+      if (fromBrowser !== DEFAULT_LOCALE) return fromBrowser;
+
+      // 2. Query parameter ?locale=...
+      const fromQuery = new URLSearchParams(window.location.search).get("locale");
+      if (isSupportedLocale(fromQuery)) return fromQuery;
+
+      // 3. Cookie salvato dal selettore di lingua
+      const match = document.cookie.match(/fbh_locale=([a-z]{2})/i);
+      if (match && isSupportedLocale(match[1])) return match[1];
+    }
+    return extractLocaleFromPathname(routerPathname);
+  }, [routerPathname]);
+
+  const [locale, setLocale] = useState<Locale>(detectLocale);
+
+  useEffect(() => {
+    setLocale(detectLocale());
+  }, [detectLocale, routerPathname]);
 
   const dict = useMemo(() => {
     return DICTIONARIES[locale] || DICTIONARIES[DEFAULT_LOCALE];
@@ -61,7 +81,8 @@ export function useTranslation() {
   const switchLocale = useCallback(
     (newLocale: Locale) => {
       if (newLocale === locale) return;
-      const newPath = buildLocalizedPath(pathname, newLocale);
+      const currentPath = typeof window !== "undefined" ? window.location.pathname : routerPathname;
+      const newPath = buildLocalizedPath(currentPath, newLocale);
       // Salva preferenza nei cookie / localStorage
       try {
         document.cookie = `fbh_locale=${newLocale}; path=/; max-age=31536000; SameSite=Lax`;
@@ -72,7 +93,7 @@ export function useTranslation() {
         window.location.href = newPath;
       }
     },
-    [locale, pathname]
+    [locale, routerPathname]
   );
 
   /**
