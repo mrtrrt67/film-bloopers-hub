@@ -15,16 +15,18 @@ export async function GET(request: Request) {
     }
 
     const { searchParams } = new URL(request.url);
-    const limit = Math.min(Math.max(parseInt(searchParams.get("limit") || "500", 10), 10), 1000);
+    const limit = Math.min(Math.max(parseInt(searchParams.get("limit") || "500", 10), 10), 2500);
     const excludeTests = shouldExcludeTestAccounts(request);
 
+    const db = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
+
     const [errRes, callsRes, accessRes, profilesRes, batchLogsRes, cfgBatchRes] = await Promise.all([
-      supabase.from("log_errori_ia").select("*").order("created_at", { ascending: false }).limit(limit),
-      supabase.from("statistiche_ia").select("*").order("data_chiamata", { ascending: false }).limit(limit),
-      supabase.from("log_accessi").select("*").order("created_at", { ascending: false }).limit(limit),
-      supabase.from("profiles").select("id, username, email"),
-      supabase.from("log_batch_sync").select("*").order("started_at", { ascending: false }).limit(50),
-      supabase.from("configurazioni").select("valore").eq("chiave", "daily_sync_history").maybeSingle(),
+      db.from("log_errori_ia").select("*", { count: "exact" }).order("created_at", { ascending: false }).limit(limit),
+      db.from("statistiche_ia").select("*", { count: "exact" }).order("data_chiamata", { ascending: false }).limit(limit),
+      db.from("log_accessi").select("*", { count: "exact" }).order("created_at", { ascending: false }).limit(limit),
+      db.from("profiles").select("id, username, email"),
+      db.from("log_batch_sync").select("*").order("started_at", { ascending: false }).limit(50),
+      db.from("configurazioni").select("valore").eq("chiave", "daily_sync_history").maybeSingle(),
     ]);
 
     const adminIdPrefix = user.id.slice(0, 8);
@@ -72,7 +74,7 @@ export async function GET(request: Request) {
 
     // 3. Pulizia permanente dei duplicati storici dal database con i privilegi dell'admin
     if (duplicateIds.length > 0) {
-      const dbToClean = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
+      const dbToClean = db;
       void (async () => {
         try {
           for (let i = 0; i < duplicateIds.length; i += 100) {
@@ -229,8 +231,11 @@ export async function GET(request: Request) {
 
     return NextResponse.json({
       aiErrors: errRes.data || [],
+      totalAiErrors: typeof errRes.count === "number" ? errRes.count : (errRes.data?.length || 0),
       recentAiCalls,
+      totalAiCalls: typeof callsRes.count === "number" ? callsRes.count : (recentAiCalls.length || 0),
       recentAccess,
+      totalAccess: typeof accessRes.count === "number" ? accessRes.count : (recentAccess.length || 0),
       batchLogs,
     });
   } catch (err: any) {

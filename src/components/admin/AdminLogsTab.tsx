@@ -29,11 +29,12 @@ export default function AdminLogsTab() {
   const [filterText, setFilterText] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(15);
+  const [fetchLimit, setFetchLimit] = useState(500);
 
-  const fetchLogs = async () => {
+  const fetchLogs = async (customLimit = fetchLimit) => {
     try {
       setRefreshing(true);
-      const res = await fetch("/api/admin/logs?limit=500");
+      const res = await fetch(`/api/admin/logs?limit=${customLimit}`);
       if (res.ok) {
         const json = await res.json();
         setData(json || {});
@@ -56,6 +57,7 @@ export default function AdminLogsTab() {
   }, [subTab, filterText, accessFilter]);
 
   const rawErrors = data?.aiErrors || [];
+  const totalAiErrors = typeof data?.totalAiErrors === "number" ? data.totalAiErrors : rawErrors.length;
   const aiErrors = rawErrors.filter((e: any) => {
     if (!filterText.trim()) return true;
     const term = filterText.toLowerCase();
@@ -70,6 +72,7 @@ export default function AdminLogsTab() {
   });
 
   const rawCalls = data?.recentAiCalls || [];
+  const totalAiCalls = typeof data?.totalAiCalls === "number" ? data.totalAiCalls : rawCalls.length;
   const recentCalls = rawCalls.filter((c: any) => {
     if (!filterText.trim()) return true;
     const term = filterText.toLowerCase();
@@ -113,7 +116,7 @@ export default function AdminLogsTab() {
             }`}
           >
             <AlertTriangle className="h-3.5 w-3.5" />
-            Errori IA ({rawErrors.length})
+            Errori IA ({totalAiErrors.toLocaleString("it-IT")})
           </button>
           <button
             onClick={() => setSubTab("calls")}
@@ -124,7 +127,7 @@ export default function AdminLogsTab() {
             }`}
           >
             <CheckCircle className="h-3.5 w-3.5" />
-            Chiamate Riuscite ({rawCalls.length})
+            Chiamate Riuscite ({totalAiCalls.toLocaleString("it-IT")})
           </button>
           <button
             onClick={() => setSubTab("access")}
@@ -164,7 +167,7 @@ export default function AdminLogsTab() {
             </div>
           )}
           <button
-            onClick={fetchLogs}
+            onClick={() => fetchLogs(fetchLimit)}
             disabled={refreshing}
             className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 transition shrink-0"
           >
@@ -284,6 +287,26 @@ export default function AdminLogsTab() {
           {/* 2. CHIAMATE RIUSCITE */}
           {subTab === "calls" && (
             <div className="rounded-2xl border border-zinc-800 bg-zinc-900/60 overflow-hidden shadow-xl">
+              {totalAiCalls > rawCalls.length && (
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-4 py-2.5 bg-emerald-950/20 border-b border-emerald-900/30 text-xs text-emerald-300">
+                  <div>
+                    Visualizzate le ultime <strong className="font-semibold text-white">{rawCalls.length}</strong> chiamate su un totale di <strong className="font-semibold text-white">{totalAiCalls.toLocaleString("it-IT")}</strong> registrate a database.
+                  </div>
+                  {fetchLimit < 2500 && (
+                    <button
+                      onClick={() => {
+                        const nextLimit = Math.min(fetchLimit + 500, 2500);
+                        setFetchLimit(nextLimit);
+                        fetchLogs(nextLimit);
+                      }}
+                      disabled={refreshing}
+                      className="px-2.5 py-1 text-[11px] font-medium bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border border-emerald-500/30 rounded-lg transition shrink-0"
+                    >
+                      Carica altre chiamate (+500)
+                    </button>
+                  )}
+                </div>
+              )}
               {recentCalls.length === 0 ? (
                 <div className="py-12 text-center text-zinc-500 text-xs">
                   Nessuna chiamata recente registrata.
@@ -350,7 +373,7 @@ export default function AdminLogsTab() {
                     onPageChange={setPage}
                     onPageSizeChange={setPageSize}
                     pageSizeOptions={[10, 15, 25, 50]}
-                    itemName="chiamate"
+                    itemName={totalAiCalls > rawCalls.length ? "chiamate caricate" : "chiamate"}
                   />
                 </>
               )}
