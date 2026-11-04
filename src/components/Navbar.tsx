@@ -403,15 +403,18 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Bottone Menu Mobile */}
-          <button
-            type="button"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden rounded-lg p-2 text-zinc-400 hover:bg-zinc-900 hover:text-white transition-colors"
-            aria-label="Menu"
-          >
-            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </button>
+          {/* Sezione Mobile Right: Selettore Lingua + Hamburger */}
+          <div className="flex md:hidden items-center gap-1.5">
+            <LanguageSwitcher variant="desktop" />
+            <button
+              type="button"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-900 hover:text-white transition-colors"
+              aria-label="Menu"
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
+          </div>
         </div>
 
         {/* Menu Mobile Pulito & Ordinato */}
