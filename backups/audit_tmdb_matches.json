@@ -1,0 +1,3402 @@
+[
+  {
+    "id": 2,
+    "titolo_db": "Il Gladiatore",
+    "anno": 2000,
+    "tmdb_id": 98,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Gladiator",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/euOKjQaV1QXtzLyNZAa1PMHGJlJ.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/aDb548BOkFfI4nFm0kx8A3Ezh7H.jpg"
+  },
+  {
+    "id": 3,
+    "titolo_db": "Cloverfield",
+    "anno": 2008,
+    "tmdb_id": 7191,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Cloverfield",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/z8CrCAEsLSdvrbZ1OjkvOmmAlYa.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/qIegUGJqyMMCRjkKV1s7A9MqdJ8.jpg"
+  },
+  {
+    "id": 4,
+    "titolo_db": "Ace Ventura - L'acchiappanimali",
+    "anno": 1994,
+    "tmdb_id": 3049,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Ace Ventura: Pet Detective",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/ptTaBr68fiHfjDVNmQRoOantMDy.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/pqiRuETmuSybfnVZ7qyeoXhQyN1.jpg"
+  },
+  {
+    "id": 6,
+    "titolo_db": "Il Padrino",
+    "anno": 1972,
+    "tmdb_id": 238,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Godfather",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/gemuM3FvVaWSEBrfk6nVFIOBhBY.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/3bhkrj58Vtu7enYsRolD1fZdja1.jpg"
+  },
+  {
+    "id": 7,
+    "titolo_db": "Il Padrino - Parte II",
+    "anno": 1974,
+    "tmdb_id": 240,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Godfather Part II",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/jftmAcdl5D94eANbhHugbUJDULI.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/8a1lJs7mFyGhGhZZDT1azJUoQiZ.jpg"
+  },
+  {
+    "id": 8,
+    "titolo_db": "Il Padrino - Parte III",
+    "anno": 1990,
+    "tmdb_id": 242,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Godfather Part III",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/niNFWEtPFgawysw20luHEonC4WI.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/lm3pQ2QoQ16pextRsmnUbG2onES.jpg"
+  },
+  {
+    "id": 10,
+    "titolo_db": "Indiana Jones e il tempio maledetto",
+    "anno": 1984,
+    "tmdb_id": 87,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Indiana Jones and the Temple of Doom",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/xrLwCgzIcxg8sYr9uuTLdeqtg3Z.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/gpdVNUaa4LhRMLfJOPj1AZdhAZ3.jpg"
+  },
+  {
+    "id": 11,
+    "titolo_db": "Indiana Jones e l'ultima crociata",
+    "anno": 1989,
+    "tmdb_id": 89,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Indiana Jones and the Last Crusade",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/bPcdsUvGwyeIfyFkzebJdUcw8Fd.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/sizg1AU8f8JDZX4QIgE4pjUMBvx.jpg"
+  },
+  {
+    "id": 12,
+    "titolo_db": "Indiana Jones e il regno del teschio di cristallo",
+    "anno": 2008,
+    "tmdb_id": 217,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Indiana Jones and the Kingdom of the Crystal Skull",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/qkQf6FVvtRKKk1JQAWTJZDPiy5r.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/56As6XEM1flWvprX4LgkPl8ii4K.jpg"
+  },
+  {
+    "id": 13,
+    "titolo_db": "Indiana Jones e il quadrante del destino",
+    "anno": 2023,
+    "tmdb_id": 335977,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Indiana Jones and the Dial of Destiny",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/cavpmNgWlOIRENlEscbg1bJ2mX2.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/Af4bXE63pVsb2FtbW8uYIyPBadD.jpg"
+  },
+  {
+    "id": 14,
+    "titolo_db": "Bianca",
+    "anno": 1984,
+    "tmdb_id": 15014,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Bianca",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/lnXZLkJ3MFgAFAiyVJGfTUykNkU.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/lnXZLkJ3MFgAFAiyVJGfTUykNkU.jpg"
+  },
+  {
+    "id": 15,
+    "titolo_db": "Le avventure di Bianca e Bernie",
+    "anno": 1977,
+    "tmdb_id": 11319,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Rescuers",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/qf2w4N26UeoS6aXcwtMGRy4zTJU.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/9jpDjrRyvv9Nw0piXOpHHQTfxw9.jpg"
+  },
+  {
+    "id": 16,
+    "titolo_db": "Bianca e Bernie nella terra dei canguri",
+    "anno": 1990,
+    "tmdb_id": 11135,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Rescuers Down Under",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/awNvQik4yvfEZWOfT13DTpNmyEn.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/5koTDBmMAkJOgAe4PL4163UKjvG.jpg"
+  },
+  {
+    "id": 17,
+    "titolo_db": "Bianca come il latte, rossa come il sangue",
+    "anno": 2013,
+    "tmdb_id": 182415,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "White as Milk, Red as Blood",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/eZQFj0tgsErtr6CcIkyLFXGNBGa.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/eZQFj0tgsErtr6CcIkyLFXGNBGa.jpg"
+  },
+  {
+    "id": 18,
+    "titolo_db": "La nave bianca",
+    "anno": 1941,
+    "tmdb_id": 64032,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The White Ship",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/8NdHt1zvhy249pOMbK9aiw8IHvp.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/8NdHt1zvhy249pOMbK9aiw8IHvp.jpg"
+  },
+  {
+    "id": 20,
+    "titolo_db": "Gladiator",
+    "anno": 1992,
+    "tmdb_id": 16219,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Gladiator",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/S708nk4QDy5PU5c4Xc61SXZTzM.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/w0YjBWVfu689txEXZG3xa4Aev3i.jpg"
+  },
+  {
+    "id": 21,
+    "titolo_db": "Gladiatori di Roma",
+    "anno": 2012,
+    "tmdb_id": 137548,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Gladiators of Rome",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/7F35x1EAYjZ4REVBDxGCX4f9ByS.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/9Qyx97TwsPQ1uR82wwQ2dzY0wOU.jpg"
+  },
+  {
+    "id": 22,
+    "titolo_db": "Il gladiatore invincibile",
+    "anno": 1961,
+    "tmdb_id": 164728,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Invincible Gladiator",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/bc8Hy1jtLAAiQ1n8PeiIngxUqlp.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/zela8yXh9bWUBab7911vSLb9OGm.jpg"
+  },
+  {
+    "id": 23,
+    "titolo_db": "Il gladiatore che sfidò l'impero",
+    "anno": 1965,
+    "tmdb_id": 5714,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Challenge of the Gladiator",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/8h2SzRMQhza5IVQCIv30nLIyXEV.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/keKrpGdwvxRPHOyKPnlrVu5dQiU.jpg"
+  },
+  {
+    "id": 24,
+    "titolo_db": "I sette gladiatori",
+    "anno": 1962,
+    "tmdb_id": 93492,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Gladiators 7",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/kKdn10PWQKCpVgE5w01yg24wnQo.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/jAQg4h3AhSgOH3jLRlcRCzagFXW.jpg"
+  },
+  {
+    "id": 25,
+    "titolo_db": "L'ultimo gladiatore",
+    "anno": 1964,
+    "tmdb_id": 134998,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Messalina Against the Son of Hercules",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/lSpPctLSS2F0W4XgQCzTWrtEMl9.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/lSpPctLSS2F0W4XgQCzTWrtEMl9.jpg"
+  },
+  {
+    "id": 26,
+    "titolo_db": "Il magnifico gladiatore",
+    "anno": 1964,
+    "tmdb_id": 211179,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Magnificent Gladiator",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/ePP3X8YRlXaQm5ERlX2W5o0rX0Z.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/7iJtohz1AiSKaV8uOp23smvnO3J.jpg"
+  },
+  {
+    "id": 27,
+    "titolo_db": "Spartacus e i 10 gladiatori",
+    "anno": 1964,
+    "tmdb_id": 238033,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Spartacus and the Ten Gladiators",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/gZsGyRcXRCICiSlnBfyH5SecIad.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/gZsGyRcXRCICiSlnBfyH5SecIad.jpg"
+  },
+  {
+    "id": 28,
+    "titolo_db": "Il gladiatore di Roma",
+    "anno": 1962,
+    "tmdb_id": 158093,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Gladiator of Rome",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/smcfYvcMixH12ZlMM3M9RG7q50l.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/bnYYCgn7hBtV6Xq4PF8GttGMvI3.jpg"
+  },
+  {
+    "id": 29,
+    "titolo_db": "Ursus il gladiatore ribelle",
+    "anno": 1962,
+    "tmdb_id": 329964,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Rebel Gladiators",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/hfsSMECtejxQOwJkzE1WjKqMWUw.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/hfsSMECtejxQOwJkzE1WjKqMWUw.jpg"
+  },
+  {
+    "id": 30,
+    "titolo_db": "L'indiana bianca",
+    "anno": 1953,
+    "tmdb_id": 169925,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Charge at Feather River",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/awt4WEDwcKuTw4oaiLwzfh7xnt7.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/awt4WEDwcKuTw4oaiLwzfh7xnt7.jpg"
+  },
+  {
+    "id": 31,
+    "titolo_db": "Indiana Jones e i predatori dell'arca perduta",
+    "anno": 1981,
+    "tmdb_id": 85,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "Raiders of the Lost Ark",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/g7brmwhpIPZoRLlHSU9sDbyGW3D.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/ceG9VzoRAVGwivFU403Wc3AHRys.jpg"
+  },
+  {
+    "id": 32,
+    "titolo_db": "Il gladiatore II",
+    "anno": 2024,
+    "tmdb_id": 558449,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Gladiator II",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/tVBCG6qHQQaq2doZsOvpGNcwMuP.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/2cxhvwyEwRlysAmRH4iodkvo0z5.jpg"
+  },
+  {
+    "id": 33,
+    "titolo_db": "Il Signore degli Anelli - La Compagnia dell'Anello",
+    "anno": 2001,
+    "tmdb_id": 120,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Lord of the Rings: The Fellowship of the Ring",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/iZTDPQYgr3rhL7hPIYFt17ATp8.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/6oom5QYQ2yQTMJIbnvbkBL9cHo6.jpg"
+  },
+  {
+    "id": 34,
+    "titolo_db": "Il Signore degli Anelli - Le due torri",
+    "anno": 2002,
+    "tmdb_id": 121,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Lord of the Rings: The Two Towers",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/jIhivyKlNwLmFJ2W6X98vh2XFwu.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/5VTN0pR8gcqV3EPUHHfMGnJYN9L.jpg"
+  },
+  {
+    "id": 35,
+    "titolo_db": "Il Signore degli Anelli - Il ritorno del re",
+    "anno": 2003,
+    "tmdb_id": 122,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Lord of the Rings: The Return of the King",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/eCua9No8HqVxGajDQrG8mvRCtJM.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/rCzpDGLbOoPwLjy3OAm5NUPOTrC.jpg"
+  },
+  {
+    "id": 36,
+    "titolo_db": "Il Signore degli Anelli",
+    "anno": 1978,
+    "tmdb_id": 123,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Lord of the Rings",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/zC18JY8JMNw4xZFjaaEYZw6H3A8.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/liW0mjvTyLs7UCumaHhx3PpU4VT.jpg"
+  },
+  {
+    "id": 37,
+    "titolo_db": "Arancia Meccanica",
+    "anno": 1971,
+    "tmdb_id": 185,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "A Clockwork Orange",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/7dbLsJo2DiyhPZO3iQc70LwDMzv.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/4sHeTAp65WrSSuc05nRBKddhBxO.jpg"
+  },
+  {
+    "id": 44,
+    "titolo_db": "Agente 007 - Licenza di uccidere",
+    "anno": 1962,
+    "tmdb_id": 646,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Dr. No",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/7zrD13m7zmWrJncWO5UXPLGzeW6.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/9zCOLJmLNst0sCPZlkW1IRoH65E.jpg"
+  },
+  {
+    "id": 45,
+    "titolo_db": "Agente 007 - Missione Goldfinger",
+    "anno": 1964,
+    "tmdb_id": 658,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Goldfinger",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/JcIhKJxmi7DQHsKV174WztIT4n.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/aKNFzaqQgPzsGXnsMc4kJH5hFIV.jpg"
+  },
+  {
+    "id": 46,
+    "titolo_db": "Casino",
+    "anno": 1995,
+    "tmdb_id": 524,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Casino",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/bUQRgD54q9OrwHrvJN36jJiWhoP.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/gziIkUSnYuj9ChCi8qOu2ZunpSC.jpg"
+  },
+  {
+    "id": 47,
+    "titolo_db": "Casino Royale",
+    "anno": 2006,
+    "tmdb_id": 36557,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Casino Royale",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/wmRTS3WrXRi8GJdpDae1NifYNwx.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/lMrxYKKhd4lqRzwUHAy5gcx9PSO.jpg"
+  },
+  {
+    "id": 48,
+    "titolo_db": "Sátántangó",
+    "anno": 1994,
+    "tmdb_id": 31414,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Satantango",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/cOrtWdUflqXL9BqoQNjv9WwQiPs.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/hySy5g6xncM3U1iRsdPgYyahXM0.jpg"
+  },
+  {
+    "id": 49,
+    "titolo_db": "The Avengers",
+    "anno": 2012,
+    "tmdb_id": 24428,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Avengers",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/o6IvnjWsAjPja21JA1EHo0XcYTy.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/RYMX2wcKCBAr24UyPD7xwmjaTn.jpg"
+  },
+  {
+    "id": 50,
+    "titolo_db": "Avengers: Age of Ultron",
+    "anno": 2015,
+    "tmdb_id": 99861,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Avengers: Age of Ultron",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/pYEHarIwyYSM1bXs5FtpL2GZELy.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/4ssDuvEDkSArWEdyBl2X5EHvYKU.jpg"
+  },
+  {
+    "id": 51,
+    "titolo_db": "Avengers: Infinity War",
+    "anno": 2018,
+    "tmdb_id": 299536,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Avengers: Infinity War",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/t24aimjQLa0dyoZQEbSws7XK1U0.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/7WsyChQLEftFiDOVTGkv3hFpyyt.jpg"
+  },
+  {
+    "id": 52,
+    "titolo_db": "Avengers: Endgame",
+    "anno": 2019,
+    "tmdb_id": 299534,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Avengers: Endgame",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/hj1xaEUGMiUxaFYoutlljtlkHSG.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/jtDv3lCnST0fZRvdYFwR5CVwK2x.jpg"
+  },
+  {
+    "id": 53,
+    "titolo_db": "Highlander: Endgame",
+    "anno": 2000,
+    "tmdb_id": 12211,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Highlander: Endgame",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/jWo1Azj8JFiFAd7MAGkutWB8ZVW.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/u7kIXMyagqcek2SaS9svfPTTGVT.jpg"
+  },
+  {
+    "id": 54,
+    "titolo_db": "Rocky",
+    "anno": 1976,
+    "tmdb_id": 1366,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Rocky",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/drkb38iICkgy712cMWJAH4IFqSQ.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/1mcJmdbRLusxhoSGjFI3pbEboXt.jpg"
+  },
+  {
+    "id": 55,
+    "titolo_db": "Rocky IV",
+    "anno": 1985,
+    "tmdb_id": 1374,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Rocky IV",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/k4mDFvQkr9CNxbK76Ih6rTnCQ4A.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/2MHUit4H6OK5adcOjnCN6suCKOl.jpg"
+  },
+  {
+    "id": 56,
+    "titolo_db": "Rocky II",
+    "anno": 1979,
+    "tmdb_id": 1367,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Rocky II",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/vJKa9utvX1kNDCDKYdMDSzCOyX5.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/nMaiiu0CzT77U4JZkUYV7KqdAjK.jpg"
+  },
+  {
+    "id": 57,
+    "titolo_db": "Pirati dei Caraibi - La maledizione della prima luna",
+    "anno": 2003,
+    "tmdb_id": 22,
+    "match_reason": "manual_override",
+    "titolo_en": "Pirates of the Caribbean: The Curse of the Black Pearl",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/r6ISuJLJ5U9MACu8lyCGmdZcHq3.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/poHwCZeWzJCShH7tOjg8RIoyjcw.jpg"
+  },
+  {
+    "id": 58,
+    "titolo_db": "Pirati dei Caraibi - La maledizione del forziere fantasma",
+    "anno": 2006,
+    "tmdb_id": 58,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Pirates of the Caribbean: Dead Man's Chest",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/fLHFIx2gJ1vrLnzO7iiBsJdi0Z3.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/uXEqmloGyP7UXAiphJUu2v2pcuE.jpg"
+  },
+  {
+    "id": 59,
+    "titolo_db": "Pirati dei Caraibi - Ai confini del mondo",
+    "anno": 2007,
+    "tmdb_id": 285,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Pirates of the Caribbean: At World's End",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/wGv9fox3iIA7jrZxTueQnsKqwoE.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/jGWpG4YhpQwVmjyHEGkxEkeRf0S.jpg"
+  },
+  {
+    "id": 60,
+    "titolo_db": "Pirati dei Caraibi - Oltre i confini del mare",
+    "anno": 2011,
+    "tmdb_id": 1865,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Pirates of the Caribbean: On Stranger Tides",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/p0aMDd3EtOCfImHIeL9hgPnLRIo.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/keGfSvCmYj7CvdRx36OdVrAEibE.jpg"
+  },
+  {
+    "id": 61,
+    "titolo_db": "Pirati dei Caraibi - La vendetta di Salazar",
+    "anno": 2017,
+    "tmdb_id": 166426,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Pirates of the Caribbean: Dead Men Tell No Tales",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/vvglsPQgyGogyTu2e59dJYGlJNE.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/6lAPOAFYFWIO3SQRemEY2wInQMC.jpg"
+  },
+  {
+    "id": 62,
+    "titolo_db": "The Wolf of Wall Street",
+    "anno": 2013,
+    "tmdb_id": 106646,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Wolf of Wall Street",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/hwg3pXw2m4HfRGbyRMIP8laf5Lf.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/kW9LmvYHAaS9iA0tHmZVq8hQYoq.jpg"
+  },
+  {
+    "id": 63,
+    "titolo_db": "Robin Hood",
+    "anno": 1922,
+    "tmdb_id": 71066,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Robin Hood",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/baqMnZbAFPsfbaAOPRU1eJlCRdj.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/baqMnZbAFPsfbaAOPRU1eJlCRdj.jpg"
+  },
+  {
+    "id": 64,
+    "titolo_db": "La leggenda di Robin Hood",
+    "anno": 1938,
+    "tmdb_id": 10907,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Adventures of Robin Hood",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/ks9KEeASeyeOFDnwbOBW9WDIbfE.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/c7LX3GMf9uXQTgVm3uxpm7E6Woc.jpg"
+  },
+  {
+    "id": 65,
+    "titolo_db": "Robin e Marian",
+    "anno": 1976,
+    "tmdb_id": 10786,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Robin and Marian",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/2gTw2pwqUNtdnfWb2elA1HvmmNx.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/y2UlVt6U8mFeegVL42rZjD5y6c7.jpg"
+  },
+  {
+    "id": 66,
+    "titolo_db": "Robin Hood - Principe dei ladri",
+    "anno": 1991,
+    "tmdb_id": 8367,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Robin Hood: Prince of Thieves",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/2l7W3jvfiVfmpJDPpfJWg2YBGJm.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/hbRnWUNJkKKVN5mkcuC5ooqjE4e.jpg"
+  },
+  {
+    "id": 67,
+    "titolo_db": "Robin Hood - Un uomo in calzamaglia",
+    "anno": 1993,
+    "tmdb_id": 8005,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Robin Hood: Men in Tights",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/zqPpJmTjgTjMwCjCqb4PaAZovom.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/woexOLEkUlYsPLLuZRK6LjZaF38.jpg"
+  },
+  {
+    "id": 68,
+    "titolo_db": "Robin Hood - L'origine della leggenda",
+    "anno": 2018,
+    "tmdb_id": 375588,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Robin Hood",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/9kJzfDEl8zVBvNtiqpXZBsS8XDk.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/AiRfixFcfTkNbn2A73qVJPlpkUo.jpg"
+  },
+  {
+    "id": 69,
+    "titolo_db": "Robin Hood",
+    "anno": 2010,
+    "tmdb_id": 20662,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Robin Hood",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/dXIFYV8PR8WS5nnxspSFnMdZIGZ.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/9NS5QGOfck24yL3bZqWeW06PgPC.jpg"
+  },
+  {
+    "id": 71,
+    "titolo_db": "Star Wars: Episodio V - L'Impero colpisce ancora",
+    "anno": 1980,
+    "tmdb_id": 1891,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "The Empire Strikes Back",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/6vzDHECuUbKiqSSXHcIKb9LPcQs.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/nNAeTmF4CtdSgMDplXTDPOpYzsX.jpg"
+  },
+  {
+    "id": 72,
+    "titolo_db": "Star Wars: Episodio VI - Il ritorno dello Jedi",
+    "anno": 1983,
+    "tmdb_id": 1892,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Return of the Jedi",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/rMcCqpaWEUBmATmpZilDTKOyVbL.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/jQYlydvHm3kUix1f8prMucrplhm.jpg"
+  },
+  {
+    "id": 73,
+    "titolo_db": "Star Wars: Episodio I - La minaccia fantasma",
+    "anno": 1999,
+    "tmdb_id": 1893,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Star Wars: Episode I - The Phantom Menace",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/iHitEFiK8udC0GcsWUU6szWzc5K.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/6wkfovpn7Eq8dYNKaG5PY3q2oq6.jpg"
+  },
+  {
+    "id": 74,
+    "titolo_db": "Star Wars: Episodio II - L'attacco dei cloni",
+    "anno": 2002,
+    "tmdb_id": 1894,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Star Wars: Episode II - Attack of the Clones",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/zW4eR9utiKPnTHcIP4xuy0t09nT.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/oZNPzxqM2s5DyVWab09NTQScDQt.jpg"
+  },
+  {
+    "id": 75,
+    "titolo_db": "Star Wars: Episodio III - La vendetta dei Sith",
+    "anno": 2005,
+    "tmdb_id": 1895,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "Star Wars: Episode III - Revenge of the Sith",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/jM5jU9JzxnyE8CXqiOpc2ZPIbEd.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/xfSAoBEm9MNBjmlNcDYLvLSMlnq.jpg"
+  },
+  {
+    "id": 76,
+    "titolo_db": "Star Wars: Il risveglio della Forza",
+    "anno": 2015,
+    "tmdb_id": 140607,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Star Wars: The Force Awakens",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/uEDFRwKiTOsIsN5dkEPCj1laIAK.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/wqnLdwVXoBjKibFRR5U3y0aDUhs.jpg"
+  },
+  {
+    "id": 77,
+    "titolo_db": "Star Wars: Gli ultimi Jedi",
+    "anno": 2017,
+    "tmdb_id": 181808,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Star Wars: The Last Jedi",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/8qOzSPUWlBGfteuKFWJJTRpiFxI.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/kOVEVeg59E0wsnXmF9nrh6OmWII.jpg"
+  },
+  {
+    "id": 78,
+    "titolo_db": "Star Wars: L'ascesa di Skywalker",
+    "anno": 2019,
+    "tmdb_id": 181812,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Star Wars: The Rise of Skywalker",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/3drtqLOARQEuFgEmGRlMlWpV3Eb.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/db32LaOibwEliAmSL2jjDF6oDdj.jpg"
+  },
+  {
+    "id": 79,
+    "titolo_db": "Guerre stellari: Episodio IV - Una nuova speranza",
+    "anno": 1977,
+    "tmdb_id": 11,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Star Wars",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/fVqKwpvobwWy0P1UImZWIDuw4RI.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/fai0rspsNeJCS69wHNjOdWxcI7P.jpg"
+  },
+  {
+    "id": 80,
+    "titolo_db": "Guerre stellari: Episodio V - L'Impero colpisce ancora",
+    "anno": 1980,
+    "tmdb_id": 1891,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "The Empire Strikes Back",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/6vzDHECuUbKiqSSXHcIKb9LPcQs.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/nNAeTmF4CtdSgMDplXTDPOpYzsX.jpg"
+  },
+  {
+    "id": 81,
+    "titolo_db": "Guerre stellari: Episodio VI - Il ritorno dello Jedi",
+    "anno": 1983,
+    "tmdb_id": 1892,
+    "match_reason": "manual_override",
+    "titolo_en": "Return of the Jedi",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/rMcCqpaWEUBmATmpZilDTKOyVbL.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/jQYlydvHm3kUix1f8prMucrplhm.jpg"
+  },
+  {
+    "id": 82,
+    "titolo_db": "Mai dire mai",
+    "anno": 1983,
+    "tmdb_id": 36670,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Never Say Never Again",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/lyPIv08a0VPrJxpGu5pvyUE0bB3.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/zhoAL4o1STGgLbLxJ9r1ijfyHC9.jpg"
+  },
+  {
+    "id": 83,
+    "titolo_db": "Interstellar",
+    "anno": 2014,
+    "tmdb_id": 157336,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Interstellar",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/bMKiLh0mES4Uiococ240lbbTGXQ.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/yQvGrMoipbRoddT0ZR8tPoR7NfX.jpg"
+  },
+  {
+    "id": 84,
+    "titolo_db": "Va' e vedi",
+    "anno": 1985,
+    "tmdb_id": 25237,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Come and See",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/nGTKjc3PDPz7WcsdEAI7U0iVIjo.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/qNbMsKVzigERgJUbwf8pKyZogpb.jpg"
+  },
+  {
+    "id": 85,
+    "titolo_db": "2001: Odissea nello spazio",
+    "anno": 1968,
+    "tmdb_id": 62,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "2001: A Space Odyssey",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/uvSRVMXGHaCeYAj2pCYNdC31b2u.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/ve72VxNqjGM69Uky4WTo2bK6rfq.jpg"
+  },
+  {
+    "id": 86,
+    "titolo_db": "Rambo",
+    "anno": 1982,
+    "tmdb_id": 1368,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "First Blood",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/dff9LLsvZWA6fKDlVkWeayK04od.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/a9sa6ERZCpplbPEO7OMWE763CLD.jpg"
+  },
+  {
+    "id": 87,
+    "titolo_db": "Rambo 2 - La vendetta",
+    "anno": 1985,
+    "tmdb_id": 1369,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Rambo: First Blood Part II",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/mRV0Ac9EJuMRsEso9fBbJr4lExZ.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/fVwRtWqEPdsCH21BVDGqgkAQcff.jpg"
+  },
+  {
+    "id": 88,
+    "titolo_db": "Rambo III",
+    "anno": 1988,
+    "tmdb_id": 1370,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Rambo III",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/1eSQvGuD25ezKaiaQsyDDG3e9iN.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/1eSQvGuD25ezKaiaQsyDDG3e9iN.jpg"
+  },
+  {
+    "id": 89,
+    "titolo_db": "John Rambo",
+    "anno": 2008,
+    "tmdb_id": 7555,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Rambo",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/3RIDyg4aUasjfZRdk6oLab0C0Ch.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/3mInub5c8o00H7EJ1TrjAqOzIuc.jpg"
+  },
+  {
+    "id": 90,
+    "titolo_db": "Rambo: Last Blood",
+    "anno": 2019,
+    "tmdb_id": 522938,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Rambo: Last Blood",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/qs5u7sQLLZZGvLu0yQ9alCmV7wm.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/kTQ3J8oTTKofAVLYnds2cHUz9KO.jpg"
+  },
+  {
+    "id": 91,
+    "titolo_db": "Obsession - Complesso di colpa",
+    "anno": 1976,
+    "tmdb_id": 4780,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "Obsession",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/g0kwlD4KLYCJ4AcCPg0yyvPhv7G.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/a0bOKTldOJVJivmPNGBHfMYJU9x.jpg"
+  },
+  {
+    "id": 92,
+    "titolo_db": "Ossessione",
+    "anno": 1943,
+    "tmdb_id": 5155,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Obsession",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/qgDF8yuJa9eEcfBqEQrqbJuxe5z.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/dHB6NdsOxO0dc71ciP2hsv3nTPf.jpg"
+  },
+  {
+    "id": 93,
+    "titolo_db": "Obsession",
+    "anno": 1949,
+    "tmdb_id": 35852,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Obsession",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/rEOBZMcw29R0kGQJkrUDgtXCU2Z.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/7BlzTHGLBxxCiqY0fTvPqaE2hcX.jpg"
+  },
+  {
+    "id": 94,
+    "titolo_db": "Obsession",
+    "anno": 1997,
+    "tmdb_id": 98544,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Obsession",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/5Z3Y42Duzwb51kIEeMnkBOgiuLk.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/5Z3Y42Duzwb51kIEeMnkBOgiuLk.jpg"
+  },
+  {
+    "id": 95,
+    "titolo_db": "Obsession",
+    "anno": 2026,
+    "tmdb_id": 1339713,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Obsession",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/kwprCwsIV4LvAqJC1dmiTAdZDJ1.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/bRwnj8WEKBCvmfeUNOukJPwB43K.jpg"
+  },
+  {
+    "id": 96,
+    "titolo_db": "The Backrooms",
+    "anno": 2026,
+    "tmdb_id": 1083381,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "Backrooms",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/MIINS3Q31PEYGM7d3mwJE5mV4L.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/rhGx6E3qRNMgj3i5su2oukNHwIQ.jpg"
+  },
+  {
+    "id": 97,
+    "titolo_db": "Ben-Hur: A Tale of the Christ",
+    "anno": 1925,
+    "tmdb_id": 31510,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Ben-Hur: A Tale of the Christ",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/aCohFCJNxPner7VzjzyNN7H8BgV.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/aCohFCJNxPner7VzjzyNN7H8BgV.jpg"
+  },
+  {
+    "id": 98,
+    "titolo_db": "Ben-Hur",
+    "anno": 1959,
+    "tmdb_id": 665,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Ben-Hur",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/4pHkQ4rY44zbgXh9grnqn0UzUgr.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/m4WQ1dBIrEIHZNCoAjdpxwSKWyH.jpg"
+  },
+  {
+    "id": 99,
+    "titolo_db": "Ben-Hur",
+    "anno": 2016,
+    "tmdb_id": 271969,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Ben-Hur",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/vKtbuybPbG2DuMieD0FGU3aVcGs.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/c9CoGrBA5yw8A7YBMz0hGzfzpNq.jpg"
+  },
+  {
+    "id": 100,
+    "titolo_db": "Nosferatu il vampiro (Nosferatu eine Symphonie des Grauens)",
+    "anno": 1922,
+    "tmdb_id": 653,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "Nosferatu",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/zx24O7VAs6NbJhiIrUhWysAiHS0.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/zv7J85D8CC9qYagAEhPM63CIG6j.jpg"
+  },
+  {
+    "id": 101,
+    "titolo_db": "Nosferatu, il principe della notte (Nosferatu: Phantom der Nacht)",
+    "anno": 1979,
+    "tmdb_id": 6404,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "Nosferatu the Vampyre",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/kiwmmJIX7eUcUoR5CBxGW0xruJO.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/jHKzGYwf7P34vz8MhJBTN6cnaYD.jpg"
+  },
+  {
+    "id": 102,
+    "titolo_db": "Nosferatu",
+    "anno": 2024,
+    "tmdb_id": 426063,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Nosferatu",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/1SftujfE9iqZpGJfnREO4IBeeqV.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/d0B8xDdqBZlzlPEzES8lu5LlNQn.jpg"
+  },
+  {
+    "id": 103,
+    "titolo_db": "L'ultimo dei mohicani",
+    "anno": 1992,
+    "tmdb_id": 9361,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Last of the Mohicans",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/rGQUmxjKg0Hx9kHkSPTm0D3dcE.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/qzJMPWRtZveBkxXOv3ucWhoJuyj.jpg"
+  },
+  {
+    "id": 104,
+    "titolo_db": "Coyote vs. Acme",
+    "anno": 2026,
+    "tmdb_id": 1204680,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Coyote vs. Acme",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/x2AtkVKU8IDgeScz354aqoYjUQG.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/kYDCl2y0VPvhT5eYWbMRInPoB03.jpg"
+  },
+  {
+    "id": 106,
+    "titolo_db": "Farewell Oak Street",
+    "anno": 1953,
+    "tmdb_id": 385704,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Farewell Oak Street",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/1YHZU9dKVch25GChAg22hiYEdR9.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/1YHZU9dKVch25GChAg22hiYEdR9.jpg"
+  },
+  {
+    "id": 107,
+    "titolo_db": "Oak Street",
+    "anno": 2026,
+    "tmdb_id": 1101383,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "The End of Oak Street",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/54mt6Tg2Hj4M9A4mpkGrLktTiJR.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/7DmtuAK5gYGlMFA45Oxkl1bEpIC.jpg"
+  },
+  {
+    "id": 108,
+    "titolo_db": "La fine di Oak Street",
+    "anno": 2026,
+    "tmdb_id": 1101383,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The End of Oak Street",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/54mt6Tg2Hj4M9A4mpkGrLktTiJR.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/7DmtuAK5gYGlMFA45Oxkl1bEpIC.jpg"
+  },
+  {
+    "id": 109,
+    "titolo_db": "Ace Ventura - Missione Africa",
+    "anno": 1995,
+    "tmdb_id": 9273,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Ace Ventura: When Nature Calls",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/5Ygaz8czBDmTGKtACnFFauUKCOC.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/wcinCf1ov2D6M3P7BBZkzQFOiIb.jpg"
+  },
+  {
+    "id": 110,
+    "titolo_db": "Braveheart - Cuore impavido",
+    "anno": 1995,
+    "tmdb_id": 197,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Braveheart",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/gZvvrgehgqYNy12Z2sP333nn5Nw.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/or1gBugydmjToAEq7OZY0owwFk.jpg"
+  },
+  {
+    "id": 111,
+    "titolo_db": "Titanic",
+    "anno": 1997,
+    "tmdb_id": 597,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Titanic",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/i87I2HPumcMkX5Vl48n2XkS5Os7.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg"
+  },
+  {
+    "id": 112,
+    "titolo_db": "10 Cloverfield Lane",
+    "anno": 2016,
+    "tmdb_id": 333371,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "10 Cloverfield Lane",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/266EUEBypO6shSfYwUpaCeNPCAb.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/q8A39vcBDruhvoDTJd6L8a4lnTi.jpg"
+  },
+  {
+    "id": 113,
+    "titolo_db": "The Cloverfield Paradox",
+    "anno": 2018,
+    "tmdb_id": 384521,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Cloverfield Paradox",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/hxKqEX748hwOkgcxs498x5qQ7Vk.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/vJi2ExTcWdJR3150VPKqqtdGxsT.jpg"
+  },
+  {
+    "id": 114,
+    "titolo_db": "Il grande Lebowski",
+    "anno": 1998,
+    "tmdb_id": 763400,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Making of 'The Big Lebowski'",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/rRwaCTF777WaBlrVxtuBic43oqC.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/rRwaCTF777WaBlrVxtuBic43oqC.jpg"
+  },
+  {
+    "id": 115,
+    "titolo_db": "Pulp Fiction",
+    "anno": 1994,
+    "tmdb_id": 680,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Pulp Fiction",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/hOpN58hkQGZph5LHhyRrryy1hzF.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/vQWk5YBFWF4bZaofAbv0tShwBvQ.jpg"
+  },
+  {
+    "id": 116,
+    "titolo_db": "Lei",
+    "anno": 2013,
+    "tmdb_id": 152601,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Her",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/ptoIaqRBgyBVMKXRG2V2afFqDut.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/eCOtqtfvn7mxGl6nfmq4b1exJRc.jpg"
+  },
+  {
+    "id": 117,
+    "titolo_db": "L'attimo fuggente",
+    "anno": 1989,
+    "tmdb_id": 207,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Dead Poets Society",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/nIH9ZI4aA8zd0tQSduMWtpniyyH.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/erzbMlcNHOdx24AXOcn2ZKA7R1q.jpg"
+  },
+  {
+    "id": 118,
+    "titolo_db": "The Hateful Eight",
+    "anno": 2015,
+    "tmdb_id": 273248,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Hateful Eight",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/2ogVOei8k5WPixP2RVJFMn16zII.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/jIywvdPjia2t3eKYbjVTcwBQlG8.jpg"
+  },
+  {
+    "id": 119,
+    "titolo_db": "Spider-Man: Homecoming",
+    "anno": 2017,
+    "tmdb_id": 315635,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Spider-Man: Homecoming",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/9OYK3q83z0LmFOx3xZXfdaVck2d.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/c24sv2weTHPsmDa7jEMN0m2P3RT.jpg"
+  },
+  {
+    "id": 120,
+    "titolo_db": "Spider-Man: Far From Home",
+    "anno": 2019,
+    "tmdb_id": 429617,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Spider-Man: Far From Home",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/blWCg2gs0uQiEl4e3ml6j3yDSKg.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/4q2NNj4S5dG2RLF9CpXsej7yXl.jpg"
+  },
+  {
+    "id": 121,
+    "titolo_db": "Spider-Man: No Way Home",
+    "anno": 2021,
+    "tmdb_id": 634649,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Spider-Man: No Way Home",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/xLnZ0DB06H0MuGXcF0uhJxr6b8y.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/1g0dhYtq4irTY1GPXvft6k4YLjm.jpg"
+  },
+  {
+    "id": 122,
+    "titolo_db": "Matrix",
+    "anno": 1999,
+    "tmdb_id": 603,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Matrix",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/3vmTUXJHlKkvenf8G35dr5HlTEh.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/dXNAPwY7VrqMAo51EKhhCJfaGb5.jpg"
+  },
+  {
+    "id": 123,
+    "titolo_db": "Matrix Reloaded",
+    "anno": 2003,
+    "tmdb_id": 604,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Matrix Reloaded",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/uWkkhMhJKBsjPkbPcRm4nlYUZxH.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/8xEVAe84zlL9rkfYT6dZXero4KK.jpg"
+  },
+  {
+    "id": 124,
+    "titolo_db": "Matrix Revolutions",
+    "anno": 2003,
+    "tmdb_id": 605,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Matrix Revolutions",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/cGprSBfxwOxgExQnwFz39XKl3H2.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/qEWiBXJGXK28jGBAm8oFKKTB0WD.jpg"
+  },
+  {
+    "id": 125,
+    "titolo_db": "Matrix Resurrections",
+    "anno": 2021,
+    "tmdb_id": 624860,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Matrix Resurrections",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/sZCT1D5yLNVHarTpv157FaLzPCc.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/8c4a8kE7PizaGQQnditMmI1xbRp.jpg"
+  },
+  {
+    "id": 126,
+    "titolo_db": "Il buono, il brutto, il cattivo",
+    "anno": 1966,
+    "tmdb_id": 429,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Good, the Bad and the Ugly",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/n9HRt5Uq6iY9u6rdaFUHCBg14sg.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/bX2xnavhMYjWDoZp1VM6VnU1xwe.jpg"
+  },
+  {
+    "id": 127,
+    "titolo_db": "C'era una volta il West",
+    "anno": 1968,
+    "tmdb_id": 335,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Once Upon a Time in the West",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/3MPqF2iK6ZBoagnB5H1pjImHpHc.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/qbYgqOczabWNn2XKwgMtVrntD6P.jpg"
+  },
+  {
+    "id": 128,
+    "titolo_db": "Giù la testa",
+    "anno": 1971,
+    "tmdb_id": 336,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Duck, You Sucker",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/qTdmSJPOW3ts04BrBRTwieA3BY9.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/nWmAtZf83qpOai0fzehf7Hn1S3R.jpg"
+  },
+  {
+    "id": 129,
+    "titolo_db": "C'era una volta in America",
+    "anno": 1984,
+    "tmdb_id": 311,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Once Upon a Time in America",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/A0Va4hHmMfuU6WPIIeSXFUl5gjN.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/i0enkzsL5dPeneWnjl1fCWm6L7k.jpg"
+  },
+  {
+    "id": 130,
+    "titolo_db": "Love Happens - Qualcosa di speciale (noto anche come Brand New Day)",
+    "anno": 2009,
+    "tmdb_id": 25643,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "Love Happens",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/hUMCP4Fhwvc5CKREt86cVJAUITs.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/ijRJlhAZ7QMkTIVAUkIY8stWfk1.jpg"
+  },
+  {
+    "id": 132,
+    "titolo_db": "Spider-Man: Brand New Day",
+    "anno": 2026,
+    "tmdb_id": 969681,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Spider-Man: Brand New Day",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/fRbJeDILi6nLYCT5XeFapjVTlSK.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/bjiS5ipwxb9JFy3XRRN4OAilSeX.jpg"
+  },
+  {
+    "id": 133,
+    "titolo_db": "C'era una volta a... Hollywood",
+    "anno": 2019,
+    "tmdb_id": 466272,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "Once Upon a Time... in Hollywood",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/wW5t1FNg3ZHQu5sXeShyaN3oU9Z.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/8j58iEBw9pOXFD2L0nt0ZXeHviB.jpg"
+  },
+  {
+    "id": 134,
+    "titolo_db": "Rocky III",
+    "anno": 1982,
+    "tmdb_id": 1371,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Rocky III",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/ajcNIcmwjbVO8kA22WMeCcTKf9T.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/uqw16i2kmwVqkJHzjzbDU4xZ0Pl.jpg"
+  },
+  {
+    "id": 135,
+    "titolo_db": "Rocky V",
+    "anno": 1990,
+    "tmdb_id": 1375,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Rocky V",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/y6xHS5icTfYXkRZtb2NvTLhVYfn.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/qCARerjCFZOEeLiVdomhwRYlDSn.jpg"
+  },
+  {
+    "id": 136,
+    "titolo_db": "La storia del generale Custer",
+    "anno": 1941,
+    "tmdb_id": 17382,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "They Died with Their Boots On",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/5cZLUtSWiz0LWK1H0EZSH5RkL1L.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/gx8jknFwZRuQwTPooe14Dsx5uTO.jpg"
+  },
+  {
+    "id": 137,
+    "titolo_db": "Ronin",
+    "anno": 1998,
+    "tmdb_id": 8195,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Ronin",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/cNngnFz2VLJbIYQEgn3Idd20h1K.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/AirrhRJjHwytOV0pdLu7YZ4DEyr.jpg"
+  },
+  {
+    "id": 138,
+    "titolo_db": "Jackie Brown",
+    "anno": 1997,
+    "tmdb_id": 184,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Jackie Brown",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/jLnXl26rUTHryy6scittB5OMUQk.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/rOUx7qg4KmEh1juEDwqzbDSL1Nr.jpg"
+  },
+  {
+    "id": 139,
+    "titolo_db": "Bullet Train",
+    "anno": 2022,
+    "tmdb_id": 718930,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Bullet Train",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/zTyMbs3zTEpDhyrel35vgpJdzFS.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/j8szC8OgrejDQjjMKSVXyaAjw3V.jpg"
+  },
+  {
+    "id": 140,
+    "titolo_db": "C'era una volta a New York",
+    "anno": 2013,
+    "tmdb_id": 152599,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Immigrant",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/c0R0CIjxP7D8eA4oGoJFdtBcLzk.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/ArWRRQYeXL3nG4jYpMOPoBvgmy9.jpg"
+  },
+  {
+    "id": 141,
+    "titolo_db": "Lo squalo",
+    "anno": 1975,
+    "tmdb_id": 578,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Jaws",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/zHO7LcDKgAM1sLAZ1Y9yuWc7W7B.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/lxM6kqilAdpdhqUl2biYp5frUxE.jpg"
+  },
+  {
+    "id": 142,
+    "titolo_db": "Lo squalo 2",
+    "anno": 1978,
+    "tmdb_id": 579,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Jaws 2",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/6lrBNBedNIiPpFtyeFwe63OkJoz.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/cN3ijEwsn4kBaRuHfcJpAQJbeWe.jpg"
+  },
+  {
+    "id": 143,
+    "titolo_db": "Lo squalo 3",
+    "anno": 1983,
+    "tmdb_id": 17692,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Jaws 3-D",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/cNNORYubcNFChvN9jAFeASNswo8.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/kqDXj53F9paqVGJLGfHtz7giJ3s.jpg"
+  },
+  {
+    "id": 144,
+    "titolo_db": "Bastardi senza gloria",
+    "anno": 2009,
+    "tmdb_id": 16869,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Inglourious Basterds",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/aa1jLbxTTuA6o5ucHoZh2khwNSo.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/aupnPtagH9JVBuMrGEanf4iqXEQ.jpg"
+  },
+  {
+    "id": 145,
+    "titolo_db": "Le iene",
+    "anno": 1992,
+    "tmdb_id": 500,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Reservoir Dogs",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/noWeDEXd0a8du7tWG9F16Pm3Cvv.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/xi8Iu6qyTfyZVDVy60raIOYJJmk.jpg"
+  },
+  {
+    "id": 146,
+    "titolo_db": "Blade Runner",
+    "anno": 1982,
+    "tmdb_id": 78,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Blade Runner",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/2mPclQ5v9YK0eqCefvav3YsYPYI.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/63N9uy8nd9j7Eog2axPQ8lbr3Wj.jpg"
+  },
+  {
+    "id": 147,
+    "titolo_db": "Mr. Crocodile Dundee",
+    "anno": 1986,
+    "tmdb_id": 9671,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Crocodile Dundee",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/j7slCp0VJeGPpcrUNykuZS2zrhL.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/pduPduL1ub5kok3lPYT15ryC9L6.jpg"
+  },
+  {
+    "id": 148,
+    "titolo_db": "Master & Commander - Sfida ai confini del mare",
+    "anno": 2003,
+    "tmdb_id": 8619,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Master and Commander: The Far Side of the World",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/6J8Cpjaan2KfLGglruBZE7MoTo7.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/7ZUHF6P0vcA5v1Gm8NbRYyd9w4N.jpg"
+  },
+  {
+    "id": 149,
+    "titolo_db": "...altrimenti ci arrabbiamo!",
+    "anno": 1974,
+    "tmdb_id": 6916,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Watch Out, We're Mad",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/27bKMOKfVtOicxZPP1Nk78WyCFE.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/oERikPHC3cr9UDCale6YrQxkyNW.jpg"
+  },
+  {
+    "id": 150,
+    "titolo_db": "Dune",
+    "anno": 2021,
+    "tmdb_id": 438631,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Dune",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/zolKD2yscZd86GviNa6pBPc6N9o.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/v1tRXZ4JtD2Iv6fjkPvT4GiwslV.jpg"
+  },
+  {
+    "id": 151,
+    "titolo_db": "Dune - Parte due",
+    "anno": 2024,
+    "tmdb_id": 693134,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Dune: Part Two",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/nhdQxDCI64rMgypYZpsF7UvbdJA.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/6izwz7rsy95ARzTR3poZ8H6c5pp.jpg"
+  },
+  {
+    "id": 152,
+    "titolo_db": "Poseidon",
+    "anno": 2006,
+    "tmdb_id": 503,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Poseidon",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/qWenXpjkzQ04wt5DLwzwrSjxLhl.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/fDPdjGc8SUEDWfTwMaZlCE6NSi3.jpg"
+  },
+  {
+    "id": 153,
+    "titolo_db": "Toy Story - Il mondo dei giocattoli",
+    "anno": 1995,
+    "tmdb_id": 862,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Toy Story",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/9E1UvfLS9PIO9c8TJEOQ7kfFq3Z.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/uXDfjJbdP4ijW5hWSBrPrlKpxab.jpg"
+  },
+  {
+    "id": 154,
+    "titolo_db": "Toy Story 2 - Woody e Buzz alla riscossa",
+    "anno": 1999,
+    "tmdb_id": 863,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "Toy Story 2",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/lHloXovbVaQ1tbOB1UaVQm6GgXo.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/4rbcp3ng8n1MKHjpeqW0L7Fnpzz.jpg"
+  },
+  {
+    "id": 155,
+    "titolo_db": "Toy Story 3 - La grande fuga",
+    "anno": 2010,
+    "tmdb_id": 10193,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Toy Story 3",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/tTBILVsSwLRB2CiNVSlewd5XZsW.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/AbbXspMOwdvwWZgVN0nabZq03Ec.jpg"
+  },
+  {
+    "id": 156,
+    "titolo_db": "Toy Story 4",
+    "anno": 2019,
+    "tmdb_id": 301528,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Toy Story 4",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/lilCjgWKcwIpa55BuTzzI2BMZgP.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/w9kR8qbmQ01HwnvK4alvnQ2ca0L.jpg"
+  },
+  {
+    "id": 157,
+    "titolo_db": "Toy Story 5",
+    "anno": 2026,
+    "tmdb_id": 1084244,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Toy Story 5",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/i7eQGriXCmNpScSVzepNHn9nMPM.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/sfQtVlIHljToOwYjhe21KPGzZWK.jpg"
+  },
+  {
+    "id": 158,
+    "titolo_db": "Batman Begins",
+    "anno": 2005,
+    "tmdb_id": 272,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Batman Begins",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/2eNeMwCncDvcJZ4AqKndWX71wDc.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/sPX89Td70IDDjVr85jdSBb4rWGr.jpg"
+  },
+  {
+    "id": 159,
+    "titolo_db": "Il cavaliere oscuro",
+    "anno": 2008,
+    "tmdb_id": 155,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Dark Knight",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/qIhsgno1mjbzUbs4H6DaRjhskAR.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg"
+  },
+  {
+    "id": 160,
+    "titolo_db": "Il cavaliere oscuro - Il ritorno",
+    "anno": 2012,
+    "tmdb_id": 49026,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Dark Knight Rises",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/p2JzxFRAlbxS4EvWMo4yiYZXu1W.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/hr0L2aueqlP2BYUblTTjmtn0hw4.jpg"
+  },
+  {
+    "id": 161,
+    "titolo_db": "Lucy",
+    "anno": 2014,
+    "tmdb_id": 240832,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Lucy",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/oQIITXMMp9mEckfFst5hySZ8DAz.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/kRbpUTRNm6QbLQFPFWUcNC4czEm.jpg"
+  },
+  {
+    "id": 162,
+    "titolo_db": "The Truman Show",
+    "anno": 1998,
+    "tmdb_id": 37165,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Truman Show",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/vniJPHHUpjdVPTSGxn6b3z93nyK.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/vuza0WqY239yBXOadKlGwJsZJFE.jpg"
+  },
+  {
+    "id": 163,
+    "titolo_db": "Digger",
+    "anno": 2020,
+    "tmdb_id": 724406,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "The Gold-digger",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/kCKJt6q72hWOd6xuGXSzlzdXozc.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/rm4UZ9DLXF06npLZMOTNTBNpWhk.jpg"
+  },
+  {
+    "id": 164,
+    "titolo_db": "Il patriota",
+    "anno": 2000,
+    "tmdb_id": 2024,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Patriot",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/tAS04P7tuhnKA28QskKprmtuLwI.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/fWZd815QxUCUcrWQZwUkAp9ljG.jpg"
+  },
+  {
+    "id": 165,
+    "titolo_db": "Digger",
+    "anno": 2026,
+    "tmdb_id": 1248832,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Digger",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/wisikjQcsvw0XqyQQYBsxudb38Z.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/1ATXKrIPJyKNwnJ6lcG088Sa6zi.jpg"
+  },
+  {
+    "id": 166,
+    "titolo_db": "Il momento di uccidere",
+    "anno": 1996,
+    "tmdb_id": 1645,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "A Time to Kill",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/u8lpYepqSQ9d58GR7K6KS1FEhZn.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/w8UCke112E9jrhjKcwG32kyhTx5.jpg"
+  },
+  {
+    "id": 167,
+    "titolo_db": "Marty Supreme",
+    "anno": 2025,
+    "tmdb_id": 1317288,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Marty Supreme",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/et9WEOYIel2xTEPL1xwBkifgO2V.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/lYWEXbQgRTR4ZQleSXAgRbxAjvq.jpg"
+  },
+  {
+    "id": 168,
+    "titolo_db": "Non è un paese per vecchi",
+    "anno": 2007,
+    "tmdb_id": 6977,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "No Country for Old Men",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/2zbXKL34bwaZ2gBygwoDE8DXHs7.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/6d5XOczc226jECq0LIX0siKtgHR.jpg"
+  },
+  {
+    "id": 169,
+    "titolo_db": "Full Metal Jacket",
+    "anno": 1987,
+    "tmdb_id": 600,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Full Metal Jacket",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/91pR97t391im33z2xnm0nvxUyv9.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/kMKyx1k8hWWscYFnPbnxxN4Eqo4.jpg"
+  },
+  {
+    "id": 170,
+    "titolo_db": "Independence Day",
+    "anno": 1996,
+    "tmdb_id": 602,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Independence Day",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/dXaARuPnIVEQWM8TkPSJ8LBpc16.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/p0BPQGSPoSa8Ml0DAf2mB2kCU0R.jpg"
+  },
+  {
+    "id": 174,
+    "titolo_db": "Il primo re",
+    "anno": 2019,
+    "tmdb_id": 565179,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The First King",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/mdM3dLbzF7bVhYTRQCPQiltP4vQ.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/dqBU63M3cKy7pfVsmhrbgY5X8iv.jpg"
+  },
+  {
+    "id": 176,
+    "titolo_db": "The Untouchables - Gli intoccabili",
+    "anno": 1987,
+    "tmdb_id": 117,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Untouchables",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/s2FtPcKNwfSQ2cHfv5p0mDjVttk.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/tPq0R4jTO4Ey8ZspFaWK9wGA4Ls.jpg"
+  },
+  {
+    "id": 178,
+    "titolo_db": "King Kong (King Kong)",
+    "anno": 1933,
+    "tmdb_id": 244,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "King Kong",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/lHlnxKL5GbgRibyRFI7n1Ey850i.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/lHlnxKL5GbgRibyRFI7n1Ey850i.jpg"
+  },
+  {
+    "id": 179,
+    "titolo_db": "King Kong (King Kong)",
+    "anno": 1976,
+    "tmdb_id": 10730,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "King Kong",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/6iSU6sfjQ2fT0wcL3AqruXErVw1.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/paYKhEwUaxKA05vmOfU7FlleTln.jpg"
+  },
+  {
+    "id": 180,
+    "titolo_db": "King Kong (King Kong)",
+    "anno": 2005,
+    "tmdb_id": 254,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "King Kong",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/3YoB2B7JMn8mJ8IsZDn80Zuyocq.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/6a2HY6UmD7XiDD3NokgaBAXEsD2.jpg"
+  },
+  {
+    "id": 181,
+    "titolo_db": "Lo Hobbit (The Hobbit)",
+    "anno": 1977,
+    "tmdb_id": 1362,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Hobbit",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/qTU84nwRmfBnukCdjoJaXZwD4qw.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/2ohvyMPhvjftLrM6S6Ljr6QrL0u.jpg"
+  },
+  {
+    "id": 182,
+    "titolo_db": "Lo Hobbit - Un viaggio inaspettato (The Hobbit: An Unexpected Journey)",
+    "anno": 2012,
+    "tmdb_id": 49051,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "The Hobbit: An Unexpected Journey",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/uoMnJrqlUmEc9etXvD2swUr1Tvu.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/yHA9Fc37VmpUA5UncTxxo3rTGVA.jpg"
+  },
+  {
+    "id": 183,
+    "titolo_db": "Lo Hobbit - La desolazione di Smaug (The Hobbit: The Desolation of Smaug)",
+    "anno": 2013,
+    "tmdb_id": 57158,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "The Hobbit: The Desolation of Smaug",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/8AG3NTGNQ4613o7XB8NUFSNW28W.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/xQYiXsheRCDBA39DOrmaw1aSpbk.jpg"
+  },
+  {
+    "id": 184,
+    "titolo_db": "Lo Hobbit - La battaglia delle cinque armate (The Hobbit: The Battle of the Five Armies)",
+    "anno": 2014,
+    "tmdb_id": 122917,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "The Hobbit: The Battle of the Five Armies",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/A2RkCwo2gcWX6OXL2B46eOU7Wv6.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/xT98tLqatZPQApyRmlPL12LtiWp.jpg"
+  },
+  {
+    "id": 185,
+    "titolo_db": "Avvenne domani (It Happened Tomorrow)",
+    "anno": 1944,
+    "tmdb_id": 3589,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "It Happened Tomorrow",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/hWKQ54scA6qCU6Wtl3euUJJCKAq.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/byWjI8SYnATh0OdnaCCKhO9nY0R.jpg"
+  },
+  {
+    "id": 186,
+    "titolo_db": "Always - Per sempre (Always)",
+    "anno": 1989,
+    "tmdb_id": 11352,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Always",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/gV89aOidilmkQBa75HVEZwRMp1W.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/r7LTwkgqUPPABnHpxceVylMf8M0.jpg"
+  },
+  {
+    "id": 187,
+    "titolo_db": "Always (Ojik geudaeman)",
+    "anno": 2011,
+    "tmdb_id": 86000,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "Always",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/zqw49pO0FndPZL5LVkq85JCNIVH.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/7PaCGnjY87sc9088zxFf34Tamcz.jpg"
+  },
+  {
+    "id": 188,
+    "titolo_db": "Always",
+    "anno": 1985,
+    "tmdb_id": 144231,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Always … But Not Forever",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/rCYAMewiNpV6gabIK7x1ee141Y8.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/rCYAMewiNpV6gabIK7x1ee141Y8.jpg"
+  },
+  {
+    "id": 189,
+    "titolo_db": "Harry, ti presento Sally... (When Harry Met Sally...)",
+    "anno": 1989,
+    "tmdb_id": 639,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "When Harry Met Sally...",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/9FntiimMchiZBjuklFfMuIinRnC.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/rFOiFUhTMtDetqCGClC9PIgnC1P.jpg"
+  },
+  {
+    "id": 190,
+    "titolo_db": "Il tempo delle mele (La Boum)",
+    "anno": 1980,
+    "tmdb_id": 166,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Party",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/lDxr4hi1El5SLIArgGAhjyOzREk.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/usGV1Q7KWR0Uq4dOIppGZ0ba8kz.jpg"
+  },
+  {
+    "id": 191,
+    "titolo_db": "Il tempo delle mele 2 (La Boum 2)",
+    "anno": 1982,
+    "tmdb_id": 171,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Party 2",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/ixRF6arqUqSHqvruUxbLFaSkK2L.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/pbkccDoxH1H1VdqWcQYycZxHTIK.jpg"
+  },
+  {
+    "id": 192,
+    "titolo_db": "Il tempo delle mele 3 (L'étudiante)",
+    "anno": 1988,
+    "tmdb_id": 52286,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Student",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/wGx196d9fMsWwItWTK3WpUkzY1T.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/tDx9zW0Edb83qh9PAGrgP3Zh9RP.jpg"
+  },
+  {
+    "id": 193,
+    "titolo_db": "L'avvocato del diavolo (Des Teufels Advokat)",
+    "anno": 1977,
+    "tmdb_id": 1813,
+    "match_reason": "first_movie_result",
+    "titolo_en": "The Devil's Advocate",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/6wq4owkyGkdXqehBsgcPOfeVVOE.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/5ZzBGpxy55OQzHxKVY11IpY6a0o.jpg"
+  },
+  {
+    "id": 194,
+    "titolo_db": "L'avvocato del diavolo (The Devil's Advocate)",
+    "anno": 1997,
+    "tmdb_id": 1813,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Devil's Advocate",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/6wq4owkyGkdXqehBsgcPOfeVVOE.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/5ZzBGpxy55OQzHxKVY11IpY6a0o.jpg"
+  },
+  {
+    "id": 195,
+    "titolo_db": "Interceptor (Mad Max)",
+    "anno": 1979,
+    "tmdb_id": 9659,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Mad Max",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/4vkHxaW8mGTQuhl6BAkUu2WnxfR.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/5LrI4GiCSrChgkdskVZiwv643Kg.jpg"
+  },
+  {
+    "id": 196,
+    "titolo_db": "Interceptor - Il guerriero della strada (Mad Max 2)",
+    "anno": 1981,
+    "tmdb_id": 8810,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Mad Max 2",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/i313vatvaMM67gi1B3YqJtl295Q.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/l1KVEhkGDpWRzQ0VqIhZqDDuOim.jpg"
+  },
+  {
+    "id": 197,
+    "titolo_db": "Mad Max oltre la sfera del tuono (Mad Max Beyond Thunderdome)",
+    "anno": 1985,
+    "tmdb_id": 9355,
+    "match_reason": "best_year_candidate",
+    "titolo_en": "Mad Max Beyond Thunderdome",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/zEFrGhYPkE0taW1cGgmfMoOWQ4t.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/jJlxcEVVUHnrUeEkQ0077VeHQpb.jpg"
+  },
+  {
+    "id": 198,
+    "titolo_db": "Mad Max: Fury Road",
+    "anno": 2015,
+    "tmdb_id": 76341,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Mad Max: Fury Road",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/5gbm8m1gYvOmVGRcxteiplDLWdg.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/ulcAi4dKpAjHwYGS08vNyx9H6I9.jpg"
+  },
+  {
+    "id": 199,
+    "titolo_db": "Furiosa: A Mad Max Saga",
+    "anno": 2024,
+    "tmdb_id": 786892,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Furiosa: A Mad Max Saga",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/fMG7ALVMYT8mVY9zQyVPIFCzQnN.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/iADOJ8Zymht2JPMoy3R7xceZprc.jpg"
+  },
+  {
+    "id": 200,
+    "titolo_db": "Quel pomeriggio di un giorno da cani (Dog Day Afternoon)",
+    "anno": 1975,
+    "tmdb_id": 968,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Dog Day Afternoon",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/kxVjqcrWGoysfBsrXPQHVLRf1o2.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/mavrhr0ig2aCRR8d48yaxtD5aMQ.jpg"
+  },
+  {
+    "id": 201,
+    "titolo_db": "Soldato blu (Soldier Blue)",
+    "anno": 1970,
+    "tmdb_id": 14384,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Soldier Blue",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/gk71DcCAhdoNux7Zt5vovmJyCRB.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/2fRfVQpdrjAhvxwytG0scOqdQOJ.jpg"
+  },
+  {
+    "id": 202,
+    "titolo_db": "Hunger Games (The Hunger Games)",
+    "anno": 2012,
+    "tmdb_id": 70160,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Hunger Games",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/azsm2nqX2eMJQ2eI6FjCIk17ncx.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/apa5G43Hha7kH7wJG0gkkHT7FA9.jpg"
+  },
+  {
+    "id": 203,
+    "titolo_db": "Hunger Games: La ragazza di fuoco (The Hunger Games: Catching Fire)",
+    "anno": 2013,
+    "tmdb_id": 101299,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Hunger Games: Catching Fire",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/oFQj7SBn9pGGc6ZuadhmQoSYWaD.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/vrQHDXjVmbYzadOXQ0UaObunoy2.jpg"
+  },
+  {
+    "id": 204,
+    "titolo_db": "Hunger Games: Il canto della rivolta - Parte 1 (The Hunger Games: Mockingjay - Part 1)",
+    "anno": 2014,
+    "tmdb_id": 131631,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Hunger Games: Mockingjay - Part 1",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/9LZSYohDOJkLU2TyRvPM1zIo62e.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/meSGXQ8MXqiC8bXxkKu7lPqnu0L.jpg"
+  },
+  {
+    "id": 205,
+    "titolo_db": "Hunger Games: Il canto della rivolta - Parte 2 (The Hunger Games: Mockingjay - Part 2)",
+    "anno": 2015,
+    "tmdb_id": 131634,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Hunger Games: Mockingjay - Part 2",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/aQvME1wpAZpjdyg5Xfe35lINmwt.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/lImKHDfExAulp16grYm8zD5eONE.jpg"
+  },
+  {
+    "id": 206,
+    "titolo_db": "Hunger Games - La ballata dell'usignolo e del serpente (The Hunger Games: The Ballad of Songbirds & Snakes)",
+    "anno": 2023,
+    "tmdb_id": 695721,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Hunger Games: The Ballad of Songbirds & Snakes",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/bk2Bh5mD3uvyKDaXKTAOGfoCTq5.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/mBaXZ95R2OxueZhvQbcEWy2DqyO.jpg"
+  },
+  {
+    "id": 207,
+    "titolo_db": "Cattivissimo me (Despicable Me)",
+    "anno": 2010,
+    "tmdb_id": 20352,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Despicable Me",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/t6hBb0Iz8TkY6JNxaUCE30es3iT.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/b1BT309QWjtFUlJPLmXmrcHOWEL.jpg"
+  },
+  {
+    "id": 208,
+    "titolo_db": "Cattivissimo me 2 (Despicable Me 2)",
+    "anno": 2013,
+    "tmdb_id": 93456,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Despicable Me 2",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/cAHjd4n5dmBnKf6eHcXbqi4CSrJ.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/5Fh4NdoEnCjCK9wLjdJ9DJNFl2b.jpg"
+  },
+  {
+    "id": 209,
+    "titolo_db": "Minions",
+    "anno": 2015,
+    "tmdb_id": 211672,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Minions",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/bQ92zNRkeD7SL2awyHPsC5PCjkF.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/dr02BdCNAUPVU07aOodwPYv6HCf.jpg"
+  },
+  {
+    "id": 210,
+    "titolo_db": "Cattivissimo me 3 (Despicable Me 3)",
+    "anno": 2017,
+    "tmdb_id": 324852,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Despicable Me 3",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/w5UQOIVconX1rmmGgUch9a1SMuG.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/e72KCMHNkbZ6USRJmABeqwmaJ5n.jpg"
+  },
+  {
+    "id": 211,
+    "titolo_db": "Minions 2 - Come Gru diventa cattivissimo (Minions: The Rise of Gru)",
+    "anno": 2022,
+    "tmdb_id": 438148,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Minions: The Rise of Gru",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/qfJeCjOVYYfy8uYqF711qV8Usqe.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/4dBDk1LPdvdhcZdjQBmdXwiVKUA.jpg"
+  },
+  {
+    "id": 212,
+    "titolo_db": "Cattivissimo me 4 (Despicable Me 4)",
+    "anno": 2024,
+    "tmdb_id": 519182,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Despicable Me 4",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/gIV7DbvWUwPN4lxSk3dMNkXzgX7.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/wWba3TaojhK7NdycRhoQpsG0FaH.jpg"
+  },
+  {
+    "id": 213,
+    "titolo_db": "Heart of the Sea - Le origini di Moby Dick (In the Heart of the Sea)",
+    "anno": 2015,
+    "tmdb_id": 205775,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "In the Heart of the Sea",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/wAN0GViqoyT1616y1fBq0hNB2HR.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/weVvNPfk6FM9vBg3BXtRtNAmiYM.jpg"
+  },
+  {
+    "id": 214,
+    "titolo_db": "Prisoners",
+    "anno": 2013,
+    "tmdb_id": 146233,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Prisoners",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/h1rj4wTATjxeqFMtEOuZyk1czis.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/uhviyknTT5cEQXbn6vWIqfM4vGm.jpg"
+  },
+  {
+    "id": 216,
+    "titolo_db": "La leggenda del pianista sull'oceano (The Legend of 1900)",
+    "anno": 1998,
+    "tmdb_id": 10376,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "The Legend of 1900",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/8rttNpb83qdHFMPMgFlcspVGaio.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/iOcbJ5pxokOPDRgieVDbsFMrCc6.jpg"
+  },
+  {
+    "id": 217,
+    "titolo_db": "The Book of Boba Fett",
+    "anno": 2021,
+    "tmdb_id": 115036,
+    "match_reason": "manual_override",
+    "titolo_en": "The Book of Boba Fett",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/lQqbnWsGt9RBGBWrmUKUOXZkl7N.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/gNbdjDi1HamTCrfvM9JeA94bNi2.jpg"
+  },
+  {
+    "id": 219,
+    "titolo_db": "Quo Vadis?",
+    "anno": 1913,
+    "tmdb_id": 114166,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Quo Vadis?",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/xbA8ljsXMgOnbkN3X5li9UzFSvf.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/xbA8ljsXMgOnbkN3X5li9UzFSvf.jpg"
+  },
+  {
+    "id": 220,
+    "titolo_db": "Quo Vadis?",
+    "anno": 1924,
+    "tmdb_id": 184499,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Quo Vadis?",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/9XznF1gIXfgqzEs6La7vXMW46sM.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/9XznF1gIXfgqzEs6La7vXMW46sM.jpg"
+  },
+  {
+    "id": 221,
+    "titolo_db": "Quo Vadis",
+    "anno": 1951,
+    "tmdb_id": 11620,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Quo Vadis",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/5fU3X1zTK5fL5rfAHWfzi06STVN.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/dqF1dattMNiwGjPSphu2VSi558Q.jpg"
+  },
+  {
+    "id": 222,
+    "titolo_db": "Quo Vadis?",
+    "anno": 1985,
+    "tmdb_id": 184499,
+    "match_reason": "first_movie_result",
+    "titolo_en": "Quo Vadis?",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/9XznF1gIXfgqzEs6La7vXMW46sM.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/9XznF1gIXfgqzEs6La7vXMW46sM.jpg"
+  },
+  {
+    "id": 223,
+    "titolo_db": "Quo Vadis",
+    "anno": 2001,
+    "tmdb_id": 59219,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Quo Vadis",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/rzePNmvU9Kczxu60TUoyzVED5xy.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/rzePNmvU9Kczxu60TUoyzVED5xy.jpg"
+  },
+  {
+    "id": 224,
+    "titolo_db": "Spartacus",
+    "anno": 1960,
+    "tmdb_id": 967,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Spartacus",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/lHxOu8Gp1urxHgtS4o0AywrniG1.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/xLPpQlFWE12cbqNJQ5Vf4eJU8ij.jpg"
+  },
+  {
+    "id": 225,
+    "titolo_db": "L'ultimo samurai (The Last Samurai)",
+    "anno": 2003,
+    "tmdb_id": 616,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Last Samurai",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/hHYbOZVogfOIVg4FEF2Hs2UUNHs.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/a8jmJPs5eZBARmnuEEvZwbjwyz4.jpg"
+  },
+  {
+    "id": 226,
+    "titolo_db": "L'ultimo samurai (Ôkami yo rakujitsu o)",
+    "anno": 1974,
+    "tmdb_id": 616,
+    "match_reason": "first_movie_result",
+    "titolo_en": "The Last Samurai",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/hHYbOZVogfOIVg4FEF2Hs2UUNHs.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/a8jmJPs5eZBARmnuEEvZwbjwyz4.jpg"
+  },
+  {
+    "id": 227,
+    "titolo_db": "Mamma, ho perso l'aereo (Home Alone)",
+    "anno": 1990,
+    "tmdb_id": 771,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Home Alone",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/aQdJ8Q4CEUq55DTcBjItOyqMhTd.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/onTSipZ8R3bliBdKfPtsDuHTdlL.jpg"
+  },
+  {
+    "id": 228,
+    "titolo_db": "Mamma, ho riperso l'aereo - Mi sono smarrito a New York (Home Alone 2: Lost in New York)",
+    "anno": 1992,
+    "tmdb_id": 772,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Home Alone 2: Lost in New York",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/eYKQJmrEyANdUcE7nJ7PQ6XARaO.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/uuitWHpJwxD1wruFl2nZHIb4UGN.jpg"
+  },
+  {
+    "id": 229,
+    "titolo_db": "Mamma, ho preso il morbillo (Home Alone 3)",
+    "anno": 1997,
+    "tmdb_id": 9714,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Home Alone 3",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/s1PwvbnNicaxT6wdlMZJqrW0yQt.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/6uOadrCfle0n2LOOxHbgWEdnrm2.jpg"
+  },
+  {
+    "id": 230,
+    "titolo_db": "Mamma, ho allagato la casa (Home Alone 4: Taking Back the House)",
+    "anno": 2002,
+    "tmdb_id": 12536,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Home Alone 4",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/zfm0UYbIpOpL8ak9tf655h3GWS2.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/qRktvMOO2QaCL7gvNyvZDoxPOZj.jpg"
+  },
+  {
+    "id": 231,
+    "titolo_db": "Mamma, ho visto i fantasmi! (Home Alone: The Holiday Heist)",
+    "anno": 2012,
+    "tmdb_id": 134375,
+    "match_reason": "manual_override",
+    "titolo_en": "Home Alone: The Holiday Heist",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/nsRl6M33UjKNpHDIRoGW81WX89H.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/aP6NPJeiv30d82lZF1baZ3qRBcZ.jpg"
+  },
+  {
+    "id": 232,
+    "titolo_db": "Home Sweet Home Alone - Mamma, ho perso l'aereo (Home Sweet Home Alone)",
+    "anno": 2021,
+    "tmdb_id": 654974,
+    "match_reason": "exact_year_and_title",
+    "titolo_en": "Home Sweet Home Alone",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/jdMU0YJC5jTEI95iALzGm6qPis0.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/fP3VvqUjEBjawxZHL4sYCq2ZdJD.jpg"
+  },
+  {
+    "id": 234,
+    "titolo_db": "Ultima notte a Soho",
+    "anno": 2021,
+    "tmdb_id": 576845,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Last Night in Soho",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/mNuXKuiywifooo8LnAzMy0W4ZiK.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/n1ZRmjlk1BJTY7aASqACfPAaLn2.jpg"
+  },
+  {
+    "id": 235,
+    "titolo_db": "Mamma ho perso il lavoro",
+    "anno": 2008,
+    "tmdb_id": 16699,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Smother",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/2vLLJG71kmrCcTbnIztn13NHKZF.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/2vLLJG71kmrCcTbnIztn13NHKZF.jpg"
+  },
+  {
+    "id": 236,
+    "titolo_db": "L'esercito delle 12 scimmie",
+    "anno": 1995,
+    "tmdb_id": 63,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Twelve Monkeys",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/9WfkdEGHO8K0AF8ahbc34zMzM4e.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/gt3iyguaCIw8DpQZI1LIN5TohM2.jpg"
+  },
+  {
+    "id": 238,
+    "titolo_db": "L'esorcista",
+    "anno": 1973,
+    "tmdb_id": 9552,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Exorcist",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/49uIBJqG4ugL7KC2yBhz0nCLeHG.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/5x0CeVHJI8tcDx8tUUwYHQSNILq.jpg"
+  },
+  {
+    "id": 239,
+    "titolo_db": "Halloween - La notte delle streghe",
+    "anno": 1978,
+    "tmdb_id": 948,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Halloween",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/uxLqrN38fSQEUVpM4S1suhnW3X.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/wijlZ3HaYMvlDTPqJoTCWKFkCPU.jpg"
+  },
+  {
+    "id": 240,
+    "titolo_db": "It - Capitolo uno",
+    "anno": 2017,
+    "tmdb_id": 346364,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "It",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/ru0gDnxKzBjzrPxfRyZIuse9hfu.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/9E2y5Q7WlCVNEhP5GiVTjhEhx1o.jpg"
+  },
+  {
+    "id": 241,
+    "titolo_db": "E.T. l'extra-terrestre",
+    "anno": 1982,
+    "tmdb_id": 601,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "E.T. the Extra-Terrestrial",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/3DIwTC2A58WDtsgjaXjo2FYA1pW.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/an0nD6uq6byfxXCfk6lQBzdL2J1.jpg"
+  },
+  {
+    "id": 256,
+    "titolo_db": "Il miglio verde",
+    "anno": 1999,
+    "tmdb_id": 497,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Green Mile",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/kptqTcldosy8JPf75JT16oTYUMB.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/8VG8fDNiy50H4FedGwdSVUPoaJe.jpg"
+  },
+  {
+    "id": 257,
+    "titolo_db": "Odissea",
+    "anno": 2026,
+    "tmdb_id": 1368337,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Odyssey",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/qQhInj9fw3S2bMbiEujVldthgKe.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/5rhTDKUhPYvpdQIijFIs5VoWsON.jpg"
+  },
+  {
+    "id": 258,
+    "titolo_db": "Biancaneve e i sette nani",
+    "anno": 1938,
+    "tmdb_id": 408,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Snow White and the Seven Dwarfs",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/pXji7b98MIliRsylaBeCBaRbcmA.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/3VAHfuNb6Z7UiW12iYKANSPBl8m.jpg"
+  },
+  {
+    "id": 259,
+    "titolo_db": "Wonka",
+    "anno": 2023,
+    "tmdb_id": 787699,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Wonka",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/7y2M1w0nWW0Z5Ph1XzED07OYUsa.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/qhb1qOilapbapxWQn9jtRCMwXJF.jpg"
+  },
+  {
+    "id": 260,
+    "titolo_db": "Io sono nessuno",
+    "anno": 2021,
+    "tmdb_id": 615457,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Nobody",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/iECT5xNf72P7cx9LDMrEwhGYD5O.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/oBgWY00bEFeZ9N25wWVyuQddbAo.jpg"
+  },
+  {
+    "id": 261,
+    "titolo_db": "Io sono nessuno 2",
+    "anno": 2025,
+    "tmdb_id": 1007734,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Nobody 2",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/8RXDbeVG9Tb0z8FWPph77uJsTkd.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/svXVRoRSu6zzFtCzkRsjZS7Lqpd.jpg"
+  },
+  {
+    "id": 262,
+    "titolo_db": "L'ultima missione: Project Hail Mary",
+    "anno": 2026,
+    "tmdb_id": 687163,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Project Hail Mary",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/gPC1X3mwqwX50Ye3qwwPt7iW3Ma.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/iOb2fjXLbpJgyQXe46n1WtGCnaa.jpg"
+  },
+  {
+    "id": 263,
+    "titolo_db": "Robin Hood - Il prezzo del sangue",
+    "anno": 2026,
+    "tmdb_id": 1284465,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Death of Robin Hood",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/knUCsVWsLv5583lsvs2cP1VRrGx.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/13MmRwmG5NmaMfU8qNrtgGXisiD.jpg"
+  },
+  {
+    "id": 264,
+    "titolo_db": "Disclosure Day",
+    "anno": 2026,
+    "tmdb_id": 1275779,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Disclosure Day",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/72Yx1uisLLJy5k2P5OzBkRdEIjp.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/AnJ8IQJI23hNpYXVNaythu061Ru.jpg"
+  },
+  {
+    "id": 265,
+    "titolo_db": "Cena con delitto - Knives Out",
+    "anno": 2019,
+    "tmdb_id": 546554,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Knives Out",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/q2sh3RJ3rhRDYlJV4ZrMzzZ9Ye7.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/pThyQovXQrw2m0s9x82twj48Jq4.jpg"
+  },
+  {
+    "id": 266,
+    "titolo_db": "Glass Onion - Knives Out",
+    "anno": 2022,
+    "tmdb_id": 661374,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Glass Onion: A Knives Out Mystery",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/yhCxL5ebwiBwkmYrjL8gqJBZKNS.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/vDGr1YdrlfbU9wxTOdpf3zChmv9.jpg"
+  },
+  {
+    "id": 267,
+    "titolo_db": "Wake Up Dead Man - Knives Out",
+    "anno": 2025,
+    "tmdb_id": 812583,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Wake Up Dead Man: A Knives Out Mystery",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/db8j0xU82lzWKX0SXrPY5tFrzwA.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/iV9LM8aUb83BjCCx2RUnKE5sSQg.jpg"
+  },
+  {
+    "id": 268,
+    "titolo_db": "Una battaglia dopo l’altra",
+    "anno": 2025,
+    "tmdb_id": 1054867,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "One Battle After Another",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/3TjxuSfBSkhB8OvBov7Dk4L0Bcd.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/lbBWwxBht4JFP5PsuJ5onpMqugW.jpg"
+  },
+  {
+    "id": 269,
+    "titolo_db": "Tre uomini e una gamba",
+    "anno": 1997,
+    "tmdb_id": 38286,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Three Men and a Leg",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/aUQhhVkB1XXUZ9MPGborY6MFYI8.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/yhgfM1WTHu4Uiwa47FAGmBk4V7x.jpg"
+  },
+  {
+    "id": 270,
+    "titolo_db": "La leggenda di Al, John e Jack",
+    "anno": 2002,
+    "tmdb_id": 38397,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Legend of Al, John and Jack",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/t7Xb04P1uCUJ1LADWD5RfqWGyDu.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/t7Xb04P1uCUJ1LADWD5RfqWGyDu.jpg"
+  },
+  {
+    "id": 271,
+    "titolo_db": "Così è la vita",
+    "anno": 1998,
+    "tmdb_id": 38396,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "That's Life",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/zcZxzcl79S3gaWWDGGHcFkjT9m2.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/zcZxzcl79S3gaWWDGGHcFkjT9m2.jpg"
+  },
+  {
+    "id": 272,
+    "titolo_db": "Chiedimi se sono felice",
+    "anno": 2000,
+    "tmdb_id": 50531,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Ask Me If I'm Happy",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/7DtDnWwmZAI3dYUKNPsRy24SxV3.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/7DtDnWwmZAI3dYUKNPsRy24SxV3.jpg"
+  },
+  {
+    "id": 273,
+    "titolo_db": "Tu la conosci Claudia?",
+    "anno": 2004,
+    "tmdb_id": 57112,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Have You Met Claudia?",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/4MbovTjSHv2AvcK39qUaEYeNuyl.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/4MbovTjSHv2AvcK39qUaEYeNuyl.jpg"
+  },
+  {
+    "id": 274,
+    "titolo_db": "Dirty Dancing - Balli proibiti",
+    "anno": 1987,
+    "tmdb_id": 88,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Dirty Dancing",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/4wj0T7FSD2FohE1IHAXU3brpL4U.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/9Jw6jys7q9gjzVX5zm1z0gC8gY9.jpg"
+  },
+  {
+    "id": 275,
+    "titolo_db": "Qualcosa è cambiato",
+    "anno": 1997,
+    "tmdb_id": 2898,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "As Good as It Gets",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/tmwubiSQ4IwJbRqSoyNFb7tMAVg.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/xXxuJPNUDZ0vjsAXca0O5p3leVB.jpg"
+  },
+  {
+    "id": 276,
+    "titolo_db": "Arrivano i prof",
+    "anno": 2018,
+    "tmdb_id": 516043,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Here Come the Teachers",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/mBc8UOa5VxdgLfY5qYWZvuboJKq.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/mBc8UOa5VxdgLfY5qYWZvuboJKq.jpg"
+  },
+  {
+    "id": 277,
+    "titolo_db": "The Rock",
+    "anno": 1996,
+    "tmdb_id": 9802,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Rock",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/leBDsXawQQ6ue7xlB6fIjXEZMZz.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/eBcoxveWzzXQrCrwWMGAROcqgpP.jpg"
+  },
+  {
+    "id": 278,
+    "titolo_db": "La fabbrica di cioccolato",
+    "anno": 2005,
+    "tmdb_id": 118,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Charlie and the Chocolate Factory",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/w2Q8Zx1RCM0aAuG36nOXXJ6pV0u.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/iKP6wg3c6COUe8gYutoGG7qcPnO.jpg"
+  },
+  {
+    "id": 279,
+    "titolo_db": "Ritorno al futuro",
+    "anno": 1985,
+    "tmdb_id": 105,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Back to the Future",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/isqoi7kuUsR5Drlqdh4ZfMULgox.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/vN5B5WgYscRGcQpVhHl6p9DDTP0.jpg"
+  },
+  {
+    "id": 280,
+    "titolo_db": "Ritorno al futuro - Parte II",
+    "anno": 1989,
+    "tmdb_id": 165,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Back to the Future Part II",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/AbwX5BzdmfA0WFBxBF909Gf4Sop.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/hQq8xZe5uLjFzSBt4LanNP7SQjl.jpg"
+  },
+  {
+    "id": 281,
+    "titolo_db": "Ritorno al futuro - Parte III",
+    "anno": 1990,
+    "tmdb_id": 196,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Back to the Future Part III",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/iBfwdp2Sp4aWH9QaHUqFq25sxIU.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/crzoVQnMzIrRfHtQw0tLBirNfVg.jpg"
+  },
+  {
+    "id": 282,
+    "titolo_db": "Le ali della libertà",
+    "anno": 1994,
+    "tmdb_id": 278,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Shawshank Redemption",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/9OxcvTJwZDjQTFvY2NxiwnSrQS6.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/9cqNxx0GxF0bflZmeSMuL5tnGzr.jpg"
+  },
+  {
+    "id": 283,
+    "titolo_db": "Qualcuno volò sul nido del cuculo",
+    "anno": 1975,
+    "tmdb_id": 510,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "One Flew Over the Cuckoo's Nest",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/hpg2j8FhnnmbiRpoOU09M0sffJu.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/kjWsMh72V6d8KRLV4EOoSJLT1H7.jpg"
+  },
+  {
+    "id": 284,
+    "titolo_db": "Butch Cassidy",
+    "anno": 1969,
+    "tmdb_id": 642,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Butch Cassidy and the Sundance Kid",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/7T9YNd236L9JXLeNTayHZgTrSHJ.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/gFmmykF1Ym3OGzENo50nZQaD1dx.jpg"
+  },
+  {
+    "id": 285,
+    "titolo_db": "La stangata",
+    "anno": 1973,
+    "tmdb_id": 9277,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Sting",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/jnD4EA8uULiNGxk96jfheznoEwz.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/ckmYng37zey8INYf6d10cVgIG93.jpg"
+  },
+  {
+    "id": 286,
+    "titolo_db": "Psyco",
+    "anno": 1960,
+    "tmdb_id": 539,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Psycho",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/tdqX0MWaFHuGwUygYn7j6eluOdP.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/yz4QVqPx3h1hD1DfqqQkCq3rmxW.jpg"
+  },
+  {
+    "id": 287,
+    "titolo_db": "Il delitto perfetto",
+    "anno": 1954,
+    "tmdb_id": 521,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Dial M for Murder",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/feVfUSdS9k39GSqJjeMLlafV8M6.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/2gDCAgl2iBQNuJuk6p2xtuS1ewg.jpg"
+  },
+  {
+    "id": 288,
+    "titolo_db": "Gli uccelli",
+    "anno": 1963,
+    "tmdb_id": 571,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Birds",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/omnOJCmTGJoxCRJorWIEweu1JTN.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/ADoJaT1s9Jlcfx3Tw2MIZ1BMxo.jpg"
+  },
+  {
+    "id": 289,
+    "titolo_db": "Capitani coraggiosi",
+    "anno": 1937,
+    "tmdb_id": 16515,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Captains Courageous",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/xez8YMw0BhIS7bY0f1rxfdzQcX9.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/qhJNHLwIcMqDKBwsr9uMDOumO33.jpg"
+  },
+  {
+    "id": 290,
+    "titolo_db": "Norimberga",
+    "anno": 2025,
+    "tmdb_id": 1214931,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Nuremberg",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/ucZHG8KD2A9Czl1aZz1f4bIvbLR.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/xthXNYltOOm80vW5Kxjzxx5gvQ6.jpg"
+  },
+  {
+    "id": 291,
+    "titolo_db": "Oppenheimer",
+    "anno": 2023,
+    "tmdb_id": 872585,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Oppenheimer",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/fRtaxfyynWMJI6DhejyA6JOzVTB.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg"
+  },
+  {
+    "id": 292,
+    "titolo_db": "Jojo Rabbit",
+    "anno": 2019,
+    "tmdb_id": 515001,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Jojo Rabbit",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/2vv0tEFH10YG3hMRCOhiWsw7bOk.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/1mqL7VG4Ix8wmxwypmCA1HTHBky.jpg"
+  },
+  {
+    "id": 293,
+    "titolo_db": "Joker",
+    "anno": 2019,
+    "tmdb_id": 475557,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Joker",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/y1AthYH1r2j4N4cYn2HdrEGgrnJ.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/udDclJoHjfjb8Ekgsd4FDteOkCU.jpg"
+  },
+  {
+    "id": 294,
+    "titolo_db": "Parasite",
+    "anno": 2019,
+    "tmdb_id": 496243,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Parasite",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/mMM8kcfspicib7AmPTvf97Rarwn.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/7IiTTgloJzvGI1TAYymCfbfl3vT.jpg"
+  },
+  {
+    "id": 295,
+    "titolo_db": "Coco",
+    "anno": 2017,
+    "tmdb_id": 354912,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Coco",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/l5qUox5uroubMi8sihD9RGPbcwO.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/6Ryitt95xrO8KXuqRGm1fUuNwqF.jpg"
+  },
+  {
+    "id": 296,
+    "titolo_db": "The Nice Guys",
+    "anno": 2016,
+    "tmdb_id": 290250,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Nice Guys",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/clq4So9spa9cXk3MZy2iMdqkxP2.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/clq4So9spa9cXk3MZy2iMdqkxP2.jpg"
+  },
+  {
+    "id": 297,
+    "titolo_db": "I segreti di Wind River",
+    "anno": 2017,
+    "tmdb_id": 395834,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Wind River",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/5OI9QQ24lrrS1IGB6RVuPL5GcZl.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/pySivdR845Hom4u4T2WNkJxe6Ad.jpg"
+  },
+  {
+    "id": 298,
+    "titolo_db": "Revenant - Redivivo",
+    "anno": 2015,
+    "tmdb_id": 281957,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Revenant",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/cw8HPomOzNql3l4xdaJJ8HGIZds.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/ji3ecJphATlVgWNY0B0RVXZizdf.jpg"
+  },
+  {
+    "id": 299,
+    "titolo_db": "American Sniper",
+    "anno": 2014,
+    "tmdb_id": 190859,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "American Sniper",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/AdYOjcPT5PHyDsyxBgjCLtIepQR.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/i1U46OwMc6vlm7OoSUKfqUH615e.jpg"
+  },
+  {
+    "id": 300,
+    "titolo_db": "Edge of Tomorrow - Senza domani",
+    "anno": 2014,
+    "tmdb_id": 137113,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Edge of Tomorrow",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/AbzpU4ookiyWFmiq1bTZwjNl7Y1.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/nBM9MMa2WCwvMG4IJ3eiGUdbPe6.jpg"
+  },
+  {
+    "id": 301,
+    "titolo_db": "All is lost - Tutto è perduto",
+    "anno": 2013,
+    "tmdb_id": 152747,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "All Is Lost",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/phZLbxYVfE98S0d1G3HdUCc7fqc.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/9cVA4oX2xHgiglv6hemxwAaofsq.jpg"
+  },
+  {
+    "id": 302,
+    "titolo_db": "Django Unchained",
+    "anno": 2012,
+    "tmdb_id": 68718,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Django Unchained",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/igYptikalrjsMueMx6rz15lE4Ts.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/7oWY8VDWW7thTzWh3OKYRkWUlD5.jpg"
+  },
+  {
+    "id": 303,
+    "titolo_db": "Vita di Pi",
+    "anno": 2012,
+    "tmdb_id": 87827,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Life of Pi",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/hQc6NHCshzZmi7cR6ggQMKlf17i.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/iLgRu4hhSr6V1uManX6ukDriiSc.jpg"
+  },
+  {
+    "id": 304,
+    "titolo_db": "Midnight in Paris",
+    "anno": 2011,
+    "tmdb_id": 59436,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Midnight in Paris",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/hfdsTXO6wIJ9uywIgnqzNYDWYQK.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/4wBG5kbfagTQclETblPRRGihk0I.jpg"
+  },
+  {
+    "id": 305,
+    "titolo_db": "Il cigno nero",
+    "anno": 2010,
+    "tmdb_id": 44214,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Black Swan",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/dywocnQY2FhEpDeV56Vl3yHw0oy.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/viWheBd44bouiLCHgNMvahLThqx.jpg"
+  },
+  {
+    "id": 306,
+    "titolo_db": "Inception",
+    "anno": 2010,
+    "tmdb_id": 27205,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Inception",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/5QHWgqaBxZI1eM5e3YhyKzY5o3z.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/xlaY2zyzMfkhk0HSC5VUwzoZPU1.jpg"
+  },
+  {
+    "id": 307,
+    "titolo_db": "Shutter Island",
+    "anno": 2010,
+    "tmdb_id": 11324,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Shutter Island",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/kgPRqDDr5RFkIly6CJrBPHYs2qS.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/nrmXQ0zcZUL8jFLrakWc90IR8z9.jpg"
+  },
+  {
+    "id": 308,
+    "titolo_db": "Avatar",
+    "anno": 2009,
+    "tmdb_id": 19995,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Avatar",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/cu6CTvQqVvaTUmWNGWydpf7EzmV.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/gKY6q7SjCkAU6FqvqWybDYgUKIF.jpg"
+  },
+  {
+    "id": 309,
+    "titolo_db": "Avatar: Fuoco e cenere",
+    "anno": 2025,
+    "tmdb_id": 83533,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Avatar: Fire and Ash",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/kvivMhuEuzXuaj0UMjAAmrXVvWn.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/bRBeSHfGHwkEpImlhxPmOcUsaeg.jpg"
+  },
+  {
+    "id": 310,
+    "titolo_db": "Avatar: La via dell'acqua",
+    "anno": 2022,
+    "tmdb_id": 76600,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Avatar: The Way of Water",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/idul2fSUPkk0EHP92EzmES6KGW4.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg"
+  },
+  {
+    "id": 311,
+    "titolo_db": "Up",
+    "anno": 2009,
+    "tmdb_id": 14160,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Up",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/j3Ga41uc0y3W8KbKjSfPHQiZYVn.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/mFvoEwSfLqbcWwFsDjQebn9bzFe.jpg"
+  },
+  {
+    "id": 312,
+    "titolo_db": "Il codice da Vinci",
+    "anno": 2006,
+    "tmdb_id": 591,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Da Vinci Code",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/sBqvvYq8PSNCJD3154Vdl5e7vAs.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/9ejKfNk0LBhSI9AahH4f9NJNZNM.jpg"
+  },
+  {
+    "id": 313,
+    "titolo_db": "Angeli e demoni",
+    "anno": 2009,
+    "tmdb_id": 13448,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Angels & Demons",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/9Jc7YuiYVFpiJ7tbvXkRV7GTxTM.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/tFZQAuulEOtFTp0gHbVdEXwGrYe.jpg"
+  },
+  {
+    "id": 314,
+    "titolo_db": "Gran Torino",
+    "anno": 2008,
+    "tmdb_id": 13223,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Gran Torino",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/eUepSGWIJjXeMAlSnk4CSZKOTfg.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/zUybYvxWdAJy5hhYovsXtHSWI1l.jpg"
+  },
+  {
+    "id": 315,
+    "titolo_db": "The Wrestler",
+    "anno": 2008,
+    "tmdb_id": 12163,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Wrestler",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/A0Uq6fZG9UVbaFZmwF593ESz8LE.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/7QH5p5BF582k6qHufCKjftfkqWH.jpg"
+  },
+  {
+    "id": 316,
+    "titolo_db": "The Hurt Locker",
+    "anno": 2008,
+    "tmdb_id": 12162,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Hurt Locker",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/9XaL18pWKcQO2M581832MjHlldD.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/io2dfBJhasvGbgkCX9cCGVOiA99.jpg"
+  },
+  {
+    "id": 317,
+    "titolo_db": "Io sono leggenda",
+    "anno": 2007,
+    "tmdb_id": 6479,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "I Am Legend",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/lrHsksAln0IxYFfZVgW6iRTaUsi.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/fhbiz5BsGUVEZmzPP72SoPlbMz0.jpg"
+  },
+  {
+    "id": 318,
+    "titolo_db": "Il petroliere",
+    "anno": 2007,
+    "tmdb_id": 7345,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "There Will Be Blood",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/2eH78Nz708yFVrcaZAE2bspY5q5.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/fa0RDkAlCec0STeMNAhPaF89q6U.jpg"
+  },
+  {
+    "id": 319,
+    "titolo_db": "Hot Fuzz",
+    "anno": 2007,
+    "tmdb_id": 4638,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Hot Fuzz",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/xY1DI4NJGgwbP5dqjPHgQWB4Elb.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/zPib4ukTSdXvHP9pxGkFCe34f3y.jpg"
+  },
+  {
+    "id": 320,
+    "titolo_db": "Apocalypto",
+    "anno": 2006,
+    "tmdb_id": 1579,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Apocalypto",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/8z6coUJwLrM9akjheUeTTQ8Bgxx.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/cRY25Q32kDNPFDkFkxAs6bgCq3L.jpg"
+  },
+  {
+    "id": 321,
+    "titolo_db": "Grindhouse - A prova di morte",
+    "anno": 2007,
+    "tmdb_id": 1991,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Death Proof",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/kf493fwH6DM9sNZ798Qf9NnSsBG.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/vtu6H4NWnQVqEp3aanUq3hNeeot.jpg"
+  },
+  {
+    "id": 322,
+    "titolo_db": "The Prestige",
+    "anno": 2006,
+    "tmdb_id": 1124,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Prestige",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/1GjRCeZoE251tWkYc3erwjpdBpU.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/Ag2B2KHKQPukjH7WutmgnnSNurZ.jpg"
+  },
+  {
+    "id": 323,
+    "titolo_db": "The Departed - Il bene e il male",
+    "anno": 2006,
+    "tmdb_id": 1422,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Departed",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/oTIEFn7Xf3bZ6HZP3yRF8CzzmYQ.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/nT97ifVT2J1yMQmeq20Qblg61T.jpg"
+  },
+  {
+    "id": 324,
+    "titolo_db": "Scoop",
+    "anno": 2024,
+    "tmdb_id": 1083658,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Scoop",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/ib3H2ZSeVRTAmd7EtGWV31LswaZ.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/ib3H2ZSeVRTAmd7EtGWV31LswaZ.jpg"
+  },
+  {
+    "id": 325,
+    "titolo_db": "Scoop",
+    "anno": 2006,
+    "tmdb_id": 512,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Scoop",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/vyQD8AHtA3zK5ufHI5l6CQ4o4TD.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/1nF290EoEn2rs4W9VVercKa4S5o.jpg"
+  },
+  {
+    "id": 326,
+    "titolo_db": "The Illusionist - L'illusionista",
+    "anno": 2006,
+    "tmdb_id": 1491,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Illusionist",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/bGvkZZtWymiN3am617tpExQ0ow1.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/1O9jUvqkHaGBMVRyOJz1AlkmALW.jpg"
+  },
+  {
+    "id": 327,
+    "titolo_db": "Munich",
+    "anno": 2005,
+    "tmdb_id": 612,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Munich",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/5APB21LvvshIZFDtGBsNMOp6SJL.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/iUekaw96QLInZpsNwRTlRKrZgwm.jpg"
+  },
+  {
+    "id": 328,
+    "titolo_db": "La guerra dei mondi",
+    "anno": 2005,
+    "tmdb_id": 74,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "War of the Worlds",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/reQUXXUd0WeoIJiSvYjlGLRGpXR.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/6Biy7R9LfumYshur3YKhpj56MpB.jpg"
+  },
+  {
+    "id": 329,
+    "titolo_db": "Cinderella Man - Una ragione per lottare",
+    "anno": 2005,
+    "tmdb_id": 921,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Cinderella Man",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/6TeNVIUGkCh9ZaTysb94Blhbram.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/wkeOjIcpuqLMW4GnVowlM9VI0JE.jpg"
+  },
+  {
+    "id": 330,
+    "titolo_db": "A History of Violence",
+    "anno": 2005,
+    "tmdb_id": 59,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "A History of Violence",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/hZRFgghyOvYkFZ6dtPtPQ97KXLg.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/ptJKY9WGDUUL064ge3jW78zBX0t.jpg"
+  },
+  {
+    "id": 331,
+    "titolo_db": "Match Point",
+    "anno": 2005,
+    "tmdb_id": 116,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Match Point",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/vHjEVTD8ucuwKSFOZJeyAnTZYli.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/vHjEVTD8ucuwKSFOZJeyAnTZYli.jpg"
+  },
+  {
+    "id": 332,
+    "titolo_db": "Neverland - Un sogno per la vita",
+    "anno": 2004,
+    "tmdb_id": 866,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Finding Neverland",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/fqfx3dcYzfK6sQVRQYn9siNzBuX.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/A9jgLICNCEb3lvWdNaIKAG9pRdp.jpg"
+  },
+  {
+    "id": 333,
+    "titolo_db": "Million Dollar Baby",
+    "anno": 2004,
+    "tmdb_id": 70,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Million Dollar Baby",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/3ehWHEKe54gTpYoTZ19q2qRCCyH.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/jcfEqKdWF1zeyvECPqp3mkWLct2.jpg"
+  },
+  {
+    "id": 334,
+    "titolo_db": "Troy",
+    "anno": 2004,
+    "tmdb_id": 652,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Troy",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/6n8BiphW9fvqC6biB0RMfblqi43.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/a07wLy4ONfpsjnBqMwhlWTJTcm.jpg"
+  },
+  {
+    "id": 335,
+    "titolo_db": "Secret Window",
+    "anno": 2004,
+    "tmdb_id": 1586,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Secret Window",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/5NpdcGLZuk6AgpVrAN2f4Vmw0Yr.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/hvzw4wufKZkDCTPVeG71Z7pGfZh.jpg"
+  },
+  {
+    "id": 336,
+    "titolo_db": "Mystic River",
+    "anno": 2003,
+    "tmdb_id": 322,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Mystic River",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/3D5VS7oWduCmwNLNmRClqGKOgZa.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/hCHVDbo6XJGj3r2i4hVjKhE0GKF.jpg"
+  },
+  {
+    "id": 337,
+    "titolo_db": "La passione di Cristo",
+    "anno": 2004,
+    "tmdb_id": 615,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Passion of the Christ",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/arQvRafRtfyEQqBZ4qAjuYuYsyo.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/rBM5o2HpmCfDejuIPybI09tkY3V.jpg"
+  },
+  {
+    "id": 338,
+    "titolo_db": "Prova a prendermi",
+    "anno": 2002,
+    "tmdb_id": 640,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Catch Me If You Can",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/j0Ab2kETKLFISnddShJA6LffxuO.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/ctjEj2xM32OvBXCq8zAdK3ZrsAj.jpg"
+  },
+  {
+    "id": 339,
+    "titolo_db": "Gangs of New York",
+    "anno": 2002,
+    "tmdb_id": 3131,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Gangs of New York",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/zaUzyruncix1oAQLlaG0Q8WQBbY.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/lemqKtcCuAano5aqrzxYiKC8kkn.jpg"
+  },
+  {
+    "id": 340,
+    "titolo_db": "Signs",
+    "anno": 2002,
+    "tmdb_id": 2675,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Signs",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/4Jv4RWBvi0F3DIXNfVF1Ldooy86.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/YtrIdrTxpRhvCnlw43dwOjfLqx.jpg"
+  },
+  {
+    "id": 341,
+    "titolo_db": "Minority Report",
+    "anno": 2002,
+    "tmdb_id": 180,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Minority Report",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/8EUnGlnPlleaNHt5dLGPK5GubQT.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/qtgFcnwh9dAFLocsDk2ySDVS8UF.jpg"
+  },
+  {
+    "id": 342,
+    "titolo_db": "Il pianista",
+    "anno": 2002,
+    "tmdb_id": 423,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Pianist",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/zK3KyPLAQl0IRIToIaQsMxm0aR3.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/2hFvxCCWrTmCYwfy7yum0GKRi3Y.jpg"
+  },
+  {
+    "id": 343,
+    "titolo_db": "About A Boy - Un ragazzo",
+    "anno": 2002,
+    "tmdb_id": 245,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "About a Boy",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/hEzs1OAhc9djI69fRUHVRgXrin.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/qoZ1bD0q9EFqcNiEYbEigsRcNCt.jpg"
+  },
+  {
+    "id": 344,
+    "titolo_db": "The Greatest Hits",
+    "anno": 2024,
+    "tmdb_id": 1011082,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Greatest Hits",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/cve12HkI9psBUfmkx7FeBciaQN7.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/cve12HkI9psBUfmkx7FeBciaQN7.jpg"
+  },
+  {
+    "id": 345,
+    "titolo_db": "L'Esorciccio",
+    "anno": 1975,
+    "tmdb_id": 64036,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Exorciccio",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/2SWLoIVmadfNNcFnILglliTQaTN.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/2SWLoIVmadfNNcFnILglliTQaTN.jpg"
+  },
+  {
+    "id": 346,
+    "titolo_db": "Seven",
+    "anno": 1995,
+    "tmdb_id": 807,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Se7en",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/1XHq0Z7BkjeQ9J5CLmWD0xX0DuB.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/191nKfP0ehp3uIvWqgPbFmI4lv9.jpg"
+  },
+  {
+    "id": 347,
+    "titolo_db": "A Beautiful Mind",
+    "anno": 2001,
+    "tmdb_id": 453,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "A Beautiful Mind",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/bsVAjDLllFLEkuS1HwU96bbvkw5.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/rEIg5yJdNOt9fmX4P8gU9LeNoTQ.jpg"
+  },
+  {
+    "id": 348,
+    "titolo_db": "Vanilla Sky",
+    "anno": 2001,
+    "tmdb_id": 1903,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Vanilla Sky",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/aV9cwAmpNhxlX8l64RXULc9jrqN.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/cAh2pCiNPftsY3aSqJuIOde7uWr.jpg"
+  },
+  {
+    "id": 349,
+    "titolo_db": "Pearl Harbor",
+    "anno": 2001,
+    "tmdb_id": 676,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Pearl Harbor",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/rU08tMQ381BRMjKSwDKiR00TNeq.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/y8A0Cvp8WQmZ3bjbnsL53lY0dsC.jpg"
+  },
+  {
+    "id": 350,
+    "titolo_db": "Mulholland Drive",
+    "anno": 2001,
+    "tmdb_id": 1018,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Mulholland Drive",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/zQKnbazscP54i6iKHfdgYdmDsLv.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/x7A59t6ySylr1L7aubOQEA480vM.jpg"
+  },
+  {
+    "id": 351,
+    "titolo_db": "La vera storia di Jack lo Squartatore",
+    "anno": 2001,
+    "tmdb_id": 768,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "From Hell",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/pvgnEmCPie99MOZFrkEpA73QHgg.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/t2WpWM8nBO4sULXr2bDfNEt4qgr.jpg"
+  },
+  {
+    "id": 352,
+    "titolo_db": "Chocolat",
+    "anno": 2000,
+    "tmdb_id": 392,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Chocolat",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/ym4zIlPCAoD0UqOBf6NmHcK0YIi.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/lnwPvyj8UR7MetG2pQ92453IIoR.jpg"
+  },
+  {
+    "id": 353,
+    "titolo_db": "Cast Away",
+    "anno": 2000,
+    "tmdb_id": 8358,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Cast Away",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/WOTDhrel5R6hDhfDhFhHmExxjO.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/7lLJgKnAicAcR5UEuo8xhSMj18w.jpg"
+  },
+  {
+    "id": 354,
+    "titolo_db": "Rapimento e riscatto",
+    "anno": 2000,
+    "tmdb_id": 11983,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Proof of Life",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/4v6lGQKphnHNz3AYb72M7xfVs0a.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/yw8x2i3vaHZZzpvqvF75E8q2N6M.jpg"
+  },
+  {
+    "id": 355,
+    "titolo_db": "Unbreakable - Il predestinato",
+    "anno": 2000,
+    "tmdb_id": 9741,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Unbreakable",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/4bbHcTViomdM0j7dM0Tm0CYQF1m.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/mLuehrGLiK5zFCyRmDDOH6gbfPf.jpg"
+  },
+  {
+    "id": 356,
+    "titolo_db": "Memento",
+    "anno": 2000,
+    "tmdb_id": 77,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Memento",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/eyVdGf0QUnw1SBr1IMvZJj5kk6M.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/nzlv62aC0octS5AklAiWpXLX9Z0.jpg"
+  },
+  {
+    "id": 357,
+    "titolo_db": "La tempesta perfetta",
+    "anno": 2000,
+    "tmdb_id": 2133,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Perfect Storm",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/kpQ8X4WAQJ032CYlta81B6OrZcg.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/vJPoxqgpfFNbGi0HyoNsjFeLCio.jpg"
+  },
+  {
+    "id": 358,
+    "titolo_db": "Il talento di Mr. Ripley",
+    "anno": 1999,
+    "tmdb_id": 1213,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Talented Mr. Ripley",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/g7GOx0foFBSdrzzpNGKKeoKwdqA.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/6ojHgqtIR41O2qLKa7LFUVj0cZa.jpg"
+  },
+  {
+    "id": 359,
+    "titolo_db": "Il mistero di Sleepy Hollow",
+    "anno": 1999,
+    "tmdb_id": 2668,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Sleepy Hollow",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/eX61VBYV1mh4AARjogZ4WIZeGaQ.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/1GuK965FLJxqUw9fd1pmvjbFAlv.jpg"
+  },
+  {
+    "id": 360,
+    "titolo_db": "The Sixth Sense - Il sesto senso",
+    "anno": 1999,
+    "tmdb_id": 745,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Sixth Sense",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/1Dth4Jbh7FzPguUIddmK43deTCy.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/vOyfUXNFSnaTk7Vk5AjpsKTUWsu.jpg"
+  },
+  {
+    "id": 361,
+    "titolo_db": "Non aprite quella porta",
+    "anno": 1974,
+    "tmdb_id": 30497,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Texas Chain Saw Massacre",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/8giqGVVX5UaQbmXM7ZEpGR9Xp8.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/mpgkRPH1GNkMCgdPk2OMyHzAks7.jpg"
+  },
+  {
+    "id": 362,
+    "titolo_db": "The Next Three Days",
+    "anno": 2010,
+    "tmdb_id": 43539,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Next Three Days",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/nCl2I0yGwKop0qBIpwXWJA7zQPP.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/wBaRZ3aHa7qoYTSY0ONbXrXYk4B.jpg"
+  },
+  {
+    "id": 363,
+    "titolo_db": "Mickey 17",
+    "anno": 2025,
+    "tmdb_id": 696506,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Mickey 17",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/2JQBZs01ahsOiANQ7Fs8MN9zBY4.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/edKpE9B5qN3e559OuMCLZdW1iBZ.jpg"
+  },
+  {
+    "id": 364,
+    "titolo_db": "Primetime",
+    "anno": 2026,
+    "tmdb_id": 1375441,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Primetime",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/sqArsDFYFryd5iKuoxLvr4y5NZv.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/lmrulvLbmaejTix1YaMxo1oGhH1.jpg"
+  },
+  {
+    "id": 365,
+    "titolo_db": "Chi ha incastrato Roger Rabbit",
+    "anno": 1988,
+    "tmdb_id": 856,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Who Framed Roger Rabbit",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/5KZOkoKzj5wfJOGdWZYy4O4LLY2.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/lYfRc57Kx9VgLZ48iulu0HKnM15.jpg"
+  },
+  {
+    "id": 366,
+    "titolo_db": "Il silenzio degli innocenti",
+    "anno": 1991,
+    "tmdb_id": 274,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Silence of the Lambs",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/jCS4Iw1bGGhSEdzFeUq8CX8UoiC.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/uS9m8OBk1A8eM9I042bx8XXpqAq.jpg"
+  },
+  {
+    "id": 367,
+    "titolo_db": "Ti uccideranno",
+    "anno": 2026,
+    "tmdb_id": 1292695,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "They Will Kill You",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/jCe5etBmMuTf2TXgYvv0EDUj4BZ.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/6oI4oQKTWMVUlr8Ivqydp28Ruu6.jpg"
+  },
+  {
+    "id": 368,
+    "titolo_db": "Predator: Badlands",
+    "anno": 2025,
+    "tmdb_id": 1242898,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Predator: Badlands",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/zn14Felr0VlFg6A86IUx4PDt2E7.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/pHpq9yNUIo6aDoCXEBzjSolywgz.jpg"
+  },
+  {
+    "id": 369,
+    "titolo_db": "Last Breath",
+    "anno": 2025,
+    "tmdb_id": 972533,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Last Breath",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/mKP5zZ8NjUf68D0qte9LyIA0C6k.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/uB8yTnF6YLIIVKuRJAK8LNk8C6w.jpg"
+  },
+  {
+    "id": 370,
+    "titolo_db": "Locked - In trappola",
+    "anno": 2025,
+    "tmdb_id": 1083968,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Locked",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/nn2TyHzFpOszdqgAQuAmS2WSxYe.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/hhkiqXpfpufwxVrdSftzeKIANl3.jpg"
+  },
+  {
+    "id": 371,
+    "titolo_db": "La trama fenicia",
+    "anno": 2025,
+    "tmdb_id": 1137350,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Phoenician Scheme",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/90yhkAmFHypazSdnR0LXSf5e6h0.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/iXxIUVqpQAlyy98UjUlzjkMYuj6.jpg"
+  },
+  {
+    "id": 372,
+    "titolo_db": "Una pallottola spuntata",
+    "anno": 2025,
+    "tmdb_id": 1035259,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Naked Gun",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/tL8WM2MW87Sf48QctGHIpnnNSWK.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/rwla9vqzrKVVKVKiOuROTIXGsxj.jpg"
+  },
+  {
+    "id": 373,
+    "titolo_db": "Death of a Unicorn",
+    "anno": 2025,
+    "tmdb_id": 1153714,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Death of a Unicorn",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/k3Nuu7Z5PuC6UxVIl2xbGhFvIjj.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/xWlF2i51zUq7BUq4iJte1g9NyIM.jpg"
+  },
+  {
+    "id": 374,
+    "titolo_db": "Una pallottola spuntata",
+    "anno": 1988,
+    "tmdb_id": 37136,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Naked Gun: From the Files of Police Squad!",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/psaW7ECMBTmBjI83FhLgIyhCG6e.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/zT0mhZqZQJE1gSY5Eg9qcGP4NYo.jpg"
+  },
+  {
+    "id": 375,
+    "titolo_db": "Mediterraneo",
+    "anno": 1991,
+    "tmdb_id": 38251,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "Mediterraneo",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/wfJ2flMchZPQCSdt8h3ZQNSW7Ym.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/omFU47TZSR7xAAZcDHKM48SmVwe.jpg"
+  },
+  {
+    "id": 376,
+    "titolo_db": "Grand Budapest Hotel",
+    "anno": 2014,
+    "tmdb_id": 120467,
+    "match_reason": "exact_poster_match",
+    "titolo_en": "The Grand Budapest Hotel",
+    "locandina_it": "https://image.tmdb.org/t/p/w500/tY8gmrOOzhJxfBLQNOxjbuSR52b.jpg",
+    "locandina_en": "https://image.tmdb.org/t/p/w500/eWdyYQreja6JGCzqHWXpWHDrrPo.jpg"
+  }
+]
