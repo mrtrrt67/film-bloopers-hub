@@ -241,7 +241,12 @@
     "emptyTitle": "Keine Filme im lokalen Archiv gefunden",
     "emptySearch": "Keine Ergebnisse für \"{term}\" unter den analysierten Filmen.",
     "emptyArchive": "Das Archiv ist derzeit leer.",
-    "searchTmdbBtn": "\"{term}\" auf TMDB suchen"
+    "searchTmdbBtn": "\"{term}\" auf TMDB suchen",
+    "noOverview": "Keine Inhaltsangabe verfügbar.",
+    "importing": "Importiere...",
+    "openAnalyze": "Öffnen & Bloopers Analysieren",
+    "tmdbEmptyTitle": "Suche unter Millionen von Filmen auf TMDB",
+    "tmdbEmptySubtitle": "Gib oben einen Titel ein, um die weltweite The Movie Database-Datenbank in Echtzeit zu durchsuchen."
   },
   "promo": {
     "title": "SPEZIELLE STARTUP-STARTAKTION",

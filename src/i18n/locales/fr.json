@@ -241,7 +241,12 @@
     "emptyTitle": "Aucun film trouvé dans l'archive locale",
     "emptySearch": "Aucun résultat pour \"{term}\" parmi les films analysés.",
     "emptyArchive": "L'archive est actuellement vide.",
-    "searchTmdbBtn": "Rechercher \"{term}\" sur TMDB"
+    "searchTmdbBtn": "Rechercher \"{term}\" sur TMDB",
+    "noOverview": "Aucun synopsis disponible.",
+    "importing": "Importation...",
+    "openAnalyze": "Ouvrir & Analyser les Bloopers",
+    "tmdbEmptyTitle": "Recherchez parmi des millions de films sur TMDB",
+    "tmdbEmptySubtitle": "Saisissez un titre dans la boîte ci-dessus pour interroger en temps réel le catalogue mondial The Movie Database."
   },
   "promo": {
     "title": "PROMO SPÉCIALE DE LANCEMENT STARTUP",

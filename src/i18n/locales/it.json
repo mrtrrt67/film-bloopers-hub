@@ -241,7 +241,12 @@
     "emptyTitle": "Nessun film trovato nell'archivio locale",
     "emptySearch": "Nessun risultato per \"{term}\" tra i film già analizzati.",
     "emptyArchive": "L'archivio è ancora vuoto.",
-    "searchTmdbBtn": "Cerca \"{term}\" su TMDB"
+    "searchTmdbBtn": "Cerca \"{term}\" su TMDB",
+    "noOverview": "Nessuna sinossi disponibile.",
+    "importing": "Importazione...",
+    "openAnalyze": "Apri & Analizza Bloopers",
+    "tmdbEmptyTitle": "Cerca tra milioni di pellicole su TMDB",
+    "tmdbEmptySubtitle": "Digita un titolo nel box in alto per interrogare in tempo reale il catalogo mondiale The Movie Database."
   },
   "promo": {
     "title": "PROMO SPECIALE DI LANCIO STARTUP",

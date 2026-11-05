@@ -241,7 +241,12 @@
     "emptyTitle": "No movies found in the local archive",
     "emptySearch": "No results for \"{term}\" among analyzed movies.",
     "emptyArchive": "The archive is currently empty.",
-    "searchTmdbBtn": "Search \"{term}\" on TMDB"
+    "searchTmdbBtn": "Search \"{term}\" on TMDB",
+    "noOverview": "No synopsis available.",
+    "importing": "Importing...",
+    "openAnalyze": "Open & Analyze Bloopers",
+    "tmdbEmptyTitle": "Search millions of movies on TMDB",
+    "tmdbEmptySubtitle": "Type a title in the box above to query the worldwide The Movie Database catalog in real time."
   },
   "promo": {
     "title": "STARTUP LAUNCH SPECIAL PROMO",

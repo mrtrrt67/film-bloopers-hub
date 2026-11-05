@@ -241,7 +241,12 @@
     "emptyTitle": "No se encontraron películas en el archivo local",
     "emptySearch": "No hay resultados para \"{term}\" entre las películas analizadas.",
     "emptyArchive": "El archivo está actualmente vacío.",
-    "searchTmdbBtn": "Buscar \"{term}\" en TMDB"
+    "searchTmdbBtn": "Buscar \"{term}\" en TMDB",
+    "noOverview": "Sinopsis no disponible.",
+    "importing": "Importando...",
+    "openAnalyze": "Abrir y Analizar Gazapos",
+    "tmdbEmptyTitle": "Busca entre millones de películas en TMDB",
+    "tmdbEmptySubtitle": "Escribe un título en el cuadro superior para consultar en tiempo real el catálogo mundial de The Movie Database."
   },
   "promo": {
     "title": "PROMO ESPECIAL DE LANZAMIENTO STARTUP",
