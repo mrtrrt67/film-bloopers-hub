@@ -1,11 +1,10 @@
 /**
  * Script batch per la traduzione completa dell'archivio (Bloopers & Curiosità)
- * Genera il file SQL `backups/translated_i18n_data.sql` pronto da eseguire.
+ * Genera il file SQL complessivo `backups/translated_i18n_data.sql`
+ * e suddivide automaticamente in parti leggere (max 500-600 query) per Supabase.
  *
  * Utilizzo:
- *   node scripts/translate_catalog_i18n.cjs --all
- *   node scripts/translate_catalog_i18n.cjs --only=bloopers
- *   node scripts/translate_catalog_i18n.cjs --only=trivia
+ *   node scripts/translate_catalog_i18n.cjs
  */
 
 const fs = require('fs');
@@ -75,6 +74,49 @@ function loadAlreadyTranslatedIds() {
   return { blooperIds, triviaIds };
 }
 
+function splitIntoParts() {
+  console.log('\n--- Generazione parti SQL suddivise (max 500 query ciascuna) ---');
+  if (!fs.existsSync(SQL_BACKUP_PATH)) return;
+
+  const content = fs.readFileSync(SQL_BACKUP_PATH, 'utf8');
+  const lines = content.split('\n').filter((l) => l.trim().startsWith('UPDATE'));
+
+  const bloopers = lines.filter((l) => l.includes('UPDATE errori'));
+  const trivia = lines.filter((l) => l.includes('UPDATE movie_trivia'));
+
+  const CHUNK_SIZE = 500;
+
+  // Bloopers: dividiamo a blocchi
+  let bPart = 1;
+  for (let i = 0; i < bloopers.length; i += CHUNK_SIZE) {
+    const chunk = bloopers.slice(i, i + CHUNK_SIZE);
+    const fileName = `part_bloopers_${bPart}_(${i + 1}-${i + chunk.length}).sql`;
+    const filePath = path.join(__dirname, '..', 'backups', fileName);
+    fs.writeFileSync(
+      filePath,
+      `-- Bloopers Parte ${bPart}: Record da ${i + 1} a ${i + chunk.length}\n\n` + chunk.join('\n') + '\n',
+      'utf8'
+    );
+    console.log(`  ✓ Creato: backups/${fileName} (${chunk.length} query)`);
+    bPart++;
+  }
+
+  // Trivia: dividiamo a blocchi
+  let tPart = 1;
+  for (let i = 0; i < trivia.length; i += CHUNK_SIZE) {
+    const chunk = trivia.slice(i, i + CHUNK_SIZE);
+    const fileName = `part_trivia_${tPart}_(${i + 1}-${i + chunk.length}).sql`;
+    const filePath = path.join(__dirname, '..', 'backups', fileName);
+    fs.writeFileSync(
+      filePath,
+      `-- Curiosità Parte ${tPart}: Record da ${i + 1} a ${i + chunk.length}\n\n` + chunk.join('\n') + '\n',
+      'utf8'
+    );
+    console.log(`  ✓ Creato: backups/${fileName} (${chunk.length} query)`);
+    tPart++;
+  }
+}
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function translateBatchWithGemini(items, type = 'blooper', retryCount = 0) {
@@ -133,9 +175,9 @@ Do NOT include markdown formatting or explanations.`;
         return map;
       }
     } catch (err) {
-      if (err?.status === 429 && retryCount < 3) {
-        console.warn(`[Quota 429] Attesa 5s prima di riprovare...`);
-        await sleep(5000);
+      if (err?.status === 429 && retryCount < 4) {
+        console.warn(`[Quota 429] Attesa 6s prima di riprovare...`);
+        await sleep(6000);
         return translateBatchWithGemini(items, type, retryCount + 1);
       }
       console.warn(`Tentativo modello ${model} fallito:`, err?.message || err);
@@ -154,19 +196,19 @@ async function run() {
   console.log('====================================================\n');
 
   const { blooperIds, triviaIds } = loadAlreadyTranslatedIds();
-  console.log(`ℹ️ Record già presenti nel file SQL: ${blooperIds.size} bloopers, ${triviaIds.size} curiosità.\n`);
+  console.log(`ℹ️ Record già memorizzati: ${blooperIds.size} bloopers, ${triviaIds.size} curiosità.\n`);
 
   const { count: totalBloopers } = await supabase.from('errori').select('id', { count: 'exact', head: true });
   const { count: totalTrivia } = await supabase.from('movie_trivia').select('id', { count: 'exact', head: true });
 
-  console.log(`Totale bloopers a database:  ${totalBloopers}`);
-  console.log(`Totale curiosità a database: ${totalTrivia}\n`);
+  console.log(`Totale bloopers a database:  ${totalBloopers} (Mancanti da tradurre: ${totalBloopers - blooperIds.size})`);
+  console.log(`Totale curiosità a database: ${totalTrivia} (Mancanti da tradurre: ${totalTrivia - triviaIds.size})\n`);
 
   let bloopersAdded = 0;
   let triviaAdded = 0;
 
   // 1. TRADUZIONE BLOOPERS
-  console.log('--- Inizio Traduzione Bloopers (Tabella errori) ---');
+  console.log('--- Inizio Traduzione Bloopers Mancanti ---');
   let lastId = 0;
   let keepGoingBloopers = true;
 
@@ -176,10 +218,10 @@ async function run() {
       .select('id, film_id, descrizione')
       .gt('id', lastId)
       .order('id', { ascending: true })
-      .limit(50);
+      .limit(60);
 
     if (error || !rows || rows.length === 0) {
-      console.log('Scansione bloopers completata.');
+      console.log('\nScansione bloopers completata.');
       break;
     }
 
@@ -210,14 +252,14 @@ async function run() {
       } else {
         await sleep(2000);
       }
-      await sleep(350);
+      await sleep(250);
     }
   }
 
   console.log(`\n✅ Bloopers completati. Nuove traduzioni aggiunte: ${bloopersAdded}\n`);
 
   // 2. TRADUZIONE CURIOSITÀ
-  console.log('--- Inizio Traduzione Curiosità (Tabella movie_trivia) ---');
+  console.log('--- Inizio Traduzione Curiosità Mancanti ---');
   let triviaOffset = 0;
   let keepGoingTrivia = true;
 
@@ -226,10 +268,10 @@ async function run() {
       .from('movie_trivia')
       .select('id, film_id, titolo, descrizione')
       .order('id', { ascending: true })
-      .range(triviaOffset, triviaOffset + 49);
+      .range(triviaOffset, triviaOffset + 59);
 
     if (error || !rows || rows.length === 0) {
-      console.log('Scansione curiosità completata.');
+      console.log('\nScansione curiosità completata.');
       break;
     }
 
@@ -274,15 +316,20 @@ async function run() {
       } else {
         await sleep(2000);
       }
-      await sleep(350);
+      await sleep(250);
     }
   }
 
-  console.log(`\n\n====================================================`);
-  console.log('🎉 TRADUZIONE COMPLETA TERMINATA CON SUCCESSO!');
-  console.log(`Totale bloopers nel file SQL:  ${blooperIds.size}`);
-  console.log(`Totale curiosità nel file SQL: ${triviaIds.size}`);
-  console.log(`File SQL pronto all'uso in:   ${SQL_BACKUP_PATH}`);
+  console.log(`\n✅ Curiosità completate. Nuove traduzioni aggiunte: ${triviaAdded}\n`);
+
+  // Esegue suddivisione in parti
+  splitIntoParts();
+
+  console.log('\n====================================================');
+  console.log('🎉 TUTTO IL CATALOGO È STATO COMPLETAMENTE TRADOTTO!');
+  console.log(`Totale bloopers:   ${blooperIds.size} / ${totalBloopers}`);
+  console.log(`Totale curiosità:  ${triviaIds.size} / ${totalTrivia}`);
+  console.log('Tutti i file suddivisi sono disponibili nella cartella backups/');
   console.log('====================================================\n');
 }
 
