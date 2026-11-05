@@ -21,6 +21,14 @@ const languages = [
 ];
 
 const MANUAL_OVERRIDES = {
+  107: { id: 1014049, mediaType: 'movie', reason: 'exact_poster_and_director_kyle_misak' }, // Oak Street (The House on Oak Street)
+  108: { id: 1101383, mediaType: 'movie', reason: 'exact_director_david_robert_mitchell' }, // La fine di Oak Street (David Robert Mitchell)
+  193: { id: 295385, mediaType: 'movie', reason: 'exact_1977_guy_green' }, // L'avvocato del diavolo (1977, Guy Green)
+  194: { id: 1813, mediaType: 'movie', reason: 'exact_1997_taylor_hackford' }, // L'avvocato del diavolo (1997, Taylor Hackford)
+  220: { id: 184499, mediaType: 'movie', reason: 'exact_1924_dannunzio' }, // Quo Vadis? (1924)
+  222: { id: 77204, mediaType: 'tv', reason: 'exact_1985_franco_rossi' }, // Quo Vadis? (1985, Franco Rossi)
+  225: { id: 616, mediaType: 'movie', reason: 'exact_2003_ed_zwick' }, // L'ultimo samurai (2003, Ed Zwick)
+  226: { id: 70385, mediaType: 'movie', reason: 'exact_1974_kenji_misumi' }, // L'ultimo samurai (1974, Kenji Misumi)
   57: { id: 22, mediaType: 'movie', reason: 'manual_override' }, // Pirati dei Caraibi (2003)
   81: { id: 1892, mediaType: 'movie', reason: 'manual_override' }, // Il ritorno dello Jedi (1983)
   217: { id: 115036, mediaType: 'tv', reason: 'manual_override' }, // The Book of Boba Fett (2021)
@@ -38,6 +46,18 @@ function cleanMovieTitle(raw) {
     .replace(/\(.*?\)/g, '')
     .replace(/:\s*Episodio\s+[IVXLCDM]+/gi, '')
     .trim();
+}
+
+async function getMovieDirector(tmdbId) {
+  try {
+    const res = await fetch(`${TMDB_API_BASE}/movie/${tmdbId}/credits?api_key=${tmdbApiKey}`);
+    if (res.ok) {
+      const data = await res.json();
+      const dir = (data.crew || []).find(c => c.job === 'Director');
+      return dir ? dir.name : null;
+    }
+  } catch (e) {}
+  return null;
 }
 
 async function findBestTmdbMovie(film) {
@@ -75,8 +95,7 @@ async function findBestTmdbMovie(film) {
     return null;
   }
 
-  // 2. Selezione miglior candidato
-  // Se un candidato corrisponde ESATTAMENTE alla locandina già presente nel DB, è una certezza assoluta (100%)
+  // 2. Controllo locandina esatta se già presente
   if (originalPosterPath) {
     const exactPosterMatch = results.find(r => r.poster_path === originalPosterPath);
     if (exactPosterMatch) {
@@ -84,7 +103,22 @@ async function findBestTmdbMovie(film) {
     }
   }
 
-  // Filtra per anno (entro 1 anno di tolleranza)
+  // 3. Se ci sono più candidati e abbiamo il regista del DB, controlla i crediti regia
+  if (film.regista && results.length > 1) {
+    const dbRegistaWords = film.regista.toLowerCase().split(/\s+/).filter(w => w.length > 2);
+    for (const cand of results.slice(0, 5)) {
+      const dirName = await getMovieDirector(cand.id);
+      if (dirName) {
+        const dirLower = dirName.toLowerCase();
+        const matchesDirector = dbRegistaWords.some(w => dirLower.includes(w));
+        if (matchesDirector) {
+          return { id: cand.id, mediaType: 'movie', reason: `director_match_${dirName}` };
+        }
+      }
+    }
+  }
+
+  // 4. Filtra per anno (entro 1 anno di tolleranza)
   let yearCandidates = [];
   if (targetYear) {
     yearCandidates = results.filter(r => {
@@ -95,7 +129,6 @@ async function findBestTmdbMovie(film) {
   }
 
   if (yearCandidates.length > 0) {
-    // Tra i candidati dell'anno giusto, cerca quello con il titolo più affine
     const exactTitle = yearCandidates.find(r => 
       (r.title && r.title.toLowerCase().trim() === cleanTitle.toLowerCase()) ||
       (r.original_title && r.original_title.toLowerCase().trim() === cleanTitle.toLowerCase())
@@ -103,7 +136,6 @@ async function findBestTmdbMovie(film) {
     if (exactTitle) {
       return { id: exactTitle.id, mediaType: 'movie', reason: 'exact_year_and_title' };
     }
-    // Altrimenti il più popolare dell'anno giusto
     yearCandidates.sort((a, b) => (b.popularity || 0) - (a.popularity || 0));
     return { id: yearCandidates[0].id, mediaType: 'movie', reason: 'best_year_candidate' };
   }
@@ -141,7 +173,7 @@ async function fetchAllLocalizedData(tmdbId, mediaType = 'movie') {
 
 async function run() {
   console.log(`=======================================================`);
-  console.log(`CORREZIONE PRECISA TMDB PER ANNO, TITOLO E LOCANDINE`);
+  console.log(`CORREZIONE PRECISA TMDB PER REGISTA, ANNO E TITOLO`);
   console.log(`Target: ${stagingUrl}`);
   console.log(`=======================================================\n`);
 
@@ -158,7 +190,7 @@ async function run() {
   console.log(`Trovati ${films.length} film da analizzare e allineare.`);
 
   let sqlStatements = `-- =========================================================================\n`;
-  sqlStatements += `-- CORREZIONE TMDB MULTILINGUA (TITOLI, TRAME E LOCANDINE CON VINCOLO ANNO)\n`;
+  sqlStatements += `-- CORREZIONE TMDB MULTILINGUA (CON VERIFICA REGISTA, ANNO E LOCANDINA)\n`;
   sqlStatements += `-- Esegui questo script nell'SQL Editor di Supabase Staging\n`;
   sqlStatements += `-- =========================================================================\n\n`;
   sqlStatements += `ALTER TABLE public.films ADD COLUMN IF NOT EXISTS posters_i18n JSONB DEFAULT '{}'::jsonb;\n\n`;
@@ -183,12 +215,10 @@ async function run() {
 
       // In italiano manteniamo sempre il titolo curato originale dell'archivio!
       titoli.it = film.titolo;
-      // Per la trama italiana, se presente quella originale curata nel DB, preserviamola
       if (film.trama && film.trama.trim().length > 30) {
         trame.it = film.trama;
       }
 
-      // Per la locandina italiana, se non c'è su TMDB o se c'è quella originale
       if (!posters.it && film.poster_url) posters.it = film.poster_url;
       if (!posters.en && (posters.it || film.poster_url)) posters.en = posters.it || film.poster_url;
 
@@ -199,6 +229,7 @@ async function run() {
         id: film.id,
         titolo_db: film.titolo,
         anno: film.anno,
+        regista: film.regista,
         tmdb_id: tmdbId,
         match_reason: match.reason,
         titolo_en: titoli.en,
@@ -210,7 +241,7 @@ async function run() {
         console.log(`[${processed}/${films.length}] Allineati con precisione ${fixedCount} film...`);
       }
 
-      await new Promise(r => setTimeout(r, 35));
+      await new Promise(r => setTimeout(r, 40));
     } catch (err) {
       console.warn(`Errore film ${film.id}:`, err.message);
     }
@@ -219,7 +250,6 @@ async function run() {
   const outSqlPath = path.join(__dirname, '..', 'backups', 'fix_all_films_tmdb_precision.sql');
   fs.writeFileSync(outSqlPath, sqlStatements, 'utf8');
 
-  // Dividi in Parte 1 e Parte 2 per comodità di esecuzione
   const sqlLines = sqlStatements.split('\n');
   const header = sqlLines.slice(0, 7).join('\n') + '\n\n';
   const updates = sqlLines.slice(7).filter(l => l.trim().startsWith('UPDATE'));
