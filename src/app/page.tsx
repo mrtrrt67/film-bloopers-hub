@@ -237,7 +237,7 @@ export default async function HomePage({
               100%
             </div>
             <div className="text-xs text-zinc-400 font-medium uppercase tracking-wider mt-0.5">
-              Dati TMDB Ufficiali
+              {dict.home.statTmdb || "Dati TMDB Ufficiali"}
             </div>
           </div>
         </div>
@@ -271,7 +271,7 @@ export default async function HomePage({
           </div>
         ) : (
           <div className="rounded-2xl border border-zinc-800 bg-zinc-900/30 p-12 text-center text-zinc-400">
-            Nessun film in evidenza al momento.
+            {dict.home.noFeaturedFilms || "Nessun film in evidenza al momento."}
           </div>
         )}
       </div>
@@ -317,9 +317,9 @@ export default async function HomePage({
 
       {/* Come Funziona Section */}
       <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-8 sm:p-12 text-center">
-        <h2 className="text-2xl font-black text-white mb-2">Come Funziona FilmBloopers Hub?</h2>
+        <h2 className="text-2xl font-black text-white mb-2">{dict.howItWorks.title}</h2>
         <p className="text-sm text-zinc-400 max-w-xl mx-auto mb-10">
-          Unisciti alla prima community italiana dedicata all&apos;analisi dei ciak errati e ai retroscena del cinema.
+          {dict.howItWorks.subtitle}
         </p>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
@@ -327,9 +327,9 @@ export default async function HomePage({
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10 text-amber-400 font-black text-base mb-4">
               1
             </div>
-            <h3 className="text-base font-bold text-white mb-1.5">Cerca o Importa il Film</h3>
+            <h3 className="text-base font-bold text-white mb-1.5">{dict.howItWorks.step1Title}</h3>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Grazie all&apos;integrazione con TMDB, qualsiasi film nella storia del cinema viene importato all&apos;istante con locandina HD, cast ufficiale e sinossi.
+              {dict.howItWorks.step1Desc}
             </p>
           </div>
 
@@ -337,9 +337,9 @@ export default async function HomePage({
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-orange-500/10 text-orange-400 font-black text-base mb-4">
               2
             </div>
-            <h3 className="text-base font-bold text-white mb-1.5">Bloopers & Curiosità con l&apos;IA</h3>
+            <h3 className="text-base font-bold text-white mb-1.5">{dict.howItWorks.step2Title}</h3>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Il nostro motore Google Gemini individua gli errori al minuto esatto ed estrae aneddoti esclusivi di backstage, segreti di produzione ed easter egg.
+              {dict.howItWorks.step2Desc}
             </p>
           </div>
 
@@ -347,9 +347,9 @@ export default async function HomePage({
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-400 font-black text-base mb-4">
               3
             </div>
-            <h3 className="text-base font-bold text-white mb-1.5">Vota, Scala la Classifica & Vinci</h3>
+            <h3 className="text-base font-bold text-white mb-1.5">{dict.howItWorks.step3Title}</h3>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Conferma o contesta i bloopers, lascia like agli aneddoti, accumula punti e sblocca l&apos;accesso Premium gratuito a vita per i migliori cacciatori.
+              {dict.howItWorks.step3Desc}
             </p>
           </div>
         </div>

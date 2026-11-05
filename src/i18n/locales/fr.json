@@ -53,7 +53,9 @@
     "trendingFilms": "Films les Plus Populaires",
     "statFilms": "Films au Catalogue",
     "statBloopers": "Bloopers Documentés",
-    "statTrivia": "Anecdotes Vérifiées"
+    "statTrivia": "Anecdotes Vérifiées",
+    "statTmdb": "Données Officielles TMDB",
+    "noFeaturedFilms": "Aucun film en vedette pour le moment."
   },
   "film": {
     "tabBloopers": "Bloopers & Erreurs",
@@ -279,5 +281,15 @@
     "badge": "Offre à Durée Limitée",
     "body": "Inscrivez-vous ou progressez dans le classement avant le {scadenza} pour débloquer l'accès <b>Premium Lifetime gratuit</b> à vie !",
     "cta": "En savoir plus"
+  },
+  "howItWorks": {
+    "title": "Comment Fonctionne FilmBloopers Hub ?",
+    "subtitle": "Rejoignez la première communauté dédiée à l'analyse des faux raccords et aux coulisses du cinéma.",
+    "step1Title": "Rechercher ou Importer un Film",
+    "step1Desc": "Grâce à l'intégration TMDB, n'importe quel film de l'histoire du cinéma est importé instantanément avec affiche HD, casting officiel et synopsis.",
+    "step2Title": "Bloopers & Anecdotes avec l'IA",
+    "step2Desc": "Notre moteur Google Gemini détecte les erreurs au minutage exact et extrait des anecdotes exclusives de tournage, secrets de production et easter eggs.",
+    "step3Title": "Votez, Grimpez au Classement & Gagnez",
+    "step3Desc": "Confirmez ou contestez des bloopers, likez des anecdotes, cumulez des points et débloquez un accès Premium à vie pour les meilleurs chasseurs."
   }
 }

@@ -53,7 +53,9 @@
     "trendingFilms": "Películas Más Populares",
     "statFilms": "Películas en Catálogo",
     "statBloopers": "Gazapos Documentados",
-    "statTrivia": "Curiosidades Verificadas"
+    "statTrivia": "Curiosidades Verificadas",
+    "statTmdb": "Datos Oficiales TMDB",
+    "noFeaturedFilms": "No hay películas destacadas en este momento."
   },
   "film": {
     "tabBloopers": "Gazapos & Errores",
@@ -279,5 +281,15 @@
     "badge": "Oferta por Tiempo Limitado",
     "body": "¡Regístrate o sube en la clasificación antes del {scadenza} para desbloquear el acceso <b>Premium Lifetime gratuito</b> de por vida!",
     "cta": "Descubre más"
+  },
+  "howItWorks": {
+    "title": "¿Cómo Funciona FilmBloopers Hub?",
+    "subtitle": "Únete a la primera comunidad dedicada al análisis de tomas falsas y los entresijos del cine.",
+    "step1Title": "Busca o Importa la Película",
+    "step1Desc": "Gracias a la integración con TMDB, cualquier película de la historia del cine se importa al instante con póster HD, reparto oficial y sinopsis.",
+    "step2Title": "Bloopers y Curiosidades con IA",
+    "step2Desc": "Nuestro motor Google Gemini identifica errores al minuto exacto y extrae anécdotas exclusivas de rodaje, secretos de producción y easter eggs.",
+    "step3Title": "Vota, Sube en el Ranking y Gana",
+    "step3Desc": "Confirma o disputa bloopers, da like a curiosidades, acumula puntos y desbloquea acceso Premium de por vida para los mejores cazadores."
   }
 }

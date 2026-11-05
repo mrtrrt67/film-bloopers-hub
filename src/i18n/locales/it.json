@@ -53,7 +53,9 @@
     "trendingFilms": "Film Più Popolari",
     "statFilms": "Film a Catalogo",
     "statBloopers": "Blooper Documentati",
-    "statTrivia": "Curiosità Verificate"
+    "statTrivia": "Curiosità Verificate",
+    "statTmdb": "Dati TMDB Ufficiali",
+    "noFeaturedFilms": "Nessun film in evidenza al momento."
   },
   "film": {
     "tabBloopers": "Blooper & Errori",
@@ -279,5 +281,15 @@
     "badge": "Offerta a Tempo Limitato",
     "body": "Registrati o scala la classifica entro il {scadenza} per sbloccare subito l'accesso <b>Premium Lifetime gratuito</b> a vita!",
     "cta": "Scopri di più"
+  },
+  "howItWorks": {
+    "title": "Come Funziona FilmBloopers Hub?",
+    "subtitle": "Unisciti alla prima community dedicata all'analisi dei ciak errati e ai retroscena del cinema.",
+    "step1Title": "Cerca o Importa il Film",
+    "step1Desc": "Grazie all'integrazione con TMDB, qualsiasi film nella storia del cinema viene importato all'istante con locandina HD, cast ufficiale e sinossi.",
+    "step2Title": "Bloopers & Curiosità con l'IA",
+    "step2Desc": "Il nostro motore Google Gemini individua gli errori al minuto esatto ed estrae aneddoti esclusivi di backstage, segreti di produzione ed easter egg.",
+    "step3Title": "Vota, Scala la Classifica & Vinci",
+    "step3Desc": "Conferma o contesta i bloopers, lascia like agli aneddoti, accumula punti e sblocca l'accesso Premium gratuito a vita per i migliori cacciatori."
   }
 }

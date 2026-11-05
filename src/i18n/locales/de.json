@@ -53,7 +53,9 @@
     "trendingFilms": "Beliebteste Filme",
     "statFilms": "Filme im Katalog",
     "statBloopers": "Dokumentierte Blooper",
-    "statTrivia": "Verifiziertes Hintergrundwissen"
+    "statTrivia": "Verifiziertes Hintergrundwissen",
+    "statTmdb": "Offizielle TMDB-Daten",
+    "noFeaturedFilms": "Derzeit keine vorgestellten Filme."
   },
   "film": {
     "tabBloopers": "Blooper & Filmfehler",
@@ -279,5 +281,15 @@
     "badge": "Zeitlich Begrenztes Angebot",
     "body": "Registriere dich oder steige bis zum {scadenza} in der Rangliste auf, um lebenslangen kostenlosen <b>Premium Lifetime Zugang</b> freizuschalten!",
     "cta": "Mehr erfahren"
+  },
+  "howItWorks": {
+    "title": "Wie Funktioniert FilmBloopers Hub?",
+    "subtitle": "Tritt der führenden Community zur Analyse von Filmfehlern und Blicken hinter die Kulissen bei.",
+    "step1Title": "Film Suchen oder Importieren",
+    "step1Desc": "Dank direkter TMDB-Integration wird jeder Film der Kinogeschichte sofort mit HD-Poster, offizieller Besetzung und Synopsis importiert.",
+    "step2Title": "Bloopers & Trivia mit KI",
+    "step2Desc": "Unsere Google-Gemini-Engine ermittelt Fehler minutengenau und liefert exklusive Set-Anekdoten, Produktionsgeheimnisse und Easter Eggs.",
+    "step3Title": "Abstimmen, Rangliste Erklimmen & Gewinnen",
+    "step3Desc": "Bestätige oder fechte Bloopers an, like Trivia, sammle Punkte und schalte kostenlosen lebenslangen Premium-Zugang für Top-Jäger frei."
   }
 }

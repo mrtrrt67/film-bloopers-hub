@@ -53,7 +53,9 @@
     "trendingFilms": "Most Popular Movies",
     "statFilms": "Movies in Catalog",
     "statBloopers": "Documented Bloopers",
-    "statTrivia": "Verified Trivia"
+    "statTrivia": "Verified Trivia",
+    "statTmdb": "Official TMDB Data",
+    "noFeaturedFilms": "No featured movies at the moment."
   },
   "film": {
     "tabBloopers": "Bloopers & Mistakes",
@@ -279,5 +281,15 @@
     "badge": "Limited Time Offer",
     "body": "Sign up or climb the leaderboard before {scadenza} to unlock free lifetime <b>Premium Lifetime access</b>!",
     "cta": "Learn more"
+  },
+  "howItWorks": {
+    "title": "How Does FilmBloopers Hub Work?",
+    "subtitle": "Join the premier community dedicated to analyzing film goofs and behind-the-scenes movie trivia.",
+    "step1Title": "Search or Import Movies",
+    "step1Desc": "With direct TMDB integration, any movie in cinema history is imported instantly with HD posters, official cast, and synopsis.",
+    "step2Title": "AI-Powered Bloopers & Trivia",
+    "step2Desc": "Our Google Gemini AI engine pinpoints exact timestamps and extracts exclusive backstage stories, production secrets, and easter eggs.",
+    "step3Title": "Vote, Climb the Leaderboard & Win",
+    "step3Desc": "Confirm or dispute bloopers, like trivia, earn points, and unlock free lifetime Premium access for top hunters."
   }
 }
