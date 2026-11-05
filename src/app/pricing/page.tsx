@@ -3,12 +3,15 @@
 import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Check, Sparkles, Zap, Shield, ArrowRight, ShieldCheck, CheckCircle2, PartyPopper, AlertCircle } from "lucide-react";
+import { Check, ArrowRight, ShieldCheck, CheckCircle2, PartyPopper, AlertCircle } from "lucide-react";
 import { PRICING_PLANS } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/client";
 import AuthModal from "@/components/AuthModal";
+import { useTranslation } from "@/i18n/client";
+import { getLocalizedPath } from "@/i18n";
 
 function PricingContent() {
+  const { dict, locale } = useTranslation();
   const searchParams = useSearchParams();
   const isSuccess = searchParams.get("success") === "true";
   const isCanceled = searchParams.get("canceled") === "true";
@@ -90,6 +93,80 @@ function PricingContent() {
   const isUserSubscribed = userProfile?.tier === "premium";
   const userSub = userProfile?.tipo_abbonamento;
 
+  const getPlanDetails = (planId: string) => {
+    const p = dict.pricing;
+    switch (planId) {
+      case "free":
+        return {
+          name: p.freePlanName,
+          period: p.freePeriod,
+          description: p.freeDesc,
+          features: [
+            { name: p.f_searches_free, included: true },
+            { name: p.f_view_bloopers, included: true },
+            { name: p.f_submit_errors, included: true },
+            { name: p.f_voting, included: false },
+            { name: p.f_leaderboard, included: false },
+            { name: p.f_unlimited_ai, included: false },
+          ],
+        };
+      case "mensile":
+        return {
+          name: p.monthlyPlanName,
+          period: p.monthlyPeriod,
+          description: p.monthlyDesc,
+          features: [
+            { name: p.f_unlimited_ai, included: true },
+            { name: p.f_voting, included: true },
+            { name: p.f_leaderboard, included: true },
+            { name: p.f_leaderboard, included: true },
+            { name: p.f_badge_vip, included: true },
+            { name: p.f_cancel_anytime, included: true },
+          ],
+        };
+      case "annuale":
+        return {
+          name: p.yearlyPlanName,
+          period: p.yearlyPeriod,
+          description: p.yearlyDesc,
+          features: [
+            { name: p.f_unlimited_ai, included: true },
+            { name: p.f_voting, included: true },
+            { name: p.f_leaderboard, included: true },
+            { name: p.f_badge_vip, included: true },
+            { name: p.f_future_updates, included: true },
+          ],
+        };
+      case "lifetime-promo":
+        return {
+          name: "Lifetime Promo",
+          period: p.lifetimePeriod,
+          description: p.lifetimeDesc,
+          features: [
+            { name: p.f_unlimited_ai, included: true },
+            { name: p.f_cancel_anytime, included: true },
+            { name: p.f_future_updates, included: true },
+            { name: p.f_badge_legend, included: true },
+            { name: p.bestValueBadge, included: true },
+          ],
+        };
+      case "lifetime-standard":
+        return {
+          name: p.lifetimePlanName,
+          period: p.lifetimePeriod,
+          description: p.lifetimeDesc,
+          features: [
+            { name: p.f_unlimited_ai, included: true },
+            { name: p.f_cancel_anytime, included: true },
+            { name: p.f_future_updates, included: true },
+            { name: p.f_badge_legend, included: true },
+          ],
+        };
+      default:
+        return null;
+    }
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12">
       {/* Banner Successo Post-Checkout Stripe */}
@@ -100,10 +177,10 @@ function PricingContent() {
           </div>
           <div>
             <h3 className="text-sm font-bold text-emerald-300">
-              Pagamento completato con successo! 🎉
+              {dict.pricing.successTitle}
             </h3>
             <p className="text-xs text-zinc-300 mt-1 leading-relaxed">
-              Il tuo account è ora abilitato con accesso Premium completo. Puoi utilizzare l&apos;IA senza limiti, votare i bloopers e scalare la classifica!
+              {dict.pricing.successDesc}
             </p>
           </div>
         </div>
@@ -113,20 +190,20 @@ function PricingContent() {
       {isCanceled && (
         <div className="mb-8 rounded-2xl border border-zinc-700 bg-zinc-900/80 p-4 flex items-center gap-3 text-xs text-zinc-300">
           <AlertCircle className="h-5 w-5 text-zinc-400 shrink-0" />
-          <span>Procedura di checkout annullata. Nessun addebito è stato effettuato sul tuo metodo di pagamento.</span>
+          <span>{dict.pricing.cancelTitle}</span>
         </div>
       )}
 
       {/* Intestazione */}
       <div className="flex flex-col items-center text-center max-w-3xl mx-auto mb-10">
         <span className="rounded-full bg-emerald-500/10 border border-emerald-500/30 px-3.5 py-1 text-xs font-bold text-emerald-400 mb-3">
-          Archivio a Consultazione Libera & Gratuita
+          {dict.pricing.badge}
         </span>
         <h1 className="text-3xl sm:text-5xl font-black text-white tracking-tight">
-          Supporta il Progetto & Sblocca l&apos;IA
+          {dict.pricing.title}
         </h1>
         <p className="text-sm sm:text-base text-zinc-300 mt-3 leading-relaxed">
-          Tutti i film, i bloopers e le curiosità sono <strong className="text-white">gratuiti e accessibili a chiunque</strong> senza paywall. I piani supporter servono per finanziare le chiamate all&apos;intelligenza artificiale (Google Gemini), sostenere i server e premiare i contributori più attivi della community.
+          {dict.pricing.subtitle}
         </p>
       </div>
 
@@ -136,11 +213,13 @@ function PricingContent() {
           <div className="space-y-1 text-center sm:text-left">
             <div className="inline-flex items-center gap-1.5 rounded-full bg-purple-500/20 text-purple-300 px-3 py-0.5 text-xs font-bold border border-purple-500/30">
               <CheckCircle2 className="h-3.5 w-3.5" />
-              <span>Abbonamento Attivo: Piano {userSub === "annuale" ? "Annuale" : "Mensile"}</span>
+              <span>
+                {dict.pricing.activeSubTitle.replace("{plan}", userSub === "annuale" ? dict.pricing.yearlyPlanName : dict.pricing.monthlyPlanName)}
+              </span>
             </div>
-            <h3 className="text-base font-bold text-white">Gestione e Disdetta in 1 Clic</h3>
+            <h3 className="text-base font-bold text-white">{dict.pricing.manageBillingTitle}</h3>
             <p className="text-xs text-zinc-400">
-              Puoi disdire il rinnovo automatico in qualsiasi momento o aggiornare il tuo metodo di pagamento direttamente nel portale Stripe.
+              {dict.pricing.manageBillingDesc}
             </p>
           </div>
           <button
@@ -148,7 +227,7 @@ function PricingContent() {
             disabled={openingPortal}
             className="shrink-0 flex items-center gap-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white px-5 py-2.5 text-xs font-bold transition shadow-lg shadow-purple-500/20 active:scale-95"
           >
-            <span>{openingPortal ? "Apertura..." : "Gestisci o Disdici Abbonamento (1 Clic)"}</span>
+            <span>{openingPortal ? dict.pricing.openingPortal : dict.pricing.openPortal}</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </button>
         </div>
@@ -164,6 +243,12 @@ function PricingContent() {
             (isUserSubscribed && userSub === plan.id) ||
             (isUserSubscribed && userSub === "lifetime" && (plan.id === "lifetime-promo" || plan.id === "lifetime-standard"));
 
+          const localized = getPlanDetails(plan.id);
+          const planName = localized?.name || plan.name;
+          const planDesc = localized?.description || plan.description;
+          const planPeriod = localized?.period || plan.period;
+          const planFeatures = localized?.features || plan.features;
+
           return (
             <div
               key={plan.id}
@@ -178,38 +263,38 @@ function PricingContent() {
               {/* Badge in evidenza */}
               {isPromo && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-3 py-0.5 text-[10px] font-black uppercase tracking-wider text-zinc-950 shadow-md whitespace-nowrap">
-                  Offerta di Lancio
+                  {dict.pricing.bestValueBadge || "Promo"}
                 </div>
               )}
               {isAnnuale && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-purple-500 px-3 py-0.5 text-[10px] font-black uppercase tracking-wider text-white shadow-md whitespace-nowrap">
-                  Più Popolare
+                  {dict.pricing.popularBadge}
                 </div>
               )}
 
               <div>
                 <div className="flex items-center justify-between mb-1 gap-1">
-                  <h3 className="text-sm sm:text-base font-bold text-white truncate">{plan.name}</h3>
+                  <h3 className="text-sm sm:text-base font-bold text-white truncate">{planName}</h3>
                   {isCurrentPlan && (
                     <span className="rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5 whitespace-nowrap shrink-0">
-                      Attivo
+                      {dict.pricing.currentPlan}
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-zinc-400 min-h-[36px] mb-4">{plan.description}</p>
+                <p className="text-xs text-zinc-400 min-h-[36px] mb-4">{planDesc}</p>
 
                 <div className="flex items-baseline flex-nowrap gap-1.5 mb-5 whitespace-nowrap">
                   <span className="text-xl sm:text-2xl xl:text-[1.35rem] 2xl:text-2xl font-black text-white whitespace-nowrap tracking-tight shrink-0">
                     {plan.price.replace(/\s+/g, "\u00A0")}
                   </span>
                   <span className="text-[11px] 2xl:text-xs text-zinc-400 font-medium whitespace-nowrap shrink-0">
-                    / {plan.period}
+                    / {planPeriod}
                   </span>
                 </div>
 
                 {/* Features List */}
                 <div className="space-y-2.5 mb-6 text-xs border-t border-zinc-800 pt-4">
-                  {plan.features.map((f, i) => (
+                  {planFeatures.map((f, i) => (
                     <div key={i} className="flex items-start gap-2">
                       <Check
                         className={`h-3.5 w-3.5 shrink-0 mt-0.5 ${
@@ -230,7 +315,7 @@ function PricingContent() {
                   disabled
                   className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 py-2.5 px-3 text-xs font-bold text-zinc-400 cursor-default whitespace-nowrap"
                 >
-                  {isCurrentPlan ? "Piano Attuale" : "Incluso"}
+                  {isCurrentPlan ? dict.pricing.currentPlan : dict.pricing.freeButton}
                 </button>
               ) : isCurrentPlan && (userSub === "mensile" || userSub === "annuale") ? (
                 <button
@@ -238,7 +323,7 @@ function PricingContent() {
                   disabled={openingPortal}
                   className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-purple-500/50 bg-purple-500/20 py-2.5 px-3 text-xs font-bold text-purple-300 hover:bg-purple-500/30 transition shadow whitespace-nowrap"
                 >
-                  <span>{openingPortal ? "Apertura..." : "Disdici / Gestisci"}</span>
+                  <span>{openingPortal ? dict.pricing.openingPortal : dict.pricing.openPortal}</span>
                 </button>
               ) : (
                 <button
@@ -253,10 +338,18 @@ function PricingContent() {
                   }`}
                 >
                   {loadingPlan === plan.id ? (
-                    "Reindirizzamento..."
+                    "..."
                   ) : (
                     <>
-                      <span>{isPromo ? "Acquista Promo" : `Scegli ${plan.name}`}</span>
+                      <span>
+                        {plan.id === "free"
+                          ? dict.pricing.freeButton
+                          : plan.id === "mensile"
+                          ? dict.pricing.monthlyButton
+                          : plan.id === "annuale"
+                          ? dict.pricing.yearlyButton
+                          : dict.pricing.lifetimeButton}
+                      </span>
                       <ArrowRight className="h-3 w-3 shrink-0" />
                     </>
                   )}
@@ -271,21 +364,24 @@ function PricingContent() {
       <div className="mt-12 rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-3 text-xs text-zinc-400">
         <div className="flex items-center gap-2 text-zinc-200 font-bold">
           <ShieldCheck className="h-4 w-4 text-amber-400" />
-          <span>Garanzia di Trasparenza, Sicurezza e Condizioni di Recesso</span>
+          <span>{dict.pricing.guaranteeTitle}</span>
         </div>
         <p className="leading-relaxed">
-          <strong>Pagamenti Sicuri:</strong> Tutte le transazioni sono elaborate in modo sicuro con crittografia end-to-end da <strong>Stripe Inc.</strong> (conforme PCI-DSS Livello 1). Nessun dato di carta di credito viene memorizzato sui nostri server.
-        </p>
-        <p className="leading-relaxed">
-          <strong>Informativa Recesso Servizi Digitali:</strong> Ai sensi dell&apos;art. 59, lett. o) del Codice del Consumo (D.Lgs. 206/2005), la fornitura di contenuti digitali ad esecuzione immediata non è soggetta al diritto di recesso una volta avviata l&apos;esecuzione del servizio. L&apos;abbonamento mensile e annuale può essere annullato in qualsiasi momento con un semplice click dal pannello Stripe, mantenendo l&apos;accesso fino alla scadenza del periodo già pagato.
+          {dict.pricing.guaranteeDesc}
         </p>
         <div className="flex flex-wrap items-center gap-4 pt-2 text-[11px] text-zinc-400 border-t border-zinc-800/80">
-          <span>Consulta i documenti legali completi:</span>
-          <Link href="/termini" className="text-amber-400 hover:underline">Termini e Condizioni</Link>
+          <span>{dict.footer?.quickLinks || "Documenti legali"}:</span>
+          <Link href={getLocalizedPath("/termini", locale)} className="text-amber-400 hover:underline">
+            {dict.footer?.terms || "Termini e Condizioni"}
+          </Link>
           <span>•</span>
-          <Link href="/privacy" className="text-amber-400 hover:underline">Informativa Privacy</Link>
+          <Link href={getLocalizedPath("/privacy", locale)} className="text-amber-400 hover:underline">
+            {dict.footer?.privacy || "Informativa Privacy"}
+          </Link>
           <span>•</span>
-          <Link href="/note-legali" className="text-amber-400 hover:underline">Note Legali & Dati Societari</Link>
+          <Link href={getLocalizedPath("/note-legali", locale)} className="text-amber-400 hover:underline">
+            {dict.footer?.legal || "Note Legali"}
+          </Link>
         </div>
       </div>
 
@@ -303,7 +399,7 @@ export default function PricingPage() {
     <Suspense
       fallback={
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 text-center text-zinc-500">
-          Caricamento piani...
+          ...
         </div>
       }
     >

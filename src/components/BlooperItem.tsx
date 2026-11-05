@@ -7,6 +7,8 @@ import { Blooper } from "@/lib/types";
 import { calculateAttendibilita, formatPublicAuthor } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import AuthModal from "./AuthModal";
+import { useTranslation } from "@/i18n/client";
+import { getLocalizedBlooperCategory, getLocalizedPath } from "@/i18n";
 
 interface BlooperItemProps {
   blooper: Blooper;
@@ -15,6 +17,7 @@ interface BlooperItemProps {
 }
 
 export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperItemProps) {
+  const { locale } = useTranslation();
   const [conferme, setConferme] = useState(blooper.conferme || 0);
   const [contestazioni, setContestazioni] = useState(blooper.contestazioni || 0);
   const [votoUtente, setVotoUtente] = useState<"conferma" | "contestazione" | null>(
@@ -193,7 +196,7 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
             )}`}
           >
             <Tag className="h-3 w-3" />
-            {blooper.categoria}
+            {getLocalizedBlooperCategory(blooper.categoria, locale)}
           </span>
 
           {/* Badge Confermato dalla Community (se conferme >= 3) */}
@@ -203,7 +206,7 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
               className="inline-flex items-center gap-1 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-2.5 py-1 text-xs font-bold text-emerald-400 shadow-sm shadow-emerald-500/10"
             >
               <ThumbsUp className="h-3 w-3 text-emerald-400" />
-              <span>Confermato ({conferme}👍)</span>
+              <span>{locale === "it" ? "Confermato" : locale === "es" ? "Confirmado" : locale === "fr" ? "Confirmé" : locale === "de" ? "Bestätigt" : "Confirmed"} ({conferme}👍)</span>
             </span>
           )}
         </div>
@@ -217,7 +220,13 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
           ) : attendibilita.badge === "contestato" ? (
             <AlertTriangle className="h-3.5 w-3.5" />
           ) : null}
-          {attendibilita.text} ({attendibilita.percent}%)
+          {attendibilita.badge === "verificato"
+            ? ({ it: "Verificato ✅", en: "Verified ✅", es: "Verificado ✅", fr: "Vérifié ✅", de: "Verifiziert ✅" }[locale] || attendibilita.text)
+            : attendibilita.badge === "contestato"
+            ? ({ it: "Contestato ⚠️", en: "Disputed ⚠️", es: "Disputado ⚠️", fr: "Contesté ⚠️", de: "Bestritten ⚠️" }[locale] || attendibilita.text)
+            : (conferme + contestazioni === 0)
+            ? ({ it: "Da Verificare", en: "To Verify", es: "Por Verificar", fr: "À Vérifier", de: "Zu Überprüfen" }[locale] || attendibilita.text)
+            : ({ it: "In Valutazione", en: "Under Review", es: "En Revisión", fr: "En Évaluation", de: "In Prüfung" }[locale] || attendibilita.text)} ({attendibilita.percent}%)
         </span>
       </div>
 
@@ -303,7 +312,7 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
             Autore: <strong className="text-zinc-300 font-semibold">{formatPublicAuthor(blooper.inserito_da, blooper.provenienza)}</strong>
             {isOwnBlooper && (
               <span className="ml-1.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 text-[10px] font-bold">
-                Tu
+                {locale === "it" ? "Tu" : locale === "es" ? "Tú" : locale === "fr" ? "Toi" : locale === "de" ? "Du" : "You"}
               </span>
             )}
           </span>
@@ -383,7 +392,7 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
                 Chiudi
               </button>
               <Link
-                href="/pricing"
+                href={getLocalizedPath("/pricing", locale)}
                 className="w-1/2 flex items-center justify-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-2.5 text-xs font-bold text-zinc-950 shadow-md shadow-amber-500/20 hover:brightness-110 transition"
               >
                 <span>Vedi Piani</span>

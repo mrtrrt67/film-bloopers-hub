@@ -20,6 +20,8 @@ import { Film as FilmType, MovieTrivia, TriviaCategoria } from "@/lib/types";
 import AuthModal from "@/components/AuthModal";
 import ConfirmModal from "@/components/ConfirmModal";
 import { createClient } from "@/lib/supabase/client";
+import { useTranslation } from "@/i18n/client";
+import { getLocalizedTriviaCategory } from "@/i18n";
 
 interface TriviaSectionProps {
   film: FilmType;
@@ -47,6 +49,7 @@ const CATEGORY_COLORS: Record<string, { bg: string; text: string; border: string
 };
 
 export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: TriviaSectionProps) {
+  const { locale } = useTranslation();
   const [triviaList, setTriviaList] = useState<MovieTrivia[]>(initialTrivia);
 
   useEffect(() => {
@@ -303,7 +306,7 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
                   : "bg-zinc-900/80 text-zinc-400 hover:text-zinc-200 border border-zinc-800 hover:border-zinc-700"
               }`}
             >
-              {cat}
+              {getLocalizedTriviaCategory(cat, locale)}
             </button>
           );
         })}
@@ -353,7 +356,7 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
                       className={`inline-flex items-center gap-1.5 rounded-lg px-2.5 py-0.5 text-[11px] font-bold border ${colors.bg} ${colors.text} ${colors.border}`}
                     >
                       <Clapperboard className="h-3 w-3" />
-                      {item.categoria}
+                      {getLocalizedTriviaCategory(item.categoria, locale)}
                     </span>
 
                     {item.fonte && (
@@ -484,7 +487,7 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
                   >
                     {CATEGORIES.filter((c) => c !== "Tutte").map((cat) => (
                       <option key={cat} value={cat}>
-                        {cat}
+                        {getLocalizedTriviaCategory(cat, locale)}
                       </option>
                     ))}
                   </select>

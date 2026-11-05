@@ -1,7 +1,9 @@
 import { Metadata } from "next";
-import { Trophy, Award, Crown, Star, Sparkles, Shield, User, ThumbsUp, CheckCircle, AlertTriangle, Info, Zap } from "lucide-react";
+import { headers, cookies } from "next/headers";
+import { Trophy, Award, Crown, Shield, Info } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import { formatPublicAuthor, getRankInfo, replacePlaceholders } from "@/lib/utils";
+import { formatPublicAuthor, getRankInfo } from "@/lib/utils";
+import { getDictionary, isSupportedLocale, Locale, resolveLocale } from "@/i18n";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -11,7 +13,43 @@ export const metadata: Metadata = {
   description: "Guarda chi sono i migliori cercatori di bloopers della community. Segnala errori, guadagna punti e sblocca l'abbonamento Premium gratuito a vita!",
 };
 
-export default async function ClassificaPage() {
+const RANK_LABELS: Record<string, Record<string, string>> = {
+  Leggenda: { it: "Leggenda", en: "Legend", es: "Leyenda", fr: "Légende", de: "Legende" },
+  VIP: { it: "VIP", en: "VIP", es: "VIP", fr: "VIP", de: "VIP" },
+  Critico: { it: "Critico", en: "Critic", es: "Crítico", fr: "Critique", de: "Kritiker" },
+  Cacciatore: { it: "Cacciatore", en: "Hunter", es: "Cazador", fr: "Chasseur", de: "Jäger" },
+};
+
+const YOU_LABELS: Record<string, string> = {
+  it: "(Tu)",
+  en: "(You)",
+  es: "(Tú)",
+  fr: "(Toi)",
+  de: "(Du)",
+};
+
+export default async function ClassificaPage({
+  params,
+  searchParams,
+}: {
+  params?: Promise<{ locale?: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+} = {}) {
+  const resolvedParams = params ? await params : {};
+  const routeLocale = resolvedParams.locale;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const headerList = await headers();
+  const cookieStore = await cookies();
+  const locale: Locale = isSupportedLocale(routeLocale)
+    ? routeLocale
+    : resolveLocale({
+        searchParams: resolvedSearchParams,
+        headerList,
+        cookieStore,
+      });
+
+  const dict = getDictionary(locale);
+
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -28,8 +66,13 @@ export default async function ClassificaPage() {
   const sogliaMensile = parseInt(conf["soglia_punti_mensile"] || "50", 10);
   const sogliaLifetime = parseInt(conf["soglia_punti_lifetime"] || "10000", 10);
 
-  const titoloPagina = conf["classifica_titolo"] || "Classifica Cacciatori di Bloopers";
-  const bannerTitolo = conf["classifica_banner_titolo"] || "Come si guadagnano i Punti e come funzionano i Premi?";
+  const titoloPagina = locale === "it" && conf["classifica_titolo"]
+    ? conf["classifica_titolo"]
+    : dict.ranking.title;
+
+  const bannerTitolo = locale === "it" && conf["classifica_banner_titolo"]
+    ? conf["classifica_banner_titolo"]
+    : dict.ranking.howPointsWork;
 
   // 2. Recupero classifica utenti (escludendo l'amministratore)
   const adminEmail = (process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL || "mrtrrt67@gmail.com").toLowerCase();
@@ -51,8 +94,6 @@ export default async function ClassificaPage() {
     })
     .slice(0, 30);
 
-  const userProfile = (profiles as any[])?.find((p: any) => p.id === user?.id);
-
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
       {/* Intestazione */}
@@ -62,7 +103,7 @@ export default async function ClassificaPage() {
         </div>
         <h1 className="text-3xl font-black text-white tracking-tight">{titoloPagina}</h1>
         <p className="text-sm text-zinc-400 mt-1 max-w-xl">
-          Segnala errori cinematografici verificati, ottieni conferme dalla community e scala la classifica per sbloccare l&apos;accesso Premium gratuito.
+          {dict.ranking.subtitle}
         </p>
       </div>
 
@@ -87,7 +128,7 @@ export default async function ClassificaPage() {
             <span>{bannerTitolo}</span>
           </h3>
           <span className="text-xs font-mono font-bold text-amber-400/90 bg-amber-500/10 px-3 py-1 rounded-full border border-amber-500/20 self-start sm:self-auto">
-            ⚡ Regolamento Ufficiale Community
+            ⚡ {dict.ranking.badge}
           </span>
         </div>
 
@@ -100,28 +141,32 @@ export default async function ClassificaPage() {
                 1
               </span>
               <span className="rounded-lg bg-amber-500/20 text-amber-300 font-mono font-bold text-xs px-2.5 py-1 border border-amber-500/30">
-                +10 Punti
+                +10 {dict.ranking.colPoints}
               </span>
             </div>
-            <h4 className="text-sm font-bold text-white pt-1">Segnala un Nuovo Blooper</h4>
+            <h4 className="text-sm font-bold text-white pt-1">{dict.ranking.reportPoint}</h4>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Scovi un errore di scena, anacronismo o microfono visibile? Inseriscilo dalla scheda del film. Non appena lo staff lo verifica e lo approva, guadagni <strong className="text-amber-300">+10 pt</strong> (oppure <strong className="text-amber-300">+20 pt 2x</strong> con abbonamento Annuale o Lifetime).
+              {locale === "it"
+                ? "Scovi un errore di scena, anacronismo o microfono visibile? Inseriscilo dalla scheda del film. Non appena lo staff lo verifica e lo approva, guadagni +10 pt."
+                : dict.ranking.howPointsDesc}
             </p>
           </div>
 
-          {/* Card 2: Contestazione o Correzione */}
+          {/* Card 2: Trivia o Correzione */}
           <div className="rounded-2xl border border-zinc-800/80 bg-zinc-900/60 p-4 space-y-2 hover:border-rose-500/40 transition">
             <div className="flex items-center justify-between">
               <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-rose-500/15 text-rose-400 font-bold text-sm">
                 2
               </span>
               <span className="rounded-lg bg-rose-500/20 text-rose-300 font-mono font-bold text-xs px-2.5 py-1 border border-rose-500/30">
-                +10 Punti
+                +10 {dict.ranking.colPoints}
               </span>
             </div>
-            <h4 className="text-sm font-bold text-white pt-1">Contesta o Correggi un Errore</h4>
+            <h4 className="text-sm font-bold text-white pt-1">{dict.ranking.triviaPoint}</h4>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Hai notato un blooper inesistente o un minutaggio impreciso? Clicca sul pollice in giù (👎) e motiva la contestazione: se la segnalazione porta alla rettifica o rimozione dell&apos;errore errato, ricevi <strong className="text-rose-300">+10 pt</strong> (+20 pt 2x con piano Annuale o Lifetime).
+              {locale === "it"
+                ? "Conosci aneddoti o curiosità inedite dal set? Condividile con la community: una volta approvate ricevi +10 pt."
+                : dict.ranking.triviaPoint}
             </p>
           </div>
 
@@ -132,30 +177,15 @@ export default async function ClassificaPage() {
                 3
               </span>
               <span className="rounded-lg bg-emerald-500/20 text-emerald-300 font-mono font-bold text-xs px-2.5 py-1 border border-emerald-500/40">
-                +1 Punto / 👍
+                +1 {dict.ranking.colPoints} / 👍
               </span>
             </div>
-            <h4 className="text-sm font-bold text-white pt-1">Rendita Pollici in Su (👍)</h4>
+            <h4 className="text-sm font-bold text-white pt-1">{dict.ranking.votePoint}</h4>
             <p className="text-xs text-zinc-300 leading-relaxed">
-              Ogni volta che un altro membro della community conferma con un pollice in su (👍) un tuo blooper approvato, guadagni <strong className="text-emerald-300">+1 punto passivo</strong>! Più i tuoi bloopers sono curati e veritieri, più punti accumulerai automaticamente nel tempo.
+              {locale === "it"
+                ? "Ogni volta che un altro membro della community conferma con un 👍 un tuo blooper approvato, guadagni punti passivi."
+                : dict.ranking.votePoint}
             </p>
-          </div>
-        </div>
-
-        {/* Note di Trasparenza & Anti-Spam */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-3.5 flex items-start gap-3 text-xs text-zinc-400">
-            <Info className="h-4 w-4 text-cyan-400 shrink-0 mt-0.5" />
-            <div>
-              <strong className="text-zinc-200">Archivio IA vs Utenti:</strong> Il catalogo iniziale è stato pre-popolato dall&apos;Intelligenza Artificiale per fornire una solida base di partenza. I bloopers IA non appartengono ad alcun utente e non generano punti sui voti; i punti spettano unicamente agli utenti reali sui loro bloopers originali approvati.
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-zinc-800 bg-zinc-950/70 p-3.5 flex items-start gap-3 text-xs text-zinc-400">
-            <Shield className="h-4 w-4 text-amber-400 shrink-0 mt-0.5" />
-            <div>
-              <strong className="text-zinc-200">Zero Clic Selvaggio:</strong> Votare 👍 un blooper assegna 0 punti al votante ed è impossibile votare i propri bloopers. Questo impedisce account bot o spam e premia solo la reale qualità delle scoperte cinematografiche.
-            </div>
           </div>
         </div>
 
@@ -164,9 +194,9 @@ export default async function ClassificaPage() {
           <div className="flex items-center gap-2.5">
             <Crown className="h-5 w-5 text-amber-400 shrink-0" />
             <div>
-              <strong className="text-white text-sm">I Premi in Palio:</strong>
-              <p className="text-zinc-400 text-xs">
-                Ogni <strong className="text-amber-300">{sogliaMensile} Punti</strong> sblocchi automaticamente 1 mese Premium omaggio. Al raggiungimento di <strong className="text-amber-300">{sogliaLifetime} Punti</strong> ottieni il pass <strong>Lifetime gratuito per sempre</strong>!
+              <strong className="text-white text-sm">{dict.ranking.tableTitle}:</strong>
+              <p className="text-zinc-400 text-xs mt-0.5">
+                {dict.ranking.thresholdMonthly}: <strong className="text-amber-300">{sogliaMensile} pt</strong> • {dict.ranking.thresholdLifetime}: <strong className="text-amber-300">{sogliaLifetime} pt</strong>
               </p>
             </div>
           </div>
@@ -176,22 +206,24 @@ export default async function ClassificaPage() {
       {/* Classifica Table */}
       <div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 overflow-hidden shadow-2xl">
         <div className="grid grid-cols-12 px-6 py-3.5 bg-zinc-950/60 border-b border-zinc-800 text-xs font-bold text-zinc-400 uppercase tracking-wider">
-          <div className="col-span-2 sm:col-span-1">Pos</div>
-          <div className="col-span-6 sm:col-span-5">Cacciatore</div>
-          <div className="col-span-4 sm:col-span-3 text-center sm:text-left">Grado</div>
-          <div className="hidden sm:block sm:col-span-3 text-right">Punti Accumulati</div>
+          <div className="col-span-2 sm:col-span-1">{dict.ranking.colPosition}</div>
+          <div className="col-span-6 sm:col-span-5">{dict.ranking.colHunter}</div>
+          <div className="col-span-4 sm:col-span-3 text-center sm:text-left">{dict.ranking.colRank}</div>
+          <div className="hidden sm:block sm:col-span-3 text-right">{dict.ranking.colPoints}</div>
         </div>
 
         <div className="divide-y divide-zinc-800/60">
           {profiles.length === 0 ? (
             <div className="py-12 text-center text-zinc-500 text-sm">
-              Nessun utente ha ancora accumulato punti. Segnala un blooper per essere il primo in classifica!
+              {dict.ranking.howPointsDesc}
             </div>
           ) : (
             profiles.map((p: any, idx: number) => {
               const rank = idx + 1;
               const isCurrentUser = user && p.id === user.id;
               const rankInfo = getRankInfo(p.punti || 0, p.tier, p.tipo_abbonamento, sogliaMensile, sogliaLifetime);
+              const localizedGrado = RANK_LABELS[rankInfo.grado]?.[locale] || rankInfo.grado;
+              const youLabel = YOU_LABELS[locale] || "(Tu)";
 
               return (
               <div
@@ -229,7 +261,7 @@ export default async function ClassificaPage() {
                         <>
                           <strong className="text-amber-400 font-bold">{formatPublicAuthor(p.email, "utente")}</strong>{" "}
                           <span className="text-[10px] rounded bg-amber-500/20 text-amber-300 font-bold px-1.5 py-0.5">
-                            (Tu)
+                            {youLabel}
                           </span>
                         </>
                       ) : (
@@ -251,7 +283,7 @@ export default async function ClassificaPage() {
                     className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs font-bold ${rankInfo.badgeColor}`}
                   >
                     <span>{rankInfo.icon}</span>
-                    <span>{rankInfo.grado}</span>
+                    <span>{localizedGrado}</span>
                   </span>
                 </div>
 

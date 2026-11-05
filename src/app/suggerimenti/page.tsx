@@ -17,8 +17,11 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { formatPublicAuthor } from "@/lib/utils";
 import AuthModal from "@/components/AuthModal";
+import { useTranslation } from "@/i18n/client";
+import { getLocalizedPath } from "@/i18n";
 
 export default function SuggerimentiPage() {
+  const { dict, locale } = useTranslation();
   const [email, setEmail] = useState("");
   const [categoria, setCategoria] = useState("Film mancante");
   const [messaggio, setMessaggio] = useState("");
@@ -103,10 +106,8 @@ export default function SuggerimentiPage() {
       let fullMessage = `[${categoria}] ${messaggio.trim()}`;
       if (categoria === "Correzione blooper") {
         if (user) {
-          // Solo se loggato e partecipa alla classifica: entra direttamente in Moderazione Bloopers
           fullMessage = `[Correzione blooper] ${messaggio.trim()}`;
         } else {
-          // Se non autenticato: non entra nel flusso di assegnazione punteggi di Moderazione
           fullMessage = `[Feedback generale - Correzione blooper (Ospite non registrato)] ${messaggio.trim()}`;
         }
       }
@@ -135,19 +136,19 @@ export default function SuggerimentiPage() {
   };
 
   const categories = [
-    { id: "Film mancante", label: "🎬 Richiesta Film Mancante" },
-    { id: "Correzione blooper", label: "⚠️ Correzione Blooper" },
-    { id: "Nuova funzionalità", label: "🚀 Proposta Nuova Funzionalità" },
-    { id: "Altro / Feedback", label: "💬 Altro / Feedback Generale" },
+    { id: "Film mancante", label: dict.suggestions.catMissingFilm },
+    { id: "Correzione blooper", label: dict.suggestions.catCorrection },
+    { id: "Nuovo blooper", label: dict.suggestions.catNewBlooper },
+    { id: "Altro / Feedback", label: dict.suggestions.catOther },
   ];
 
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-10">
       <Link
-        href="/"
+        href={getLocalizedPath("/", locale)}
         className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white mb-6 transition"
       >
-        <ArrowLeft className="h-3.5 w-3.5" /> Torna alla Home
+        <ArrowLeft className="h-3.5 w-3.5" /> {dict.common?.back || "Torna alla Home"}
       </Link>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -155,14 +156,14 @@ export default function SuggerimentiPage() {
         <div className="lg:col-span-7 rounded-3xl border border-zinc-800 bg-zinc-900/60 p-6 sm:p-8 shadow-2xl">
           <div className="inline-flex items-center gap-2 rounded-full bg-amber-500/10 border border-amber-500/30 px-3 py-1 text-xs font-bold text-amber-400 mb-4">
             <Lightbulb className="h-3.5 w-3.5" />
-            <span>Spazio Community & Feedback</span>
+            <span>{dict.suggestions.badge}</span>
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-            Invia un Suggerimento allo Staff
+            {dict.suggestions.title}
           </h1>
           <p className="text-xs sm:text-sm text-zinc-400 mt-2 leading-relaxed">
-            Hai trovato un errore nei dati, desideri richiedere l&apos;inserimento di una pellicola o hai idee per migliorare FilmBloopers Hub? Faccelo sapere compilando questo form.
+            {dict.suggestions.subtitle}
           </p>
 
           {isDoublePoints && (
@@ -184,17 +185,15 @@ export default function SuggerimentiPage() {
           {success ? (
             <div className="mt-8 rounded-2xl border border-emerald-500/40 bg-emerald-500/10 p-6 text-center space-y-3 animate-in fade-in">
               <CheckCircle className="h-10 w-10 text-emerald-400 mx-auto" />
-              <h3 className="text-base font-bold text-emerald-300">Suggerimento Inviato con Successo!</h3>
+              <h3 className="text-base font-bold text-emerald-300">{dict.suggestions.successTitle}</h3>
               <p className="text-xs text-zinc-300 max-w-md mx-auto leading-relaxed">
-                {categoria === "Correzione blooper" && user
-                  ? "La tua correzione è stata inoltrata direttamente al team di Moderazione per la verifica e l'assegnazione dei tuoi punti in classifica!"
-                  : "Grazie per il tuo contributo prezioso! Il nostro staff esaminerà il messaggio al più presto."}
+                {dict.suggestions.successDesc}
               </p>
               <button
                 onClick={() => setSuccess(false)}
                 className="mt-4 px-4 py-2 rounded-xl text-xs font-bold bg-emerald-500 text-zinc-950 hover:bg-emerald-400 transition"
               >
-                Invia un altro suggerimento
+                {dict.suggestions.sendAnother}
               </button>
             </div>
           ) : (
@@ -208,7 +207,7 @@ export default function SuggerimentiPage() {
               {/* Selettore Categoria */}
               <div>
                 <label className="block text-xs font-semibold text-zinc-300 mb-2">
-                  Tipo di suggerimento
+                  {dict.suggestions.categoryLabel}
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {categories.map((c) => (
@@ -244,7 +243,7 @@ export default function SuggerimentiPage() {
                       Sei connesso come <strong className="text-white">{userHandle}</strong> (Punti attuali: <strong className="text-amber-400">{profile?.punti ?? 0} pt</strong>).
                     </p>
                     <p className="text-[11px] text-zinc-300 leading-relaxed">
-                      Inviando questo messaggio, la tua correzione entrerà <strong>direttamente nella console di Moderazione dello Staff</strong>. Una volta verificata e approvata, ti verranno accreditati <strong className="text-amber-300">{isDoublePoints ? "20 punti (Punti Doppi Piano Annuale/Lifetime)" : "10 punti base"}</strong> per scalare la classifica!
+                      Inviando questo messaggio, la tua correzione entrerà <strong>direttamente nella console di Moderazione dello Staff</strong>. Una volta verificata e approvata, ti verranno accreditati <strong className="text-amber-300">{isDoublePoints ? "20 punti (Punti Doppi)" : "10 punti base"}</strong> per scalare la classifica!
                     </p>
                   </div>
                 ) : (
@@ -260,9 +259,6 @@ export default function SuggerimentiPage() {
                         <p className="text-xs text-zinc-300 leading-relaxed">
                           La correzione blooper viene inviata direttamente in <strong>Moderazione con assegnazione punti</strong> solo per gli utenti <strong>registrati e connessi</strong>.
                         </p>
-                        <p className="text-[11px] text-zinc-400">
-                          Se invii senza effettuare l&apos;accesso, il messaggio verrà trattato unicamente come feedback generale allo staff senza attribuzione di punteggi.
-                        </p>
                       </div>
                     </div>
                     <button
@@ -271,7 +267,7 @@ export default function SuggerimentiPage() {
                       className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-xs font-black text-zinc-950 hover:brightness-110 active:scale-95 transition shadow-md"
                     >
                       <UserCheck className="h-4 w-4" />
-                      Accedi o Registrati per Guadagnare Punti e Inviare in Moderazione
+                      Accedi o Registrati per Guadagnare Punti
                     </button>
                   </div>
                 )
@@ -280,7 +276,7 @@ export default function SuggerimentiPage() {
               {/* Email */}
               <div>
                 <label className="block text-xs font-semibold text-zinc-300 mb-1">
-                  La tua email
+                  {dict.suggestions.emailLabel}
                   {user && <span className="text-zinc-500 font-normal ml-2">(associata al tuo profilo)</span>}
                 </label>
                 <input
@@ -296,12 +292,12 @@ export default function SuggerimentiPage() {
               {/* Messaggio */}
               <div>
                 <label className="block text-xs font-semibold text-zinc-300 mb-1">
-                  Dettagli del suggerimento o richiesta
+                  {dict.suggestions.messageLabel}
                 </label>
                 <textarea
                   value={messaggio}
                   onChange={(e) => setMessaggio(e.target.value)}
-                  placeholder="Scrivi qui i dettagli del tuo suggerimento (es. titolo del film, minuto esatto, errore riscontrato o proposta di correzione)..."
+                  placeholder={dict.suggestions.messagePlaceholder}
                   rows={5}
                   required
                   className="w-full rounded-xl bg-zinc-950 border border-zinc-800 p-3.5 text-xs text-white placeholder:text-zinc-600 focus:outline-none focus:border-amber-500 leading-relaxed"
@@ -314,7 +310,7 @@ export default function SuggerimentiPage() {
                 className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-5 py-3 text-xs font-black text-zinc-950 shadow-lg shadow-amber-500/20 hover:brightness-110 active:scale-95 transition disabled:opacity-50"
               >
                 <Send className="h-3.5 w-3.5" />
-                {loading ? "Invio in corso..." : "Invia Suggerimento allo Staff"}
+                {loading ? dict.suggestions.submitting : dict.suggestions.submitBtn}
               </button>
             </form>
           )}
@@ -325,27 +321,38 @@ export default function SuggerimentiPage() {
           <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-3">
             <h3 className="text-sm font-black text-white flex items-center gap-2">
               <Sparkles className="h-4 w-4 text-amber-400" />
-              Come funziona il sistema di segnalazione?
+              {dict.suggestions.guidelinesTitle}
             </h3>
-            <p className="text-xs text-zinc-400 leading-relaxed">
-              Tutti i suggerimenti inviati da questa sezione arrivano direttamente nella console amministrativa dello staff. Le <strong>correzioni blooper inviate da utenti registrati</strong> vanno direttamente nella sezione Moderazione per l&apos;approvazione e l&apos;assegnazione dei punti in classifica.
-            </p>
+            <ul className="text-xs text-zinc-400 space-y-2 leading-relaxed">
+              <li className="flex items-start gap-2">
+                <span className="text-amber-400">•</span>
+                <span>{dict.suggestions.rule1}</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber-400">•</span>
+                <span>{dict.suggestions.rule2}</span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="text-amber-400">•</span>
+                <span>{dict.suggestions.rule3}</span>
+              </li>
+            </ul>
           </div>
 
           <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-3">
             <h3 className="text-sm font-black text-white flex items-center gap-2">
               <Film className="h-4 w-4 text-amber-400" />
-              Vuoi segnalare un blooper specifico?
+              Catalogo Film
             </h3>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Se conosci già il film presente a catalogo, puoi aprire la scheda del film e cliccare su <strong>&quot;Segnala Errore&quot;</strong>. Una volta approvato dallo staff, riceverai punti per scalare la classifica!
+              Puoi esplorare l&apos;intero catalogo e accedere alle schede di dettaglio per visualizzare curiosità e bloopers verificati.
             </p>
             <div className="pt-2">
               <Link
-                href="/esplora"
+                href={getLocalizedPath("/esplora", locale)}
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:underline"
               >
-                Cerca nel catalogo film &rarr;
+                {dict.nav?.explore || "Esplora Catalogo"} &rarr;
               </Link>
             </div>
           </div>
@@ -353,17 +360,17 @@ export default function SuggerimentiPage() {
           <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-3">
             <h3 className="text-sm font-black text-white flex items-center gap-2">
               <HelpCircle className="h-4 w-4 text-amber-400" />
-              Hai domande sui punteggi?
+              {dict.ranking.title}
             </h3>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Scopri come accumulare punti con le tue segnalazioni e correzioni approvate per sbloccare l&apos;abbonamento Premium gratuito a vita.
+              {dict.ranking.subtitle}
             </p>
             <div className="pt-2">
               <Link
-                href="/classifica"
+                href={getLocalizedPath("/classifica", locale)}
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:underline"
               >
-                Consulta la Classifica & Premi &rarr;
+                {dict.ranking.title} &rarr;
               </Link>
             </div>
           </div>

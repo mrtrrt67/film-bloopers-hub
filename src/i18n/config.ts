@@ -111,6 +111,8 @@ export function buildLocalizedPath(pathname: string, targetLocale: Locale): stri
   return `/${targetLocale}${cleanPath}`;
 }
 
+export const getLocalizedPath = buildLocalizedPath;
+
 /**
  * Helper per estrarre il testo corretto da una colonna JSONB di Supabase (o fallback sul testo originale).
  * Gestisce automaticamente la gerarchia:
