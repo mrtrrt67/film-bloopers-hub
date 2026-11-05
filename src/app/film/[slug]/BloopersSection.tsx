@@ -3,6 +3,8 @@
 import { useState, useEffect } from "react";
 import { Sparkles, PlusCircle, AlertCircle, Filter, Send, Trophy, CheckCircle, X, Check, AlertTriangle } from "lucide-react";
 import { Film, Blooper, BlooperCategoria } from "@/lib/types";
+import { useTranslation } from "@/i18n/client";
+import { getLocalizedBlooperCategory } from "@/i18n";
 import BlooperItem from "@/components/BlooperItem";
 import AuthModal from "@/components/AuthModal";
 import { createClient } from "@/lib/supabase/client";
@@ -14,6 +16,8 @@ interface BloopersSectionProps {
 }
 
 export default function BloopersSection({ film, initialBloopers, onBloopersUpdate }: BloopersSectionProps) {
+  const { dict, locale } = useTranslation();
+  const f = dict.film || {};
   const [bloopers, setBloopers] = useState<Blooper[]>(initialBloopers);
 
   useEffect(() => {
@@ -194,13 +198,13 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-zinc-800">
         <div>
           <h2 className="text-xl font-black text-white flex items-center gap-2">
-            <span>Bloopers & Incongruenze</span>
+            <span>{f.bloopersTitle || "Bloopers & Incongruenze"}</span>
             <span className="rounded-full bg-amber-500/20 border border-amber-500/40 px-2.5 py-0.5 text-xs font-bold text-amber-400">
               {bloopers.length}
             </span>
           </h2>
           <p className="text-xs text-zinc-400 mt-0.5">
-            Errori documentati dalla community e verificati tramite analisi cinematografica.
+            {f.bloopersSubtitle || "Errori documentati dalla community e verificati tramite analisi cinematografica."}
           </p>
         </div>
 
@@ -212,7 +216,7 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
             className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-3.5 py-2 text-xs font-bold text-zinc-950 shadow-md shadow-amber-500/10 hover:brightness-110 transition-all disabled:opacity-50"
           >
             <Sparkles className={`h-4 w-4 ${generating ? "animate-spin" : ""}`} />
-            {generating ? "Analisi IA in corso..." : "Genera altri con IA"}
+            {generating ? (f.generatingAi || "Analisi IA in corso...") : (f.generateAi || "Genera altri con IA")}
           </button>
 
           <button
@@ -226,7 +230,7 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
             className="flex items-center gap-1.5 rounded-xl border border-zinc-700 bg-zinc-800/80 hover:bg-zinc-800 px-3.5 py-2 text-xs font-bold text-zinc-200 transition-colors"
           >
             <PlusCircle className="h-4 w-4 text-amber-400" />
-            Segnala Errore
+            {f.reportError || "Segnala Errore"}
           </button>
         </div>
       </div>
@@ -238,7 +242,7 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
             <Filter className="h-3.5 w-3.5 text-zinc-500 shrink-0 mr-1" />
             {categories.map((cat) => (
               <button
-                key={cat}
+                key={cat === "Tutte" ? (f.allFilter || "Tutte") : getLocalizedBlooperCategory(cat, locale)}
                 onClick={() => setSelectedCategory(cat)}
                 className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
                   selectedCategory === cat
@@ -253,7 +257,7 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
 
           {/* Toggle Ordinamento (Minuto / Conferme) */}
           <div className="flex items-center gap-1.5 shrink-0 bg-zinc-900/90 border border-zinc-800 p-1 rounded-xl self-start sm:self-auto">
-            <span className="text-[11px] font-medium text-zinc-400 px-1.5">Ordina:</span>
+            <span className="text-[11px] font-medium text-zinc-400 px-1.5">{f.sortBy || "Ordina:"}</span>
             <button
               type="button"
               onClick={() => setSortBy("minuto")}
@@ -263,7 +267,7 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
                   : "text-zinc-400 hover:text-zinc-200"
               }`}
             >
-              ⏱️ Minuto
+              {f.sortMinute || "⏱️ Minuto"}
             </button>
             <button
               type="button"
@@ -274,7 +278,7 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
                   : "text-zinc-400 hover:text-zinc-200"
               }`}
             >
-              👍 Più confermati
+              {f.sortConfirmed || "👍 Più confermati"}
             </button>
           </div>
         </div>

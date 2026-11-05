@@ -173,12 +173,12 @@ export default function FilmContentSwitcher({
             {activeTab === "bloopers" ? (
               <span className="flex items-center gap-1.5 text-zinc-400">
                 <span className="h-2 w-2 rounded-full bg-amber-400 animate-pulse" />
-                Minutaggi di scena, fotogrammi e voti della community
+                {dict.film?.bloopersTabHint || "Minutaggi di scena, fotogrammi e voti della community"}
               </span>
             ) : (
               <span className="flex items-center gap-1.5 text-amber-400 font-medium">
                 <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-                Aneddoti di backstage, segreti di produzione ed easter egg
+                {dict.film?.triviaTabHint || "Aneddoti di backstage, segreti di produzione ed easter egg"}
               </span>
             )}
           </div>

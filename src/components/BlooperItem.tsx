@@ -17,7 +17,7 @@ interface BlooperItemProps {
 }
 
 export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperItemProps) {
-  const { locale } = useTranslation();
+  const { dict, locale } = useTranslation();
   const [conferme, setConferme] = useState(blooper.conferme || 0);
   const [contestazioni, setContestazioni] = useState(blooper.contestazioni || 0);
   const [votoUtente, setVotoUtente] = useState<"conferma" | "contestazione" | null>(
@@ -309,7 +309,7 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
         <div className="flex items-center gap-1.5 text-zinc-400">
           <User className="h-3.5 w-3.5" />
           <span>
-            Autore: <strong className="text-zinc-300 font-semibold">{formatPublicAuthor(blooper.inserito_da, blooper.provenienza)}</strong>
+            {dict.film?.author || "Autore:"} <strong className="text-zinc-300 font-semibold">{formatPublicAuthor(blooper.inserito_da, blooper.provenienza)}</strong>
             {isOwnBlooper && (
               <span className="ml-1.5 rounded-md bg-amber-500/20 text-amber-300 border border-amber-500/30 px-1.5 py-0.5 text-[10px] font-bold">
                 {locale === "it" ? "Tu" : locale === "es" ? "Tú" : locale === "fr" ? "Toi" : locale === "de" ? "Du" : "You"}

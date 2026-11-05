@@ -470,6 +470,8 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
                 filmTitle={film.titolo}
                 amazonTag={amazonTag}
                 variant="banner"
+                dict={dict}
+                locale={locale}
               />
             </div>
           </div>
@@ -505,6 +507,8 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
                 filmTitle={film.titolo}
                 amazonTag={amazonTag}
                 variant="sidebar"
+                dict={dict}
+                locale={locale}
               />
             </div>
 
