@@ -5,7 +5,7 @@ import { Film as FilmIcon, Lightbulb, Sparkles } from "lucide-react";
 import { Film, Blooper, MovieTrivia } from "@/lib/types";
 import BloopersSection from "@/app/film/[slug]/BloopersSection";
 import TriviaSection from "@/components/TriviaSection";
-import { useTranslation } from "@/i18n";
+import { useTranslation } from "@/i18n/client";
 
 import { createClient } from "@/lib/supabase/client";
 

@@ -1,8 +1,12 @@
+"use client";
+
 import Link from "next/link";
 import { Film, ShieldCheck, Heart } from "lucide-react";
 import CookiePreferencesButton from "@/components/CookiePreferencesButton";
+import { useTranslation } from "@/i18n/client";
 
 export default function Footer() {
+  const { localizeHref } = useTranslation();
   return (
     <footer className="mt-auto border-t border-zinc-800/80 bg-zinc-950/95 py-12 text-zinc-400">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -35,19 +39,19 @@ export default function Footer() {
             <h4 className="text-xs font-bold text-zinc-200 uppercase tracking-wider mb-3.5">Esplora</h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/" className="hover:text-amber-400 transition-colors">Home Page</Link>
+                <Link href={localizeHref("/")} className="hover:text-amber-400 transition-colors">Home Page</Link>
               </li>
               <li>
-                <Link href="/esplora" className="hover:text-amber-400 transition-colors">Catalogo & Ricerca Film</Link>
+                <Link href={localizeHref("/esplora")} className="hover:text-amber-400 transition-colors">Catalogo & Ricerca Film</Link>
               </li>
               <li>
-                <Link href="/classifica" className="hover:text-amber-400 transition-colors">Classifica Cacciatori</Link>
+                <Link href={localizeHref("/classifica")} className="hover:text-amber-400 transition-colors">Classifica Cacciatori</Link>
               </li>
               <li>
-                <Link href="/pricing" className="hover:text-amber-400 transition-colors">Piani & Abbonamenti</Link>
+                <Link href={localizeHref("/pricing")} className="hover:text-amber-400 transition-colors">Piani & Abbonamenti</Link>
               </li>
               <li>
-                <Link href="/suggerimenti" className="text-amber-400/90 hover:text-amber-300 font-semibold transition-colors flex items-center gap-1">
+                <Link href={localizeHref("/suggerimenti")} className="text-amber-400/90 hover:text-amber-300 font-semibold transition-colors flex items-center gap-1">
                   💡 Invia Suggerimento
                 </Link>
               </li>
@@ -59,17 +63,17 @@ export default function Footer() {
             <h4 className="text-xs font-bold text-zinc-200 uppercase tracking-wider mb-3.5">Note Legali & Privacy</h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/privacy" className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
+                <Link href={localizeHref("/privacy")} className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
                   <span>Informativa sulla Privacy (GDPR)</span>
                 </Link>
               </li>
               <li>
-                <Link href="/termini" className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
+                <Link href={localizeHref("/termini")} className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
                   <span>Termini e Condizioni d&apos;Uso</span>
                 </Link>
               </li>
               <li>
-                <Link href="/cookie" className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
+                <Link href={localizeHref("/cookie")} className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
                   <span>Cookie Policy</span>
                 </Link>
               </li>
@@ -77,7 +81,7 @@ export default function Footer() {
                 <CookiePreferencesButton />
               </li>
               <li>
-                <Link href="/note-legali" className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
+                <Link href={localizeHref("/note-legali")} className="hover:text-amber-400 transition-colors flex items-center gap-1.5">
                   <span>Note Legali & Riferimenti Societari</span>
                 </Link>
               </li>

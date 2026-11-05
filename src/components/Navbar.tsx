@@ -20,7 +20,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import AuthModal from "./AuthModal";
-import { useTranslation } from "@/i18n";
+import { useTranslation } from "@/i18n/client";
 import LanguageSwitcher from "./LanguageSwitcher";
 
 export default function Navbar() {

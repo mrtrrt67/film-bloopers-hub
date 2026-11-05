@@ -42,27 +42,32 @@ export function proxy(request: NextRequest) {
     return NextResponse.next();
   }
 
-  // 3. Estrai il primo segmento per verificare se è una lingua estera (/en, /es, /fr, /de)
+  // 3. Estrai il primo segmento per verificare se è una lingua
   const segments = pathname.split("/").filter(Boolean);
   const firstSegment = segments[0]?.toLowerCase();
 
-  // Se il primo segmento è un locale estero supportato (en, es, fr, de)
-  if (isSupportedLocale(firstSegment) && firstSegment !== DEFAULT_LOCALE) {
-    const locale: Locale = firstSegment;
-    // Calcola il percorso interno senza prefisso lingua per il rendering del componente
+  // Se l'utente tenta di accedere con prefisso esplicito /it/..., redirect 301 alla versione canonica senza prefisso
+  if (firstSegment === DEFAULT_LOCALE) {
     const remainingSegments = segments.slice(1);
-    const internalPath = remainingSegments.length > 0 ? `/${remainingSegments.join("/")}` : "/";
+    const cleanPath = remainingSegments.length > 0 ? `/${remainingSegments.join("/")}` : "/";
+    url.pathname = cleanPath;
+    const response = NextResponse.redirect(url, 301);
+    response.cookies.set("fbh_locale", DEFAULT_LOCALE, {
+      path: "/",
+      maxAge: 31536000,
+      sameSite: "lax",
+    });
+    return response;
+  }
 
+  // Se è un locale estero supportato (en, es, fr, de)
+  if (isSupportedLocale(firstSegment)) {
+    const locale: Locale = firstSegment;
     const requestHeaders = new Headers(request.headers);
     requestHeaders.set("x-locale", locale);
     requestHeaders.set("x-pathname", pathname);
 
-    // Esegui rewrite interno: l'URL nel browser rimane /en/film/... mentre Next renderizza la pagina /film/...
-    const rewriteUrl = new URL(internalPath, request.url);
-    rewriteUrl.search = request.nextUrl.search;
-    rewriteUrl.searchParams.set("locale", locale);
-
-    const response = NextResponse.rewrite(rewriteUrl, {
+    const response = NextResponse.next({
       request: {
         headers: requestHeaders,
       },
@@ -77,7 +82,7 @@ export function proxy(request: NextRequest) {
     return response;
   }
 
-  // 4. Se la richiesta è per la radice italiana (senza prefisso)
+  // 4. Per tutte le altre richieste (radice italiana senza prefisso)
   const requestHeaders = new Headers(request.headers);
   requestHeaders.set("x-locale", DEFAULT_LOCALE);
   requestHeaders.set("x-pathname", pathname);

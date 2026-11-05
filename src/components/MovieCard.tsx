@@ -5,7 +5,7 @@ import Image from "next/image";
 import { Film as FilmIcon, AlertCircle, Sparkles } from "lucide-react";
 import { Film } from "@/lib/types";
 import { slugify } from "@/lib/utils";
-import { useTranslation, getLocalizedDbText } from "@/i18n";
+import { useTranslation, getLocalizedDbText, buildLocalizedPath, Locale } from "@/i18n/client";
 
 interface MovieCardProps {
   film: Film & {
@@ -13,15 +13,17 @@ interface MovieCardProps {
     trivia_count?: number;
     recommendationReason?: string;
   };
+  locale?: Locale;
 }
 
-export default function MovieCard({ film }: MovieCardProps) {
-  const { locale, dict, localizeHref } = useTranslation();
+export default function MovieCard({ film, locale: propLocale }: MovieCardProps) {
+  const { locale: contextLocale, dict } = useTranslation();
+  const locale = propLocale || contextLocale;
 
   const localizedTitle = getLocalizedDbText(film.titoli_i18n, locale, film.titolo);
   const filmSlug = slugify(localizedTitle || film.titolo, film.anno);
   const rawHref = `/film/${filmSlug}-${String(film.id)}`;
-  const href = localizeHref(rawHref);
+  const href = buildLocalizedPath(rawHref, locale);
 
   return (
     <Link

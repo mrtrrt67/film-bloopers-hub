@@ -2,7 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Globe, ChevronDown, Check } from "lucide-react";
-import { useTranslation, Locale, LOCALES, LOCALE_DETAILS } from "@/i18n";
+import { useTranslation, Locale, LOCALES, LOCALE_DETAILS } from "@/i18n/client";
 
 interface LanguageSwitcherProps {
   variant?: "desktop" | "mobile" | "compact";

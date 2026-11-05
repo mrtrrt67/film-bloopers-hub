@@ -23,15 +23,25 @@ function extractCount(field: any): number {
 }
 
 
-export default async function HomePage({ searchParams }: { searchParams?: Promise<{ [key: string]: string | string[] | undefined }> } = {}) {
+export default async function HomePage({
+  params,
+  searchParams,
+}: {
+  params?: Promise<{ locale?: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+} = {}) {
+  const resolvedParams = params ? await params : {};
+  const routeLocale = resolvedParams.locale;
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const headerList = await headers();
   const cookieStore = await cookies();
-  const locale = resolveLocale({
-    searchParams: resolvedSearchParams,
-    headerList,
-    cookieStore,
-  });
+  const locale: Locale = isSupportedLocale(routeLocale)
+    ? routeLocale
+    : resolveLocale({
+        searchParams: resolvedSearchParams,
+        headerList,
+        cookieStore,
+      });
 
 
 
@@ -256,7 +266,7 @@ export default async function HomePage({ searchParams }: { searchParams?: Promis
         {featuredFilms.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 sm:gap-6">
             {featuredFilms.map((film) => (
-              <MovieCard key={film.id} film={film} />
+              <MovieCard key={film.id} film={film} locale={locale} />
             ))}
           </div>
         ) : (

@@ -20,12 +20,12 @@ import { getRelatedFilms } from "@/lib/recommendations";
 import { getFilmRatingInfo } from "@/lib/tmdb";
 import { StreamingAvailabilityCard } from "@/components/film/StreamingAvailabilityCard";
 import { headers, cookies } from "next/headers";
-import { getDictionary, isSupportedLocale, Locale, DEFAULT_LOCALE, getLocalizedDbText, resolveLocale } from "@/i18n";
+import { getDictionary, isSupportedLocale, Locale, DEFAULT_LOCALE, getLocalizedDbText, resolveLocale, buildLocalizedPath } from "@/i18n";
 
 export const dynamic = "force-dynamic";
 
 interface PageProps {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; locale?: string }>;
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
@@ -99,7 +99,7 @@ async function getFilmData(slug: string) {
 }
 
 export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug, locale: routeLocale } = await params;
   const data = await getFilmData(slug);
 
   if (!data?.film) {
@@ -114,7 +114,9 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const headerList = await headers();
   const cookieStore = await cookies();
-  const locale = resolveLocale({ searchParams: resolvedSearchParams, headerList, cookieStore });
+  const locale: Locale = isSupportedLocale(routeLocale)
+    ? routeLocale
+    : resolveLocale({ searchParams: resolvedSearchParams, headerList, cookieStore });
 
 
 
@@ -189,7 +191,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
 }
 
 export default async function FilmDetailPage({ params, searchParams }: PageProps) {
-  const { slug } = await params;
+  const { slug, locale: routeLocale } = await params;
   const data = await getFilmData(slug);
 
   if (!data?.film) {
@@ -202,11 +204,13 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
   const resolvedSearchParams = searchParams ? await searchParams : {};
   const headerList = await headers();
   const cookieStore = await cookies();
-  const locale = resolveLocale({
-    searchParams: resolvedSearchParams,
-    headerList,
-    cookieStore,
-  });
+  const locale: Locale = isSupportedLocale(routeLocale)
+    ? routeLocale
+    : resolveLocale({
+        searchParams: resolvedSearchParams,
+        headerList,
+        cookieStore,
+      });
   const dict = getDictionary(locale);
   const localizedTitle = getLocalizedDbText(film.titoli_i18n, locale, film.titolo);
   const localizedPlot = getLocalizedDbText(film.trame_i18n, locale, film.trama);
@@ -353,7 +357,7 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
           {/* Breadcrumb & Navigation */}
           <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
             <Link
-              href="/esplora"
+              href={buildLocalizedPath("/esplora", locale)}
               className="inline-flex items-center gap-1.5 rounded-xl bg-zinc-900/80 backdrop-blur-md border border-zinc-800 px-3 py-1.5 text-xs font-semibold text-zinc-300 hover:text-white transition-colors"
             >
               <ArrowLeft className="h-3.5 w-3.5" /> {dict.common.back}
@@ -609,7 +613,7 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
                       </p>
                     </div>
                     <Link
-                      href="/esplora"
+                      href={buildLocalizedPath("/esplora", locale)}
                       className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors"
                     >
                       <span>Tutto il catalogo</span>
@@ -619,7 +623,7 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
 
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
                     {relatedFilms.map((f: any) => (
-                      <MovieCard key={f.id} film={f} />
+                      <MovieCard key={f.id} film={f} locale={locale} />
                     ))}
                   </div>
                 </div>
