@@ -17,7 +17,12 @@
     "freePlan": "Basis-Paket (Kostenlos)",
     "lifetimeAccess": "👑 Lebenslanger Zugang",
     "monthlyPremium": "⭐ Monatliches Premium",
-    "yearlyPremium": "⭐ Jährliches Premium"
+    "yearlyPremium": "⭐ Jährliches Premium",
+    "adminConsole": "Admin-Konsole",
+    "upgradeToPremium": "Auf Premium upgraden (ab 0,99€)",
+    "manageSubShort": "Verwalten oder Kündigen (1 Klick)",
+    "loginOrRegister": "Anmelden oder Registrieren",
+    "startSearch": "Suche starten"
   },
   "common": {
     "search": "Suchen...",

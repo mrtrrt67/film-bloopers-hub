@@ -267,11 +267,11 @@ export default function Navbar() {
                   {/* Badge Abbonamento */}
                   {userProfile?.tipo_abbonamento === "lifetime" ? (
                     <span className="rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 text-[9px] font-black px-1.5 py-0.5">
-                      👑 Leggenda
+                      {dict.nav?.legend || "👑 Leggenda"}
                     </span>
                   ) : userProfile?.tier === "premium" || userProfile?.tipo_abbonamento === "mensile" || userProfile?.tipo_abbonamento === "annuale" ? (
                     <span className="rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/40 text-[9px] font-black px-1.5 py-0.5">
-                      ⭐ VIP
+                      {dict.nav?.vip || "⭐ VIP"}
                     </span>
                   ) : null}
 
@@ -292,15 +292,15 @@ export default function Navbar() {
                       <div className="flex items-center justify-between pt-2 mt-2 border-t border-zinc-800 text-[11px]">
                         <span className="text-zinc-400">
                           {userProfile?.tipo_abbonamento === "lifetime"
-                            ? "👑 Accesso a Vita"
+                            ? (dict.nav?.lifetimeAccess || "👑 Accesso a Vita")
                             : userProfile?.tipo_abbonamento === "mensile"
-                            ? "⭐ Premium Mensile"
+                            ? (dict.nav?.monthlyPremium || "⭐ Premium Mensile")
                             : userProfile?.tipo_abbonamento === "annuale"
-                            ? "⭐ Premium Annuale"
-                            : "Piano Base (Free)"}
+                            ? (dict.nav?.yearlyPremium || "⭐ Premium Annuale")
+                            : (dict.nav?.freePlan || "Piano Base (Free)")}
                         </span>
                         <span className="font-bold text-amber-400 font-mono">
-                          {userProfile?.punti || 0} Punti
+                          {userProfile?.punti || 0} {dict.nav?.points || "Punti"}
                         </span>
                       </div>
                     </div>
@@ -320,7 +320,7 @@ export default function Navbar() {
                         >
                           <span className="flex items-center gap-2">
                             <CreditCard className="h-4 w-4 text-purple-400" />
-                            <span>{openingPortal ? "Apertura..." : "Gestisci o Disdici (1 Clic)"}</span>
+                            <span>{openingPortal ? (dict.pricing?.openingPortal || "Apertura...") : (dict.nav?.manageSubShort || "Gestisci o Disdici (1 Clic)")}</span>
                           </span>
                           <ExternalLink className="h-3 w-3 text-purple-400" />
                         </button>
@@ -334,7 +334,7 @@ export default function Navbar() {
                           className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-400 hover:bg-amber-500/10 transition-colors font-semibold"
                         >
                           <Sparkles className="h-4 w-4" />
-                          <span>Passa a Premium (da 0,99€)</span>
+                          <span>{dict.nav?.upgradeToPremium || "Passa a Premium (da 0,99€)"}</span>
                         </Link>
                       )}
 
@@ -346,7 +346,7 @@ export default function Navbar() {
                           className="flex items-center gap-2 px-3 py-2.5 rounded-lg text-amber-300 hover:bg-amber-500/10 transition-colors font-bold"
                         >
                           <Shield className="h-4 w-4 text-amber-400" />
-                          <span>Console Amministrazione</span>
+                          <span>{dict.nav?.adminConsole || "Console Amministrazione"}</span>
                         </Link>
                       )}
 
@@ -465,11 +465,11 @@ export default function Navbar() {
                     </span>
                     {userProfile?.tipo_abbonamento === "lifetime" ? (
                       <span className="rounded-full bg-amber-500/20 text-amber-300 text-[10px] font-black px-2 py-0.5">
-                        👑 Leggenda
+                        {dict.nav?.legend || "👑 Leggenda"}
                       </span>
                     ) : userProfile?.tier === "premium" || userProfile?.tipo_abbonamento === "mensile" || userProfile?.tipo_abbonamento === "annuale" ? (
                       <span className="rounded-full bg-purple-500/20 text-purple-300 text-[10px] font-black px-2 py-0.5">
-                        ⭐ VIP
+                        {dict.nav?.vip || "⭐ VIP"}
                       </span>
                     ) : null}
                   </div>
@@ -486,7 +486,7 @@ export default function Navbar() {
                       className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-purple-500/30 bg-purple-500/10 text-xs font-bold text-purple-300 hover:bg-purple-500/20 transition"
                     >
                       <CreditCard className="h-4 w-4" />
-                      <span>{openingPortal ? "Apertura Portale..." : "Gestisci o Disdici (1 Clic)"}</span>
+                      <span>{openingPortal ? (dict.pricing?.openingPortal || "Apertura...") : (dict.nav?.manageSubShort || "Gestisci o Disdici (1 Clic)")}</span>
                     </button>
                   )}
 
@@ -498,7 +498,7 @@ export default function Navbar() {
                       className="flex items-center gap-2 px-3 py-2.5 rounded-xl border border-amber-500/30 bg-amber-500/10 text-xs font-bold text-amber-400"
                     >
                       <Shield className="h-4 w-4" />
-                      <span>Console Amministrazione</span>
+                      <span>{dict.nav?.adminConsole || "Console Amministrazione"}</span>
                     </Link>
                   )}
 
@@ -508,7 +508,7 @@ export default function Navbar() {
                     className="w-full flex items-center justify-center gap-2 py-2 rounded-xl text-xs font-semibold text-red-400 hover:bg-red-500/10 transition"
                   >
                     <LogOut className="h-4 w-4" />
-                    <span>Disconnetti</span>
+                    <span>{dict.nav?.logout || "Disconnetti"}</span>
                   </button>
                 </div>
               ) : (
@@ -522,7 +522,7 @@ export default function Navbar() {
                     className="w-full flex items-center justify-center gap-2 rounded-xl border border-zinc-800 bg-zinc-900 py-2.5 text-xs font-bold text-white"
                   >
                     <LogIn className="h-4 w-4 text-amber-400" />
-                    <span>Accedi o Registrati</span>
+                    <span>{dict.nav?.loginOrRegister || "Accedi o Registrati"}</span>
                   </button>
                   <Link
                     href="/esplora"
@@ -530,7 +530,7 @@ export default function Navbar() {
                     className="w-full flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 py-2.5 text-xs font-black text-zinc-950"
                   >
                     <Compass className="h-4 w-4" />
-                    <span>Inizia la ricerca</span>
+                    <span>{dict.nav?.startSearch || "Inizia la ricerca"}</span>
                   </Link>
                 </div>
               )}

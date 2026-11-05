@@ -17,7 +17,12 @@
     "freePlan": "Piano Base (Free)",
     "lifetimeAccess": "👑 Accesso a Vita",
     "monthlyPremium": "⭐ Premium Mensile",
-    "yearlyPremium": "⭐ Premium Annuale"
+    "yearlyPremium": "⭐ Premium Annuale",
+    "adminConsole": "Console Amministrazione",
+    "upgradeToPremium": "Passa a Premium (da 0,99€)",
+    "manageSubShort": "Gestisci o Disdici (1 Clic)",
+    "loginOrRegister": "Accedi o Registrati",
+    "startSearch": "Inizia la ricerca"
   },
   "common": {
     "search": "Cerca...",

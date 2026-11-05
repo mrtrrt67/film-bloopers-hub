@@ -17,7 +17,12 @@
     "freePlan": "Plan Básico (Gratis)",
     "lifetimeAccess": "👑 Acceso de por Vida",
     "monthlyPremium": "⭐ Premium Mensual",
-    "yearlyPremium": "⭐ Premium Anual"
+    "yearlyPremium": "⭐ Premium Anual",
+    "adminConsole": "Consola de Administración",
+    "upgradeToPremium": "Pásate a Premium (desde 0,99€)",
+    "manageSubShort": "Gestionar o Cancelar (1 Clic)",
+    "loginOrRegister": "Iniciar Sesión o Registrarse",
+    "startSearch": "Iniciar búsqueda"
   },
   "common": {
     "search": "Buscar...",

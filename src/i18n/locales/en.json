@@ -17,7 +17,12 @@
     "freePlan": "Basic Plan (Free)",
     "lifetimeAccess": "👑 Lifetime Access",
     "monthlyPremium": "⭐ Monthly Premium",
-    "yearlyPremium": "⭐ Yearly Premium"
+    "yearlyPremium": "⭐ Yearly Premium",
+    "adminConsole": "Admin Console",
+    "upgradeToPremium": "Upgrade to Premium (from €0.99)",
+    "manageSubShort": "Manage or Cancel (1 Click)",
+    "loginOrRegister": "Log In or Sign Up",
+    "startSearch": "Start searching"
   },
   "common": {
     "search": "Search...",
