@@ -8,7 +8,7 @@ import { calculateAttendibilita, formatPublicAuthor } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import AuthModal from "./AuthModal";
 import { useTranslation } from "@/i18n/client";
-import { getLocalizedBlooperCategory, getLocalizedPath } from "@/i18n";
+import { getLocalizedBlooperCategory, getLocalizedPath, getLocalizedDbText } from "@/i18n";
 
 interface BlooperItemProps {
   blooper: Blooper;
@@ -232,7 +232,7 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
 
       {/* Descrizione */}
       <p className="text-sm text-zinc-200 leading-relaxed font-normal mb-4">
-        {blooper.descrizione}
+        {getLocalizedDbText(blooper.descrizione_i18n, locale, blooper.descrizione)}
       </p>
 
       {/* Box Inserimento Motivazione Contestazione (Dislike) */}

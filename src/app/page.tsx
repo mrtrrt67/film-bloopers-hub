@@ -75,9 +75,9 @@ export default async function HomePage({
   });
 
   const bannerVisibile = conf["home_banner_top"] !== "false";
-  const bannerTitolo = locale === "it" ? conf["home_banner_top_titolo"] : dict.promo?.title;
-  const bannerTesto = locale === "it" ? conf["home_banner_top_testo"] : dict.promo?.body;
-  const bannerBadge = locale === "it" ? conf["home_banner_top_badge"] : dict.promo?.badge;
+  const bannerTitolo = locale === "it" ? conf["home_banner_top_titolo"] : (conf[`home_banner_top_titolo_${locale}`] || dict.promo?.title);
+  const bannerTesto = locale === "it" ? conf["home_banner_top_testo"] : (conf[`home_banner_top_testo_${locale}`] || dict.promo?.body);
+  const bannerBadge = locale === "it" ? conf["home_banner_top_badge"] : (conf[`home_banner_top_badge_${locale}`] || dict.promo?.badge);
   const promoDeadline = conf["promo_lifetime_deadline"] || "2026-12-31";
 
   // 2. Film in evidenza (con conteggio errori e curiosità accurati al 100%)

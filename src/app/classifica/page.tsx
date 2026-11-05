@@ -66,13 +66,13 @@ export default async function ClassificaPage({
   const sogliaMensile = parseInt(conf["soglia_punti_mensile"] || "50", 10);
   const sogliaLifetime = parseInt(conf["soglia_punti_lifetime"] || "10000", 10);
 
-  const titoloPagina = locale === "it" && conf["classifica_titolo"]
-    ? conf["classifica_titolo"]
-    : dict.ranking.title;
+  const titoloPagina = locale === "it"
+    ? (conf["classifica_titolo"] || dict.ranking.title)
+    : (conf[`classifica_titolo_${locale}`] || dict.ranking.title);
 
-  const bannerTitolo = locale === "it" && conf["classifica_banner_titolo"]
-    ? conf["classifica_banner_titolo"]
-    : dict.ranking.howPointsWork;
+  const bannerTitolo = locale === "it"
+    ? (conf["classifica_banner_titolo"] || dict.ranking.howPointsWork)
+    : (conf[`classifica_banner_titolo_${locale}`] || dict.ranking.howPointsWork);
 
   // 2. Recupero classifica utenti (escludendo l'amministratore)
   const adminEmail = (process.env.ADMIN_EMAIL || process.env.NEXT_PUBLIC_ADMIN_EMAIL || "mrtrrt67@gmail.com").toLowerCase();

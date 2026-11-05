@@ -21,7 +21,7 @@ import AuthModal from "@/components/AuthModal";
 import ConfirmModal from "@/components/ConfirmModal";
 import { createClient } from "@/lib/supabase/client";
 import { useTranslation } from "@/i18n/client";
-import { getLocalizedTriviaCategory } from "@/i18n";
+import { getLocalizedTriviaCategory, getLocalizedDbText } from "@/i18n";
 
 interface TriviaSectionProps {
   film: FilmType;
@@ -368,12 +368,12 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
 
                   {/* Titolo Curiosità */}
                   <h3 className="text-base font-bold text-white group-hover:text-amber-300 transition-colors leading-snug">
-                    {item.titolo}
+                    {getLocalizedDbText(item.titolo_i18n, locale, item.titolo)}
                   </h3>
 
                   {/* Descrizione Aneddoto */}
                   <p className="mt-2.5 text-xs sm:text-sm text-zinc-300 font-normal leading-relaxed">
-                    {item.descrizione}
+                    {getLocalizedDbText(item.descrizione_i18n, locale, item.descrizione)}
                   </p>
                 </div>
 

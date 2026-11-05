@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateTriviaForMovie } from "@/lib/gemini";
+import { batchTranslateFilmTexts } from "@/lib/translator";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -182,18 +183,47 @@ export async function POST(request: Request) {
 
         const validTrivia = trivia.filter((g) => g.titolo && g.titolo.trim() && g.descrizione && g.descrizione.trim());
 
-        const daInserire = validTrivia.map((g, idx) => ({
-          film_id: film.id,
-          categoria: g.categoria,
-          titolo: g.titolo.trim(),
-          descrizione: g.descrizione.trim(),
-          fonte: g.fonte || "Making-of ufficiale",
-          approvato: true,
-          inserito_da: "IA (Admin)",
-          provenienza: "IA Verificata",
-          likes: Math.floor(Math.random() * 5) + 1,
-          ordine: (film.currentCount || 0) + idx + 1,
+        const batchPayload = validTrivia.map((g, idx) => ({
+          id: idx,
+          text: `${g.titolo.trim()} ||| ${g.descrizione.trim()}`,
         }));
+
+        let transMap = new Map();
+        try {
+          transMap = await batchTranslateFilmTexts(batchPayload, "trivia");
+        } catch (tErr) {
+          console.warn("Auto-traduzione batch trivia warning:", tErr);
+        }
+
+        const daInserire = validTrivia.map((g, idx) => {
+          const trans = transMap.get(idx);
+          const titoloI18n: Record<string, string> = {};
+          const descI18n: Record<string, string> = {};
+
+          if (trans) {
+            for (const lang of ["it", "en", "es", "fr", "de"] as const) {
+              const full = trans[lang] || "";
+              const parts = full.split("|||");
+              titoloI18n[lang] = (parts[0] || g.titolo).trim();
+              descI18n[lang] = (parts[1] || parts[0] || g.descrizione).trim();
+            }
+          }
+
+          return {
+            film_id: film.id,
+            categoria: g.categoria,
+            titolo: g.titolo.trim(),
+            descrizione: g.descrizione.trim(),
+            titolo_i18n: titoloI18n,
+            descrizione_i18n: descI18n,
+            fonte: g.fonte || "Making-of ufficiale",
+            approvato: true,
+            inserito_da: "IA (Admin)",
+            provenienza: "IA Verificata",
+            likes: Math.floor(Math.random() * 5) + 1,
+            ordine: (film.currentCount || 0) + idx + 1,
+          };
+        });
 
         if (daInserire.length === 0) {
           results.push({

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateBloopersForMovie } from "@/lib/gemini";
+import { translateFilmText } from "@/lib/translator";
 
 export async function POST(request: Request) {
   try {
@@ -150,19 +151,30 @@ export async function POST(request: Request) {
       }
     }
 
-    // 6. Inserimento bloopers generati
+    // 6. Inserimento bloopers generati con auto-traduzione multilingua
     const emailInserimento = user?.email || "IA (Sistema)";
-    const daInserire = generati.map((g) => ({
-      film_id,
-      minuto: g.minuto,
-      categoria: g.categoria,
-      descrizione: g.descrizione,
-      approvato: true,
-      conferme: 0,
-      contestazioni: 0,
-      inserito_da: emailInserimento,
-      provenienza: "IA Verificata",
-    }));
+    const daInserire = await Promise.all(
+      generati.map(async (g) => {
+        let trans = null;
+        try {
+          trans = await translateFilmText(g.descrizione, "blooper");
+        } catch (e) {
+          console.warn("Auto-traduzione blooper non riuscita:", e);
+        }
+        return {
+          film_id,
+          minuto: g.minuto,
+          categoria: g.categoria,
+          descrizione: g.descrizione,
+          descrizione_i18n: trans || {},
+          approvato: true,
+          conferme: 0,
+          contestazioni: 0,
+          inserito_da: emailInserimento,
+          provenienza: "IA Verificata",
+        };
+      })
+    );
 
     let inserted = null;
     let insertErr = null;

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateTriviaForMovie } from "@/lib/gemini";
+import { translateFilmText } from "@/lib/translator";
 
 export async function POST(request: Request) {
   try {
@@ -150,20 +151,34 @@ export async function POST(request: Request) {
       }
     }
 
-    // 6. Inserimento curiosità generate
+    // 6. Inserimento curiosità generate con auto-traduzione multilingua
     const emailInserimento = user?.email || "IA (Sistema)";
-    const daInserire = generati.map((g, idx) => ({
-      film_id,
-      categoria: g.categoria,
-      titolo: g.titolo,
-      descrizione: g.descrizione,
-      fonte: g.fonte || "Dietro le quinte",
-      approvato: true,
-      inserito_da: emailInserimento,
-      provenienza: "IA Verificata",
-      likes: 0,
-      ordine: (existingTrivia?.length || 0) + idx + 1,
-    }));
+    const daInserire = await Promise.all(
+      generati.map(async (g, idx) => {
+        let transDesc = null;
+        let transTitle = null;
+        try {
+          transDesc = await translateFilmText(g.descrizione, "trivia");
+          transTitle = await translateFilmText(g.titolo, "general");
+        } catch (e) {
+          console.warn("Auto-traduzione trivia non riuscita:", e);
+        }
+        return {
+          film_id,
+          categoria: g.categoria,
+          titolo: g.titolo,
+          titolo_i18n: transTitle || {},
+          descrizione: g.descrizione,
+          descrizione_i18n: transDesc || {},
+          fonte: g.fonte || "Dietro le quinte",
+          approvato: true,
+          inserito_da: emailInserimento,
+          provenienza: "IA Verificata",
+          likes: 0,
+          ordine: (existingTrivia?.length || 0) + idx + 1,
+        };
+      })
+    );
 
     let inserted = null;
     let insertErr = null;

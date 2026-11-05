@@ -1,3 +1,4 @@
+import { translateFilmText } from "@/lib/translator";
 import { NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
@@ -13,8 +14,7 @@ export async function GET() {
       return NextResponse.json({ error: "Accesso non autorizzato" }, { status: 403 });
     }
 
-    const adminDb = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : supabase;
-    const { data, error } = await adminDb
+    const { data, error } = await supabase
       .from("configurazioni")
       .select("*")
       .order("chiave", { ascending: true });
@@ -58,6 +58,26 @@ export async function PATCH(request: Request) {
         if (updErr) {
           console.error("Errore aggiornamento configurazione:", item.chiave, updErr);
         }
+
+        // Se è una chiave testuale (es. banner promo, annunci), genera automaticamente le traduzioni per le altre 4 lingue
+        const isTranslatableKey = /^(home_banner_top_(titolo|testo|badge|btn)|annuncio_|promo_)/.test(item.chiave);
+        if (isTranslatableKey && typeof item.valore === "string" && item.valore.trim().length > 0) {
+          try {
+            const trans = await translateFilmText(item.valore, "general");
+            for (const lang of ["en", "es", "fr", "de"] as const) {
+              const langVal = trans[lang];
+              if (langVal) {
+                await adminDb.from("configurazioni").upsert({
+                  chiave: `${item.chiave}_${lang}`,
+                  valore: langVal,
+                  visibile: item.visibile !== undefined ? item.visibile : true,
+                }, { onConflict: "chiave" });
+              }
+            }
+          } catch (tErr) {
+            console.warn("Auto-traduzione configurazione fallita per:", item.chiave, tErr);
+          }
+        }
       }
     }
 
@@ -72,4 +92,3 @@ export async function PATCH(request: Request) {
     return NextResponse.json({ error: err.message || "Errore salvataggio configurazioni" }, { status: 500 });
   }
 }
-

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { translateFilmText } from "@/lib/translator";
 
 export async function GET(request: Request) {
   try {
@@ -87,11 +88,22 @@ export async function POST(request: Request) {
         ? `@${user.email.split("@")[0]}`
         : "Utente";
 
+      let transTitle: Record<string, string> = {};
+      let transDesc: Record<string, string> = {};
+      try {
+        transTitle = await translateFilmText(titolo, "trivia");
+        transDesc = await translateFilmText(descrizione, "trivia");
+      } catch (tErr) {
+        console.warn("Auto-traduzione trivia utente warning:", tErr);
+      }
+
       const daInserire = {
         film_id,
         categoria: categoria || "Curiosità & Retroscena",
         titolo,
         descrizione,
+        titolo_i18n: transTitle,
+        descrizione_i18n: transDesc,
         fonte: fonte || null,
         approvato: isUserAdmin, // Se inserito da admin è già approvato, altrimenti da moderare
         inserito_da: authorHandle,

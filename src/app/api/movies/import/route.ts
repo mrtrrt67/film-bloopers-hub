@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getTMDBMovieDetails, formatCredits } from "@/lib/tmdb";
+import { getTMDBMovieDetails, formatCredits, fetchTMDBMultiLanguage } from "@/lib/tmdb";
 import { submitToIndexNow, INDEXNOW_HOST } from "@/lib/indexnow";
 import { slugify } from "@/lib/utils";
 
@@ -38,6 +38,16 @@ export async function POST(request: Request) {
     }
 
     // 3. Inserimento nuovo record ufficiale nel DB con solo le colonne presenti nella tabella films
+    let multiTitoli: Record<string, string> = { it: details.title };
+    let multiTrame: Record<string, string> = { it: formatted.trama || "" };
+    try {
+      const multi = await fetchTMDBMultiLanguage(Number(tmdb_id));
+      if (multi?.titoli) multiTitoli = { ...multiTitoli, ...multi.titoli };
+      if (multi?.trame) multiTrame = { ...multiTrame, ...multi.trame };
+    } catch (e) {
+      console.warn("fetchTMDBMultiLanguage warning:", e);
+    }
+
     const newRecord: Record<string, any> = {
       titolo: details.title,
       anno: year,
@@ -46,6 +56,8 @@ export async function POST(request: Request) {
       genere: formatted.genere,
       trama: formatted.trama,
       poster_url: formatted.poster_url,
+      titoli_i18n: multiTitoli,
+      trame_i18n: multiTrame,
     };
 
     let { data: inserted, error: insertErr } = await db

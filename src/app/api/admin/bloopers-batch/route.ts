@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateBloopersForMovie } from "@/lib/gemini";
+import { batchTranslateFilmTexts } from "@/lib/translator";
 
 export const maxDuration = 60;
 export const dynamic = "force-dynamic";
@@ -188,11 +189,20 @@ export async function POST(request: Request) {
           continue;
         }
 
-        const daInserire = bloopers.map((g) => ({
+        const batchPayload = bloopers.map((g, idx) => ({ id: idx, text: g.descrizione }));
+        let transMap = new Map();
+        try {
+          transMap = await batchTranslateFilmTexts(batchPayload, "blooper");
+        } catch (tErr) {
+          console.warn("Auto-traduzione batch bloopers warning:", tErr);
+        }
+
+        const daInserire = bloopers.map((g, idx) => ({
           film_id: film.id,
           minuto: g.minuto || "00:00",
           categoria: g.categoria,
           descrizione: g.descrizione,
+          descrizione_i18n: transMap.get(idx) || {},
           approvato: true,
           conferme: 0,
           contestazioni: 0,
