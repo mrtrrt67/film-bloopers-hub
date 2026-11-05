@@ -21,3 +21,4 @@ export function getDictionary(locale?: Locale | string | null): Dictionary {
   }
   return DICTIONARIES[DEFAULT_LOCALE];
 }
+

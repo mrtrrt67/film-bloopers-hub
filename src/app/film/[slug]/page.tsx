@@ -137,7 +137,8 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   const tramaSnippet = film.trama && maxTramaLen > 20 ? ` ${film.trama.slice(0, maxTramaLen).trim()}...` : "";
   const description = `${countDesc}${tramaSnippet}`.slice(0, 158).trim();
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://filmbloopers.online";
-  const imageUrl = film.backdrop_url || film.poster_url || `${siteUrl}/og-image.jpg`;
+  const localizedPoster = getLocalizedDbText(film.posters_i18n, locale, film.poster_url);
+  const imageUrl = localizedPoster || film.backdrop_url || film.poster_url || `${siteUrl}/og-image.jpg`;
 
   return {
     title,
@@ -214,6 +215,7 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
   const dict = getDictionary(locale);
   const localizedTitle = getLocalizedDbText(film.titoli_i18n, locale, film.titolo);
   const localizedPlot = getLocalizedDbText(film.trame_i18n, locale, film.trama);
+  const localizedPoster = getLocalizedDbText(film.posters_i18n, locale, film.poster_url);
 
   // Normalizza i bloopers calcolando conferme e contestazioni
   // (l'eventuale voto dell'utente connesso viene idratato client-side in modo trasparente senza rompere la cache Edge)
@@ -373,10 +375,10 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
             <div className="flex items-start gap-3.5">
               {/* Mini Locandina Mobile */}
               <div className="relative aspect-[2/3] w-24 shrink-0 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900 shadow-2xl">
-                {film.poster_url ? (
+                {(localizedPoster || film.poster_url) ? (
                   <Image
-                    src={film.poster_url}
-                    alt={film.titolo}
+                    src={localizedPoster || film.poster_url || ""}
+                    alt={localizedTitle || film.titolo}
                     fill
                     unoptimized
                     priority
@@ -478,10 +480,10 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
             {/* Colonna Sinistra Desktop: Poster & Azioni Esterne */}
             <div className="hidden md:flex md:col-span-4 lg:col-span-3 flex-col items-start gap-4">
               <div className="relative aspect-[2/3] w-full overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl">
-                {film.poster_url ? (
+                {(localizedPoster || film.poster_url) ? (
                   <Image
-                    src={film.poster_url}
-                    alt={film.titolo}
+                    src={localizedPoster || film.poster_url || ""}
+                    alt={localizedTitle || film.titolo}
                     fill
                     unoptimized
                     priority

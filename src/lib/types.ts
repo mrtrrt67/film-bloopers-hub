@@ -14,6 +14,7 @@ export interface Film {
   slug?: string;
   titoli_i18n?: Record<string, string> | null;
   trame_i18n?: Record<string, string> | null;
+  posters_i18n?: Record<string, string> | null;
   creato_il?: string;
   created_at?: string;
 }

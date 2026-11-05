@@ -21,6 +21,7 @@ export default function MovieCard({ film, locale: propLocale }: MovieCardProps) 
   const locale = propLocale || contextLocale;
 
   const localizedTitle = getLocalizedDbText(film.titoli_i18n, locale, film.titolo);
+  const localizedPoster = getLocalizedDbText(film.posters_i18n, locale, film.poster_url);
   const filmSlug = slugify(localizedTitle || film.titolo, film.anno);
   const rawHref = `/film/${filmSlug}-${String(film.id)}`;
   const href = buildLocalizedPath(rawHref, locale);
@@ -32,9 +33,9 @@ export default function MovieCard({ film, locale: propLocale }: MovieCardProps) 
     >
       {/* Poster Image */}
       <div className="relative aspect-[2/3] w-full overflow-hidden bg-zinc-950">
-        {film.poster_url ? (
+        {(localizedPoster || film.poster_url) ? (
           <Image
-            src={film.poster_url}
+            src={localizedPoster || film.poster_url || ""}
             alt={localizedTitle}
             fill
             unoptimized
