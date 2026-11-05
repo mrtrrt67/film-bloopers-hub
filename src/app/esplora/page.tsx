@@ -170,13 +170,13 @@ export default function EsploraPage() {
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
         <div>
           <span className="text-xs font-bold text-amber-400 uppercase tracking-wider">
-            Catalogo Cinematografico
+            {dict.explore?.badge || "Catalogo Cinematografico"}
           </span>
           <h1 className="text-3xl font-black text-white tracking-tight mt-1">
-            Esplora Film, Bloopers & Curiosità
+            {dict.explore?.title || "Esplora Film, Bloopers & Curiosità"}
           </h1>
           <p className="text-sm text-zinc-400 mt-1 max-w-2xl">
-            Cerca tra le pellicole già analizzate nella community o digita qualsiasi titolo per scoprire bloopers verificati, retroscena dal set e aneddoti esclusivi.
+            {dict.explore?.subtitle || "Cerca tra le pellicole già analizzate nella community o digita qualsiasi titolo per scoprire bloopers verificati, retroscena dal set e aneddoti esclusivi."}
           </p>
         </div>
 
@@ -202,7 +202,7 @@ export default function EsploraPage() {
             }`}
           >
             <Globe className="h-3.5 w-3.5" />
-            Cerca su TMDB {tmdbResults.length > 0 && `(${tmdbResults.length})`}
+            {dict.explore?.tabTmdb || "Cerca su TMDB"} {tmdbResults.length > 0 && `(${tmdbResults.length})`}
           </button>
         </div>
       </div>
@@ -246,11 +246,11 @@ export default function EsploraPage() {
         ) : (
           <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-800 py-16 px-4 text-center">
             <FilmIcon className="h-12 w-12 text-zinc-600 mb-3" />
-            <h3 className="text-base font-bold text-white">Nessun film trovato nell'archivio locale</h3>
+            <h3 className="text-base font-bold text-white">{dict.explore?.emptyTitle || "Nessun film trovato nell'archivio locale"}</h3>
             <p className="text-xs text-zinc-400 max-w-sm mt-1 mb-4">
               {searchTerm
-                ? `Nessun risultato per "${searchTerm}" tra i film già analizzati.`
-                : "L'archivio è ancora vuoto."}
+                ? (dict.explore?.emptySearch || 'Nessun risultato per "{term}" tra i film già analizzati.').replace("{term}", searchTerm)
+                : (dict.explore?.emptyArchive || "L'archivio è ancora vuoto.")}
             </p>
             {searchTerm && (
               <button
@@ -261,7 +261,7 @@ export default function EsploraPage() {
                 className="flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-zinc-950 shadow-md hover:brightness-110"
               >
                 <Globe className="h-4 w-4" />
-                Cerca &quot;{searchTerm}&quot; su TMDB
+                {(dict.explore?.searchTmdbBtn || 'Cerca "{term}" su TMDB').replace("{term}", searchTerm)}
               </button>
             )}
           </div>

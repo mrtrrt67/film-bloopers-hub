@@ -139,7 +139,9 @@
     "colPoints": "Punti",
     "colTier": "Status",
     "yourPoints": "I tuoi punti:",
-    "currentRank": "Grado attuale:"
+    "currentRank": "Grado attuale:",
+    "adminTitle": "Account Amministratore",
+    "adminDesc": "Sei autenticato come amministratore ({email}). Il tuo profilo è escluso dalla classifica pubblica per garantire la trasparenza e la leale competizione tra gli utenti della community."
   },
   "suggestions": {
     "badge": "Contribuisci all'archivio",
@@ -163,7 +165,16 @@
     "submitting": "Invio in corso...",
     "successTitle": "Suggerimento inviato con successo!",
     "successDesc": "Grazie per il tuo prezioso contributo! Il team e la community esamineranno la tua segnalazione a breve.",
-    "sendAnother": "Invia un altro suggerimento"
+    "sendAnother": "Invia un altro suggerimento",
+    "prioritySupportTitle": "⚡ Supporto Prioritario Attivo ({role})",
+    "prioritySupportDesc": "Il tuo abbonamento include l'assistenza prioritaria e il raddoppio dei punti in classifica: la tua richiesta verrà evidenziata in cima alla coda di moderazione!",
+    "roleAdmin": "Amministratore",
+    "roleAnnual": "Piano Annuale",
+    "roleLifetime": "Piano Lifetime",
+    "emailAssociated": "(associata al tuo profilo)",
+    "catalogCardTitle": "Catalogo Film",
+    "catalogCardDesc": "Puoi esplorare l'intero catalogo e accedere alle schede di dettaglio per visualizzare curiosità e bloopers verificati.",
+    "catalogCardBtn": "Esplora Catalogo"
   },
   "categories": {
     "all": "Tutte le categorie",
@@ -192,10 +203,45 @@
     "retroscena": "Retroscena dal Set"
   },
   "footer": {
-    "quickLinks": "Documenti legali",
-    "terms": "Termini e Condizioni",
-    "privacy": "Informativa Privacy",
-    "legal": "Note Legali & Dati Societari",
-    "rights": "Tutti i diritti riservati."
+    "brandDescription": "Il più grande archivio italiano di bloopers, errori di montaggio, curiosità dal set e aneddoti di backstage nella storia del cinema. Esplora le pellicole celebri e scopri cosa è sfuggito ai registi.",
+    "gdprCompliant": "GDPR Compliant",
+    "tmdbPartner": "TMDB Partner",
+    "exploreTitle": "Esplora",
+    "exploreHome": "Home Page",
+    "exploreCatalog": "Catalogo & Ricerca Film",
+    "exploreRanking": "Classifica Cacciatori",
+    "explorePricing": "Piani & Abbonamenti",
+    "exploreSuggestion": "💡 Invia Suggerimento",
+    "legalTitle": "Note Legali & Privacy",
+    "privacy": "Informativa sulla Privacy (GDPR)",
+    "terms": "Termini e Condizioni d'Uso",
+    "cookiePolicy": "Cookie Policy",
+    "manageCookies": "Gestisci Cookie",
+    "legal": "Note Legali & Riferimenti Societari",
+    "support": "Assistenza: supporto@filmbloopers.it",
+    "disclaimersTitle": "Trasparenza & Disclaimers",
+    "amazonAffiliationTitle": "Affiliazione Commerciale Amazon:",
+    "amazonAffiliationText": "In qualità di Affiliato Amazon, FilmBloopers Hub riceve un guadagno dagli acquisti idonei effettuati tramite i link del sito.",
+    "tmdbAttribution": "Questo prodotto utilizza le API di The Movie Database (TMDB) per trame, cast e locandine, ma non è approvato o certificato da TMDB.",
+    "companyNotice": "FilmBloopers Hub — Il database intelligente degli errori cinematografici | P.IVA / C.F.: 12345678901 | Sede Legale: Via Roma 1, 10121 Torino (TO) | Contatti: supporto@filmbloopers.it",
+    "copyrightNotice": "Tutti i diritti riservati. Uso critico e divulgativo ai sensi dell'art. 70 L. 633/1941.",
+    "madeWithPassion": "Realizzato con passione per il cinema"
+  },
+  "explore": {
+    "badge": "Catalogo Cinematografico",
+    "title": "Esplora Film, Bloopers & Curiosità",
+    "subtitle": "Cerca tra le pellicole già analizzate nella community o digita qualsiasi titolo per scoprire bloopers verificati, retroscena dal set e aneddoti esclusivi.",
+    "tabArchive": "Archivio",
+    "tabTmdb": "Cerca su TMDB",
+    "emptyTitle": "Nessun film trovato nell'archivio locale",
+    "emptySearch": "Nessun risultato per \"{term}\" tra i film già analizzati.",
+    "emptyArchive": "L'archivio è ancora vuoto.",
+    "searchTmdbBtn": "Cerca \"{term}\" su TMDB"
+  },
+  "promo": {
+    "title": "PROMO SPECIALE DI LANCIO STARTUP",
+    "badge": "Offerta a Tempo Limitato",
+    "body": "Registrati o scala la classifica entro il {scadenza} per sbloccare subito l'accesso <b>Premium Lifetime gratuito</b> a vita!",
+    "cta": "Scopri di più"
   }
 }

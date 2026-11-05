@@ -139,7 +139,9 @@
     "colPoints": "Points",
     "colTier": "Status",
     "yourPoints": "Your points:",
-    "currentRank": "Current rank:"
+    "currentRank": "Current rank:",
+    "adminTitle": "Administrator Account",
+    "adminDesc": "You are logged in as an administrator ({email}). Your profile is excluded from the public leaderboard to ensure transparency and fair competition among community members."
   },
   "suggestions": {
     "badge": "Contribute to the Archive",
@@ -163,7 +165,16 @@
     "submitting": "Submitting...",
     "successTitle": "Suggestion submitted successfully!",
     "successDesc": "Thank you for your valuable contribution! Our team and community will review your submission shortly.",
-    "sendAnother": "Send another suggestion"
+    "sendAnother": "Send another suggestion",
+    "prioritySupportTitle": "⚡ Priority Support Active ({role})",
+    "prioritySupportDesc": "Your subscription includes priority support and double leaderboard points: your request will be pinned at the top of the moderation queue!",
+    "roleAdmin": "Administrator",
+    "roleAnnual": "Annual Plan",
+    "roleLifetime": "Lifetime Plan",
+    "emailAssociated": "(associated with your profile)",
+    "catalogCardTitle": "Movie Catalog",
+    "catalogCardDesc": "Explore the entire catalog and open film detail pages to view verified bloopers and trivia.",
+    "catalogCardBtn": "Explore Catalog"
   },
   "categories": {
     "all": "All categories",
@@ -192,10 +203,45 @@
     "retroscena": "Behind the Scenes"
   },
   "footer": {
-    "quickLinks": "Legal documents",
+    "brandDescription": "The largest archive of movie bloopers, editing mistakes, behind-the-scenes trivia, and set anecdotes in cinema history. Explore famous films and discover what escaped the directors.",
+    "gdprCompliant": "GDPR Compliant",
+    "tmdbPartner": "TMDB Partner",
+    "exploreTitle": "Explore",
+    "exploreHome": "Home Page",
+    "exploreCatalog": "Catalog & Movie Search",
+    "exploreRanking": "Hunter Leaderboard",
+    "explorePricing": "Plans & Subscriptions",
+    "exploreSuggestion": "💡 Submit Suggestion",
+    "legalTitle": "Legal & Privacy",
+    "privacy": "Privacy Policy (GDPR)",
     "terms": "Terms and Conditions",
-    "privacy": "Privacy Policy",
+    "cookiePolicy": "Cookie Policy",
+    "manageCookies": "Manage Cookies",
     "legal": "Legal Notice & Corporate Info",
-    "rights": "All rights reserved."
+    "support": "Support: support@filmbloopers.it",
+    "disclaimersTitle": "Transparency & Disclaimers",
+    "amazonAffiliationTitle": "Amazon Commercial Affiliation:",
+    "amazonAffiliationText": "As an Amazon Associate, FilmBloopers Hub earns from qualifying purchases made through links on this site.",
+    "tmdbAttribution": "This product uses the TMDB API for movie plots, cast, and posters but is not endorsed or certified by TMDB.",
+    "companyNotice": "FilmBloopers Hub — The intelligent movie mistake database | VAT / Tax ID: 12345678901 | Contact: support@filmbloopers.it",
+    "copyrightNotice": "All rights reserved. Fair use for criticism, review, and research.",
+    "madeWithPassion": "Made with passion for cinema"
+  },
+  "explore": {
+    "badge": "Cinema Catalog",
+    "title": "Explore Movies, Bloopers & Trivia",
+    "subtitle": "Search among movies already analyzed by the community or type any title to discover verified bloopers, on-set trivia, and exclusive behind-the-scenes stories.",
+    "tabArchive": "Archive",
+    "tabTmdb": "Search on TMDB",
+    "emptyTitle": "No movies found in the local archive",
+    "emptySearch": "No results for \"{term}\" among analyzed movies.",
+    "emptyArchive": "The archive is currently empty.",
+    "searchTmdbBtn": "Search \"{term}\" on TMDB"
+  },
+  "promo": {
+    "title": "STARTUP LAUNCH SPECIAL PROMO",
+    "badge": "Limited Time Offer",
+    "body": "Sign up or climb the leaderboard before {scadenza} to unlock free lifetime <b>Premium Lifetime access</b>!",
+    "cta": "Learn more"
   }
 }

@@ -139,7 +139,9 @@
     "colPoints": "Puntos",
     "colTier": "Estado",
     "yourPoints": "Tus puntos:",
-    "currentRank": "Rango actual:"
+    "currentRank": "Rango actual:",
+    "adminTitle": "Cuenta de Administrador",
+    "adminDesc": "Has iniciado sesión como administrador ({email}). Tu perfil está excluido de la clasificación pública para garantizar la transparencia y la justa competencia entre los miembros de la comunidad."
   },
   "suggestions": {
     "badge": "Contribuye al archivo",
@@ -163,7 +165,16 @@
     "submitting": "Enviando...",
     "successTitle": "¡Sugerencia enviada con éxito!",
     "successDesc": "¡Gracias por tu contribución! El equipo y la comunidad revisarán tu reporte en breve.",
-    "sendAnother": "Enviar otra sugerencia"
+    "sendAnother": "Enviar otra sugerencia",
+    "prioritySupportTitle": "⚡ Soporte Prioritario Activo ({role})",
+    "prioritySupportDesc": "¡Tu suscripción incluye soporte prioritario y puntos dobles en la clasificación: tu solicitud se destacará en la parte superior de la cola de moderación!",
+    "roleAdmin": "Administrador",
+    "roleAnnual": "Plan Anual",
+    "roleLifetime": "Plan Lifetime",
+    "emailAssociated": "(asociado a tu perfil)",
+    "catalogCardTitle": "Catálogo de Películas",
+    "catalogCardDesc": "Explora todo el catálogo y accede a las fichas de detalle para ver gazapos y curiosidades verificadas.",
+    "catalogCardBtn": "Explorar Catálogo"
   },
   "categories": {
     "all": "Todas las categorías",
@@ -192,10 +203,45 @@
     "retroscena": "Detrás de las Cámaras"
   },
   "footer": {
-    "quickLinks": "Documentos legales",
-    "terms": "Términos y Condiciones",
-    "privacy": "Política de Privacidad",
-    "legal": "Aviso Legal",
-    "rights": "Todos los derechos reservados."
+    "brandDescription": "El mayor archivo de gazapos cinematográficos, errores de montaje, curiosidades del rodaje y anécdotas de la historia del cine. Explora películas célebres y descubre lo que se les escapó a los directores.",
+    "gdprCompliant": "Conforme al RGPD",
+    "tmdbPartner": "Socio de TMDB",
+    "exploreTitle": "Explorar",
+    "exploreHome": "Inicio",
+    "exploreCatalog": "Catálogo y Búsqueda de Películas",
+    "exploreRanking": "Clasificación de Cazadores",
+    "explorePricing": "Planes y Suscripciones",
+    "exploreSuggestion": "💡 Enviar Sugerencia",
+    "legalTitle": "Aviso Legal y Privacidad",
+    "privacy": "Política de Privacidad (RGPD)",
+    "terms": "Términos y Condiciones de Uso",
+    "cookiePolicy": "Política de Cookies",
+    "manageCookies": "Gestionar Cookies",
+    "legal": "Aviso Legal y Datos de la Empresa",
+    "support": "Soporte: support@filmbloopers.it",
+    "disclaimersTitle": "Transparencia y Descargos",
+    "amazonAffiliationTitle": "Afiliación Comercial con Amazon:",
+    "amazonAffiliationText": "Como Afiliado de Amazon, FilmBloopers Hub obtiene ingresos por las compras adscritas que cumplan los requisitos aplicables.",
+    "tmdbAttribution": "Este producto utiliza la API de TMDB para sinopsis, reparto y carteles, pero no está avalado ni certificado por TMDB.",
+    "companyNotice": "FilmBloopers Hub — La base de datos inteligente de errores cinematográficos | Contacto: support@filmbloopers.it",
+    "copyrightNotice": "Todos los derechos reservados. Uso crítico y divulgativo.",
+    "madeWithPassion": "Hecho con pasión por el cine"
+  },
+  "explore": {
+    "badge": "Catálogo Cinematográfico",
+    "title": "Explora Películas, Gazapos y Curiosidades",
+    "subtitle": "Busca entre las películas ya analizadas en la comunidad o escribe cualquier título para descubrir gazapos verificados, curiosidades del rodaje y anécdotas exclusivas.",
+    "tabArchive": "Archivo",
+    "tabTmdb": "Buscar en TMDB",
+    "emptyTitle": "No se encontraron películas en el archivo local",
+    "emptySearch": "No hay resultados para \"{term}\" entre las películas analizadas.",
+    "emptyArchive": "El archivo está actualmente vacío.",
+    "searchTmdbBtn": "Buscar \"{term}\" en TMDB"
+  },
+  "promo": {
+    "title": "PROMO ESPECIAL DE LANZAMIENTO STARTUP",
+    "badge": "Oferta por Tiempo Limitado",
+    "body": "¡Regístrate o sube en la clasificación antes del {scadenza} para desbloquear el acceso <b>Premium Lifetime gratuito</b> de por vida!",
+    "cta": "Descubre más"
   }
 }

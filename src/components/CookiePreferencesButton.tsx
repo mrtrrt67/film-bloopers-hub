@@ -5,11 +5,13 @@ import { Cookie } from "lucide-react";
 interface CookiePreferencesButtonProps {
   className?: string;
   variant?: "link" | "button";
+  label?: string;
 }
 
 export default function CookiePreferencesButton({
   className = "",
   variant = "link",
+  label,
 }: CookiePreferencesButtonProps) {
   const handleClick = () => {
     if (typeof window !== "undefined") {
@@ -28,7 +30,7 @@ export default function CookiePreferencesButton({
         }
       >
         <Cookie className="h-4 w-4" />
-        <span>Gestisci preferenze cookie</span>
+        <span>{label || "Gestisci preferenze cookie"}</span>
       </button>
     );
   }
@@ -42,8 +44,7 @@ export default function CookiePreferencesButton({
         "hover:text-amber-400 transition-colors flex items-center gap-1.5 text-xs text-left text-zinc-400"
       }
     >
-      <span>Gestisci Cookie</span>
+      <span>{label || "Gestisci Cookie"}</span>
     </button>
   );
 }
-

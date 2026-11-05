@@ -173,10 +173,17 @@ export default function SuggerimentiPage() {
               </div>
               <div>
                 <h4 className="text-xs font-black uppercase text-amber-400 tracking-wider">
-                  ⚡ Supporto Prioritario Attivo ({isAdmin ? "Amministratore" : (profile?.tipo_abbonamento === "annuale" ? "Piano Annuale" : "Piano Lifetime")})
+                  {(dict.suggestions?.prioritySupportTitle || "⚡ Supporto Prioritario Attivo ({role})").replace(
+                    "{role}",
+                    isAdmin
+                      ? (dict.suggestions?.roleAdmin || "Amministratore")
+                      : profile?.tipo_abbonamento === "annuale"
+                      ? (dict.suggestions?.roleAnnual || "Piano Annuale")
+                      : (dict.suggestions?.roleLifetime || "Piano Lifetime")
+                  )}
                 </h4>
                 <p className="text-[11px] text-zinc-300 mt-0.5 leading-normal">
-                  Il tuo abbonamento include l&apos;assistenza prioritaria e il raddoppio dei punti in classifica: la tua richiesta verrà evidenziata in cima alla coda di moderazione!
+                  {dict.suggestions?.prioritySupportDesc || "Il tuo abbonamento include l'assistenza prioritaria e il raddoppio dei punti in classifica: la tua richiesta verrà evidenziata in cima alla coda di moderazione!"}
                 </p>
               </div>
             </div>
@@ -277,7 +284,7 @@ export default function SuggerimentiPage() {
               <div>
                 <label className="block text-xs font-semibold text-zinc-300 mb-1">
                   {dict.suggestions.emailLabel}
-                  {user && <span className="text-zinc-500 font-normal ml-2">(associata al tuo profilo)</span>}
+                  {user && <span className="text-zinc-500 font-normal ml-2">{dict.suggestions?.emailAssociated || "(associata al tuo profilo)"}</span>}
                 </label>
                 <input
                   type="email"
@@ -342,17 +349,17 @@ export default function SuggerimentiPage() {
           <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-6 space-y-3">
             <h3 className="text-sm font-black text-white flex items-center gap-2">
               <Film className="h-4 w-4 text-amber-400" />
-              Catalogo Film
+              {dict.suggestions?.catalogCardTitle || "Catalogo Film"}
             </h3>
             <p className="text-xs text-zinc-400 leading-relaxed">
-              Puoi esplorare l&apos;intero catalogo e accedere alle schede di dettaglio per visualizzare curiosità e bloopers verificati.
+              {dict.suggestions?.catalogCardDesc || "Puoi esplorare l'intero catalogo e accedere alle schede di dettaglio per visualizzare curiosità e bloopers verificati."}
             </p>
             <div className="pt-2">
               <Link
                 href={getLocalizedPath("/esplora", locale)}
                 className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:underline"
               >
-                {dict.nav?.explore || "Esplora Catalogo"} &rarr;
+                {dict.suggestions?.catalogCardBtn || dict.nav?.explore || "Esplora Catalogo"} &rarr;
               </Link>
             </div>
           </div>

@@ -370,7 +370,7 @@ function PricingContent() {
           {dict.pricing.guaranteeDesc}
         </p>
         <div className="flex flex-wrap items-center gap-4 pt-2 text-[11px] text-zinc-400 border-t border-zinc-800/80">
-          <span>{dict.footer?.quickLinks || "Documenti legali"}:</span>
+          <span>{dict.footer?.legalTitle || "Documenti legali"}:</span>
           <Link href={getLocalizedPath("/termini", locale)} className="text-amber-400 hover:underline">
             {dict.footer?.terms || "Termini e Condizioni"}
           </Link>

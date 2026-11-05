@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { Sparkles, ArrowRight } from "lucide-react";
-import { formatHighlightedDateItalian } from "@/lib/utils";
+import { formatHighlightedDateLocalized } from "@/lib/utils";
+import { useTranslation } from "@/i18n/client";
 
 interface PromoBannerProps {
   titolo?: string;
@@ -13,19 +14,24 @@ interface PromoBannerProps {
 }
 
 export default function PromoBanner({
-  titolo = "PROMO SPECIALE DI LANCIO STARTUP",
-  testo = "Registrati o scala la classifica entro il {scadenza} per sbloccare subito l'accesso <b>Premium Lifetime gratuito</b> a vita!",
-  badge = "Offerta a Tempo Limitato",
+  titolo,
+  testo,
+  badge,
   scadenza = "2026-12-31",
   visibile = true,
 }: PromoBannerProps) {
+  const { dict, locale, localizeHref } = useTranslation();
+
   if (!visibile) return null;
 
-  const dataEvidenziata = formatHighlightedDateItalian(scadenza || "2026-12-31");
+  const promoTitle = (locale === "it" && titolo) ? titolo : (dict.promo?.title || "PROMO SPECIALE DI LANCIO STARTUP");
+  const promoBadge = (locale === "it" && badge) ? badge : (dict.promo?.badge || "Offerta a Tempo Limitato");
+  const rawTesto = (locale === "it" && testo) ? testo : (dict.promo?.body || "Registrati o scala la classifica entro il {scadenza} per sbloccare subito l'accesso <b>Premium Lifetime gratuito</b> a vita!");
+  const ctaLabel = dict.promo?.cta || "Scopri di più";
 
-  let testoFormattato =
-    testo ||
-    "Registrati o scala la classifica entro il {scadenza} per sbloccare subito l'accesso <b>Premium Lifetime gratuito</b> a vita!";
+  const dataEvidenziata = formatHighlightedDateLocalized(scadenza || "2026-12-31", locale);
+
+  let testoFormattato = rawTesto;
 
   // 1. Sostituisce i segnaposto standard {scadenza} o {deadline}
   if (testoFormattato.includes("{scadenza}") || testoFormattato.includes("{deadline}")) {
@@ -53,10 +59,10 @@ export default function PromoBanner({
           <div className="space-y-2">
             <div className="flex flex-wrap items-center gap-2.5">
               <span className="text-xs font-black tracking-wider text-amber-400 uppercase">
-                {titolo}
+                {promoTitle}
               </span>
               <span className="rounded-md bg-amber-500/15 border border-amber-500/35 px-2.5 py-0.5 text-[10px] font-bold text-amber-300 uppercase tracking-wide">
-                {badge}
+                {promoBadge}
               </span>
             </div>
             <p
@@ -67,14 +73,13 @@ export default function PromoBanner({
         </div>
 
         <Link
-          href="/pricing"
+          href={localizeHref("/pricing")}
           className="shrink-0 flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 px-5 py-2.5 text-xs font-black text-zinc-950 shadow-lg shadow-orange-500/20 hover:brightness-110 active:scale-95 transition-all whitespace-nowrap self-end sm:self-center"
         >
-          <span>Scopri di più</span>
+          <span>{ctaLabel}</span>
           <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
     </div>
   );
 }
-

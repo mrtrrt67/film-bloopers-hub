@@ -139,7 +139,9 @@
     "colPoints": "Punkte",
     "colTier": "Status",
     "yourPoints": "Deine Punkte:",
-    "currentRank": "Aktueller Rang:"
+    "currentRank": "Aktueller Rang:",
+    "adminTitle": "Administrator-Konto",
+    "adminDesc": "Du bist als Administrator angemeldet ({email}). Dein Profil ist von der öffentlichen Bestenliste ausgeschlossen, um Transparenz und fairen Wettbewerb in der Community zu gewährleisten."
   },
   "suggestions": {
     "badge": "Hilf mit beim Aufbau",
@@ -163,7 +165,16 @@
     "submitting": "Wird gesendet...",
     "successTitle": "Vorschlag erfolgreich eingereicht!",
     "successDesc": "Vielen Dank für deinen Beitrag! Unser Team und die Community werden deinen Vorschlag in Kürze prüfen.",
-    "sendAnother": "Einen weiteren Vorschlag senden"
+    "sendAnother": "Einen weiteren Vorschlag senden",
+    "prioritySupportTitle": "⚡ Prioritäts-Support Aktiv ({role})",
+    "prioritySupportDesc": "Dein Abonnement umfasst Prioritäts-Support und doppelte Punkte in der Bestenliste: Deine Anfrage wird ganz oben in der Moderations-Warteschlange angezeigt!",
+    "roleAdmin": "Administrator",
+    "roleAnnual": "Jahresabo",
+    "roleLifetime": "Lebenslanger Zugang",
+    "emailAssociated": "(mit deinem Profil verknüpft)",
+    "catalogCardTitle": "Filmkatalog",
+    "catalogCardDesc": "Erkunde den gesamten Katalog und öffne Detailseiten, um verifizierte Filmfehler und Anekdoten zu entdecken.",
+    "catalogCardBtn": "Katalog Erkunden"
   },
   "categories": {
     "all": "Alle Kategorien",
@@ -192,10 +203,45 @@
     "retroscena": "Hinter den Kulissen"
   },
   "footer": {
-    "quickLinks": "Rechtliche Dokumente",
-    "terms": "Allgemeine Geschäftsbedingungen",
-    "privacy": "Datenschutzerklärung",
-    "legal": "Impressum",
-    "rights": "Alle Rechte vorbehalten."
+    "brandDescription": "Das größte Filmfehler-Archiv für Schnittfehler, Pannen, Set-Anekdoten und Hintergrundwissen der Filmgeschichte. Entdecke berühmte Filme und erfahre, was den Regisseuren entgangen ist.",
+    "gdprCompliant": "DSGVO-konform",
+    "tmdbPartner": "TMDB Partner",
+    "exploreTitle": "Entdecken",
+    "exploreHome": "Startseite",
+    "exploreCatalog": "Katalog & Filmsuche",
+    "exploreRanking": "Jäger-Bestenliste",
+    "explorePricing": "Pläne & Abonnements",
+    "exploreSuggestion": "💡 Vorschlag Senden",
+    "legalTitle": "Rechtliches & Datenschutz",
+    "privacy": "Datenschutzerklärung (DSGVO)",
+    "terms": "Nutzungsbedingungen",
+    "cookiePolicy": "Cookie-Richtlinie",
+    "manageCookies": "Cookies Verwalten",
+    "legal": "Impressum & Unternehmensdaten",
+    "support": "Support: support@filmbloopers.it",
+    "disclaimersTitle": "Transparenz & Hinweise",
+    "amazonAffiliationTitle": "Amazon Partnerprogramm:",
+    "amazonAffiliationText": "Als Amazon-Partner verdient FilmBloopers Hub an qualifizierten Verkäufen über Links auf dieser Website.",
+    "tmdbAttribution": "Dieses Produkt verwendet die TMDB-API für Filmdaten, Besetzung und Filmplakate, wird jedoch nicht von TMDB unterstützt oder zertifiziert.",
+    "companyNotice": "FilmBloopers Hub — Die intelligente Datenbank für Filmfehler | Kontakt: support@filmbloopers.it",
+    "copyrightNotice": "Alle Rechte vorbehalten. Zitatrecht und redaktionelle Berichterstattung.",
+    "madeWithPassion": "Mit Leidenschaft für das Kino gemacht"
+  },
+  "explore": {
+    "badge": "Filmkatalog",
+    "title": "Entdecke Filme, Filmfehler & Film-Trivia",
+    "subtitle": "Suche in bereits analysierten Filmen der Community oder gib einen beliebigen Titel ein, um verifizierte Filmfehler, Set-Geheimnisse und Anekdoten zu entdecken.",
+    "tabArchive": "Archiv",
+    "tabTmdb": "Auf TMDB suchen",
+    "emptyTitle": "Keine Filme im lokalen Archiv gefunden",
+    "emptySearch": "Keine Ergebnisse für \"{term}\" unter den analysierten Filmen.",
+    "emptyArchive": "Das Archiv ist derzeit leer.",
+    "searchTmdbBtn": "\"{term}\" auf TMDB suchen"
+  },
+  "promo": {
+    "title": "SPEZIELLE STARTUP-STARTAKTION",
+    "badge": "Zeitlich Begrenztes Angebot",
+    "body": "Registriere dich oder steige bis zum {scadenza} in der Rangliste auf, um lebenslangen kostenlosen <b>Premium Lifetime Zugang</b> freizuschalten!",
+    "cta": "Mehr erfahren"
   }
 }

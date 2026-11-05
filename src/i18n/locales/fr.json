@@ -139,7 +139,9 @@
     "colPoints": "Points",
     "colTier": "Statut",
     "yourPoints": "Vos points :",
-    "currentRank": "Grade actuel :"
+    "currentRank": "Grade actuel :",
+    "adminTitle": "Compte Administrateur",
+    "adminDesc": "Vous êtes connecté en tant qu'administrateur ({email}). Votre profil est exclu du classement public afin de garantir la transparence et une compétition équitable entre les membres de la communauté."
   },
   "suggestions": {
     "badge": "Contribuer à l'archive",
@@ -163,7 +165,16 @@
     "submitting": "Envoi en cours...",
     "successTitle": "Suggestion envoyée avec succès !",
     "successDesc": "Merci pour votre contribution ! Notre équipe et la communauté examineront votre signalement sous peu.",
-    "sendAnother": "Envoyer une autre suggestion"
+    "sendAnother": "Envoyer une autre suggestion",
+    "prioritySupportTitle": "⚡ Support Prioritaire Actif ({role})",
+    "prioritySupportDesc": "Votre abonnement comprend le support prioritaire et des points doublés au classement : votre demande sera mise en avant en haut de la file de modération !",
+    "roleAdmin": "Administrateur",
+    "roleAnnual": "Forfait Annuel",
+    "roleLifetime": "Forfait À Vie",
+    "emailAssociated": "(associé à votre profil)",
+    "catalogCardTitle": "Catalogue de Films",
+    "catalogCardDesc": "Explorez l'ensemble du catalogue et accédez aux fiches détaillées pour découvrir les faux raccords et anecdotes vérifiées.",
+    "catalogCardBtn": "Explorer le Catalogue"
   },
   "categories": {
     "all": "Toutes les catégories",
@@ -192,10 +203,45 @@
     "retroscena": "L'Envers du Décor"
   },
   "footer": {
-    "quickLinks": "Documents légaux",
-    "terms": "Conditions Générales",
-    "privacy": "Politique de Confidentialité",
-    "legal": "Mentions Légales",
-    "rights": "Tous droits réservés."
+    "brandDescription": "La plus grande archive de faux raccords, erreurs de montage, anecdotes de tournage et coulisses du cinéma. Explorez les films cultes et découvrez ce qui a échappé aux réalisateurs.",
+    "gdprCompliant": "Conforme au RGPD",
+    "tmdbPartner": "Partenaire TMDB",
+    "exploreTitle": "Explorer",
+    "exploreHome": "Accueil",
+    "exploreCatalog": "Catalogue & Recherche de Films",
+    "exploreRanking": "Classement des Chasseurs",
+    "explorePricing": "Plans & Abonnements",
+    "exploreSuggestion": "💡 Envoyer une Suggestion",
+    "legalTitle": "Mentions Légales & Confidentialité",
+    "privacy": "Politique de Confidentialité (RGPD)",
+    "terms": "Conditions Générales d'Utilisation",
+    "cookiePolicy": "Politique des Cookies",
+    "manageCookies": "Gérer les Cookies",
+    "legal": "Mentions Légales & Informations Entreprise",
+    "support": "Assistance : support@filmbloopers.it",
+    "disclaimersTitle": "Transparence & Avertissements",
+    "amazonAffiliationTitle": "Affiliation Commerciale Amazon :",
+    "amazonAffiliationText": "En tant que Partenaire Amazon, FilmBloopers Hub réalise un bénéfice sur les achats remplissant les conditions requises.",
+    "tmdbAttribution": "Ce produit utilise l'API TMDB pour les synopsis, le casting et les affiches, mais n'est ni approuvé ni certifié par TMDB.",
+    "companyNotice": "FilmBloopers Hub — La base de données intelligente des erreurs de cinéma | Contact : support@filmbloopers.it",
+    "copyrightNotice": "Tous droits réservés. Usage critique et pédagogique.",
+    "madeWithPassion": "Créé avec passion pour le cinéma"
+  },
+  "explore": {
+    "badge": "Catalogue Cinématographique",
+    "title": "Explorez Films, Faux Raccords & Anecdotes",
+    "subtitle": "Recherchez parmi les films déjà analysés par la communauté ou saisissez un titre pour découvrir les faux raccords vérifiés, les secrets de tournage et des anecdotes exclusives.",
+    "tabArchive": "Archive",
+    "tabTmdb": "Rechercher sur TMDB",
+    "emptyTitle": "Aucun film trouvé dans l'archive locale",
+    "emptySearch": "Aucun résultat pour \"{term}\" parmi les films analysés.",
+    "emptyArchive": "L'archive est actuellement vide.",
+    "searchTmdbBtn": "Rechercher \"{term}\" sur TMDB"
+  },
+  "promo": {
+    "title": "PROMO SPÉCIALE DE LANCEMENT STARTUP",
+    "badge": "Offre à Durée Limitée",
+    "body": "Inscrivez-vous ou progressez dans le classement avant le {scadenza} pour débloquer l'accès <b>Premium Lifetime gratuit</b> à vie !",
+    "cta": "En savoir plus"
   }
 }

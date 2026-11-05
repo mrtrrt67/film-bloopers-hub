@@ -239,3 +239,32 @@ export function formatHighlightedDateItalian(dateInput: string | Date | null | u
   return `<strong class="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black shadow-sm mx-1.5 align-middle tracking-normal whitespace-nowrap">${formatted}</strong>`;
 }
 
+export function formatHighlightedDateLocalized(
+  dateInput: string | Date | null | undefined,
+  locale: string = "it"
+): string {
+  if (!dateInput) return "";
+  const localeMap: Record<string, string> = {
+    it: "it-IT",
+    en: "en-US",
+    es: "es-ES",
+    fr: "fr-FR",
+    de: "de-DE",
+  };
+  const targetLocale = localeMap[locale] || "it-IT";
+
+  let formatted = String(dateInput);
+  try {
+    const d = new Date(dateInput);
+    if (!isNaN(d.getTime())) {
+      formatted = d.toLocaleDateString(targetLocale, {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      });
+    }
+  } catch {}
+
+  return `<strong class="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-amber-500/20 border border-amber-500/40 text-amber-300 font-black shadow-sm mx-1.5 align-middle tracking-normal whitespace-nowrap">${formatted}</strong>`;
+}
+

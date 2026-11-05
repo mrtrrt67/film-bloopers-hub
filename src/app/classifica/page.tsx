@@ -112,9 +112,11 @@ export default async function ClassificaPage({
         <div className="mb-8 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4 text-xs text-amber-300 flex items-center gap-3 shadow-lg">
           <Shield className="h-5 w-5 shrink-0 text-amber-400" />
           <div>
-            <p className="font-bold text-amber-200">Account Amministratore</p>
+            <p className="font-bold text-amber-200">
+              {dict.ranking?.adminTitle || "Account Amministratore"}
+            </p>
             <p className="text-zinc-300 text-[11px] mt-0.5">
-              Sei autenticato come amministratore ({user?.email}). Il tuo profilo è escluso dalla classifica pubblica per garantire la trasparenza e la leale competizione tra gli utenti della community.
+              {(dict.ranking?.adminDesc || "Sei autenticato come amministratore ({email}). Il tuo profilo è escluso dalla classifica pubblica per garantire la trasparenza e la leale competizione tra gli utenti della community.").replace("{email}", user?.email || "")}
             </p>
           </div>
         </div>
