@@ -36,47 +36,32 @@ function cleanAndParseJson<T>(raw: string): T | null {
   }
 }
 
-export type I18nRecord = {
-  it: string;
-  en: string;
-  es: string;
-  fr: string;
-  de: string;
-};
-
 /**
- * Traduce un testo cinematografico (scritto in qualsiasi lingua di partenza)
- * in tutte le 5 lingue supportate (it, en, es, fr, de) con terminologia cinematografica naturale.
+ * Traduce un testo italiano nelle 4 lingue supportate (en, es, fr, de)
+ * preservando la terminologia cinematografica accurata.
  */
 export async function translateFilmText(
   text: string,
   context: "blooper" | "trivia" | "general" = "blooper"
-): Promise<I18nRecord> {
+): Promise<Record<string, string>> {
   if (!text || !text.trim()) {
-    return { it: "", en: "", es: "", fr: "", de: "" };
+    return { en: "", es: "", fr: "", de: "" };
   }
 
   const ai = getGeminiClient();
   if (!ai) {
     console.warn("GEMINI_API_KEY non configurata per la traduzione.");
-    return { it: text, en: text, es: text, fr: text, de: text };
+    return { en: text, es: text, fr: text, de: text };
   }
 
-  const prompt = `You are a professional multilingual film localization engine.
-The input text is a cinema ${context} written in any language (typically Italian, English, Spanish, French, or German).
-Translate or adapt it accurately into all 5 target languages:
-- "it": Italian
-- "en": English
-- "es": Spanish
-- "fr": French
-- "de": German
+  const prompt = `You are a professional film localization engine.
+Translate the following Italian cinema ${context} into English (en), Spanish (es), French (fr), and German (de).
+Preserve natural cinema jargon (e.g. shot/plano/plan/Einstellung, cuts, boom mic, props, stunts).
 
-Preserve natural cinema jargon (e.g. shot/inquadratura/plano/plan/Einstellung, boom mic/microfono a giraffa/percha, cut/stacco/corte, props/oggetti di scena/attrezzeria, stunts/controfigura).
-
-Original text:
+Original Italian:
 """${text.trim()}"""
 
-Return ONLY a valid JSON object with EXACTLY keys "it", "en", "es", "fr", "de".
+Return ONLY a valid JSON object with EXACTLY keys "en", "es", "fr", "de".
 Do NOT include markdown formatting or explanations.`;
 
   for (const model of MODEL_CANDIDATES) {
@@ -86,14 +71,13 @@ Do NOT include markdown formatting or explanations.`;
         contents: prompt,
       });
 
-      const parsed = cleanAndParseJson<I18nRecord>(response.text || "");
-      if (parsed && (parsed.en || parsed.it)) {
+      const parsed = cleanAndParseJson<Record<string, string>>(response.text || "");
+      if (parsed && parsed.en && parsed.es && parsed.fr && parsed.de) {
         return {
-          it: (parsed.it || text).trim(),
-          en: (parsed.en || text).trim(),
-          es: (parsed.es || parsed.en || text).trim(),
-          fr: (parsed.fr || parsed.en || text).trim(),
-          de: (parsed.de || parsed.en || text).trim(),
+          en: parsed.en.trim(),
+          es: parsed.es.trim(),
+          fr: parsed.fr.trim(),
+          de: parsed.de.trim(),
         };
       }
     } catch (err: any) {
@@ -102,36 +86,35 @@ Do NOT include markdown formatting or explanations.`;
   }
 
   // Fallback se tutte le chiamate falliscono
-  return { it: text, en: text, es: text, fr: text, de: text };
+  return { en: text, es: text, fr: text, de: text };
 }
 
 /**
- * Traduce un blocco di testi in parallelo in una singola richiesta Gemini
- * per minimizzare latenza e consumo di token.
+ * Traduce un blocco di testi (fino a 10 per chiamata) per minimizzare consumi e latenza.
  */
 export async function batchTranslateFilmTexts(
   items: Array<{ id: string | number; text: string }>,
   context: "blooper" | "trivia" = "blooper"
-): Promise<Map<string | number, I18nRecord>> {
-  const result = new Map<string | number, I18nRecord>();
+): Promise<Map<string | number, Record<string, string>>> {
+  const result = new Map<string | number, Record<string, string>>();
   if (!items || items.length === 0) return result;
 
   const ai = getGeminiClient();
   if (!ai) {
     items.forEach((item) => {
-      result.set(item.id, { it: item.text, en: item.text, es: item.text, fr: item.text, de: item.text });
+      result.set(item.id, { en: item.text, es: item.text, fr: item.text, de: item.text });
     });
     return result;
   }
 
-  const payload = items.map((it) => ({
+  const payload = items.map((it, idx) => ({
     refId: String(it.id),
     text: it.text,
   }));
 
-  const prompt = `You are a professional multilingual film localization engine.
-Translate the following array of cinema ${context} items into Italian (it), English (en), Spanish (es), French (fr), and German (de).
-Preserve cinema terminology (shot/cut/boom mic/props/stunt).
+  const prompt = `You are a professional film localization engine.
+Translate the following array of Italian cinema ${context} items into English (en), Spanish (es), French (fr), and German (de).
+Preserve cinema terminology.
 
 Input items:
 ${JSON.stringify(payload, null, 2)}
@@ -140,14 +123,13 @@ Return ONLY a valid JSON array of objects with the exact structure:
 [
   {
     "refId": "string",
-    "it": "...",
     "en": "...",
     "es": "...",
     "fr": "...",
     "de": "..."
   }
 ]
-Do NOT include any markdown or text outside the JSON array.`;
+Do NOT include any text outside the JSON array.`;
 
   for (const model of MODEL_CANDIDATES) {
     try {
@@ -156,20 +138,18 @@ Do NOT include any markdown or text outside the JSON array.`;
         contents: prompt,
       });
 
-      const parsed = cleanAndParseJson<Array<{ refId: string; it?: string; en?: string; es?: string; fr?: string; de?: string }>>(
+      const parsed = cleanAndParseJson<Array<{ refId: string; en: string; es: string; fr: string; de: string }>>(
         response.text || ""
       );
 
       if (Array.isArray(parsed) && parsed.length > 0) {
         parsed.forEach((entry) => {
-          if (entry.refId) {
-            const original = items.find((x) => String(x.id) === entry.refId)?.text || "";
+          if (entry.refId && entry.en) {
             result.set(entry.refId, {
-              it: entry.it?.trim() || original,
-              en: entry.en?.trim() || original,
-              es: entry.es?.trim() || entry.en?.trim() || original,
-              fr: entry.fr?.trim() || entry.en?.trim() || original,
-              de: entry.de?.trim() || entry.en?.trim() || original,
+              en: entry.en.trim(),
+              es: entry.es?.trim() || entry.en.trim(),
+              fr: entry.fr?.trim() || entry.en.trim(),
+              de: entry.de?.trim() || entry.en.trim(),
             });
           }
         });
@@ -188,3 +168,4 @@ Do NOT include any markdown or text outside the JSON array.`;
 
   return result;
 }
+

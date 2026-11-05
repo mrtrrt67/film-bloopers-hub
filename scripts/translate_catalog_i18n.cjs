@@ -1,11 +1,11 @@
 /**
- * Script batch intelligente per la traduzione del catalogo storico (Bloopers & Curiosità).
+ * Script batch per la traduzione completa dell'archivio (Bloopers & Curiosità)
+ * Genera il file SQL `backups/translated_i18n_data.sql` pronto da eseguire.
  *
  * Utilizzo:
- *   node scripts/translate_catalog_i18n.cjs --limit=10
- *   node scripts/translate_catalog_i18n.cjs --filmId=77
  *   node scripts/translate_catalog_i18n.cjs --all
- *   node scripts/translate_catalog_i18n.cjs --only=bloopers --limit=50
+ *   node scripts/translate_catalog_i18n.cjs --only=bloopers
+ *   node scripts/translate_catalog_i18n.cjs --only=trivia
  */
 
 const fs = require('fs');
@@ -32,9 +32,7 @@ function getEnv() {
 
 const env = getEnv();
 const supabaseUrl = env.NEXT_PUBLIC_SUPABASE_URL;
-const serviceKey = env.SUPABASE_SERVICE_ROLE_KEY;
 const anonKey = env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const supabaseKey = serviceKey || anonKey;
 const geminiApiKey = env.GEMINI_API_KEY;
 
 if (!supabaseUrl || !geminiApiKey) {
@@ -42,22 +40,8 @@ if (!supabaseUrl || !geminiApiKey) {
   process.exit(1);
 }
 
-const supabase = createClient(supabaseUrl, supabaseKey);
+const supabase = createClient(supabaseUrl, anonKey);
 const ai = new GoogleGenAI({ apiKey: geminiApiKey });
-
-// Parsing argomenti CLI
-const args = process.argv.slice(2);
-let limit = 20;
-let targetFilmId = null;
-let onlyType = null; // 'bloopers' | 'trivia' | null
-let processAll = false;
-
-args.forEach((arg) => {
-  if (arg.startsWith('--limit=')) limit = parseInt(arg.split('=')[1], 10);
-  if (arg.startsWith('--filmId=')) targetFilmId = parseInt(arg.split('=')[1], 10);
-  if (arg.startsWith('--only=')) onlyType = arg.split('=')[1];
-  if (arg === '--all') processAll = true;
-});
 
 const SQL_BACKUP_PATH = path.join(__dirname, '..', 'backups', 'translated_i18n_data.sql');
 
@@ -73,16 +57,34 @@ function escapeSql(str) {
   return "'" + str.replace(/'/g, "''") + "'";
 }
 
+function loadAlreadyTranslatedIds() {
+  const blooperIds = new Set();
+  const triviaIds = new Set();
+
+  if (fs.existsSync(SQL_BACKUP_PATH)) {
+    const lines = fs.readFileSync(SQL_BACKUP_PATH, 'utf8').split('\n');
+    for (const line of lines) {
+      const bMatch = line.match(/UPDATE errori SET .* WHERE id = (\d+);/);
+      if (bMatch) blooperIds.add(parseInt(bMatch[1], 10));
+
+      const tMatch = line.match(/UPDATE movie_trivia SET .* WHERE id = '([^']+)';/);
+      if (tMatch) triviaIds.add(tMatch[1]);
+    }
+  }
+
+  return { blooperIds, triviaIds };
+}
+
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
-async function translateBatchWithGemini(items, type = 'blooper') {
+async function translateBatchWithGemini(items, type = 'blooper', retryCount = 0) {
   const payload = items.map((it) => ({
     id: String(it.id),
     text: it.text,
   }));
 
-  const prompt = `You are a professional film translation engine.
-Translate the following cinema ${type} items into Italian (it), English (en), Spanish (es), French (fr), and German (de).
+  const prompt = `You are a professional film localization engine.
+Translate the following cinema ${type} descriptions into Italian (it), English (en), Spanish (es), French (fr), and German (de).
 Preserve natural cinema terminology (shot/cut/boom mic/props/stunt).
 
 Input items:
@@ -131,6 +133,11 @@ Do NOT include markdown formatting or explanations.`;
         return map;
       }
     } catch (err) {
+      if (err?.status === 429 && retryCount < 3) {
+        console.warn(`[Quota 429] Attesa 5s prima di riprovare...`);
+        await sleep(5000);
+        return translateBatchWithGemini(items, type, retryCount + 1);
+      }
       console.warn(`Tentativo modello ${model} fallito:`, err?.message || err);
     }
   }
@@ -140,60 +147,52 @@ Do NOT include markdown formatting or explanations.`;
 
 async function run() {
   console.log('====================================================');
-  console.log('🎬 FilmBloopers Hub - Batch Localization Translator');
+  console.log('🎬 FilmBloopers Hub - Generazione File SQL Multilingua');
   console.log('====================================================');
-  console.log(`Database URL:    ${supabaseUrl}`);
-  console.log(`Modalità auth:   ${serviceKey ? 'Service Role Key (Bypass RLS)' : 'Anon Key (SQL backup)'}`);
-  console.log(`Output SQL:      ${SQL_BACKUP_PATH}`);
-  console.log(`Filtri:          Film ID: ${targetFilmId || 'Tutti'} | Limite: ${processAll ? 'Nessuno (--all)' : limit}`);
+  console.log(`Database:     ${supabaseUrl}`);
+  console.log(`Output SQL:   ${SQL_BACKUP_PATH}`);
   console.log('====================================================\n');
 
-  let totalBloopersDone = 0;
-  let totalTriviaDone = 0;
+  const { blooperIds, triviaIds } = loadAlreadyTranslatedIds();
+  console.log(`ℹ️ Record già presenti nel file SQL: ${blooperIds.size} bloopers, ${triviaIds.size} curiosità.\n`);
 
-  // 1. ELABORAZIONE BLOOPERS
-  if (!onlyType || onlyType === 'bloopers') {
-    console.log('--- 1. Traduzione Bloopers (Tabella errori) ---');
-    let lastId = 0;
-    let keepGoing = true;
+  const { count: totalBloopers } = await supabase.from('errori').select('id', { count: 'exact', head: true });
+  const { count: totalTrivia } = await supabase.from('movie_trivia').select('id', { count: 'exact', head: true });
 
-    while (keepGoing) {
-      let query = supabase
-        .from('errori')
-        .select('id, film_id, descrizione, descrizione_i18n')
-        .gt('id', lastId)
-        .order('id', { ascending: true })
-        .limit(30);
+  console.log(`Totale bloopers a database:  ${totalBloopers}`);
+  console.log(`Totale curiosità a database: ${totalTrivia}\n`);
 
-      if (targetFilmId) {
-        query = query.eq('film_id', targetFilmId);
-      }
+  let bloopersAdded = 0;
+  let triviaAdded = 0;
 
-      const { data: rows, error } = await query;
-      if (error) {
-        console.error('Errore lettura errori:', error.message);
-        break;
-      }
+  // 1. TRADUZIONE BLOOPERS
+  console.log('--- Inizio Traduzione Bloopers (Tabella errori) ---');
+  let lastId = 0;
+  let keepGoingBloopers = true;
 
-      if (!rows || rows.length === 0) {
-        console.log('Nessun altro blooper trovato nella scansione.');
-        break;
-      }
+  while (keepGoingBloopers) {
+    const { data: rows, error } = await supabase
+      .from('errori')
+      .select('id, film_id, descrizione')
+      .gt('id', lastId)
+      .order('id', { ascending: true })
+      .limit(50);
 
-      lastId = rows[rows.length - 1].id;
+    if (error || !rows || rows.length === 0) {
+      console.log('Scansione bloopers completata.');
+      break;
+    }
 
-      // Filtra quelli che non hanno ancora traduzione completa
-      const needsTrans = rows.filter((r) => {
-        const i18n = r.descrizione_i18n;
-        return !i18n || typeof i18n !== 'object' || !i18n.en || !i18n.es;
-      });
+    lastId = rows[rows.length - 1].id;
 
-      if (needsTrans.length === 0) {
-        continue;
-      }
+    // Filtra quelli già presenti nel file SQL
+    const toTranslate = rows.filter((r) => !blooperIds.has(r.id) && r.descrizione && r.descrizione.trim());
 
-      // Traduciamo a gruppi di 6
-      const chunk = needsTrans.slice(0, 6);
+    if (toTranslate.length === 0) continue;
+
+    // Lotti da 8 per Gemini
+    for (let i = 0; i < toTranslate.length; i += 8) {
+      const chunk = toTranslate.slice(i, i + 8);
       const items = chunk.map((c) => ({ id: c.id, text: c.descrizione }));
       const transMap = await translateBatchWithGemini(items, 'blooper');
 
@@ -201,79 +200,52 @@ async function run() {
         for (const item of items) {
           const trans = transMap.get(String(item.id));
           if (trans) {
-            // Genera SQL per migrazione
             const sql = `UPDATE errori SET descrizione_i18n = ${escapeSql(JSON.stringify(trans))}::jsonb WHERE id = ${item.id};`;
             appendSql(sql);
-
-            // Se abbiamo serviceKey proviamo update live
-            if (serviceKey) {
-              await supabase.from('errori').update({ descrizione_i18n: trans }).eq('id', item.id);
-            }
-
-            totalBloopersDone++;
-            console.log(`  ✓ Blooper #${item.id} -> EN: "${trans.en.slice(0, 60)}..."`);
+            blooperIds.add(item.id);
+            bloopersAdded++;
           }
         }
+        process.stdout.write(`\r[Bloopers: ${blooperIds.size}/${totalBloopers} - ${Math.round((blooperIds.size / totalBloopers) * 100)}%]`);
       } else {
-        console.log('  ⚠️ Risposta vuota da Gemini, attesa 2s...');
         await sleep(2000);
       }
-
-      if (!processAll && totalBloopersDone >= limit) {
-        console.log(`Raggiunto limite configurato di ${limit} bloopers.`);
-        break;
-      }
-
-      await sleep(500);
+      await sleep(350);
     }
   }
 
-  // 2. ELABORAZIONE TRIVIA
-  if (!onlyType || onlyType === 'trivia') {
-    console.log('\n--- 2. Traduzione Curiosità (Tabella movie_trivia) ---');
-    let lastCreatedAt = null;
-    let keepGoing = true;
+  console.log(`\n✅ Bloopers completati. Nuove traduzioni aggiunte: ${bloopersAdded}\n`);
 
-    while (keepGoing) {
-      let query = supabase
-        .from('movie_trivia')
-        .select('id, film_id, titolo, descrizione, titolo_i18n, descrizione_i18n, created_at')
-        .order('created_at', { ascending: true })
-        .limit(30);
+  // 2. TRADUZIONE CURIOSITÀ
+  console.log('--- Inizio Traduzione Curiosità (Tabella movie_trivia) ---');
+  let triviaOffset = 0;
+  let keepGoingTrivia = true;
 
-      if (targetFilmId) {
-        query = query.eq('film_id', targetFilmId);
-      }
-      if (lastCreatedAt) {
-        query = query.gt('created_at', lastCreatedAt);
-      }
+  while (keepGoingTrivia) {
+    const { data: rows, error } = await supabase
+      .from('movie_trivia')
+      .select('id, film_id, titolo, descrizione')
+      .order('id', { ascending: true })
+      .range(triviaOffset, triviaOffset + 49);
 
-      const { data: rows, error } = await query;
-      if (error) {
-        console.error('Errore lettura movie_trivia:', error.message);
-        break;
-      }
+    if (error || !rows || rows.length === 0) {
+      console.log('Scansione curiosità completata.');
+      break;
+    }
 
-      if (!rows || rows.length === 0) {
-        console.log('Nessuna altra curiosità trovata nella scansione.');
-        break;
-      }
+    triviaOffset += rows.length;
 
-      lastCreatedAt = rows[rows.length - 1].created_at;
+    const toTranslate = rows.filter(
+      (r) => !triviaIds.has(r.id) && r.titolo && r.titolo.trim() && r.descrizione && r.descrizione.trim()
+    );
 
-      const needsTrans = rows.filter((r) => {
-        const i18n = r.descrizione_i18n;
-        return !i18n || typeof i18n !== 'object' || !i18n.en || !i18n.es;
-      });
+    if (toTranslate.length === 0) continue;
 
-      if (needsTrans.length === 0) {
-        continue;
-      }
-
-      const chunk = needsTrans.slice(0, 6);
+    for (let i = 0; i < toTranslate.length; i += 8) {
+      const chunk = toTranslate.slice(i, i + 8);
       const items = chunk.map((c) => ({
         id: c.id,
-        text: `${c.titolo} ||| ${c.descrizione}`,
+        text: `${c.titolo.trim()} ||| ${c.descrizione.trim()}`,
       }));
 
       const transMap = await translateBatchWithGemini(items, 'trivia');
@@ -294,37 +266,23 @@ async function run() {
 
             const sql = `UPDATE movie_trivia SET titolo_i18n = ${escapeSql(JSON.stringify(titleI18n))}::jsonb, descrizione_i18n = ${escapeSql(JSON.stringify(descI18n))}::jsonb WHERE id = ${escapeSql(String(r.id))};`;
             appendSql(sql);
-
-            if (serviceKey) {
-              await supabase
-                .from('movie_trivia')
-                .update({ titolo_i18n: titleI18n, descrizione_i18n: descI18n })
-                .eq('id', r.id);
-            }
-
-            totalTriviaDone++;
-            console.log(`  ✓ Trivia #${r.id} -> EN Title: "${titleI18n.en}"`);
+            triviaIds.add(r.id);
+            triviaAdded++;
           }
         }
+        process.stdout.write(`\r[Curiosità: ${triviaIds.size}/${totalTrivia} - ${Math.round((triviaIds.size / totalTrivia) * 100)}%]`);
       } else {
-        console.log('  ⚠️ Risposta vuota da Gemini, attesa 2s...');
         await sleep(2000);
       }
-
-      if (!processAll && totalTriviaDone >= limit) {
-        console.log(`Raggiunto limite configurato di ${limit} curiosità.`);
-        break;
-      }
-
-      await sleep(500);
+      await sleep(350);
     }
   }
 
-  console.log('\n====================================================');
-  console.log('✅ OPERAZIONE COMPLETATA');
-  console.log(`Bloopers tradotti: ${totalBloopersDone}`);
-  console.log(`Curiosità tradotte: ${totalTriviaDone}`);
-  console.log(`File SQL salvato in: ${SQL_BACKUP_PATH}`);
+  console.log(`\n\n====================================================`);
+  console.log('🎉 TRADUZIONE COMPLETA TERMINATA CON SUCCESSO!');
+  console.log(`Totale bloopers nel file SQL:  ${blooperIds.size}`);
+  console.log(`Totale curiosità nel file SQL: ${triviaIds.size}`);
+  console.log(`File SQL pronto all'uso in:   ${SQL_BACKUP_PATH}`);
   console.log('====================================================\n');
 }
 
