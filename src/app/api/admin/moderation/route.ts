@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { checkAndAwardPointRewards } from "@/lib/rewards";
+import { translateFilmText } from "@/lib/translator";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -252,8 +253,25 @@ export async function POST(request: Request) {
     const { action, blooper_id, contestazione_id, suggestion_id, points, userId, userEmail, minuto, descrizione } = body;
 
     if (action === "approve") {
-      // 1. Approva blooper
-      await adminDb.from("errori").update({ approvato: true }).eq("id", blooper_id);
+      // 1. Approva blooper e auto-genera traduzioni se assenti
+      const updatePayload: Record<string, any> = { approvato: true };
+      try {
+        const { data: curBlooper } = await adminDb
+          .from("errori")
+          .select("descrizione, descrizione_i18n")
+          .eq("id", blooper_id)
+          .maybeSingle();
+
+        if (curBlooper?.descrizione && (!curBlooper.descrizione_i18n || !curBlooper.descrizione_i18n.en)) {
+          const trans = await translateFilmText(curBlooper.descrizione, "blooper");
+          if (trans && Object.keys(trans).length > 0) {
+            updatePayload.descrizione_i18n = trans;
+          }
+        }
+      } catch (e) {
+        console.warn("Auto-traduzione blooper approvato non riuscita:", e);
+      }
+      await adminDb.from("errori").update(updatePayload).eq("id", blooper_id);
 
       // 2. Risolvi profilo utente
       const targetProfile = await resolveProfile(adminDb, userId, userEmail);

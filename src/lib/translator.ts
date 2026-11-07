@@ -37,31 +37,40 @@ function cleanAndParseJson<T>(raw: string): T | null {
 }
 
 /**
- * Traduce un testo italiano nelle 4 lingue supportate (en, es, fr, de)
- * preservando la terminologia cinematografica accurata.
+ * Traduce un testo cinematografico (in qualsiasi lingua di partenza: italiano, inglese, spagnolo, francese, tedesco, ecc.)
+ * in TUTTE le 5 lingue supportate (it, en, es, fr, de).
+ * Preserva accuratamente la terminologia tecnica cinematografica.
  */
 export async function translateFilmText(
   text: string,
   context: "blooper" | "trivia" | "general" = "blooper"
 ): Promise<Record<string, string>> {
   if (!text || !text.trim()) {
-    return { en: "", es: "", fr: "", de: "" };
+    return { it: "", en: "", es: "", fr: "", de: "" };
   }
 
   const ai = getGeminiClient();
   if (!ai) {
     console.warn("GEMINI_API_KEY non configurata per la traduzione.");
-    return { en: text, es: text, fr: text, de: text };
+    return { it: text, en: text, es: text, fr: text, de: text };
   }
 
   const prompt = `You are a professional film localization engine.
-Translate the following Italian cinema ${context} into English (en), Spanish (es), French (fr), and German (de).
-Preserve natural cinema jargon (e.g. shot/plano/plan/Einstellung, cuts, boom mic, props, stunts).
+The input text below is a cinema ${context} written in an unknown language (it could be Italian, English, Spanish, French, German, or any other).
+Detect the language, and provide high-quality natural translations into ALL five languages:
+- "it": Italian
+- "en": English
+- "es": Spanish
+- "fr": French
+- "de": German
 
-Original Italian:
+Preserve natural cinema jargon (e.g. shot/plano/plan/Einstellung, continuity, cuts, boom mic, props, stunts, timestamps).
+If the text is already in one of these languages, preserve it faithfully in that language and translate to the other four.
+
+Original Input:
 """${text.trim()}"""
 
-Return ONLY a valid JSON object with EXACTLY keys "en", "es", "fr", "de".
+Return ONLY a valid JSON object with EXACTLY keys "it", "en", "es", "fr", "de".
 Do NOT include markdown formatting or explanations.`;
 
   for (const model of MODEL_CANDIDATES) {
@@ -72,12 +81,13 @@ Do NOT include markdown formatting or explanations.`;
       });
 
       const parsed = cleanAndParseJson<Record<string, string>>(response.text || "");
-      if (parsed && parsed.en && parsed.es && parsed.fr && parsed.de) {
+      if (parsed && (parsed.en || parsed.it)) {
         return {
-          en: parsed.en.trim(),
-          es: parsed.es.trim(),
-          fr: parsed.fr.trim(),
-          de: parsed.de.trim(),
+          it: (parsed.it || text).trim(),
+          en: (parsed.en || text).trim(),
+          es: (parsed.es || parsed.en || text).trim(),
+          fr: (parsed.fr || parsed.en || text).trim(),
+          de: (parsed.de || parsed.en || text).trim(),
         };
       }
     } catch (err: any) {
@@ -86,7 +96,7 @@ Do NOT include markdown formatting or explanations.`;
   }
 
   // Fallback se tutte le chiamate falliscono
-  return { en: text, es: text, fr: text, de: text };
+  return { it: text, en: text, es: text, fr: text, de: text };
 }
 
 /**
@@ -113,7 +123,13 @@ export async function batchTranslateFilmTexts(
   }));
 
   const prompt = `You are a professional film localization engine.
-Translate the following array of Italian cinema ${context} items into English (en), Spanish (es), French (fr), and German (de).
+Translate the following array of cinema ${context} items (each in any input language) into ALL five languages:
+- "it": Italian
+- "en": English
+- "es": Spanish
+- "fr": French
+- "de": German
+
 Preserve cinema terminology.
 
 Input items:
@@ -123,6 +139,7 @@ Return ONLY a valid JSON array of objects with the exact structure:
 [
   {
     "refId": "string",
+    "it": "...",
     "en": "...",
     "es": "...",
     "fr": "...",
@@ -138,18 +155,20 @@ Do NOT include any text outside the JSON array.`;
         contents: prompt,
       });
 
-      const parsed = cleanAndParseJson<Array<{ refId: string; en: string; es: string; fr: string; de: string }>>(
+      const parsed = cleanAndParseJson<Array<{ refId: string; it?: string; en: string; es?: string; fr?: string; de?: string }>>(
         response.text || ""
       );
 
       if (Array.isArray(parsed) && parsed.length > 0) {
         parsed.forEach((entry) => {
-          if (entry.refId && entry.en) {
+          if (entry.refId) {
+            const original = items.find(x => String(x.id) === String(entry.refId))?.text || "";
             result.set(entry.refId, {
-              en: entry.en.trim(),
-              es: entry.es?.trim() || entry.en.trim(),
-              fr: entry.fr?.trim() || entry.en.trim(),
-              de: entry.de?.trim() || entry.en.trim(),
+              it: entry.it?.trim() || original,
+              en: entry.en ? entry.en.trim() : original,
+              es: entry.es?.trim() || entry.en?.trim() || original,
+              fr: entry.fr?.trim() || entry.en?.trim() || original,
+              de: entry.de?.trim() || entry.en?.trim() || original,
             });
           }
         });
