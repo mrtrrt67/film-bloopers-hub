@@ -1,3 +1,4 @@
+import { Metadata } from "next";
 import Link from "next/link";
 import { Search, Sparkles, Film as FilmIcon, Trophy, CheckCircle, ArrowRight, Flame } from "lucide-react";
 import { createPublicClient } from "@/lib/supabase/public";
@@ -9,6 +10,59 @@ import { headers, cookies } from "next/headers";
 import { getDictionary, isSupportedLocale, Locale, DEFAULT_LOCALE, getLocalizedDbText, resolveLocale } from "@/i18n";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+  searchParams,
+}: {
+  params?: Promise<{ locale?: string }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
+} = {}): Promise<Metadata> {
+  const resolvedParams = params ? await params : {};
+  const routeLocale = resolvedParams.locale;
+  const resolvedSearchParams = searchParams ? await searchParams : {};
+  const headerList = await headers();
+  const cookieStore = await cookies();
+  const locale: Locale = isSupportedLocale(routeLocale)
+    ? routeLocale
+    : resolveLocale({
+        searchParams: resolvedSearchParams,
+        headerList,
+        cookieStore,
+      });
+
+  const titles: Record<Locale, string> = {
+    it: "FilmBloopers Hub | Bloopers, Errori di Scena & Curiosità nei Film",
+    en: "FilmBloopers Hub | Movie Bloopers, Set Mistakes & Cinema Trivia",
+    es: "FilmBloopers Hub | Bloopers, Errores de Escena y Curiosidades de Películas",
+    fr: "FilmBloopers Hub | Bêtisiers, Erreurs de Tournage et Anecdotes de Films",
+    de: "FilmBloopers Hub | Filmfehler, Bloopers & Hinter den Kulissen Trivia",
+  };
+
+  const descriptions: Record<Locale, string> = {
+    it: "Scopri oltre 1.000 bloopers, curiosità dal set, aneddoti di backstage ed errori di montaggio al minuto esatto nei film più celebri. Archivio verificato e gratuito.",
+    en: "Discover thousands of movie bloopers, set mistakes, continuity errors, and behind-the-scenes trivia at the exact timestamp in the most famous films. Free verified archive.",
+    es: "Descubre miles de bloopers, errores de continuidad y curiosidades de rodaje al minuto exacto en las películas más famosas del cine. Archivo verificado y gratuito.",
+    fr: "Découvrez des milliers de bêtisiers, erreurs de tournage et anecdotes de cinéma au minutage exact dans les plus grands chefs-d'œuvre. Archive vérifiée et gratuite.",
+    de: "Entdecke Tausende Filmfehler, Szenen-Bloopers und Hinter-den-Kulissen-Trivia mit genauem Zeitstempel in den berühmtesten Filmen. Kostenloses Archiv.",
+  };
+
+  return {
+    title: titles[locale] || titles.it,
+    description: descriptions[locale] || descriptions.it,
+    alternates: {
+      canonical: locale === DEFAULT_LOCALE ? "/" : `/${locale}`,
+      languages: {
+        it: "/",
+        en: "/en",
+        es: "/es",
+        fr: "/fr",
+        de: "/de",
+        "x-default": "/en",
+      },
+    },
+  };
+}
 function extractCount(field: any): number {
   if (!field) return 0;
   if (typeof field === "number") return field;

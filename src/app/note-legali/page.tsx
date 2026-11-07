@@ -6,6 +6,17 @@ export const metadata: Metadata = {
   title: "Note Legali, Trasparenza & Disclaimer | FilmBloopers Hub",
   description:
     "Dati societari, informativa sull'Affiliazione Amazon, attribuzione TMDB e disclaimer sul copyright cinematografico di FilmBloopers Hub.",
+  alternates: {
+    canonical: "/note-legali",
+    languages: {
+      "it": "/note-legali",
+      "en": "/en/note-legali",
+      "es": "/es/note-legali",
+      "fr": "/fr/note-legali",
+      "de": "/de/note-legali",
+      "x-default": "/en/note-legali",
+    },
+  },
 };
 
 export default function NoteLegaliPage() {

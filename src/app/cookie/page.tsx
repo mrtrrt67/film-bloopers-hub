@@ -7,6 +7,17 @@ export const metadata: Metadata = {
   title: "Informativa sui Cookie (Cookie Policy) | FilmBloopers Hub",
   description:
     "Informativa completa sull'utilizzo dei cookie tecnici, analitici (Google Analytics) e di terze parti su FilmBloopers Hub in conformità alla Direttiva ePrivacy e al GDPR.",
+  alternates: {
+    canonical: "/cookie",
+    languages: {
+      "it": "/cookie",
+      "en": "/en/cookie",
+      "es": "/es/cookie",
+      "fr": "/fr/cookie",
+      "de": "/de/cookie",
+      "x-default": "/en/cookie",
+    },
+  },
 };
 
 export default function CookiePage() {

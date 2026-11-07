@@ -6,6 +6,14 @@ export const metadata: Metadata = {
     "Cerca tra oltre 200 film ed esplora il catalogo dei bloopers. Trova errori di scena per titolo e anno, con la ricerca cinematografica integrata.",
   alternates: {
     canonical: "/esplora",
+    languages: {
+      "it": "/esplora",
+      "en": "/en/esplora",
+      "es": "/es/esplora",
+      "fr": "/fr/esplora",
+      "de": "/de/esplora",
+      "x-default": "/en/esplora",
+    },
   },
   openGraph: {
     title: "Esplora Archivio Bloopers | FilmBloopers Hub",

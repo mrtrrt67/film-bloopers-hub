@@ -6,6 +6,14 @@ export const metadata: Metadata = {
     "Segnala un film mancante, proponi nuovi bloopers da analizzare o invia un feedback per migliorare la piattaforma FilmBloopers Hub.",
   alternates: {
     canonical: "/suggerimenti",
+    languages: {
+      "it": "/suggerimenti",
+      "en": "/en/suggerimenti",
+      "es": "/es/suggerimenti",
+      "fr": "/fr/suggerimenti",
+      "de": "/de/suggerimenti",
+      "x-default": "/en/suggerimenti",
+    },
   },
   openGraph: {
     title: "Suggerimenti e Segnalazioni | FilmBloopers Hub",

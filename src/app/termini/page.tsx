@@ -6,6 +6,17 @@ export const metadata: Metadata = {
   title: "Termini e Condizioni di Servizio | FilmBloopers Hub",
   description:
     "Termini e condizioni d'uso della piattaforma FilmBloopers Hub, regole sugli abbonamenti digitali, esclusione recesso e contenuti della community.",
+  alternates: {
+    canonical: "/termini",
+    languages: {
+      "it": "/termini",
+      "en": "/en/termini",
+      "es": "/es/termini",
+      "fr": "/fr/termini",
+      "de": "/de/termini",
+      "x-default": "/en/termini",
+    },
+  },
 };
 
 export default function TerminiPage() {

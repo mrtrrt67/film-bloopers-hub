@@ -6,6 +6,17 @@ export const metadata: Metadata = {
   title: "Informativa sulla Privacy (GDPR) | FilmBloopers Hub",
   description:
     "Informativa completa sul trattamento dei dati personali ai sensi del Regolamento UE 2016/679 (GDPR) di FilmBloopers Hub.",
+  alternates: {
+    canonical: "/privacy",
+    languages: {
+      "it": "/privacy",
+      "en": "/en/privacy",
+      "es": "/es/privacy",
+      "fr": "/fr/privacy",
+      "de": "/de/privacy",
+      "x-default": "/en/privacy",
+    },
+  },
 };
 
 export default function PrivacyPage() {

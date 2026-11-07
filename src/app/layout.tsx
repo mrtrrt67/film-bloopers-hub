@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { headers, cookies } from "next/headers";
+import { resolveLocale, DEFAULT_LOCALE } from "@/i18n";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AccessTracker from "@/components/AccessTracker";
@@ -63,6 +65,14 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: "/",
+    languages: {
+      "it": "/",
+      "en": "/en",
+      "es": "/es",
+      "fr": "/fr",
+      "de": "/de",
+      "x-default": "/en",
+    },
   },
   openGraph: {
     title: "FilmBloopers Hub | Bloopers, Errori di Scena & Curiosità nei Film",
@@ -117,14 +127,18 @@ export const metadata: Metadata = {
   category: "entertainment",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headerList = await headers();
+  const cookieStore = await cookies();
+  const locale = resolveLocale({ headerList, cookieStore }) || DEFAULT_LOCALE;
+
   return (
     <html
-      lang="it"
+      lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} dark h-full antialiased`}
       style={{ backgroundColor: "#09090b", colorScheme: "dark" }}
     >
