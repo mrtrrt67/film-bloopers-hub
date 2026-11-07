@@ -104,7 +104,17 @@
     "noStreamingAvailable": "Actuellement non répertorié sur les principales plateformes de streaming.",
     "physicalEdition": "Édition Physique ou Livre",
     "physicalEditionDesc": "DVD, Blu-ray collector ou roman sur Amazon",
-    "justWatchVerification": "Données vérifiées par JustWatch"
+    "justWatchVerification": "Données vérifiées par JustWatch",
+    "year": "Année",
+    "originalTitle": "Titre original :",
+    "notSpecified": "Non renseigné",
+    "noPlotAvailable": "Synopsis actuellement non disponible.",
+    "showPlot": "Afficher le synopsis ▼",
+    "bloopersCount": "Bloopers",
+    "triviaCount": "Anecdotes",
+    "youMayAlsoLike": "Vous pourriez aussi aimer :",
+    "youMayAlsoLikeDesc": "Films similaires recommandés par réalisateur, saga, casting et genre.",
+    "allCatalog": "Tout le catalogue"
   },
   "pricing": {
     "badge": "Archive Ouverte & Gratuite",

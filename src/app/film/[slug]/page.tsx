@@ -427,11 +427,11 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
                 <div className="flex items-center gap-1.5 mt-2">
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-amber-500 text-zinc-950 text-[10px] font-black">
                     <AlertCircle className="h-2.5 w-2.5" />
-                    {bloopers.length} Bloopers
+                    {bloopers.length} {dict.film.bloopersCount || "Bloopers"}
                   </span>
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-zinc-900 text-amber-300 border border-amber-500/40 text-[10px] font-bold">
                     <Sparkles className="h-2.5 w-2.5 text-amber-400" />
-                    {trivia.length} Curiosità
+                    {trivia.length} {dict.film.triviaCount || "Curiosità"}
                   </span>
                   {ratingInfo && (
                     <span
@@ -454,7 +454,7 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
               <details className="group rounded-xl border border-zinc-800/80 bg-zinc-900/30 p-3 text-xs">
                 <summary className="font-bold text-amber-400 cursor-pointer flex items-center justify-between">
                   <span>{dict.film.plot}</span>
-                  <span className="text-[10px] text-zinc-500 group-open:hidden">Mostra trama ▼</span>
+                  <span className="text-[10px] text-zinc-500 group-open:hidden">{dict.film.showPlot || "Mostra trama ▼"}</span>
                 </summary>
                 <p className="mt-2 text-zinc-300 leading-relaxed font-normal">
                   {localizedPlot}
@@ -520,7 +520,7 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
                 <div className="flex flex-wrap items-center gap-2.5 mb-2">
                   {film.anno && (
                     <span className="rounded-lg bg-amber-500/10 border border-amber-500/30 px-2.5 py-0.5 text-xs font-black text-amber-400">
-                      Anno {film.anno}
+                      {dict.film.year || "Anno"} {film.anno}
                     </span>
                   )}
                   {formattedDuration && (
@@ -561,7 +561,7 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
                 </h1>
                 {film.original_title && film.original_title !== film.titolo && (
                   <p className="text-sm font-medium text-zinc-400 italic mt-0.5">
-                    Titolo originale: {film.original_title}
+                    {dict.film.originalTitle || "Titolo originale:"} {film.original_title}
                   </p>
                 )}
 
@@ -572,7 +572,7 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
                       {dict.film.director}
                     </span>
                     <span className="text-zinc-200 font-bold text-sm">
-                      {film.regista || "Non indicato"}
+                      {film.regista || dict.film.notSpecified || "Non indicato"}
                     </span>
                   </div>
                   <div>
@@ -580,7 +580,7 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
                       {dict.film.cast}
                     </span>
                     <span className="text-zinc-300 line-clamp-1">
-                      {film.attori || "Non indicato"}
+                      {film.attori || dict.film.notSpecified || "Non indicato"}
                     </span>
                   </div>
                 </div>
@@ -591,7 +591,7 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
                     {dict.film.plot}
                   </h3>
                   <p className="text-sm text-zinc-300 leading-relaxed font-normal">
-                    {localizedPlot || "Trama al momento non disponibile."}
+                    {localizedPlot || dict.film.noPlotAvailable || "Trama al momento non disponibile."}
                   </p>
                 </div>
               </div>
@@ -611,18 +611,18 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
                       <div className="flex items-center gap-2 mb-1">
                         <Sparkles className="h-5 w-5 text-amber-400 shrink-0" />
                         <h2 className="text-xl sm:text-2xl font-black text-white">
-                          Potrebbero piacerti anche:
+                          {dict.film.youMayAlsoLike || "Potrebbero piacerti anche:"}
                         </h2>
                       </div>
                       <p className="text-xs sm:text-sm text-zinc-400">
-                        Pellicole affini consigliate per regia, saga cinematografica, cast e genere.
+                        {dict.film.youMayAlsoLikeDesc || "Pellicole affini consigliate per regia, saga cinematografica, cast e genere."}
                       </p>
                     </div>
                     <Link
                       href={buildLocalizedPath("/esplora", locale)}
                       className="hidden sm:inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 transition-colors"
                     >
-                      <span>Tutto il catalogo</span>
+                      <span>{dict.film.allCatalog || "Tutto il catalogo"}</span>
                       <ArrowRight className="h-3.5 w-3.5" />
                     </Link>
                   </div>
