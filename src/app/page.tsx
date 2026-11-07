@@ -32,11 +32,11 @@ export async function generateMetadata({
       });
 
   const titles: Record<Locale, string> = {
-    it: "FilmBloopers Hub | Bloopers, Errori di Scena & Curiosità nei Film",
-    en: "FilmBloopers Hub | Movie Bloopers, Set Mistakes & Cinema Trivia",
-    es: "FilmBloopers Hub | Bloopers, Errores de Escena y Curiosidades de Películas",
-    fr: "FilmBloopers Hub | Bêtisiers, Erreurs de Tournage et Anecdotes de Films",
-    de: "FilmBloopers Hub | Filmfehler, Bloopers & Hinter den Kulissen Trivia",
+    it: "FilmBloopers Hub | Bloopers ed Errori nei Film",
+    en: "FilmBloopers Hub | Movie Bloopers & Set Trivia",
+    es: "FilmBloopers Hub | Bloopers y Errores de Cine",
+    fr: "FilmBloopers Hub | Bêtisiers & Erreurs de Film",
+    de: "FilmBloopers Hub | Filmfehler & Movie Trivia",
   };
 
   const descriptions: Record<Locale, string> = {
@@ -48,7 +48,9 @@ export async function generateMetadata({
   };
 
   return {
-    title: titles[locale] || titles.it,
+    title: {
+      absolute: titles[locale] || titles.it,
+    },
     description: descriptions[locale] || descriptions.it,
     alternates: {
       canonical: locale === DEFAULT_LOCALE ? "/" : `/${locale}`,
