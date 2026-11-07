@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { slugify } from "@/lib/utils";
+import { LOCALES, DEFAULT_LOCALE, buildLocalizedPath } from "@/i18n";
 
 export const INDEXNOW_KEY = process.env.INDEXNOW_KEY || "b3106037cdfc4d729c7eac554ef4fb55";
 export const INDEXNOW_HOST = process.env.INDEXNOW_HOST || "filmbloopers.online";
@@ -23,6 +24,19 @@ function getSupabaseClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://gmiwhscbqvadnlqruhjs.supabase.co";
   const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
   return createClient(supabaseUrl, supabaseKey);
+}
+
+/**
+ * Costruisce tutti gli URL localizzati (it, en, es, fr, de) per una scheda film
+ */
+export function buildMovieLocalizedUrls(slug: string, id: number | string): string[] {
+  const baseUrl = `https://${INDEXNOW_HOST}`;
+  const baseSlug = `${slug}-${id}`;
+  return LOCALES.map((locale) => {
+    return locale === DEFAULT_LOCALE
+      ? `${baseUrl}/film/${baseSlug}`
+      : `${baseUrl}/${locale}/film/${baseSlug}`;
+  });
 }
 
 /**
@@ -67,7 +81,7 @@ export async function submitToIndexNow(urls: string[]): Promise<IndexNowResponse
 
     switch (res.status) {
       case 200:
-        message = `Successo: ${cleanUrls.length} URL inviati e accettati da IndexNow.`;
+        message = `Successo (200): ${cleanUrls.length} URL inviati e accettati da IndexNow.`;
         break;
       case 202:
         message = `Accettato (202): ${cleanUrls.length} URL ricevuti, IndexNow sta verificando la chiave e processando l'indicizzazione.`;
@@ -112,35 +126,55 @@ export async function submitToIndexNow(urls: string[]): Promise<IndexNowResponse
 }
 
 /**
- * Estrae tutti gli URL pubblici del sito (pagine statiche e schede film) per l'invio in blocco
+ * Helper per notificare automaticamente IndexNow per tutte le varianti di lingua di un film
+ */
+export async function notifyIndexNowForMovie(film: {
+  id: number | string;
+  titolo: string;
+  anno?: number | null;
+}): Promise<IndexNowResponse> {
+  const slug = slugify(film.titolo, film.anno);
+  const urls = buildMovieLocalizedUrls(slug, film.id);
+  return submitToIndexNow(urls);
+}
+
+/**
+ * Estrae tutti gli URL pubblici del sito in tutte le lingue (pagine statiche e schede film) per l'invio in blocco
  */
 export async function getAllSiteUrls(): Promise<string[]> {
   const baseUrl = `https://${INDEXNOW_HOST}`;
 
-  const staticUrls = [
-    `${baseUrl}/`,
-    `${baseUrl}/esplora`,
-    `${baseUrl}/classifica`,
-    `${baseUrl}/pricing`,
-    `${baseUrl}/suggerimenti`,
-    `${baseUrl}/privacy`,
-    `${baseUrl}/termini`,
-    `${baseUrl}/cookie`,
-    `${baseUrl}/note-legali`,
+  const staticPaths = [
+    "/",
+    "/esplora",
+    "/classifica",
+    "/pricing",
+    "/suggerimenti",
+    "/privacy",
+    "/termini",
+    "/cookie",
+    "/note-legali",
   ];
+
+  const staticUrls: string[] = [];
+  for (const p of staticPaths) {
+    for (const locale of LOCALES) {
+      staticUrls.push(`${baseUrl}${buildLocalizedPath(p, locale)}`);
+    }
+  }
 
   try {
     const supabase = getSupabaseClient();
     const { data: films } = await supabase
       .from("films")
       .select("id, titolo, anno")
-      .limit(2000);
+      .limit(3000);
 
-    const movieUrls = (films || []).map((film: any) => {
+    const movieUrls: string[] = [];
+    for (const film of films || []) {
       const slug = slugify(film.titolo, film.anno);
-      const shortId = String(film.id);
-      return `${baseUrl}/film/${slug}-${shortId}`;
-    });
+      movieUrls.push(...buildMovieLocalizedUrls(slug, film.id));
+    }
 
     return [...staticUrls, ...movieUrls];
   } catch (err) {

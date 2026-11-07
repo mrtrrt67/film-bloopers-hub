@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { checkAndAwardPointRewards } from "@/lib/rewards";
 import { translateFilmText } from "@/lib/translator";
+import { notifyIndexNowForMovie } from "@/lib/indexnow";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -299,15 +300,21 @@ export async function POST(request: Request) {
         ? `Blooper approvato! Assegnati ${awardedPts} pt a ${userTag} (Raddoppiati per Amministratore / Piano Annuale)${rewardMsg}`
         : `Blooper approvato e ${awardedPts} pt assegnati a ${userTag}!${rewardMsg}`;
 
-      // Inserimento notifica celebrativa per l'utente che ha inviato il blooper
-      if (targetProfile) {
-        try {
-          const { data: bData } = await adminDb
-            .from("errori")
-            .select("films(titolo, anno)")
-            .eq("id", blooper_id)
-            .maybeSingle();
-          const filmTitolo = (bData as any)?.films?.titolo || "un film";
+      // Notifica utente e ping automatico IndexNow per aggiornare i motori di ricerca
+      try {
+        const { data: bData } = await adminDb
+          .from("errori")
+          .select("film_id, films(id, titolo, anno)")
+          .eq("id", blooper_id)
+          .maybeSingle();
+
+        const filmObj = (bData as any)?.films;
+        if (filmObj?.id && filmObj?.titolo) {
+          void notifyIndexNowForMovie(filmObj).catch((e) => console.warn("IndexNow blooper approval warn:", e));
+        }
+
+        if (targetProfile && filmObj) {
+          const filmTitolo = filmObj.titolo || "un film";
           await adminDb.from("notifiche_utenti").insert({
             user_id: targetProfile.id,
             tipo: "blooper_approvato",
@@ -317,9 +324,9 @@ export async function POST(request: Request) {
             film_titolo: filmTitolo,
             letta: false,
           });
-        } catch {
-          // Fallback
         }
+      } catch {
+        // Fallback safety
       }
 
       return NextResponse.json({ success: true, message: msg });
