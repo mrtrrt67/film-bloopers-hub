@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Esplora Archivio Bloopers | Cerca Film ed Errori",
+  title: "Esplora Archivio Bloopers e Film",
   description:
     "Cerca tra oltre 200 film ed esplora il catalogo dei bloopers. Trova errori di scena per titolo e anno, con la ricerca cinematografica integrata.",
   alternates: {

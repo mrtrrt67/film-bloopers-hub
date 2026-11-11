@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Invia un Suggerimento o Segnalazione | FilmBloopers Hub",
+  title: "Suggerimenti e Segnalazioni",
   description:
     "Segnala un film mancante, proponi nuovi bloopers da analizzare o invia un feedback per migliorare la piattaforma FilmBloopers Hub.",
   alternates: {

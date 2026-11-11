@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Scale, ArrowLeft, ShoppingCart, Film, AlertTriangle, ShieldCheck, Mail, Building } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Note Legali, Trasparenza & Disclaimer | FilmBloopers Hub",
+  title: "Note Legali e Disclaimer",
   description:
     "Dati societari, informativa sull'Affiliazione Amazon, attribuzione TMDB e disclaimer sul copyright cinematografico di FilmBloopers Hub.",
   alternates: {

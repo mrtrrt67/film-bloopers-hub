@@ -3,7 +3,7 @@ import Link from "next/link";
 import { ShieldCheck, ArrowLeft, Mail, Lock, Database, Globe, UserCheck, AlertCircle } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Informativa sulla Privacy (GDPR) | FilmBloopers Hub",
+  title: "Privacy Policy (GDPR)",
   description:
     "Informativa completa sul trattamento dei dati personali ai sensi del Regolamento UE 2016/679 (GDPR) di FilmBloopers Hub.",
   alternates: {

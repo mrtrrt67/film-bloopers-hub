@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export const metadata: Metadata = {
-  title: "Classifica Cacciatori di Bloopers | FilmBloopers Hub",
+  title: "Classifica Cacciatori di Bloopers",
   description: "Guarda chi sono i migliori cercatori di bloopers della community. Segnala errori, guadagna punti e sblocca l'abbonamento Premium gratuito a vita!",
   alternates: {
     canonical: "/classifica",

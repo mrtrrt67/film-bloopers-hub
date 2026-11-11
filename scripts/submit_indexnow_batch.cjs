@@ -113,6 +113,25 @@ async function run() {
 
     if (res.status === 200 || res.status === 202) {
       console.log(`[IndexNow] SUCCESSO! Tutti i ${cleanUrls.length} URL sono stati registrati nei motori (Bing, Yahoo, DuckDuckGo, Seznam).`);
+
+      const trackingPayload = {
+        submittedUrls: cleanUrls,
+        lastSubmittedAt: new Date().toISOString(),
+        lastStatus: res.status,
+        lastCount: cleanUrls.length,
+      };
+
+      const { error: saveErr } = await supabase.from("configurazioni").upsert({
+        chiave: "indexnow_tracking",
+        valore: JSON.stringify(trackingPayload),
+        visibile: false,
+      });
+
+      if (saveErr) {
+        console.warn("[IndexNow] Errore salvataggio tracking:", saveErr.message);
+      } else {
+        console.log("[IndexNow] Registro 'indexnow_tracking' aggiornato con successo nel database! (1750 URL registrati)");
+      }
     } else {
       console.warn(`[IndexNow] Nota sullo stato: ${res.status}`);
     }

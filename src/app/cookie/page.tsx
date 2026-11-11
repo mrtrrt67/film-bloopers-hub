@@ -4,7 +4,7 @@ import { Cookie, ArrowLeft, CheckCircle, ShieldCheck, BarChart3, Settings, Exter
 import CookiePreferencesButton from "@/components/CookiePreferencesButton";
 
 export const metadata: Metadata = {
-  title: "Informativa sui Cookie (Cookie Policy) | FilmBloopers Hub",
+  title: "Cookie Policy",
   description:
     "Informativa completa sull'utilizzo dei cookie tecnici, analitici (Google Analytics) e di terze parti su FilmBloopers Hub in conformità alla Direttiva ePrivacy e al GDPR.",
   alternates: {

@@ -98,13 +98,47 @@ async function getFilmData(slug: string) {
   };
 }
 
+const MAX_SEO_TITLE_LENGTH = 64;
+const BRAND_SUFFIX = " | FilmBloopers Hub";
+
+const SHORT_TOPIC_BY_LOCALE: Record<Locale, { full: string; compact: string }> = {
+  it: { full: "Bloopers & Curiosità", compact: "Bloopers" },
+  en: { full: "Bloopers & Trivia", compact: "Bloopers" },
+  es: { full: "Errores & Curiosidades", compact: "Bloopers" },
+  fr: { full: "Bloopers & Coulisses", compact: "Bloopers" },
+  de: { full: "Filmfehler & Trivia", compact: "Filmfehler" },
+};
+
+/** Builds a localized film page title capped at 64 chars to avoid SERP truncation and Bing warnings. */
+function buildFilmPageTitle(filmTitle: string, year: number | string | null | undefined, locale: Locale): string {
+  const cleanTitle = filmTitle.trim();
+  const yearPart = year ? ` (${year})` : "";
+  const topics = SHORT_TOPIC_BY_LOCALE[locale] || SHORT_TOPIC_BY_LOCALE.it;
+
+  const candidates = [
+    `${cleanTitle}${yearPart} — ${topics.full}${BRAND_SUFFIX}`,
+    `${cleanTitle}${yearPart} — ${topics.compact}${BRAND_SUFFIX}`,
+    `${cleanTitle}${yearPart}${BRAND_SUFFIX}`,
+    `${cleanTitle}${BRAND_SUFFIX}`,
+  ];
+
+  for (const candidate of candidates) {
+    if (candidate.length <= MAX_SEO_TITLE_LENGTH) {
+      return candidate;
+    }
+  }
+
+  const maxTitleChars = Math.max(10, MAX_SEO_TITLE_LENGTH - BRAND_SUFFIX.length - 1);
+  return `${cleanTitle.slice(0, maxTitleChars).trimEnd()}…${BRAND_SUFFIX}`;
+}
+
 export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   const { slug, locale: routeLocale } = await params;
   const data = await getFilmData(slug);
 
   if (!data?.film) {
     return {
-      title: "Film non trovato | FilmBloopers Hub",
+      title: { absolute: "Film non trovato | FilmBloopers Hub" },
       description: "La pellicola cercata non è presente nell'archivio.",
     };
   }
@@ -121,9 +155,8 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
 
 
 
-  const dict = getDictionary(locale);
   const localizedTitle = getLocalizedDbText(film.titoli_i18n, locale, film.titolo);
-  const title = `${localizedTitle} (${film.anno || "N/D"}) — ${dict.film.tabBloopers} & ${dict.film.tabTrivia}`;
+  const title = buildFilmPageTitle(localizedTitle || film.titolo, film.anno, locale);
   
   const countParts: string[] = [];
   if (bloopers?.length) countParts.push(`${bloopers.length} bloopers al minuto esatto`);
@@ -141,7 +174,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   const imageUrl = localizedPoster || film.backdrop_url || film.poster_url || `${siteUrl}/og-image.jpg`;
 
   return {
-    title,
+    title: { absolute: title },
     description,
     keywords: [
       `dove vedere ${film.titolo}`,
@@ -169,7 +202,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
       },
     },
     openGraph: {
-      title: `${title} | FilmBloopers Hub`,
+      title,
       description,
       url: `/film/${slug}`,
       images: [
@@ -413,9 +446,9 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
                   )}
                 </div>
 
-                <h1 className="text-xl font-black text-white tracking-tight leading-tight line-clamp-2">
+                <p className="text-xl font-black text-white tracking-tight leading-tight line-clamp-2">
                   {localizedTitle}
-                </h1>
+                </p>
                 
                 {film.regista && (
                   <p className="text-xs text-zinc-400 mt-1 line-clamp-1">

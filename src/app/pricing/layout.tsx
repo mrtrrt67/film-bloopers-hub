@@ -1,7 +1,7 @@
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Piani Premium & Accesso Completo | FilmBloopers Hub",
+  title: "Piani Premium & Accesso Completo",
   description:
     "Sblocca l'accesso illimitato alle analisi IA dei bloopers, filtri esclusivi e badge VIP. Oppure guadagna l'accesso gratis a vita scalando la classifica!",
   alternates: {

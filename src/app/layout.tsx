@@ -34,7 +34,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || "https://filmbloopers.online"),
   title: {
-    default: "FilmBloopers Hub | Bloopers, Errori di Scena & Curiosità nei Film",
+    default: "FilmBloopers Hub | Bloopers ed Errori nei Film",
     template: "%s | FilmBloopers Hub",
   },
   description:

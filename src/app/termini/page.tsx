@@ -3,7 +3,7 @@ import Link from "next/link";
 import { FileText, ArrowLeft, Scale, Award, ShieldAlert, CreditCard, CheckCircle2 } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Termini e Condizioni di Servizio | FilmBloopers Hub",
+  title: "Termini e Condizioni",
   description:
     "Termini e condizioni d'uso della piattaforma FilmBloopers Hub, regole sugli abbonamenti digitali, esclusione recesso e contenuti della community.",
   alternates: {
