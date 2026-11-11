@@ -653,7 +653,13 @@ export async function getFilmRatingInfo(
 
     // Recupera offerte dirette JustWatch (Deep-Link ufficiali al player)
     const titleForJW = cleanTitle || (details ? details.title : "");
-    const jwOffers = await fetchJustWatchDirectOffers(titleForJW, year);
+    const amazonTag = process.env.NEXT_PUBLIC_AMAZON_TAG || "filmbloopers-21";
+    const jwOffers = await fetchJustWatchDirectOffers(titleForJW, year, amazonTag, {
+      tmdbId: details?.id || tmdbId,
+      imdbId,
+      originalTitle: details?.original_title,
+      localizedTitle: details?.title,
+    });
 
     const streaming =
       details || jwOffers ? parseStreamingProviders(details, jwOffers) : null;

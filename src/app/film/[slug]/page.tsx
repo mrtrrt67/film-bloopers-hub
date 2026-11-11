@@ -500,7 +500,7 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
               <StreamingAvailabilityCard
                 streaming={ratingInfo?.streaming}
                 amazonUrl={amazonUrl}
-                filmTitle={film.titolo}
+                filmTitle={localizedTitle || film.titolo}
                 amazonTag={amazonTag}
                 variant="banner"
                 dict={dict}
@@ -528,7 +528,7 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
                 ) : (
                   <div className="flex h-full w-full flex-col items-center justify-center p-6 text-center text-zinc-600">
                     <FilmIcon className="h-16 w-16 mb-2" />
-                    <span className="text-xs">{film.titolo}</span>
+                    <span className="text-xs">{localizedTitle || film.titolo}</span>
                   </div>
                 )}
               </div>
@@ -537,7 +537,7 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
               <StreamingAvailabilityCard
                 streaming={ratingInfo?.streaming}
                 amazonUrl={amazonUrl}
-                filmTitle={film.titolo}
+                filmTitle={localizedTitle || film.titolo}
                 amazonTag={amazonTag}
                 variant="sidebar"
                 dict={dict}

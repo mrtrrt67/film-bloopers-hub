@@ -209,7 +209,7 @@ async function getCatalog(): Promise<ScoredFilm[]> {
   const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("films")
-    .select("id, titolo, anno, regista, genere, attori, slug, poster_url, backdrop_url, trama, creato_il, errori(count), movie_trivia(count)");
+    .select("id, titolo, titoli_i18n, anno, regista, genere, attori, slug, poster_url, posters_i18n, backdrop_url, trama, trame_i18n, creato_il, errori(count), movie_trivia(count)");
 
   if (error || !data) {
     console.error("Errore nel recupero catalogo film:", error);
