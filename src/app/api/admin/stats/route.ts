@@ -177,7 +177,7 @@ export async function GET(request: Request) {
     // 3. Top Ricerche & Ultime Ricerche (esclude test, frammenti parziali e deduplica)
     const { data: logRicerche } = await adminDb
       .from("log_ricerche")
-      .select("id, termine, created_at")
+      .select("*")
       .order("created_at", { ascending: false })
       .limit(1000);
 
@@ -232,6 +232,9 @@ export async function GET(request: Request) {
     const recentSearches = filteredSearches.slice(0, 60).map((r) => ({
       id: r.id,
       termine: r.termine.trim(),
+      ip_address: r.ip_address || null,
+      country: r.country || null,
+      city: r.city || null,
       created_at: r.created_at,
       is_today: isToday(r.created_at),
     }));

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { extractClientMetadata, insertLogWithMeta, updateLogWithMeta } from "@/lib/request-meta";
 
 export async function POST(request: Request) {
   try {
@@ -27,6 +28,7 @@ export async function POST(request: Request) {
 
     const hasServiceKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
     const db = hasServiceKey ? createAdminClient() : supabase;
+    const meta = extractClientMetadata(request);
 
     // 2. Controllo anti-frammenti: se negli ultimi 45 secondi è stata registrata
     // una ricerca che è prefisso del termine attuale, aggiorna la riga esistente
@@ -47,16 +49,13 @@ export async function POST(request: Request) {
 
     if (matchingPrefix) {
       // Aggiorna la riga esistente con il termine più completo
-      await db
-        .from("log_ricerche")
-        .update({ termine: cleanTerm })
-        .eq("id", matchingPrefix.id);
+      await updateLogWithMeta(db, "log_ricerche", matchingPrefix.id, { termine: cleanTerm }, meta);
 
       return NextResponse.json({ ok: true, updated: true });
     }
 
     // 3. Altrimenti registra il nuovo termine completo
-    await db.from("log_ricerche").insert({ termine: cleanTerm });
+    await insertLogWithMeta(db, "log_ricerche", { termine: cleanTerm }, meta);
 
     return NextResponse.json({ ok: true, inserted: true });
   } catch (err: any) {

@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { isTestAccount, shouldExcludeTestAccounts } from "@/lib/test-accounts";
+import { extractClientMetadata, insertLogWithMeta } from "@/lib/request-meta";
 
 // Cache in memoria per deduplicare chiamate identiche arrivate entro pochi secondi
 const recentVisitsCache = new Map<string, number>();
@@ -64,11 +65,10 @@ export async function POST(request: Request) {
       tipo = `utente:${username}`;
     }
 
+    const meta = extractClientMetadata(request);
+
     // 1. Deduplicazione Server-Side in memoria (IP + Tipo entro 5 secondi)
-    const clientIp =
-      request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-      request.headers.get("x-real-ip") ||
-      "unknown_ip";
+    const clientIp = meta.ip_address || "unknown_ip";
 
     const cacheKey = `${clientIp}_${tipo}`;
     const now = Date.now();
@@ -101,7 +101,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ ok: true, deduplicated: true });
     }
 
-    await db.from("log_accessi").insert({ tipo });
+    await insertLogWithMeta(db, "log_accessi", { tipo }, meta);
     return NextResponse.json({ ok: true });
   } catch (err) {
     return NextResponse.json({ ok: false }, { status: 500 });

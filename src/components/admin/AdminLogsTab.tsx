@@ -454,12 +454,14 @@ export default function AdminLogsTab() {
                           <tr className="border-b border-zinc-800 bg-zinc-950/40 text-zinc-400 font-semibold">
                             <th className="py-3 px-4">Data / Ora</th>
                             <th className="py-3 px-4">Visitatore / Username</th>
+                            <th className="py-3 px-4">IP / Località</th>
                             <th className="py-3 px-4 text-right">Tipologia</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-800/60 text-zinc-300">
                           {paginatedAccess.map((a: any) => {
                             const isGuest = a.isGuest || a.tipo === "ospite";
+                            const geoText = [a.country, a.city].filter(Boolean).join(" · ");
                             return (
                               <tr key={a.id || Math.random()} className="hover:bg-zinc-800/30 transition-colors">
                                 <td className="py-2.5 px-4 font-mono text-zinc-400 text-[11px] whitespace-nowrap">
@@ -476,6 +478,16 @@ export default function AdminLogsTab() {
                                       <UserCheck className="h-3.5 w-3.5 text-amber-400 shrink-0" />
                                       <span>{a.username || "Utente Registrato"}</span>
                                     </span>
+                                  )}
+                                </td>
+                                <td className="py-2.5 px-4 font-mono text-[11px] text-zinc-300 whitespace-nowrap">
+                                  {a.ip_address || geoText ? (
+                                    <div className="flex flex-col">
+                                      <span className="text-zinc-200">{a.ip_address || "N/D"}</span>
+                                      {geoText && <span className="text-[10px] text-zinc-500 font-sans">{geoText}</span>}
+                                    </div>
+                                  ) : (
+                                    <span className="text-zinc-600">—</span>
                                   )}
                                 </td>
                                 <td className="py-2.5 px-4 text-right">

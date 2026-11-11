@@ -221,6 +221,9 @@ CREATE TRIGGER trg_protect_profile_privileged_columns
 CREATE TABLE IF NOT EXISTS public.log_accessi (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   tipo text NOT NULL,
+  ip_address text,
+  country text,
+  city text,
   created_at timestamptz DEFAULT now()
 );
 
@@ -228,6 +231,9 @@ CREATE TABLE IF NOT EXISTS public.log_ricerche (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   user_id uuid,
   termine text NOT NULL,
+  ip_address text,
+  country text,
+  city text,
   created_at timestamptz DEFAULT now()
 );
 

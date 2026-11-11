@@ -390,25 +390,39 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
                   <thead>
                     <tr className="border-b border-zinc-800 text-zinc-400">
                       <th className="pb-2 font-medium">Termine Cercato</th>
+                      <th className="pb-2 font-medium">IP / Località</th>
                       <th className="pb-2 text-right font-medium">Data / Ora</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-zinc-800/60 text-zinc-300 font-mono">
-                    {paginatedRecentSearches.map((s: any, idx: number) => (
-                      <tr key={s.id || idx} className="hover:bg-zinc-800/30">
-                        <td className="py-2.5 font-bold text-white font-sans flex items-center gap-2">
-                          <span>{s.termine}</span>
-                          {s.is_today && (
-                            <span className="rounded bg-sky-500/20 text-sky-300 text-[9px] font-mono px-1.5 py-0.5 border border-sky-500/30">
-                              OGGI
-                            </span>
-                          )}
-                        </td>
-                        <td className="py-2.5 text-right text-zinc-400 text-[11px]">
-                          {s.created_at ? s.created_at.slice(0, 16).replace("T", " ") : "N/D"}
-                        </td>
-                      </tr>
-                    ))}
+                    {paginatedRecentSearches.map((s: any, idx: number) => {
+                      const geoText = [s.country, s.city].filter(Boolean).join(" · ");
+                      return (
+                        <tr key={s.id || idx} className="hover:bg-zinc-800/30">
+                          <td className="py-2.5 font-bold text-white font-sans flex items-center gap-2">
+                            <span>{s.termine}</span>
+                            {s.is_today && (
+                              <span className="rounded bg-sky-500/20 text-sky-300 text-[9px] font-mono px-1.5 py-0.5 border border-sky-500/30">
+                                OGGI
+                              </span>
+                            )}
+                          </td>
+                          <td className="py-2.5 text-zinc-400 text-[11px] whitespace-nowrap">
+                            {s.ip_address || geoText ? (
+                              <div className="flex flex-col">
+                                <span className="text-zinc-200">{s.ip_address || "N/D"}</span>
+                                {geoText && <span className="text-[10px] text-zinc-500 font-sans">{geoText}</span>}
+                              </div>
+                            ) : (
+                              <span className="text-zinc-600">—</span>
+                            )}
+                          </td>
+                          <td className="py-2.5 text-right text-zinc-400 text-[11px]">
+                            {s.created_at ? s.created_at.slice(0, 16).replace("T", " ") : "N/D"}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
 

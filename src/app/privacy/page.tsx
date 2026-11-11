@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPage() {
-  const lastUpdated = "24 Ottobre 2026";
+  const lastUpdated = "11 Novembre 2026";
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-300 py-12 px-4 sm:px-6 lg:px-8">
@@ -109,10 +109,10 @@ export default function PrivacyPage() {
                 <div className="rounded-xl border border-zinc-800 bg-zinc-950/60 p-4 space-y-2">
                   <div className="flex items-center gap-2 font-bold text-white">
                     <Globe className="h-4 w-4 text-amber-400" />
-                    <span>Log Tecnici & Ricerche</span>
+                    <span>Log Tecnici, Accessi &amp; Ricerche</span>
                   </div>
                   <p className="text-zinc-400">
-                    Query di ricerca nell&apos;archivio film, indirizzo IP anonimizzato, tipo di browser e timestamp per finalità di sicurezza anti-abuso.
+                    Indirizzo IP di connessione, localizzazione geografica approssimativa (Paese e città derivati dall&apos;infrastruttura edge), query di ricerca nell&apos;archivio film, tipo di browser e timestamp per finalità di sicurezza anti-abuso, prevenzione frodi e diagnostica tecnica.
                   </p>
                 </div>
 
@@ -140,7 +140,7 @@ export default function PrivacyPage() {
               <ul className="list-disc pl-5 space-y-1.5 text-zinc-400">
                 <li><strong>Esecuzione del Contratto (Art. 6.1.b GDPR):</strong> Creazione e mantenimento dell&apos;account, accesso alle funzionalità di ricerca e fruizione degli abbonamenti Premium.</li>
                 <li><strong>Gestione della Community e Classifiche:</strong> Assegnazione dei punti reputazione legati alle segnalazioni e calcolo della classifica cacciatori.</li>
-                <li><strong>Legittimo Interesse e Sicurezza (Art. 6.1.f GDPR):</strong> Protezione della piattaforma contro attacchi informatici, frodi, abusi dei sistemi AI o tentativi di brute-force.</li>
+                <li><strong>Legittimo Interesse e Sicurezza (Art. 6.1.f GDPR):</strong> Protezione della piattaforma contro attacchi informatici, frodi, abusi dei sistemi AI, traffico anomalo e tentativi di brute-force tramite registrazione tecnica dei log di accesso e ricerca.</li>
                 <li><strong>Obblighi Legali e Fiscali (Art. 6.1.c GDPR):</strong> Adempimento degli obblighi di contabilità e fatturazione connessi all&apos;acquisto di abbonamenti a pagamento.</li>
               </ul>
             </div>
@@ -186,7 +186,7 @@ export default function PrivacyPage() {
                 I dati relativi all&apos;account sono conservati per l&apos;intera durata di registrazione al servizio. In caso di richiesta di cancellazione dell&apos;account, i dati personali vengono eliminati o resi anonimi entro 30 giorni, fatti salvi gli obblighi di conservazione previsti dalla legge (es. fatture e transazioni fiscali per 10 anni).
               </p>
               <p className="text-zinc-400">
-                I log tecnici di sicurezza e di traffico del sito vengono cancellati automaticamente dopo un periodo massimo di 90 giorni.
+                I log tecnici di accesso, ricerca e sicurezza (inclusi indirizzi IP e dati geografici associati) sono conservati esclusivamente per il tempo strettamente necessario alla diagnostica e alla tutela della piattaforma e vengono cancellati dopo un periodo massimo di 90 giorni.
               </p>
             </div>
           </div>
