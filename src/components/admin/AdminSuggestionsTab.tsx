@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { MessageSquare, Trash2, Mail, Calendar } from "lucide-react";
 import ConfirmModal from "@/components/ConfirmModal";
+import { formatItalianDateTime } from "@/lib/date-utils";
 
 export default function AdminSuggestionsTab() {
   const [suggestions, setSuggestions] = useState<any[]>([]);
@@ -127,7 +128,7 @@ export default function AdminSuggestionsTab() {
                       </span>
                       <span className="flex items-center gap-1 text-zinc-500 font-mono text-[11px]">
                         <Calendar className="h-3 w-3" />
-                        {s.created_at ? s.created_at.slice(0, 16).replace("T", " ") : "N/D"}
+                        {formatItalianDateTime(s.created_at)}
                       </span>
                     </div>
                     <p className="text-xs text-zinc-200 leading-relaxed bg-zinc-950/60 p-3 rounded-xl border border-zinc-800/80">

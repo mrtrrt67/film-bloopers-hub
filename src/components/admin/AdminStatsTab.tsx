@@ -27,6 +27,7 @@ import {
 } from "lucide-react";
 import AdminPagination from "./AdminPagination";
 import AdminIndexNowCard from "./AdminIndexNowCard";
+import { formatItalianDateTime } from "@/lib/date-utils";
 
 interface AdminStatsTabProps {
   onNavigateToFilms?: (filter?: string) => void;
@@ -418,7 +419,7 @@ export default function AdminStatsTab({ onNavigateToFilms }: AdminStatsTabProps)
                             )}
                           </td>
                           <td className="py-2.5 text-right text-zinc-400 text-[11px]">
-                            {s.created_at ? s.created_at.slice(0, 16).replace("T", " ") : "N/D"}
+                            {formatItalianDateTime(s.created_at)}
                           </td>
                         </tr>
                       );

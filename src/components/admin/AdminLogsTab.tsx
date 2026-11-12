@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { formatItalianDateTime } from "@/lib/date-utils";
 import { 
   FileText, 
   AlertTriangle, 
@@ -94,7 +95,8 @@ export default function AdminLogsTab() {
     return (
       (a.tipo || "").toLowerCase().includes(term) ||
       (a.username || "").toLowerCase().includes(term) ||
-      (a.created_at || "").toLowerCase().includes(term)
+      (a.created_at || "").toLowerCase().includes(term) ||
+      formatItalianDateTime(a.created_at, { includeSeconds: true }).toLowerCase().includes(term)
     );
   });
 
@@ -218,7 +220,7 @@ export default function AdminLogsTab() {
                           return (
                             <tr key={e.id || Math.random()} className="hover:bg-zinc-800/30">
                               <td className="py-2.5 px-4 font-mono text-zinc-400 text-[11px] whitespace-nowrap">
-                                {e.created_at ? String(e.created_at).slice(0, 19).replace("T", " ") : "N/D"}
+                                {formatItalianDateTime(e.created_at, { includeSeconds: true })}
                               </td>
                               <td className="py-2.5 px-4 font-semibold text-rose-400 uppercase tracking-wider text-[10px]">
                                 {e.operazione || "N/D"}
@@ -328,7 +330,7 @@ export default function AdminLogsTab() {
                         {paginatedCalls.map((c: any) => (
                           <tr key={c.id || Math.random()} className="hover:bg-zinc-800/30">
                             <td className="py-2.5 px-4 font-mono text-zinc-400 text-[11px]">
-                              {c.data_chiamata ? String(c.data_chiamata).slice(0, 19).replace("T", " ") : "N/D"}
+                              {formatItalianDateTime(c.data_chiamata, { includeSeconds: true })}
                             </td>
                             <td className="py-2.5 px-4 font-medium text-white">
                               {c.modello || "sconosciuto"}
@@ -465,7 +467,7 @@ export default function AdminLogsTab() {
                             return (
                               <tr key={a.id || Math.random()} className="hover:bg-zinc-800/30 transition-colors">
                                 <td className="py-2.5 px-4 font-mono text-zinc-400 text-[11px] whitespace-nowrap">
-                                  {a.created_at ? String(a.created_at).slice(0, 19).replace("T", " ") : "N/D"}
+                                  {formatItalianDateTime(a.created_at, { includeSeconds: true })}
                                 </td>
                                 <td className="py-2.5 px-4 font-bold text-white">
                                   {isGuest ? (

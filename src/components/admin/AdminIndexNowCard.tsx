@@ -113,6 +113,7 @@ export default function AdminIndexNowCard() {
     if (!isoStr) return "Nessun invio registrato";
     try {
       return new Date(isoStr).toLocaleString("it-IT", {
+        timeZone: "Europe/Rome",
         day: "2-digit",
         month: "2-digit",
         year: "numeric",
