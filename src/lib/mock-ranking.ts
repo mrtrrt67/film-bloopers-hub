@@ -9,138 +9,248 @@ export interface RankingProfile {
   is_demo?: boolean;
 }
 
+interface SeedConfig {
+  id: string;
+  username: string;
+  basePunti: number;
+  tier?: string;
+  tipo_abbonamento?: string;
+  /** Ogni quanti giorni questo utente invia una segnalazione/blooper approvata (+10 pt) */
+  blooperCadenceDays: number;
+  /** Sfasamento per non far accumulare punti a tutti nello stesso giorno */
+  blooperOffsetDays: number;
+  /** Ogni quanti giorni riceve un voto positivo 👍 (+1 pt) */
+  voteCadenceDays: number;
+  voteOffsetDays: number;
+}
+
+/** Data di riferimento di inizio simulazione (14 Novembre 2026 UTC) */
+const REFERENCE_DATE_MS = Date.UTC(2026, 10, 14); // Mese 10 = Novembre
+
 /**
- * Profili dimostrativi della community con punteggi realistici e scaglionati.
- * I punteggi riflettono le regole del sito:
- * - 1° - 7°: Grado VIP (>= 50 pt, fino a ~210 pt)
- * - 8° - 12°: Grado Critico (20 - 49 pt)
- * - 13° - 15°: Grado Cacciatore (10 - 19 pt, nuovi membri con le prime segnalazioni approvate)
+ * Profili dimostrativi della community con pattern di attività realistici.
+ * Nel corso dei giorni e delle settimane, vari membri guadagnano periodicamente
+ * +10 pt (blooper approvato) o +1 pt (voto utile ricevuto), muovendo gradualmente
+ * la classifica e scambiandosi talvolta di posizione.
  */
-export const SEED_RANKING_PROFILES: RankingProfile[] = [
+const SEED_CONFIGS: SeedConfig[] = [
   {
     id: "seed-user-1",
     username: "CineDetective_91",
-    punti: 210,
+    basePunti: 210,
     tier: "premium",
     tipo_abbonamento: "mensile",
-    is_demo: true,
+    blooperCadenceDays: 12,
+    blooperOffsetDays: 7,
+    voteCadenceDays: 4,
+    voteOffsetDays: 1,
   },
   {
     id: "seed-user-2",
     username: "MovieBuff_Alex",
-    punti: 175,
+    basePunti: 175,
     tier: "premium",
     tipo_abbonamento: "mensile",
-    is_demo: true,
+    blooperCadenceDays: 10,
+    blooperOffsetDays: 3,
+    voteCadenceDays: 3,
+    voteOffsetDays: 2,
   },
   {
     id: "seed-user-3",
     username: "RetroCinema",
-    punti: 140,
+    basePunti: 140,
     tier: "premium",
     tipo_abbonamento: "mensile",
-    is_demo: true,
+    blooperCadenceDays: 14,
+    blooperOffsetDays: 5,
+    voteCadenceDays: 5,
+    voteOffsetDays: 3,
   },
   {
     id: "seed-user-4",
     username: "Elena_Film",
-    punti: 115,
+    basePunti: 115,
     tier: "premium",
     tipo_abbonamento: "mensile",
-    is_demo: true,
+    blooperCadenceDays: 8,
+    blooperOffsetDays: 7, // Sale già domani (+10 pt)
+    voteCadenceDays: 3,
+    voteOffsetDays: 1,
   },
   {
     id: "seed-user-5",
     username: "MarcoVFX",
-    punti: 90,
+    basePunti: 90,
     tier: "premium",
     tipo_abbonamento: "mensile",
-    is_demo: true,
+    blooperCadenceDays: 11,
+    blooperOffsetDays: 4,
+    voteCadenceDays: 4,
+    voteOffsetDays: 2,
   },
   {
     id: "seed-user-6",
     username: "FrameByFrame",
-    punti: 75,
+    basePunti: 75,
     tier: "premium",
     tipo_abbonamento: "mensile",
-    is_demo: true,
+    blooperCadenceDays: 13,
+    blooperOffsetDays: 8,
+    voteCadenceDays: 5,
+    voteOffsetDays: 4,
   },
   {
     id: "seed-user-7",
     username: "BlooperHunter_IT",
-    punti: 60,
+    basePunti: 60,
     tier: "premium",
     tipo_abbonamento: "mensile",
-    is_demo: true,
+    blooperCadenceDays: 9,
+    blooperOffsetDays: 2,
+    voteCadenceDays: 4,
+    voteOffsetDays: 3,
   },
   {
     id: "seed-user-8",
     username: "SarahScreens",
-    punti: 45,
+    basePunti: 45,
     tier: "free",
     tipo_abbonamento: "nessuno",
-    is_demo: true,
+    blooperCadenceDays: 7,
+    blooperOffsetDays: 3, // Raggiungerà presto i 50 pt e diventerà VIP
+    voteCadenceDays: 3,
+    voteOffsetDays: 2, // Riceve +1 pt domani
   },
   {
     id: "seed-user-9",
     username: "TheCinemaEye",
-    punti: 35,
+    basePunti: 35,
     tier: "free",
     tipo_abbonamento: "nessuno",
-    is_demo: true,
+    blooperCadenceDays: 15,
+    blooperOffsetDays: 6,
+    voteCadenceDays: 6,
+    voteOffsetDays: 2,
   },
   {
     id: "seed-user-10",
     username: "Luca_Bloopers",
-    punti: 30,
+    basePunti: 30,
     tier: "free",
     tipo_abbonamento: "nessuno",
-    is_demo: true,
+    blooperCadenceDays: 11,
+    blooperOffsetDays: 5,
+    voteCadenceDays: 5,
+    voteOffsetDays: 1,
   },
   {
     id: "seed-user-11",
     username: "ReelSpotter",
-    punti: 25,
+    basePunti: 25,
     tier: "free",
     tipo_abbonamento: "nessuno",
-    is_demo: true,
+    blooperCadenceDays: 13,
+    blooperOffsetDays: 9,
+    voteCadenceDays: 6,
+    voteOffsetDays: 4,
   },
   {
     id: "seed-user-12",
     username: "ClapperBoard88",
-    punti: 20,
+    basePunti: 20,
     tier: "free",
     tipo_abbonamento: "nessuno",
-    is_demo: true,
+    blooperCadenceDays: 15,
+    blooperOffsetDays: 11,
+    voteCadenceDays: 7,
+    voteOffsetDays: 3,
   },
   {
     id: "seed-user-13",
     username: "Davide_Cut",
-    punti: 15,
+    basePunti: 15,
     tier: "free",
     tipo_abbonamento: "nessuno",
-    is_demo: true,
+    blooperCadenceDays: 8,
+    blooperOffsetDays: 5,
+    voteCadenceDays: 5,
+    voteOffsetDays: 2,
   },
   {
     id: "seed-user-14",
     username: "KinoFan_DE",
-    punti: 10,
+    basePunti: 10,
     tier: "free",
     tipo_abbonamento: "nessuno",
-    is_demo: true,
+    blooperCadenceDays: 16,
+    blooperOffsetDays: 7,
+    voteCadenceDays: 8,
+    voteOffsetDays: 4,
   },
   {
     id: "seed-user-15",
     username: "Sam_FilmGeek",
-    punti: 10,
+    basePunti: 10,
     tier: "free",
     tipo_abbonamento: "nessuno",
-    is_demo: true,
+    blooperCadenceDays: 6,
+    blooperOffsetDays: 4, // Molto attivo, farà il salto a 20 pt (Critico)
+    voteCadenceDays: 4,
+    voteOffsetDays: 1,
   },
 ];
 
 /**
- * Fonde in modo trasparente i profili reali del database con i profili dimostrativi.
+ * Calcola i profili dimostrativi con punteggio dinamico in base al giorno corrente.
+ * Il calcolo è deterministico: durante la stessa giornata i numeri rimangono
+ * perfettamente stabili senza sfarfallii ad ogni refresh, ma con il passare dei
+ * giorni alcuni membri aumentano naturalmente di punteggio.
+ */
+export function getDynamicSeedProfiles(targetDate: Date = new Date()): RankingProfile[] {
+  const currentUtcMs = Date.UTC(
+    targetDate.getUTCFullYear(),
+    targetDate.getUTCMonth(),
+    targetDate.getUTCDate()
+  );
+
+  const daysPassed = Math.max(0, Math.floor((currentUtcMs - REFERENCE_DATE_MS) / (1000 * 60 * 60 * 24)));
+
+  return SEED_CONFIGS.map((seed) => {
+    // Quanti bloopers (+10 pt) sono stati aggiunti dal giorno di riferimento
+    const bloopersAdded = Math.max(
+      0,
+      Math.floor((daysPassed + seed.blooperOffsetDays) / seed.blooperCadenceDays) -
+        Math.floor(seed.blooperOffsetDays / seed.blooperCadenceDays)
+    );
+
+    // Quanti voti 👍 (+1 pt) sono stati ricevuti
+    const votesAdded = Math.max(
+      0,
+      Math.floor((daysPassed + seed.voteOffsetDays) / seed.voteCadenceDays) -
+        Math.floor(seed.voteOffsetDays / seed.voteCadenceDays)
+    );
+
+    const punti = seed.basePunti + bloopersAdded * 10 + votesAdded;
+
+    // Se un utente raggiunge o supera la soglia di 50 pt (VIP), aggiorna il grado
+    const isVip = punti >= 50;
+    const tier = isVip ? "premium" : (seed.tier || "free");
+    const tipo_abbonamento = isVip ? "mensile" : (seed.tipo_abbonamento || "nessuno");
+
+    return {
+      id: seed.id,
+      username: seed.username,
+      punti,
+      tier,
+      tipo_abbonamento,
+      is_demo: true,
+    };
+  });
+}
+
+/**
+ * Fonde in modo trasparente i profili reali del database con i profili dimostrativi dinamici.
  * - Esclude collisioni su username.
  * - Gli utenti reali con punti si inseriscono nella loro esatta posizione.
  * - In caso di parità di punteggio, l'utente reale ha precedenza rispetto al profilo dimostrativo.
@@ -148,7 +258,7 @@ export const SEED_RANKING_PROFILES: RankingProfile[] = [
 export function buildPublicRanking(
   realProfiles: RankingProfile[],
   currentUser: { id: string; email?: string | null } | null,
-  options?: { enableSeed?: boolean; limit?: number }
+  options?: { enableSeed?: boolean; limit?: number; referenceDate?: Date }
 ): RankingProfile[] {
   const enableSeed = options?.enableSeed ?? true;
   const limit = options?.limit ?? 30;
@@ -164,7 +274,8 @@ export function buildPublicRanking(
     if (p.email) realKeys.add(p.email.toLowerCase().split("@")[0]);
   }
 
-  const activeSeeds = SEED_RANKING_PROFILES.filter(
+  const dynamicSeeds = getDynamicSeedProfiles(options?.referenceDate);
+  const activeSeeds = dynamicSeeds.filter(
     (seed) => !realKeys.has(seed.username.toLowerCase())
   );
 
@@ -193,4 +304,3 @@ export function buildPublicRanking(
 
   return sliced;
 }
-
