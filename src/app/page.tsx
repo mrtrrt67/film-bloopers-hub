@@ -6,10 +6,9 @@ import MovieCard from "@/components/MovieCard";
 import PromoBanner from "@/components/PromoBanner";
 import BlooperItem from "@/components/BlooperItem";
 import { Film, Blooper } from "@/lib/types";
-import { headers, cookies } from "next/headers";
-import { getDictionary, isSupportedLocale, Locale, DEFAULT_LOCALE, getLocalizedDbText, resolveLocale } from "@/i18n";
+import { getDictionary, isSupportedLocale, Locale, DEFAULT_LOCALE, getLocalizedDbText } from "@/i18n";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60; // Cache Edge ogni 60s con stale-while-revalidate per massima velocità (30ms TTFB)
 
 export async function generateMetadata({
   params,
@@ -21,15 +20,12 @@ export async function generateMetadata({
   const resolvedParams = params ? await params : {};
   const routeLocale = resolvedParams.locale;
   const resolvedSearchParams = searchParams ? await searchParams : {};
-  const headerList = await headers();
-  const cookieStore = await cookies();
+  const queryLocale = typeof resolvedSearchParams.locale === "string" ? resolvedSearchParams.locale : undefined;
   const locale: Locale = isSupportedLocale(routeLocale)
     ? routeLocale
-    : resolveLocale({
-        searchParams: resolvedSearchParams,
-        headerList,
-        cookieStore,
-      });
+    : isSupportedLocale(queryLocale)
+    ? queryLocale
+    : DEFAULT_LOCALE;
 
   const titles: Record<Locale, string> = {
     it: "FilmBloopers Hub | Bloopers ed Errori nei Film",
@@ -89,15 +85,12 @@ export default async function HomePage({
   const resolvedParams = params ? await params : {};
   const routeLocale = resolvedParams.locale;
   const resolvedSearchParams = searchParams ? await searchParams : {};
-  const headerList = await headers();
-  const cookieStore = await cookies();
+  const queryLocale = typeof resolvedSearchParams.locale === "string" ? resolvedSearchParams.locale : undefined;
   const locale: Locale = isSupportedLocale(routeLocale)
     ? routeLocale
-    : resolveLocale({
-        searchParams: resolvedSearchParams,
-        headerList,
-        cookieStore,
-      });
+    : isSupportedLocale(queryLocale)
+    ? queryLocale
+    : DEFAULT_LOCALE;
 
 
 

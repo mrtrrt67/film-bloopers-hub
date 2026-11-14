@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Image from "next/image";
@@ -19,17 +20,34 @@ import FilmContentSwitcher from "@/components/FilmContentSwitcher";
 import { getRelatedFilms } from "@/lib/recommendations";
 import { getFilmRatingInfo } from "@/lib/tmdb";
 import { StreamingAvailabilityCard } from "@/components/film/StreamingAvailabilityCard";
-import { headers, cookies } from "next/headers";
-import { getDictionary, isSupportedLocale, Locale, DEFAULT_LOCALE, getLocalizedDbText, resolveLocale, buildLocalizedPath } from "@/i18n";
+import { getDictionary, isSupportedLocale, Locale, DEFAULT_LOCALE, getLocalizedDbText, buildLocalizedPath } from "@/i18n";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600; // Cache e rigenerazione Edge ad alta velocità ogni ora
+export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  try {
+    const supabase = createPublicClient();
+    const { data: films } = await supabase
+      .from("films")
+      .select("id, titolo, anno")
+      .order("creato_il", { ascending: false })
+      .limit(60);
+
+    return ((films as any[]) || []).map((film: any) => ({
+      slug: `${slugify(film.titolo, film.anno)}-${String(film.id)}`,
+    }));
+  } catch {
+    return [];
+  }
+}
 
 interface PageProps {
   params: Promise<{ slug: string; locale?: string }>;
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 }
 
-async function getFilmData(slug: string) {
+const getFilmData = cache(async (slug: string) => {
   const supabase = createPublicClient();
 
   // Estrae eventuale ID parziale dallo slug (es. "matrix-1999-143" o "matrix-1999")
@@ -96,7 +114,7 @@ async function getFilmData(slug: string) {
     relatedFilms,
     ratingInfo,
   };
-}
+});
 
 const MAX_SEO_TITLE_LENGTH = 64;
 const BRAND_SUFFIX = " | FilmBloopers Hub";
@@ -146,11 +164,12 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   const { film, bloopers, trivia } = data;
 
   const resolvedSearchParams = searchParams ? await searchParams : {};
-  const headerList = await headers();
-  const cookieStore = await cookies();
+  const queryLocale = typeof resolvedSearchParams.locale === "string" ? resolvedSearchParams.locale : undefined;
   const locale: Locale = isSupportedLocale(routeLocale)
     ? routeLocale
-    : resolveLocale({ searchParams: resolvedSearchParams, headerList, cookieStore });
+    : isSupportedLocale(queryLocale)
+    ? queryLocale
+    : DEFAULT_LOCALE;
 
 
 
@@ -238,15 +257,12 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
 
 
   const resolvedSearchParams = searchParams ? await searchParams : {};
-  const headerList = await headers();
-  const cookieStore = await cookies();
+  const queryLocale = typeof resolvedSearchParams.locale === "string" ? resolvedSearchParams.locale : undefined;
   const locale: Locale = isSupportedLocale(routeLocale)
     ? routeLocale
-    : resolveLocale({
-        searchParams: resolvedSearchParams,
-        headerList,
-        cookieStore,
-      });
+    : isSupportedLocale(queryLocale)
+    ? queryLocale
+    : DEFAULT_LOCALE;
   const dict = getDictionary(locale);
   const localizedTitle = getLocalizedDbText(film.titoli_i18n, locale, film.titolo);
   const localizedPlot = getLocalizedDbText(film.trame_i18n, locale, film.trama);
