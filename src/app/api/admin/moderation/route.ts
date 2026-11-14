@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { checkAndAwardPointRewards } from "@/lib/rewards";
@@ -329,11 +330,21 @@ export async function POST(request: Request) {
         // Fallback safety
       }
 
+      try {
+        revalidatePath("/");
+        revalidatePath("/classifica");
+        revalidatePath("/film/[slug]", "page");
+      } catch {}
+
       return NextResponse.json({ success: true, message: msg });
     }
 
     if (action === "reject") {
       await adminDb.from("errori").delete().eq("id", blooper_id);
+      try {
+        revalidatePath("/");
+        revalidatePath("/film/[slug]", "page");
+      } catch {}
       return NextResponse.json({ success: true, message: "Segnalazione rifiutata ed eliminata." });
     }
 
@@ -528,6 +539,12 @@ export async function POST(request: Request) {
       const msg = isDouble
         ? `Correzione approvata! Assegnati ${awardedPts} pt (Raddoppiati per Amministratore / Piano Annuale)${rewardMsg}`
         : `Correzione approvata e ${awardedPts} pt assegnati alla classifica!${rewardMsg}`;
+
+      try {
+        revalidatePath("/");
+        revalidatePath("/classifica");
+        revalidatePath("/film/[slug]", "page");
+      } catch {}
 
       return NextResponse.json({ success: true, message: msg });
     }

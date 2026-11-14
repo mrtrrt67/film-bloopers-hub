@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateTriviaForMovie } from "@/lib/gemini";
@@ -214,6 +215,11 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
+
+    try {
+      revalidatePath("/");
+      revalidatePath("/film/[slug]", "page");
+    } catch {}
 
     return NextResponse.json({
       success: true,
