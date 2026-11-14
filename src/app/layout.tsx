@@ -146,13 +146,19 @@ export default async function RootLayout({
         className={`${geistSans.className} min-h-full flex flex-col bg-zinc-950 text-zinc-100 selection:bg-amber-500 selection:text-zinc-950`}
         style={{ backgroundColor: "#09090b" }}
       >
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-amber-500 focus:text-zinc-950 focus:rounded-lg focus:font-bold focus:shadow-xl focus:outline-none focus:ring-2 focus:ring-amber-400"
+        >
+          Salta al contenuto principale
+        </a>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || "G-J9PFHEC6T4"} />
         <AccessTracker />
         <PwaInstallPrompt />
         <CookieBanner />
         <Navbar />
         <RewardCelebrationBanner />
-        <main className="flex-1">{children}</main>
+        <main id="main-content" className="flex-1">{children}</main>
         <Footer />
         <VercelAnalytics />
       </body>

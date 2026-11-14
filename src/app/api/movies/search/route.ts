@@ -11,5 +11,12 @@ export async function GET(request: Request) {
   }
 
   const results = await searchTMDBMovies(q, year);
-  return NextResponse.json({ results });
+  return NextResponse.json(
+    { results },
+    {
+      headers: {
+        "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=3600",
+      },
+    }
+  );
 }

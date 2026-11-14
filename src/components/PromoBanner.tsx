@@ -13,6 +13,17 @@ interface PromoBannerProps {
   visibile?: boolean;
 }
 
+function sanitizePromoHtml(html: string): string {
+  return html
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, "")
+    .replace(/<object\b[^<]*(?:(?!<\/object>)<[^<]*)*<\/object>/gi, "")
+    .replace(/<embed\b[^<]*(?:(?!<\/embed>)<[^<]*)*<\/embed>/gi, "")
+    .replace(/javascript:/gi, "")
+    .replace(/\son\w+\s*=\s*(['"]).*?\1/gi, "")
+    .replace(/\son\w+\s*=\s*[^\s>]+/gi, "");
+}
+
 export default function PromoBanner({
   titolo,
   testo,
@@ -67,7 +78,7 @@ export default function PromoBanner({
             </div>
             <p
               className="text-sm text-zinc-300 leading-relaxed"
-              dangerouslySetInnerHTML={{ __html: testoFormattato }}
+              dangerouslySetInnerHTML={{ __html: sanitizePromoHtml(testoFormattato) }}
             />
           </div>
         </div>

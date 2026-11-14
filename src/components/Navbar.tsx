@@ -411,6 +411,8 @@ export default function Navbar() {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="rounded-lg p-2 text-zinc-400 hover:bg-zinc-900 hover:text-white transition-colors"
               aria-label="Menu"
+              aria-expanded={mobileMenuOpen}
+              aria-controls="mobile-navigation"
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </button>
@@ -419,7 +421,7 @@ export default function Navbar() {
 
         {/* Menu Mobile Pulito & Ordinato */}
         {mobileMenuOpen && (
-          <div className="md:hidden border-b border-zinc-800 bg-zinc-950/95 px-4 pt-3 pb-5 space-y-1 backdrop-blur-2xl">
+          <div id="mobile-navigation" className="md:hidden border-b border-zinc-800 bg-zinc-950/95 px-4 pt-3 pb-5 space-y-1 backdrop-blur-2xl">
             {/* Selettore Lingua Mobile */}
             <div className="mb-3 pb-3 border-b border-zinc-800/80">
               <LanguageSwitcher variant="mobile" />
