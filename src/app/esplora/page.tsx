@@ -44,7 +44,8 @@ export default function EsploraPage() {
         const { data: films } = await supabase
           .from("films")
           .select("*, errori(count), movie_trivia(count)")
-          .order("anno", { ascending: false });
+          .order("anno", { ascending: false })
+          .limit(120);
 
         if (films) {
           const mapped = films.map((f: any) => ({

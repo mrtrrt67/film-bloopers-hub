@@ -173,6 +173,8 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   const localizedPoster = getLocalizedDbText(film.posters_i18n, locale, film.poster_url);
   const imageUrl = localizedPoster || film.backdrop_url || film.poster_url || `${siteUrl}/og-image.jpg`;
 
+  const canonicalFilmSlug = `${slugify(film.titolo, film.anno)}-${film.id}`;
+
   return {
     title: { absolute: title },
     description,
@@ -191,20 +193,20 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
       film.genere || "",
     ].filter(Boolean),
     alternates: {
-      canonical: locale === DEFAULT_LOCALE ? `/film/${slug}` : `/${locale}/film/${slug}`,
+      canonical: locale === DEFAULT_LOCALE ? `/film/${canonicalFilmSlug}` : `/${locale}/film/${canonicalFilmSlug}`,
       languages: {
-        "it": `/film/${slug}`,
-        "en": `/en/film/${slug}`,
-        "es": `/es/film/${slug}`,
-        "fr": `/fr/film/${slug}`,
-        "de": `/de/film/${slug}`,
-        "x-default": `/en/film/${slug}`,
+        "it": `/film/${canonicalFilmSlug}`,
+        "en": `/en/film/${canonicalFilmSlug}`,
+        "es": `/es/film/${canonicalFilmSlug}`,
+        "fr": `/fr/film/${canonicalFilmSlug}`,
+        "de": `/de/film/${canonicalFilmSlug}`,
+        "x-default": `/en/film/${canonicalFilmSlug}`,
       },
     },
     openGraph: {
       title,
       description,
-      url: `/film/${slug}`,
+      url: locale === DEFAULT_LOCALE ? `/film/${canonicalFilmSlug}` : `/${locale}/film/${canonicalFilmSlug}`,
       images: [
         {
           url: imageUrl,
@@ -446,9 +448,9 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
                   )}
                 </div>
 
-                <p className="text-xl font-black text-white tracking-tight leading-tight line-clamp-2">
+                <h1 className="text-xl font-black text-white tracking-tight leading-tight line-clamp-2">
                   {localizedTitle}
-                </p>
+                </h1>
                 
                 {film.regista && (
                   <p className="text-xs text-zinc-400 mt-1 line-clamp-1">
@@ -620,9 +622,9 @@ export default async function FilmDetailPage({ params, searchParams }: PageProps
 
                 {/* Sinossi Trama Desktop */}
                 <div className="mt-5 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 p-5">
-                  <h3 className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
+                  <h2 className="text-xs font-bold uppercase tracking-wider text-amber-400 mb-2">
                     {dict.film.plot}
-                  </h3>
+                  </h2>
                   <p className="text-sm text-zinc-300 leading-relaxed font-normal">
                     {localizedPlot || dict.film.noPlotAvailable || "Trama al momento non disponibile."}
                   </p>

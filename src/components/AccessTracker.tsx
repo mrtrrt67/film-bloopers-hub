@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { createPublicClient } from "@/lib/supabase/public";
+import { createClient } from "@/lib/supabase/client";
 
 export default function AccessTracker() {
   const hasRunInitial = useRef(false);
@@ -33,7 +33,7 @@ export default function AccessTracker() {
           }
         }
 
-        const supabase = createPublicClient();
+        const supabase = createClient();
         const user = customUser !== undefined ? customUser : (await supabase.auth.getUser()).data?.user;
 
         // Se è l'admin, escludi permanentemente
@@ -91,8 +91,8 @@ export default function AccessTracker() {
     }
 
     // Ascolta cambi di autenticazione: se l'utente effettua login o si registra, traccia immediatamente la visita autenticata!
-    const supabase = createPublicClient();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const supabase = createClient();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event: any, session: any) => {
       if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session?.user) {
         checkAndTrack(session.user);
       }

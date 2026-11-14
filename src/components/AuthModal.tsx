@@ -54,40 +54,22 @@ export default function AuthModal({
             throw new Error("Inserisci la tua email o il tuo username.");
           }
 
-          let foundEmail: string | null = null;
+          // Risoluzione sicura server-side tramite API rate-limitata (protegge le email da scraping e query non autenticate)
+          const resolveRes = await fetch("/api/auth/resolve-username", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: cleanUsername }),
+          });
 
-          // 1. Prova prima a cercare per colonna username (se presente nella tabella profiles)
-          try {
-            const { data: byUsername } = await supabase
-              .from("profiles")
-              .select("email, username")
-              .eq("username", cleanUsername)
-              .maybeSingle();
+          const resolveData = await resolveRes.json().catch(() => ({}));
 
-            if (byUsername?.email) {
-              foundEmail = byUsername.email;
-            }
-          } catch (_) {
-            // Se la colonna username non è ancora presente nel DB, si procede col fallback
-          }
-
-          // 2. Se non trovato, cerca per prefisso email (es. "mrtrrt" corrisponde a "mrtrrt@libero.it")
-          if (!foundEmail) {
-            const { data: byEmailPrefix } = await supabase
-              .from("profiles")
-              .select("email")
-              .ilike("email", `${cleanUsername}@%`)
-              .maybeSingle();
-
-            if (byEmailPrefix?.email) {
-              foundEmail = byEmailPrefix.email;
-            }
-          }
-
-          if (foundEmail) {
-            targetEmail = foundEmail;
+          if (resolveRes.ok && resolveData.email) {
+            targetEmail = resolveData.email;
           } else {
-            throw new Error(`Nessun account trovato per l'username "@${cleanUsername}". Prova ad accedere inserendo la tua email completa.`);
+            throw new Error(
+              resolveData.error ||
+                `Nessun account trovato per l'username "@${cleanUsername}". Prova ad accedere inserendo la tua email completa.`
+            );
           }
         }
 

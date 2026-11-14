@@ -2,6 +2,24 @@ import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { translateFilmText } from "@/lib/translator";
+import { extractClientMetadata } from "@/lib/request-meta";
+
+// Rate limiter in-memory per prevenire spam bot sui like delle curiosità
+const triviaLikesRateMap = new Map<string, { count: number; resetAt: number }>();
+
+function checkTriviaLikeRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = triviaLikesRateMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    triviaLikesRateMap.set(ip, { count: 1, resetAt: now + 60_000 });
+    return true;
+  }
+  if (entry.count >= 30) {
+    return false;
+  }
+  entry.count += 1;
+  return true;
+}
 
 export async function GET(request: Request) {
   try {
@@ -43,8 +61,22 @@ export async function POST(request: Request) {
 
     // Azione 1: Like / Cuore a una curiosità
     if (action === "like" && trivia_id) {
-      // 1. Prova prima con RPC se disponibile
-      const { data: rpcLikes, error: rpcErr } = await supabase.rpc("increment_trivia_likes", { trivia_id });
+      const meta = extractClientMetadata(request);
+      const clientIp = meta.ip_address || "anonymous";
+      if (!checkTriviaLikeRateLimit(clientIp)) {
+        return NextResponse.json(
+          { error: "Troppi mi piace inviati in breve tempo. Riprova tra poco." },
+          { status: 429 }
+        );
+      }
+
+      const cleanTriviaId = typeof trivia_id === "number" ? trivia_id : parseInt(String(trivia_id), 10);
+      if (isNaN(cleanTriviaId) || cleanTriviaId <= 0) {
+        return NextResponse.json({ error: "trivia_id non valido" }, { status: 400 });
+      }
+
+      // 1. Prova prima con RPC atomica se disponibile
+      const { data: rpcLikes, error: rpcErr } = await supabase.rpc("increment_trivia_likes", { trivia_id: cleanTriviaId });
       if (!rpcErr && typeof rpcLikes === "number") {
         return NextResponse.json({ success: true, likes: rpcLikes });
       }
@@ -53,14 +85,14 @@ export async function POST(request: Request) {
       const { data: current } = await db
         .from("movie_trivia")
         .select("likes")
-        .eq("id", trivia_id)
+        .eq("id", cleanTriviaId)
         .single();
 
       const newLikes = (current?.likes || 0) + 1;
       const { error: updErr } = await db
         .from("movie_trivia")
         .update({ likes: newLikes })
-        .eq("id", trivia_id);
+        .eq("id", cleanTriviaId);
 
       if (updErr) {
         return NextResponse.json({ error: updErr.message }, { status: 500 });
