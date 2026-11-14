@@ -202,6 +202,7 @@ export default function AuthModal({
         {/* Close Button */}
         <button
           onClick={onClose}
+          aria-label="Chiudi finestra di autenticazione"
           className="absolute top-4 right-4 rounded-lg p-1 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-colors"
         >
           <X className="h-5 w-5" />

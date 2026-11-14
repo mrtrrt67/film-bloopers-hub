@@ -324,6 +324,7 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
             type="button"
             onClick={() => handleVote("conferma")}
             disabled={loading || isOwnBlooper}
+            aria-label={isOwnBlooper ? "Non puoi votare un tuo blooper" : "Conferma blooper (pollice in su)"}
             className={`flex items-center gap-1.5 rounded-lg border min-h-[38px] sm:min-h-[32px] px-3 sm:px-2.5 py-1.5 sm:py-1 font-semibold text-xs transition-all touch-manipulation active:scale-95 ${
               isOwnBlooper
                 ? "border-zinc-800/60 bg-zinc-900/30 text-zinc-600 cursor-not-allowed opacity-60"
@@ -341,6 +342,7 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
             type="button"
             onClick={handleDislikeButtonClick}
             disabled={loading || isOwnBlooper}
+            aria-label={isOwnBlooper ? "Non puoi contestare un tuo blooper" : "Contesta blooper (pollice in giù)"}
             className={`flex items-center gap-1.5 rounded-lg border min-h-[38px] sm:min-h-[32px] px-3 sm:px-2.5 py-1.5 sm:py-1 font-semibold text-xs transition-all touch-manipulation active:scale-95 ${
               isOwnBlooper
                 ? "border-zinc-800/60 bg-zinc-900/30 text-zinc-600 cursor-not-allowed opacity-60"

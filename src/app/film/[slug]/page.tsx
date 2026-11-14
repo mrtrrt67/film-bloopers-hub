@@ -22,7 +22,7 @@ import { StreamingAvailabilityCard } from "@/components/film/StreamingAvailabili
 import { headers, cookies } from "next/headers";
 import { getDictionary, isSupportedLocale, Locale, DEFAULT_LOCALE, getLocalizedDbText, resolveLocale, buildLocalizedPath } from "@/i18n";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600; // Rigenerazione incrementale ogni ora da Supabase / TMDB
 
 interface PageProps {
   params: Promise<{ slug: string; locale?: string }>;

@@ -24,9 +24,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Firma non valida" }, { status: 400 });
   }
 
-  // Supabase service client per aggiornamento profilo
+  // Supabase service client per aggiornamento profilo protetto da RLS
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://gmiwhscbqvadnlqruhjs.supabase.co";
-  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseServiceKey) {
+    console.error("SUPABASE_SERVICE_ROLE_KEY non configurata per webhook Stripe");
+    return NextResponse.json({ error: "Configurazione server incompleta" }, { status: 500 });
+  }
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
   try {

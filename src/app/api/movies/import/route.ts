@@ -3,20 +3,50 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getTMDBMovieDetails, formatCredits, fetchTMDBMultiLanguage } from "@/lib/tmdb";
 import { notifyIndexNowForMovie } from "@/lib/indexnow";
+import { extractClientMetadata } from "@/lib/request-meta";
+
+// Rate limiter in-memory per prevenire spam massivo su TMDB / Supabase
+const importRateMap = new Map<string, { count: number; resetAt: number }>();
+
+function checkImportRateLimit(ip: string): boolean {
+  const now = Date.now();
+  const entry = importRateMap.get(ip);
+  if (!entry || now > entry.resetAt) {
+    importRateMap.set(ip, { count: 1, resetAt: now + 60_000 });
+    return true;
+  }
+  if (entry.count >= 10) {
+    return false;
+  }
+  entry.count += 1;
+  return true;
+}
 
 export async function POST(request: Request) {
   try {
+    const meta = extractClientMetadata(request);
+    const clientIp = meta.ip_address || "anonymous";
+
+    if (!checkImportRateLimit(clientIp)) {
+      return NextResponse.json(
+        { error: "Troppe importazioni in corso. Riprova tra un minuto." },
+        { status: 429 }
+      );
+    }
+
     const supabase = await createClient();
     const hasServiceKey = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY);
     const db = hasServiceKey ? createAdminClient() : supabase;
-    const { tmdb_id } = await request.json();
+    const body = await request.json().catch(() => ({}));
+    const { tmdb_id } = body;
 
-    if (!tmdb_id) {
-      return NextResponse.json({ error: "tmdb_id mancante" }, { status: 400 });
+    const numId = Number(tmdb_id);
+    if (!tmdb_id || !Number.isInteger(numId) || numId <= 0 || numId > 50_000_000) {
+      return NextResponse.json({ error: "tmdb_id non valido" }, { status: 400 });
     }
 
     // 1. Recupera dettagli ufficiali da TMDB
-    const details = await getTMDBMovieDetails(Number(tmdb_id));
+    const details = await getTMDBMovieDetails(numId);
     if (!details) {
       return NextResponse.json({ error: "Film non trovato su TMDB" }, { status: 404 });
     }

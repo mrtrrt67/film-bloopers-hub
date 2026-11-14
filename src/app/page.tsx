@@ -9,7 +9,7 @@ import { Film, Blooper } from "@/lib/types";
 import { headers, cookies } from "next/headers";
 import { getDictionary, isSupportedLocale, Locale, DEFAULT_LOCALE, getLocalizedDbText, resolveLocale } from "@/i18n";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 600; // Rigenerazione incrementale ogni 10 minuti
 
 export async function generateMetadata({
   params,

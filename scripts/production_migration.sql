@@ -242,6 +242,16 @@ INSERT INTO public.configurazioni (chiave, valore, visibile)
 VALUES ('classifica_community_demo', 'true', true)
 ON CONFLICT (chiave) DO NOTHING;
 
+-- -------------------------------------------------------------------------
+-- 10. INDICI AD ALTE PRESTAZIONI SU BLOOPERS, VOTI, FILM E LOG
+-- -------------------------------------------------------------------------
+CREATE INDEX IF NOT EXISTS idx_errori_film_approvato ON public.errori (film_id, approvato);
+CREATE INDEX IF NOT EXISTS idx_errori_creato_il ON public.errori (creato_il DESC);
+CREATE INDEX IF NOT EXISTS idx_voti_bloopers_errore_tipo ON public.voti_bloopers (errore_id, tipo);
+CREATE INDEX IF NOT EXISTS idx_films_creato_il ON public.films (creato_il DESC);
+CREATE INDEX IF NOT EXISTS idx_log_accessi_created_at ON public.log_accessi (created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_log_ricerche_created_at ON public.log_ricerche (created_at DESC);
+
 -- =========================================================================
 -- FINE SCRIPT: Tutte le istruzioni sono completate con successo.
 -- =========================================================================
