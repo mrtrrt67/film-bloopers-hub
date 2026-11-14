@@ -1,8 +1,9 @@
 import { Metadata } from "next";
 import { headers, cookies } from "next/headers";
-import { Trophy, Award, Crown, Shield, Info } from "lucide-react";
+import { Trophy, Award, Crown, Shield } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import { formatPublicAuthor, getRankInfo } from "@/lib/utils";
+import { buildPublicRanking, RankingProfile } from "@/lib/mock-ranking";
 import { getDictionary, isSupportedLocale, Locale, resolveLocale } from "@/i18n";
 
 export const dynamic = "force-dynamic";
@@ -70,7 +71,7 @@ export default async function ClassificaPage({
     .select("chiave, valore, visibile");
 
   const conf: Record<string, string> = {};
-  (configRows || []).forEach((c: any) => {
+  (configRows || []).forEach((c: { chiave: string; valore: string }) => {
     conf[c.chiave] = c.valore;
   });
 
@@ -96,14 +97,29 @@ export default async function ClassificaPage({
     .limit(50);
 
   // L'amministratore non concorre alla classifica pubblica della community
-  const profiles = (rawProfiles || [])
-    .filter((p: any) => {
-      if (p.is_admin === true) return false;
-      if (p.email && p.email.toLowerCase() === adminEmail) return false;
-      if (p.username && p.username.toLowerCase() === adminEmail.split("@")[0].toLowerCase()) return false;
-      return true;
-    })
-    .slice(0, 30);
+  const realProfiles: RankingProfile[] = (rawProfiles || []).filter((p: RankingProfile) => {
+    if (p.is_admin === true) return false;
+    if (p.email && p.email.toLowerCase() === adminEmail) return false;
+    if (p.username && p.username.toLowerCase() === adminEmail.split("@")[0].toLowerCase()) return false;
+    return true;
+  });
+
+  // Se l'utente collegato non è admin e non è presente tra i top 50 (es. appena registrato a 0 punti),
+  // carichiamo il suo profilo per mostrargli la posizione personale
+  if (user && !isAdminUser && !realProfiles.some((p: RankingProfile) => p.id === user.id)) {
+    const { data: myProfile } = await supabase
+      .from("profiles")
+      .select("id, email, username, punti, tier, tipo_abbonamento, is_admin")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (myProfile && !myProfile.is_admin) {
+      realProfiles.push(myProfile as RankingProfile);
+    }
+  }
+
+  const isDemoActive = conf["classifica_community_demo"] !== "false";
+  const profiles = buildPublicRanking(realProfiles, user, { enableSeed: isDemoActive, limit: 30 });
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-10">
@@ -231,7 +247,7 @@ export default async function ClassificaPage({
               {dict.ranking.howPointsDesc}
             </div>
           ) : (
-            profiles.map((p: any, idx: number) => {
+            profiles.map((p: RankingProfile, idx: number) => {
               const rank = idx + 1;
               const isCurrentUser = user && p.id === user.id;
               const rankInfo = getRankInfo(p.punti || 0, p.tier, p.tipo_abbonamento, sogliaMensile, sogliaLifetime);
@@ -272,14 +288,14 @@ export default async function ClassificaPage({
                     <span className="text-zinc-200 truncate">
                       {isCurrentUser ? (
                         <>
-                          <strong className="text-amber-400 font-bold">{formatPublicAuthor(p.email, "utente")}</strong>{" "}
+                          <strong className="text-amber-400 font-bold">{formatPublicAuthor(p.username || p.email, "utente")}</strong>{" "}
                           <span className="text-[10px] rounded bg-amber-500/20 text-amber-300 font-bold px-1.5 py-0.5">
                             {youLabel}
                           </span>
                         </>
                       ) : (
                         <span className="font-medium text-zinc-300">
-                          {formatPublicAuthor(p.email, "utente")}
+                          {formatPublicAuthor(p.username || p.email, "utente")}
                         </span>
                       )}
                     </span>

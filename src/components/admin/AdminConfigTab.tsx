@@ -48,6 +48,10 @@ const CONFIG_METADATA: Record<string, { label: string; desc?: string }> = {
     label: "Spiegazione Premio Lifetime",
     desc: "Puoi usare {soglia_lifetime} nel testo.",
   },
+  classifica_community_demo: {
+    label: "Classifica Community Dimostrativa",
+    desc: "Mostra profili cacciatori fittizi e realistici per popolare la classifica (true/false). Imposta su 'false' per mostrare unicamente gli utenti reali.",
+  },
   footer_testo_principale: {
     label: "Testo Principale Footer",
   },

@@ -237,6 +237,11 @@ CREATE TABLE IF NOT EXISTS public.log_ricerche (
   created_at timestamptz DEFAULT now()
 );
 
+-- Configurazione classifica community dimostrativa
+INSERT INTO public.configurazioni (chiave, valore, visibile)
+VALUES ('classifica_community_demo', 'true', true)
+ON CONFLICT (chiave) DO NOTHING;
+
 -- =========================================================================
 -- FINE SCRIPT: Tutte le istruzioni sono completate con successo.
 -- =========================================================================
