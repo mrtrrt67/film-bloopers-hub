@@ -299,6 +299,23 @@ export default async function ClassificaPage({
                         </span>
                       )}
                     </span>
+                    {isAdminUser && (
+                      p.is_demo ? (
+                        <span
+                          className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400 border border-zinc-700 shrink-0"
+                          title="Profilo dimostrativo (visibile solo all'admin)"
+                        >
+                          DEMO
+                        </span>
+                      ) : (
+                        <span
+                          className="text-[9px] font-mono font-bold px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 shrink-0"
+                          title="Utente reale (visibile solo all'admin)"
+                        >
+                          REALE
+                        </span>
+                      )
+                    )}
                   </div>
                   {/* Punti visibili su mobile */}
                   <span className="sm:hidden text-[11px] font-mono font-bold text-amber-400/90 mt-0.5">
