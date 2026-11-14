@@ -46,7 +46,7 @@ export default async function ClassificaPage({
 }: {
   params?: Promise<{ locale?: string }>;
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
-} = {}) {
+}) {
   const resolvedParams = params ? await params : {};
   const routeLocale = resolvedParams.locale;
   const resolvedSearchParams = searchParams ? await searchParams : {};

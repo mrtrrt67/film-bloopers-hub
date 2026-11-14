@@ -17,7 +17,7 @@ export async function generateMetadata({
 }: {
   params?: Promise<{ locale?: string }>;
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
-} = {}): Promise<Metadata> {
+}): Promise<Metadata> {
   const resolvedParams = params ? await params : {};
   const routeLocale = resolvedParams.locale;
   const resolvedSearchParams = searchParams ? await searchParams : {};
@@ -85,7 +85,7 @@ export default async function HomePage({
 }: {
   params?: Promise<{ locale?: string }>;
   searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
-} = {}) {
+}) {
   const resolvedParams = params ? await params : {};
   const routeLocale = resolvedParams.locale;
   const resolvedSearchParams = searchParams ? await searchParams : {};

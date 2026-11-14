@@ -78,40 +78,45 @@ interface JWOffer {
 }
 
 async function searchJustWatchNodes(searchQuery: string): Promise<JWEdge[]> {
-  const searchRes = await fetch("https://apis.justwatch.com/graphql", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      operationName: "SearchTitles",
-      variables: { searchQuery, country: "IT", language: "it" },
-      query: `query SearchTitles($searchQuery: String!, $country: Country!, $language: Language!) {
-        popularTitles(country: $country, filter: { searchQuery: $searchQuery }) {
-          edges {
-            node {
-              id
-              objectType
-              content(country: $country, language: $language) {
-                title
-                originalTitle
-                originalReleaseYear
-                externalIds {
-                  tmdbId
-                  imdbId
+  try {
+    const searchRes = await fetch("https://apis.justwatch.com/graphql", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(2000),
+      body: JSON.stringify({
+        operationName: "SearchTitles",
+        variables: { searchQuery, country: "IT", language: "it" },
+        query: `query SearchTitles($searchQuery: String!, $country: Country!, $language: Language!) {
+          popularTitles(country: $country, filter: { searchQuery: $searchQuery }) {
+            edges {
+              node {
+                id
+                objectType
+                content(country: $country, language: $language) {
+                  title
+                  originalTitle
+                  originalReleaseYear
+                  externalIds {
+                    tmdbId
+                    imdbId
+                  }
                 }
               }
             }
           }
-        }
-      }`,
-    }),
-    next: { revalidate: 86400 },
-  });
+        }`,
+      }),
+      next: { revalidate: 86400 },
+    });
 
-  if (!searchRes.ok) return [];
-  const sJson = (await searchRes.json()) as {
-    data?: { popularTitles?: { edges?: JWEdge[] } };
-  };
-  return sJson.data?.popularTitles?.edges || [];
+    if (!searchRes.ok) return [];
+    const sJson = (await searchRes.json()) as {
+      data?: { popularTitles?: { edges?: JWEdge[] } };
+    };
+    return sJson.data?.popularTitles?.edges || [];
+  } catch {
+    return [];
+  }
 }
 
 function selectBestJustWatchNode(
@@ -214,6 +219,7 @@ export async function fetchJustWatchDirectOffers(
     const offersRes = await fetch("https://apis.justwatch.com/graphql", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      signal: AbortSignal.timeout(2000),
       body: JSON.stringify({
         operationName: "GetOffers",
         variables: { nodeId: best.id, country: "IT" },

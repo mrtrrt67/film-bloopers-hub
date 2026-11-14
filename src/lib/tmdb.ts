@@ -48,7 +48,7 @@ export async function searchTMDBMovies(
       query.trim()
     )}&language=it-IT&page=${page}&include_adult=false`;
 
-    const res = await fetch(url, { next: { revalidate: 3600 } });
+    const res = await fetch(url, { signal: AbortSignal.timeout(3500), next: { revalidate: 3600 } });
     if (!res.ok) {
       const errJson = await res.json().catch(() => null);
       const msg = errJson?.status_message || `Errore TMDB HTTP ${res.status}`;
@@ -103,13 +103,13 @@ export async function getTMDBMovieDetails(
     // 1. Prova endpoint /movie se non è specificato come serie TV
     if (mediaType !== "tv") {
       const movieUrl = `${TMDB_API_BASE}/movie/${tmdbId}?api_key=${apiKey}&append_to_response=credits,keywords,watch/providers&language=it-IT`;
-      let res = await fetch(movieUrl, { next: { revalidate: 86400 } });
+      let res = await fetch(movieUrl, { signal: AbortSignal.timeout(3500), next: { revalidate: 86400 } });
 
       if (res.ok) {
         let data = (await res.json()) as TMDBMovieDetails;
         if (!data.overview || data.overview.trim() === "") {
           const urlEn = `${TMDB_API_BASE}/movie/${tmdbId}?api_key=${apiKey}&language=en-US`;
-          const resEn = await fetch(urlEn, { next: { revalidate: 86400 } });
+          const resEn = await fetch(urlEn, { signal: AbortSignal.timeout(3500), next: { revalidate: 86400 } });
           if (resEn.ok) {
             const dataEn = await resEn.json();
             data.overview = dataEn.overview;
@@ -121,13 +121,13 @@ export async function getTMDBMovieDetails(
 
     // 2. Se /movie restituisce 404 o fallisce, oppure mediaType === "tv", prova /tv/{id}
     const tvUrl = `${TMDB_API_BASE}/tv/${tmdbId}?api_key=${apiKey}&append_to_response=credits,keywords,watch/providers&language=it-IT`;
-    let resTv = await fetch(tvUrl, { next: { revalidate: 86400 } });
+    let resTv = await fetch(tvUrl, { signal: AbortSignal.timeout(3500), next: { revalidate: 86400 } });
     if (resTv.ok) {
       const tvData = await resTv.json();
       let overview = tvData.overview;
       if (!overview || overview.trim() === "") {
         const tvUrlEn = `${TMDB_API_BASE}/tv/${tmdbId}?api_key=${apiKey}&language=en-US`;
-        const resEn = await fetch(tvUrlEn, { next: { revalidate: 86400 } });
+        const resEn = await fetch(tvUrlEn, { signal: AbortSignal.timeout(3500), next: { revalidate: 86400 } });
         if (resEn.ok) {
           const dataEn = await resEn.json();
           overview = dataEn.overview;
@@ -201,7 +201,7 @@ export async function fetchTMDBMultiLanguage(
     languages.map(async ({ code, tmdb }) => {
       try {
         const url = `${TMDB_API_BASE}/${endpoint}/${tmdbId}?api_key=${apiKey}&language=${tmdb}`;
-        const res = await fetch(url, { next: { revalidate: 86400 } });
+        const res = await fetch(url, { signal: AbortSignal.timeout(3500), next: { revalidate: 86400 } });
         if (res.ok) {
           const data = await res.json();
           const title = data.title || data.name || data.original_title || "";
@@ -224,7 +224,7 @@ export async function getTMDBCollection(collectionId: number) {
 
   try {
     const url = `${TMDB_API_BASE}/collection/${collectionId}?api_key=${apiKey}&language=it-IT`;
-    const res = await fetch(url, { next: { revalidate: 86400 } });
+    const res = await fetch(url, { signal: AbortSignal.timeout(3500), next: { revalidate: 86400 } });
     if (!res.ok) return null;
 
     const data = await res.json();
