@@ -44,10 +44,10 @@
     "language": "Langue"
   },
   "home": {
-    "heroBadge": "L'archive ultime des erreurs et anecdotes de cinéma",
-    "heroTitle": "Les secrets et faux raccords du cinéma que vous n'avez jamais remarqués",
-    "heroSubtitle": "Des milliers d'erreurs de continuité, anachronismes, micros dans le champ et coulisses des plus grands chefs-d'œuvre du cinéma.",
-    "exploreCta": "Explorer le Catalogue",
+    "heroBadge": "Anecdotes de tournage, coulisses et faux raccords avec recherche IA libre",
+    "heroTitle": "Anecdotes de tournage, coulisses et faux raccords : explorez n'importe quel film avec l'IA",
+    "heroSubtitle": "Des anecdotes de tournage les plus fascinantes et secrets de coulisses aux faux raccords au minutage exact. Cherchez librement n'importe quel film et laissez notre IA en révéler tous les secrets.",
+    "exploreCta": "Chercher un Film avec l'IA",
     "randomFilm": "Film Aléatoire",
     "latestBloopers": "Derniers Bloopers Ajoutés",
     "trendingFilms": "Films les Plus Populaires",

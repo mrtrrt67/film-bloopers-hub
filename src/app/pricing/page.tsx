@@ -119,7 +119,6 @@ function PricingContent() {
             { name: p.f_unlimited_ai, included: true },
             { name: p.f_voting, included: true },
             { name: p.f_leaderboard, included: true },
-            { name: p.f_leaderboard, included: true },
             { name: p.f_badge_vip, included: true },
             { name: p.f_cancel_anytime, included: true },
           ],

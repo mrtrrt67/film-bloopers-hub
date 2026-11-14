@@ -40,11 +40,11 @@ export async function generateMetadata({
   };
 
   const descriptions: Record<Locale, string> = {
-    it: "Scopri oltre 1.000 bloopers, curiosità dal set, aneddoti di backstage ed errori di montaggio al minuto esatto nei film più celebri. Archivio verificato e gratuito.",
-    en: "Discover thousands of movie bloopers, set mistakes, continuity errors, and behind-the-scenes trivia at the exact timestamp in the most famous films. Free verified archive.",
-    es: "Descubre miles de bloopers, errores de continuidad y curiosidades de rodaje al minuto exacto en las películas más famosas del cine. Archivo verificado y gratuito.",
-    fr: "Découvrez des milliers de bêtisiers, erreurs de tournage et anecdotes de cinéma au minutage exact dans les plus grands chefs-d'œuvre. Archive vérifiée et gratuite.",
-    de: "Entdecke Tausende Filmfehler, Szenen-Bloopers und Hinter-den-Kulissen-Trivia mit genauem Zeitstempel in den berühmtesten Filmen. Kostenloses Archiv.",
+    it: "Curiosità dal set, retroscena inediti e blooper al minuto esatto. Cerca liberamente qualsiasi pellicola del cinema mondiale e scova i suoi segreti con l'Intelligenza Artificiale.",
+    en: "Behind-the-scenes movie trivia, unrevealed set secrets, and exact timestamp bloopers. Search any film worldwide and reveal its secrets with Artificial Intelligence.",
+    es: "Curiosidades de rodaje, secretos tras las cámaras y gazapos al minuto exacto. Busca libremente cualquier película del mundo y descubre sus secretos con Inteligencia Artificial.",
+    fr: "Anecdotes de tournage, coulisses inédites et faux raccords au minutage exact. Cherchez n'importe quel film du cinéma mondial et révélez ses secrets avec l'Intelligence Artificielle.",
+    de: "Set-Trivia, exklusive Hintergründe und Filmfehler mit genauem Zeitstempel. Suche jeden beliebigen Film weltweit und lüfte seine Geheimnisse mit Künstlicher Intelligenz.",
   };
 
   return {

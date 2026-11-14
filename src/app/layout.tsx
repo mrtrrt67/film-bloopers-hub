@@ -38,7 +38,7 @@ export const metadata: Metadata = {
     template: "%s | FilmBloopers Hub",
   },
   description:
-    "Scopri oltre 1.000 bloopers, curiosità dal set, aneddoti di backstage ed errori di montaggio al minuto esatto nei film più celebri. Archivio verificato e gratuito.",
+    "Curiosità dal set, retroscena inediti e blooper al minuto esatto. Cerca liberamente qualsiasi pellicola del cinema mondiale e scova i suoi segreti con l'Intelligenza Artificiale.",
   keywords: [
     "bloopers film",
     "errori film",

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getTMDBMovieDetails, formatCredits, fetchTMDBMultiLanguage } from "@/lib/tmdb";
@@ -116,6 +117,10 @@ export async function POST(request: Request) {
 
     if (inserted) {
       void notifyIndexNowForMovie(inserted).catch((err) => console.warn("IndexNow auto-submit warn:", err));
+      try {
+        revalidatePath("/");
+        revalidatePath("/esplora");
+      } catch {}
     }
 
     return NextResponse.json({ film: inserted });
