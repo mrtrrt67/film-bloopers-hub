@@ -7,8 +7,7 @@ import { Blooper } from "@/lib/types";
 import { calculateAttendibilita, formatPublicAuthor } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import AuthModal from "./AuthModal";
-import { useTranslation } from "@/i18n/client";
-import { getLocalizedBlooperCategory, getLocalizedPath, getLocalizedDbText } from "@/i18n";
+import { useTranslation, getLocalizedBlooperCategory, getLocalizedPath, getLocalizedDbText } from "@/i18n/client";
 
 interface BlooperItemProps {
   blooper: Blooper;

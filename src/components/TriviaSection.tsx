@@ -20,8 +20,7 @@ import { Film as FilmType, MovieTrivia, TriviaCategoria } from "@/lib/types";
 import AuthModal from "@/components/AuthModal";
 import ConfirmModal from "@/components/ConfirmModal";
 import { createClient } from "@/lib/supabase/client";
-import { useTranslation } from "@/i18n/client";
-import { getLocalizedTriviaCategory, getLocalizedDbText } from "@/i18n";
+import { useTranslation, getLocalizedTriviaCategory, getLocalizedDbText } from "@/i18n/client";
 
 interface TriviaSectionProps {
   film: FilmType;

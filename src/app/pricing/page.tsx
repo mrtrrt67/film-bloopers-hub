@@ -7,8 +7,7 @@ import { Check, ArrowRight, ShieldCheck, CheckCircle2, PartyPopper, AlertCircle 
 import { PRICING_PLANS } from "@/lib/stripe";
 import { createClient } from "@/lib/supabase/client";
 import AuthModal from "@/components/AuthModal";
-import { useTranslation } from "@/i18n/client";
-import { getLocalizedPath } from "@/i18n";
+import { useTranslation, getLocalizedPath } from "@/i18n/client";
 
 function PricingContent() {
   const { dict, locale } = useTranslation();

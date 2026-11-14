@@ -29,7 +29,6 @@ export default function MovieCard({ film, locale: propLocale }: MovieCardProps) 
   return (
     <Link
       href={href}
-      prefetch={false}
       className="group relative flex flex-col overflow-hidden rounded-xl border border-zinc-800/80 bg-zinc-900/40 transition-all duration-300 hover:-translate-y-1 hover:border-amber-500/40 hover:shadow-xl hover:shadow-amber-500/5"
     >
       {/* Poster Image */}

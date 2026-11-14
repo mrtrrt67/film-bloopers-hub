@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import { Sparkles, PlusCircle, AlertCircle, Filter, Send, Trophy, CheckCircle, X, Check, AlertTriangle } from "lucide-react";
 import { Film, Blooper, BlooperCategoria } from "@/lib/types";
-import { useTranslation } from "@/i18n/client";
-import { getLocalizedBlooperCategory } from "@/i18n";
+import { useTranslation, getLocalizedBlooperCategory } from "@/i18n/client";
 import BlooperItem from "@/components/BlooperItem";
 import AuthModal from "@/components/AuthModal";
 import { createClient } from "@/lib/supabase/client";

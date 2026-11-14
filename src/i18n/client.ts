@@ -86,8 +86,10 @@ export {
   LOCALE_DETAILS,
   extractLocaleFromPathname,
   buildLocalizedPath,
+  getLocalizedPath,
   isSupportedLocale,
   getLocalizedDbText,
 } from "./config";
+export { getLocalizedBlooperCategory, getLocalizedTriviaCategory } from "./categories";
 export { DICTIONARIES, getDictionary, type Dictionary } from "./dictionaries";
 

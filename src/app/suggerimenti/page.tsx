@@ -17,8 +17,7 @@ import {
 import { createClient } from "@/lib/supabase/client";
 import { formatPublicAuthor } from "@/lib/utils";
 import AuthModal from "@/components/AuthModal";
-import { useTranslation } from "@/i18n/client";
-import { getLocalizedPath } from "@/i18n";
+import { useTranslation, getLocalizedPath } from "@/i18n/client";
 
 export default function SuggerimentiPage() {
   const { dict, locale } = useTranslation();

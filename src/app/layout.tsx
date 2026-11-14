@@ -1,12 +1,10 @@
 import type { Metadata, Viewport } from "next";
-import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import { headers, cookies } from "next/headers";
 import { resolveLocale, DEFAULT_LOCALE } from "@/i18n";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import AccessTracker from "@/components/AccessTracker";
-import NavigationProgressBar from "@/components/NavigationProgressBar";
 import PwaInstallPrompt from "@/components/PwaInstallPrompt";
 import RewardCelebrationBanner from "@/components/RewardCelebrationBanner";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
@@ -154,9 +152,6 @@ export default async function RootLayout({
         >
           Salta al contenuto principale
         </a>
-        <Suspense fallback={null}>
-          <NavigationProgressBar />
-        </Suspense>
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || "G-J9PFHEC6T4"} />
         <AccessTracker />
         <PwaInstallPrompt />
