@@ -16,7 +16,8 @@ import {
   X, 
   ExternalLink,
   Sparkles,
-  Bot
+  Bot,
+  Languages
 } from "lucide-react";
 import { normalizePosterUrl } from "@/lib/tmdb";
 import { slugify } from "@/lib/utils";
@@ -85,6 +86,119 @@ export default function AdminFilmsTab({ initialFilter = "all", onNavigateToConfi
   const [savingEdit, setSavingEdit] = useState(false);
   const [previewError, setPreviewError] = useState(false);
   const [scanningFilmId, setScanningFilmId] = useState<number | null>(null);
+  const [translatingFilmId, setTranslatingFilmId] = useState<number | null>(null);
+  const [translatingBatch, setTranslatingBatch] = useState(false);
+  const [translatingBatchProgress, setTranslatingBatchProgress] = useState<string | null>(null);
+  const [missingI18nStats, setMissingI18nStats] = useState<{
+    missingBloopersCount: number;
+    missingTriviaCount: number;
+    filmsNeedingTranslationCount: number;
+  } | null>(null);
+
+  const fetchMissingI18nStats = async () => {
+    try {
+      const res = await fetch("/api/admin/translate-i18n");
+      if (res.ok) {
+        const d = await res.json();
+        setMissingI18nStats(d);
+      }
+    } catch (e) {}
+  };
+
+  // Traduce bloopers e curiosità con IA per un singolo film specifico nelle 5 lingue
+  const handleTranslateSingleFilm = async (film: any) => {
+    if (translatingFilmId) return;
+    setTranslatingFilmId(film.id);
+    setActionMessage(null);
+    try {
+      const res = await fetch("/api/admin/translate-i18n", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ filmId: film.id }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.success) {
+        setActionMessage(`❌ Errore traduzione: ${data.error || "Errore sconosciuto"}`);
+      } else {
+        const bUp = data.totalBloopersUpdated || 0;
+        const tUp = data.totalTriviaUpdated || 0;
+        if (bUp === 0 && tUp === 0) {
+          setActionMessage(`ℹ️ "${film.titolo}": blooper e curiosità sono già completamente tradotti in tutte le lingue.`);
+        } else {
+          setActionMessage(`🌐 "${film.titolo}": tradotti con successo ${bUp} blooper e ${tUp} curiosità nelle 5 lingue!`);
+        }
+        await fetchMissingI18nStats();
+      }
+    } catch (err: any) {
+      console.error("Errore traduzione film:", err);
+      setActionMessage(`❌ Errore durante la traduzione di "${film.titolo}": ${err.message}`);
+    } finally {
+      setTranslatingFilmId(null);
+    }
+  };
+
+  // Sincronizza traduzioni in batch per i film che ne hanno bisogno
+  const handleBatchTranslateI18n = async () => {
+    openConfirm(
+      "🌐 Sincronizzazione Traduzioni Multilingua (i18n)",
+      `Avviare la traduzione automatica con IA per i film che presentano blooper o curiosità non ancora tradotti nelle 5 lingue (it, en, es, fr, de)? Verranno tradotti a blocchi con barra di avanzamento in tempo reale.`,
+      async () => {
+        setTranslatingBatch(true);
+        setActionMessage(null);
+        let totalB = 0;
+        let totalT = 0;
+        let processedCount = 0;
+        const excluded: number[] = [];
+
+        try {
+          for (let step = 1; step <= 5; step++) {
+            setTranslatingBatchProgress(`Passo ${step}/5: analisi e traduzione film con IA...`);
+
+            const res = await fetch("/api/admin/translate-i18n", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ limit: 2, excludeIds: excluded }),
+            });
+
+            if (!res.ok) {
+              const err = await res.json().catch(() => ({}));
+              setActionMessage(`❌ Errore: ${err.error || "Operazione interrotta"}`);
+              break;
+            }
+
+            const data = await res.json();
+            if (!data.processedFilms || data.processedFilms.length === 0) {
+              break;
+            }
+
+            for (const pf of data.processedFilms) {
+              excluded.push(pf.film_id);
+              totalB += pf.bloopersUpdated || 0;
+              totalT += pf.triviaUpdated || 0;
+              processedCount++;
+            }
+
+            setTranslatingBatchProgress(`Elaborati ${processedCount} film (+${totalB} blooper, +${totalT} curiosità)...`);
+            await new Promise((r) => setTimeout(r, 600));
+          }
+
+          setActionMessage(
+            processedCount > 0
+              ? `🌐 Traduzioni completate con successo per ${processedCount} film: +${totalB} blooper e +${totalT} curiosità tradotti nelle 5 lingue!`
+              : `ℹ️ Tutti i film esaminati sono già completi di traduzioni.`
+          );
+          await fetchMissingI18nStats();
+        } catch (err: any) {
+          setActionMessage(`❌ Errore: ${err.message}`);
+        } finally {
+          setTranslatingBatch(false);
+          setTranslatingBatchProgress(null);
+        }
+      },
+      "Avvia Traduzione Multilingua",
+      "warning"
+    );
+  };
 
   // Scansiona bloopers e curiosità con IA per un singolo film specifico in tempo reale
   const handleScanSingleFilm = async (film: any) => {
@@ -213,12 +327,14 @@ export default function AdminFilmsTab({ initialFilter = "all", onNavigateToConfi
   useEffect(() => {
     setIsStagingHost(window.location.hostname.includes("staging") || window.location.hostname.includes("localhost"));
     fetchFilms();
+    fetchMissingI18nStats();
 
     // Ricaricamento automatico quando la finestra riprende il focus (es. dopo aver controllato il batch GitHub)
     const handleFocus = () => {
       fetchFilms();
       fetchMissingBloopersStats();
       fetchMissingTriviaStats();
+      fetchMissingI18nStats();
     };
     window.addEventListener("focus", handleFocus);
 
@@ -830,8 +946,8 @@ export default function AdminFilmsTab({ initialFilter = "all", onNavigateToConfi
             </p>
           </div>
 
-          {/* Manutenzione rapida: visibile solo se ci sono locandine o cast da sistemare */}
-          {(missingPostersCount > 0 || missingCastCount > 0) && (
+          {/* Manutenzione rapida: visibile se ci sono locandine, cast o traduzioni da sistemare */}
+          {(missingPostersCount > 0 || missingCastCount > 0 || (missingI18nStats && missingI18nStats.filmsNeedingTranslationCount > 0)) && (
             <div className="flex flex-wrap items-center gap-2">
               {missingPostersCount > 0 && (
                 <button
@@ -853,6 +969,17 @@ export default function AdminFilmsTab({ initialFilter = "all", onNavigateToConfi
                 >
                   <Users className={`h-3.5 w-3.5 ${updatingAllCast ? "animate-spin" : ""}`} />
                   <span>Cast Mancante ({missingCastCount})</span>
+                </button>
+              )}
+              {missingI18nStats && missingI18nStats.filmsNeedingTranslationCount > 0 && (
+                <button
+                  onClick={handleBatchTranslateI18n}
+                  disabled={translatingBatch}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-indigo-600 hover:bg-indigo-500 text-white active:scale-95 transition disabled:opacity-50 shadow-sm"
+                  title="Traduci con IA tutti i blooper e le curiosità mancanti nelle 5 lingue (it, en, es, fr, de)"
+                >
+                  <Languages className={`h-3.5 w-3.5 ${translatingBatch ? "animate-spin" : ""}`} />
+                  <span>Traduci i18n ({missingI18nStats.filmsNeedingTranslationCount} film)</span>
                 </button>
               )}
             </div>
@@ -924,6 +1051,13 @@ export default function AdminFilmsTab({ initialFilter = "all", onNavigateToConfi
           </div>
         </div>
       </div>
+
+      {translatingBatchProgress && (
+        <div className="p-4 rounded-xl bg-indigo-950/50 border border-indigo-500/40 text-xs font-bold text-indigo-300 flex items-center gap-3 animate-pulse">
+          <Languages className="h-4 w-4 animate-spin text-indigo-400 shrink-0" />
+          <span>{translatingBatchProgress}</span>
+        </div>
+      )}
 
       {actionMessage && (
         <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs font-bold text-emerald-300 flex items-center justify-between">
@@ -1189,6 +1323,15 @@ export default function AdminFilmsTab({ initialFilter = "all", onNavigateToConfi
                       >
                         <Sparkles className={`h-3 w-3 ${scanningFilmId === film.id ? "animate-spin" : ""}`} />
                         <span>{scanningFilmId === film.id ? "Scansione..." : "Aggiorna IA"}</span>
+                      </button>
+                      <button
+                        onClick={() => handleTranslateSingleFilm(film)}
+                        disabled={translatingFilmId === film.id}
+                        className="flex items-center gap-1 px-2 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-zinc-950 border border-indigo-500/30 font-bold transition text-[11px] disabled:opacity-50"
+                        title="Traduci tutti i blooper e le curiosità di questo film nelle 5 lingue (it, en, es, fr, de)"
+                      >
+                        <Languages className={`h-3 w-3 ${translatingFilmId === film.id ? "animate-spin" : ""}`} />
+                        <span>{translatingFilmId === film.id ? "Traduco..." : "Traduci i18n"}</span>
                       </button>
                       <Link
                         href={`/film/${slugify(film.titolo, film.anno)}-${film.id}`}
