@@ -32,7 +32,7 @@ export async function generateStaticParams() {
       .from("films")
       .select("id, titolo, anno")
       .order("creato_il", { ascending: false })
-      .limit(60);
+      .limit(500);
 
     return ((films as any[]) || []).map((film: any) => ({
       slug: `${slugify(film.titolo, film.anno)}-${String(film.id)}`,
@@ -85,12 +85,12 @@ const getFilmData = cache(async (slug: string) => {
         // Cerca anche per titolo originale o nei titoli tradotti (titoli_i18n)
         const { data: allFilms } = await supabase
           .from("films")
-          .select("*")
+          .select("id, titolo, original_title, titoli_i18n")
           .limit(500);
 
         if (allFilms) {
           const norm = titleGuess.toLowerCase();
-          const match = allFilms.find((f: any) => {
+          const match = (allFilms as any[]).find((f: any) => {
             if (f.titolo && f.titolo.toLowerCase().includes(norm)) return true;
             if (f.original_title && f.original_title.toLowerCase().includes(norm)) return true;
             if (f.titoli_i18n && typeof f.titoli_i18n === "object") {
@@ -100,7 +100,14 @@ const getFilmData = cache(async (slug: string) => {
             }
             return false;
           });
-          if (match) targetFilm = match as Film;
+          if (match) {
+            const { data: fullFilm } = await supabase
+              .from("films")
+              .select("*")
+              .eq("id", (match as any).id)
+              .maybeSingle();
+            if (fullFilm) targetFilm = fullFilm as Film;
+          }
         }
       }
     }

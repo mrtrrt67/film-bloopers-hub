@@ -32,7 +32,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         es: `${baseUrl}/es${clean}`,
         fr: `${baseUrl}/fr${clean}`,
         de: `${baseUrl}/de${clean}`,
-        "x-default": `${baseUrl}/en${clean}`,
+        "x-default": `${baseUrl}${clean || "/"}`,
       },
     };
   };
@@ -80,7 +80,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
           es: `${baseUrl}/es/film/${filmBaseSlug}`,
           fr: `${baseUrl}/fr/film/${filmBaseSlug}`,
           de: `${baseUrl}/de/film/${filmBaseSlug}`,
-          "x-default": `${baseUrl}/en/film/${filmBaseSlug}`,
+          "x-default": `${baseUrl}/film/${filmBaseSlug}`,
         },
       };
 
