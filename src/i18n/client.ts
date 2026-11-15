@@ -25,6 +25,13 @@ export function useTranslation() {
       const fromQuery = new URLSearchParams(window.location.search).get("locale");
       if (isSupportedLocale(fromQuery)) return fromQuery;
 
+      try {
+        const match = document.cookie.match(/fbh_locale=([a-z]{2})/);
+        if (match && isSupportedLocale(match[1])) return match[1] as Locale;
+        const stored = localStorage.getItem("fbh_locale");
+        if (isSupportedLocale(stored)) return stored as Locale;
+      } catch {}
+
       return DEFAULT_LOCALE;
     }
     return extractLocaleFromPathname(routerPathname);

@@ -41,7 +41,17 @@
     "submit": "Invia",
     "success": "Operazione completata con successo",
     "error": "Si è verificato un errore",
-    "language": "Lingua"
+    "language": "Lingua",
+    "error404Badge": "Errore 404",
+    "error404Title": "Scena o Scheda Non Trovata",
+    "error404Desc": "La pellicola, il blooper o la pagina che stai cercando non fa parte del catalogo, è stata rimossa oppure l'indirizzo digitato contiene un refuso.",
+    "backHome": "Torna alla Home",
+    "exploreArchive": "Esplora l'Archivio",
+    "errorBadge": "Ciak Interrotto",
+    "errorTitle": "Qualcosa è andato storto sulla scena",
+    "errorDesc": "Si è verificato un errore imprevisto durante il caricamento di questa sezione. Puoi provare a ricaricare la scena o tornare alla home page.",
+    "reloadScene": "Ricarica la Scena",
+    "errorId": "ID Errore:"
   },
   "home": {
     "heroBadge": "Curiosità dal set & errori di scena",

@@ -41,7 +41,17 @@
     "submit": "Submit",
     "success": "Operation completed successfully",
     "error": "An error occurred",
-    "language": "Language"
+    "language": "Language",
+    "error404Badge": "Error 404",
+    "error404Title": "Scene or Movie Not Found",
+    "error404Desc": "The movie, blooper, or page you are looking for is not part of the catalog, was removed, or the address contains a typo.",
+    "backHome": "Back to Home",
+    "exploreArchive": "Explore Archive",
+    "errorBadge": "Cut! Scene Interrupted",
+    "errorTitle": "Something went wrong on the set",
+    "errorDesc": "An unexpected error occurred while loading this section. You can try reloading the scene or return to the home page.",
+    "reloadScene": "Reload Scene",
+    "errorId": "Error ID:"
   },
   "home": {
     "heroBadge": "Movie trivia & set secrets",

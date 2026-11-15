@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import Link from "next/link";
 import { AlertTriangle, RefreshCw, Home } from "lucide-react";
+import { useTranslation } from "@/i18n/client";
 
 export default function Error({
   error,
@@ -11,6 +12,9 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const { dict, localizeHref } = useTranslation();
+  const c = dict.common || {};
+
   useEffect(() => {
     // Logga l'errore per il monitoraggio / diagnostica client
     console.error("Runtime application error caught by error boundary:", error);
@@ -23,21 +27,20 @@ export default function Error({
       </div>
 
       <span className="text-xs font-black uppercase tracking-widest text-red-400 mb-2">
-        Ciak Interrotto
+        {c.errorBadge || "Ciak Interrotto"}
       </span>
 
       <h1 className="text-3xl sm:text-4xl font-black text-white tracking-tight mb-3">
-        Qualcosa è andato storto sulla scena
+        {c.errorTitle || "Qualcosa è andato storto sulla scena"}
       </h1>
 
       <p className="text-sm text-zinc-400 max-w-md mb-8 leading-relaxed">
-        Si è verificato un errore imprevisto durante il caricamento di questa sezione.
-        Puoi provare a ricaricare la scena o tornare alla home page.
+        {c.errorDesc || "Si è verificato un errore imprevisto durante il caricamento di questa sezione. Puoi provare a ricaricare la scena o tornare alla home page."}
       </p>
 
       {error?.digest && (
         <p className="text-xs font-mono text-zinc-600 mb-6 bg-zinc-900/60 px-3 py-1.5 rounded-lg border border-zinc-800">
-          ID Errore: {error.digest}
+          {(c.errorId || "ID Errore:")} {error.digest}
         </p>
       )}
 
@@ -46,13 +49,13 @@ export default function Error({
           onClick={() => reset()}
           className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-amber-500 text-zinc-950 font-bold text-sm hover:bg-amber-400 transition shadow-lg shadow-amber-500/20 active:scale-95"
         >
-          <RefreshCw className="h-4 w-4" /> Ricarica la Scena
+          <RefreshCw className="h-4 w-4" /> {c.reloadScene || "Ricarica la Scena"}
         </button>
         <Link
-          href="/"
+          href={localizeHref("/")}
           className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 text-zinc-200 font-bold text-sm hover:bg-zinc-800 hover:text-white transition active:scale-95"
         >
-          <Home className="h-4 w-4" /> Torna alla Home
+          <Home className="h-4 w-4" /> {c.backHome || "Torna alla Home"}
         </Link>
       </div>
     </div>

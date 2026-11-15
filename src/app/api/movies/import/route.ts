@@ -70,10 +70,12 @@ export async function POST(request: Request) {
     // 3. Inserimento nuovo record ufficiale nel DB con solo le colonne presenti nella tabella films
     let multiTitoli: Record<string, string> = { it: details.title };
     let multiTrame: Record<string, string> = { it: formatted.trama || "" };
+    let multiPosters: Record<string, string> = formatted.poster_url ? { it: formatted.poster_url } : {};
     try {
       const multi = await fetchTMDBMultiLanguage(Number(tmdb_id));
       if (multi?.titoli) multiTitoli = { ...multiTitoli, ...multi.titoli };
       if (multi?.trame) multiTrame = { ...multiTrame, ...multi.trame };
+      if (multi?.posters) multiPosters = { ...multiPosters, ...multi.posters };
     } catch (e) {
       console.warn("fetchTMDBMultiLanguage warning:", e);
     }
@@ -88,6 +90,7 @@ export async function POST(request: Request) {
       poster_url: formatted.poster_url,
       titoli_i18n: multiTitoli,
       trame_i18n: multiTrame,
+      posters_i18n: multiPosters,
     };
 
     let { data: inserted, error: insertErr } = await db

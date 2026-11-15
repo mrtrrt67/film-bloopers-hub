@@ -41,7 +41,17 @@
     "submit": "Enviar",
     "success": "Operación completada con éxito",
     "error": "Ha ocurrido un error",
-    "language": "Idioma"
+    "language": "Idioma",
+    "error404Badge": "Error 404",
+    "error404Title": "Escena o Ficha No Encontrada",
+    "error404Desc": "La película, el gazapo o la página que buscas no forma parte del catálogo, ha sido eliminada o la dirección contiene una errata.",
+    "backHome": "Volver al Inicio",
+    "exploreArchive": "Explorar el Archivo",
+    "errorBadge": "¡Corten! Escena Interrumpida",
+    "errorTitle": "Algo salió mal en el rodaje",
+    "errorDesc": "Se produjo un error inesperado al cargar esta sección. Puedes intentar recargar la escena o volver al inicio.",
+    "reloadScene": "Recargar la Escena",
+    "errorId": "ID de Error:"
   },
   "home": {
     "heroBadge": "Curiosidades y secretos de rodaje",

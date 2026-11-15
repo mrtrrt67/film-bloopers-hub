@@ -256,11 +256,13 @@ export async function fetchTMDBMultiLanguage(
 ): Promise<{
   titoli: Record<string, string>;
   trame: Record<string, string>;
+  posters: Record<string, string>;
 }> {
   const apiKey = getApiKey();
   const result = {
     titoli: {} as Record<string, string>,
     trame: {} as Record<string, string>,
+    posters: {} as Record<string, string>,
   };
 
   if (!apiKey || !tmdbId) return result;
@@ -286,6 +288,9 @@ export async function fetchTMDBMultiLanguage(
           const overview = data.overview || "";
           if (title) result.titoli[code] = title;
           if (overview) result.trame[code] = overview;
+          if (data.poster_path) {
+            result.posters[code] = `https://image.tmdb.org/t/p/w500${data.poster_path}`;
+          }
         }
       } catch (e) {
         console.warn(`TMDB translation fetch error for ${code}:`, e);

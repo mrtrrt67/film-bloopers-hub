@@ -81,6 +81,27 @@ const getFilmData = cache(async (slug: string) => {
 
       if (byTitle) {
         targetFilm = byTitle as Film;
+      } else {
+        // Cerca anche per titolo originale o nei titoli tradotti (titoli_i18n)
+        const { data: allFilms } = await supabase
+          .from("films")
+          .select("*")
+          .limit(500);
+
+        if (allFilms) {
+          const norm = titleGuess.toLowerCase();
+          const match = allFilms.find((f: any) => {
+            if (f.titolo && f.titolo.toLowerCase().includes(norm)) return true;
+            if (f.original_title && f.original_title.toLowerCase().includes(norm)) return true;
+            if (f.titoli_i18n && typeof f.titoli_i18n === "object") {
+              return Object.values(f.titoli_i18n).some(
+                (v: any) => typeof v === "string" && v.toLowerCase().includes(norm)
+              );
+            }
+            return false;
+          });
+          if (match) targetFilm = match as Film;
+        }
       }
     }
   }

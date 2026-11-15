@@ -41,7 +41,17 @@
     "submit": "Envoyer",
     "success": "Opération réussie",
     "error": "Une erreur est survenue",
-    "language": "Langue"
+    "language": "Langue",
+    "error404Badge": "Erreur 404",
+    "error404Title": "Scène ou Fiche Non Trouvée",
+    "error404Desc": "Le film, le blooper ou la page que vous cherchez ne fait pas partie du catalogue, a été supprimé ou l'adresse contient une faute de frappe.",
+    "backHome": "Retour à l'Accueil",
+    "exploreArchive": "Explorer les Archives",
+    "errorBadge": "Coupez ! Prise Interrompue",
+    "errorTitle": "Un problème est survenu sur le plateau",
+    "errorDesc": "Une erreur inattendue s'est produite lors du chargement de cette section. Vous pouvez essayer de recharger la scène ou revenir à l'accueil.",
+    "reloadScene": "Recharger la Scène",
+    "errorId": "ID d'Erreur :"
   },
   "home": {
     "heroBadge": "Secrets de tournage & erreurs de scène",

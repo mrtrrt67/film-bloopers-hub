@@ -41,7 +41,17 @@
     "submit": "Absenden",
     "success": "Vorgang erfolgreich abgeschlossen",
     "error": "Ein Fehler ist aufgetreten",
-    "language": "Sprache"
+    "language": "Sprache",
+    "error404Badge": "Fehler 404",
+    "error404Title": "Szene oder Film Nicht Gefunden",
+    "error404Desc": "Der gesuchte Film, Filmfehler oder die Seite ist nicht im Katalog vorhanden, wurde entfernt oder die Adresse enthält einen Tippfehler.",
+    "backHome": "Zur Startseite",
+    "exploreArchive": "Archiv Erkunden",
+    "errorBadge": "Cut! Szene Unterbrochen",
+    "errorTitle": "Etwas ist am Set schiefgelaufen",
+    "errorDesc": "Beim Laden dieses Bereichs ist ein unerwarteter Fehler aufgetreten. Du kannst versuchen, die Szene neu zu laden oder zur Startseite zurückzukehren.",
+    "reloadScene": "Szene Neu Laden",
+    "errorId": "Fehler-ID:"
   },
   "home": {
     "heroBadge": "Set-Trivia & Filmgeheimnisse",
