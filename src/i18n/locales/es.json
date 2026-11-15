@@ -44,12 +44,9 @@
     "language": "Idioma"
   },
   "home": {
-    "heroBadge": "Curiosidades, anécdotas de rodaje y fallos de escena con búsqueda libre IA",
-    "heroTitle": "Curiosidades, secretos de rodaje y fallos de escena: descubre cualquier película con IA",
-    "heroSubtitle": "Desde las anécdotas de rodaje más increíbles hasta gazapos y fallos de montaje al minuto exacto. Busca libremente cualquier película: si aún no tiene errores o curiosidades, o si los presentes no te bastan, puedes descubrir nuevos al instante con Inteligencia Artificial.",
-    "aiCalloutTitle": "Curiosidades y fallos para cualquier película",
-    "aiCalloutBadge": "Búsqueda Libre con IA",
-    "aiCalloutText": "¿Una película no tiene aún errores o curiosidades registradas, o quieres más? Con la Inteligencia Artificial puedes descubrir y generar de inmediato nuevos fallos de escena y secretos de rodaje en tiempo real.",
+    "heroBadge": "Curiosidades y secretos de rodaje",
+    "heroTitle": "Curiosidades, secretos y fallos del cine revelados por la IA",
+    "heroSubtitle": "Anécdotas de rodaje y fallos al minuto exacto. Busca cualquier película: la IA revelará curiosidades y secretos ocultos en tiempo real.",
     "exploreCta": "Buscar cualquier Película con IA",
     "randomFilm": "Película Aleatoria",
     "latestBloopers": "Últimos Gazapos Añadidos",

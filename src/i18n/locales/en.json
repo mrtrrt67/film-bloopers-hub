@@ -44,12 +44,9 @@
     "language": "Language"
   },
   "home": {
-    "heroBadge": "Movie trivia, set secrets & scene errors with free AI search",
-    "heroTitle": "Movie trivia, set secrets & scene errors: discover any film with AI",
-    "heroSubtitle": "From incredible backstage trivia to exact timestamp scene errors. Search any movie worldwide: if a film has no errors or trivia yet, or if you want more, you can freely uncover brand-new ones with AI in real time.",
-    "aiCalloutTitle": "Trivia and scene errors for any movie",
-    "aiCalloutBadge": "Free AI Search",
-    "aiCalloutText": "Found a film with few errors or trivia, or want to discover more? Use our AI on any movie page to instantly uncover new scene mistakes and unrevealed set anecdotes in real time.",
+    "heroBadge": "Movie trivia & set secrets",
+    "heroTitle": "Movie trivia, secrets & scene errors revealed by AI",
+    "heroSubtitle": "Backstage anecdotes and exact timestamp mistakes. Search any movie: AI finds exclusive trivia and hidden details in real time.",
     "exploreCta": "Search any Movie with AI",
     "randomFilm": "Random Movie",
     "latestBloopers": "Latest Bloopers Added",

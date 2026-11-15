@@ -44,12 +44,9 @@
     "language": "Lingua"
   },
   "home": {
-    "heroBadge": "Curiosità dal set, retroscena ed errori di scena con ricerca libera IA",
-    "heroTitle": "Curiosità, retroscena ed errori di scena: scopri i segreti di qualsiasi film con l'IA",
-    "heroSubtitle": "Dagli aneddoti più incredibili di backstage agli errori di scena al minuto esatto. Cerca liberamente qualsiasi film del cinema: se non trovi ancora errori e curiosità o se quelli presenti non ti bastano, puoi scovarne subito di nuovi e inediti con l'Intelligenza Artificiale.",
-    "aiCalloutTitle": "Curiosità ed errori per qualsiasi film",
-    "aiCalloutBadge": "Ricerca Libera con IA",
-    "aiCalloutText": "Un film non ha ancora errori o curiosità registrati, oppure ne vorresti altri? Con l'Intelligenza Artificiale puoi scovare e generare subito nuovi errori di montaggio e aneddoti dal set in tempo reale.",
+    "heroBadge": "Curiosità dal set & errori di scena",
+    "heroTitle": "Curiosità, retroscena ed errori del cinema svelati dall'IA",
+    "heroSubtitle": "Aneddoti dal set ed errori al minuto esatto. Cerca qualsiasi film: l'IA troverà curiosità inedite e dettagli nascosti in tempo reale.",
     "exploreCta": "Cerca qualsiasi Film con l'IA",
     "randomFilm": "Film Casuale",
     "latestBloopers": "Ultimi Blooper Aggiunti",

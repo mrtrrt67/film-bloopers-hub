@@ -44,12 +44,9 @@
     "language": "Sprache"
   },
   "home": {
-    "heroBadge": "Hintergrund-Trivia, Set-Anekdoten & Szenenfehler mit freier KI-Suche",
-    "heroTitle": "Set-Trivia, Filmgeheimnisse & Szenenfehler: Entdecke jeden Film mit KI",
-    "heroSubtitle": "Von unglaublichen Set-Anekdoten bis zu Filmfehlern mit exaktem Zeitstempel. Suche jeden beliebigen Film: Falls noch keine Fehler oder Trivia vorhanden sind oder du mehr willst, kannst du mit der KI sofort neue entdecken.",
-    "aiCalloutTitle": "Trivia und Filmfehler für jeden Film",
-    "aiCalloutBadge": "Freie KI-Suche",
-    "aiCalloutText": "Hat ein Film noch keine registrierten Fehler oder Trivia, oder möchtest du mehr? Mit Künstlicher Intelligenz kannst du sofort neue Schnittpatzer und Hintergrund-Anekdoten in Echtzeit entdecken.",
+    "heroBadge": "Set-Trivia & Filmgeheimnisse",
+    "heroTitle": "Film-Trivia, Geheimnisse & Szenenfehler enthüllt mit KI",
+    "heroSubtitle": "Exklusive Set-Anekdoten und Filmfehler mit genauem Zeitstempel. Suche jeden Film: Die KI findet verborgene Details und Trivia in Echtzeit.",
     "exploreCta": "Jeden Film mit KI Suchen",
     "randomFilm": "Zufälliger Film",
     "latestBloopers": "Zuletzt Hinzugefügte Blooper",

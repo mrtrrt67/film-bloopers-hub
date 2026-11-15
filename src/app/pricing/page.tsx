@@ -89,7 +89,12 @@ function PricingContent() {
     }
   };
 
-  const isUserSubscribed = userProfile?.tier === "premium";
+  const isUserSubscribed =
+    userProfile?.tier === "premium" ||
+    userProfile?.tier === "admin" ||
+    userProfile?.tipo_abbonamento === "mensile" ||
+    userProfile?.tipo_abbonamento === "annuale" ||
+    userProfile?.tipo_abbonamento === "lifetime";
   const userSub = userProfile?.tipo_abbonamento;
 
   const getPlanDetails = (planId: string) => {

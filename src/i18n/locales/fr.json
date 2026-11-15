@@ -44,12 +44,9 @@
     "language": "Langue"
   },
   "home": {
-    "heroBadge": "Anecdotes de tournage, coulisses et erreurs de scène avec recherche IA libre",
-    "heroTitle": "Anecdotes de tournage, coulisses et erreurs de scène : explorez n'importe quel film avec l'IA",
-    "heroSubtitle": "Des anecdotes de tournage les plus folles aux erreurs de scène au minutage exact. Cherchez n'importe quel film : s'il n'a pas encore d'erreurs ou de curiosités, ou si celles présentes ne vous suffisent pas, dénichez-en de nouvelles instantanément grâce à l'IA.",
-    "aiCalloutTitle": "Anecdotes et erreurs pour chaque film",
-    "aiCalloutBadge": "Recherche Libre IA",
-    "aiCalloutText": "Un film manque d'erreurs ou de curiosités, ou vous souhaitez en savoir plus ? Grâce à l'Intelligence Artificielle, dénichez et générez immédiatement de nouveaux faux raccords et secrets de tournage en temps réel.",
+    "heroBadge": "Secrets de tournage & erreurs de scène",
+    "heroTitle": "Secrets de tournage, anecdotes et erreurs révélés par l'IA",
+    "heroSubtitle": "Anecdotes de tournage et erreurs au minutage exact. Cherchez n'importe quel film : l'IA déniche curiosités inédites et détails cachés en temps réel.",
     "exploreCta": "Chercher un Film avec l'IA",
     "randomFilm": "Film Aléatoire",
     "latestBloopers": "Derniers Bloopers Ajoutés",
