@@ -14,12 +14,16 @@ DELETE FROM public.errori WHERE approvato = false;
 DELETE FROM public.profiles WHERE LOWER(email) <> 'mrtrrt67@gmail.com';
 DELETE FROM auth.users WHERE LOWER(email) <> 'mrtrrt67@gmail.com';
 
--- Assicura che l'admin abbia i privilegi e lo stato corretto
+-- Assicura che l'admin abbia i privilegi e lo stato identico alla produzione
 UPDATE public.profiles 
 SET is_admin = true,
-    tier = 'premium',
-    tipo_abbonamento = 'lifetime',
-    punti = 50
+    tier = 'admin',
+    tipo_abbonamento = 'mensile',
+    subscription_type = 'nessuno',
+    data_scadenza = '2027-03-02',
+    punti = 0,
+    punti_premiati = 0,
+    mesi_accreditati = 5
 WHERE LOWER(email) = 'mrtrrt67@gmail.com';
 
 -- 3. Estensione pgcrypto per cifratura password

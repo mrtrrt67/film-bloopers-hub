@@ -261,28 +261,6 @@ export default async function HomePage({
               <span>{dict.nav.huntersRanking}</span>
             </Link>
           </div>
-
-          {/* AI Uncover Callout Card */}
-          <div className="mt-8 mx-auto max-w-2xl rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-zinc-900/90 to-zinc-950 p-4 sm:p-5 text-left shadow-xl shadow-amber-500/5">
-            <div className="flex items-start gap-3.5">
-              <div className="p-2.5 rounded-xl bg-amber-500/20 text-amber-400 shrink-0 mt-0.5 border border-amber-500/30">
-                <Sparkles className="h-5 w-5" />
-              </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h4 className="text-xs sm:text-sm font-black text-white uppercase tracking-wider">
-                    {dict.home.aiCalloutTitle}
-                  </h4>
-                  <span className="rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 text-[10px] font-bold px-2 py-0.5">
-                    {dict.home.aiCalloutBadge}
-                  </span>
-                </div>
-                <p className="text-xs sm:text-[13px] text-zinc-300 leading-relaxed font-normal">
-                  {dict.home.aiCalloutText}
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Live Counters */}
