@@ -239,19 +239,22 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-4 border-b border-zinc-800/50">
           <div className="flex items-center gap-2 overflow-x-auto scrollbar-none">
             <Filter className="h-3.5 w-3.5 text-zinc-500 shrink-0 mr-1" />
-            {categories.map((cat) => (
-              <button
-                key={cat === "Tutte" ? (f.allFilter || "Tutte") : getLocalizedBlooperCategory(cat, locale)}
-                onClick={() => setSelectedCategory(cat)}
-                className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
-                  selectedCategory === cat
-                    ? "bg-amber-500 text-zinc-950 font-bold shadow"
-                    : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white"
-                }`}
-              >
-                {cat}
-              </button>
-            ))}
+            {categories.map((cat) => {
+              const label = cat === "Tutte" ? (f.allFilter || "Tutte") : getLocalizedBlooperCategory(cat, locale);
+              return (
+                <button
+                  key={label}
+                  onClick={() => setSelectedCategory(cat)}
+                  className={`shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+                    selectedCategory === cat
+                      ? "bg-amber-500 text-zinc-950 font-bold shadow"
+                      : "bg-zinc-900 border border-zinc-800 text-zinc-400 hover:text-white"
+                  }`}
+                >
+                  {label}
+                </button>
+              );
+            })}
           </div>
 
           {/* Toggle Ordinamento (Minuto / Conferme) */}
@@ -318,7 +321,7 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
           <div className="w-full max-w-lg rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl">
             <div className="flex items-center justify-between mb-2">
               <h3 className="text-lg font-black text-white flex items-center gap-2">
-                <span>✍️ Segnala un Nuovo Blooper</span>
+                <span>{f.submitBlooperTitle || "✍️ Segnala un Nuovo Blooper"}</span>
               </h3>
               <button
                 type="button"
@@ -398,42 +401,42 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
               <form onSubmit={handleSubmitReport} className="space-y-4">
                 <div>
                   <label className="block text-xs font-bold text-zinc-300 mb-1">
-                    Minuto del film (es. 01:14:25 oppure 45:10)
+                    {f.fieldMinute || "Minuto del film (es. 01:14:25 oppure 45:10)"}
                   </label>
                   <input
                     type="text"
                     required
                     value={minuto}
                     onChange={(e) => setMinuto(e.target.value)}
-                    placeholder="01:14:25"
+                    placeholder={f.placeholderMinute || "01:14:25"}
                     className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3.5 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-bold text-zinc-300 mb-1">Categoria</label>
+                  <label className="block text-xs font-bold text-zinc-300 mb-1">{f.fieldCategory || f.category || "Categoria"}</label>
                   <select
                     value={categoria}
                     onChange={(e) => setCategoria(e.target.value as BlooperCategoria)}
                     className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3.5 py-2 text-sm text-white focus:border-amber-500 focus:outline-none"
                   >
-                    <option value="Errori di scena / Posizione">Errori di scena / Posizione</option>
-                    <option value="Troupe o microfoni visibili">Troupe o microfoni visibili</option>
-                    <option value="Anacronismi">Anacronismi</option>
-                    <option value="Errori storici o fattuali">Errori storici o fattuali</option>
+                    <option value="Errori di scena / Posizione">{getLocalizedBlooperCategory("Errori di scena / Posizione", locale)}</option>
+                    <option value="Troupe o microfoni visibili">{getLocalizedBlooperCategory("Troupe o microfoni visibili", locale)}</option>
+                    <option value="Anacronismi">{getLocalizedBlooperCategory("Anacronismi", locale)}</option>
+                    <option value="Errori storici o fattuali">{getLocalizedBlooperCategory("Errori storici o fattuali", locale)}</option>
                   </select>
                 </div>
 
                 <div>
                   <label className="block text-xs font-bold text-zinc-300 mb-1">
-                    Descrizione dettagliata dell&apos;errore
+                    {f.fieldBlooperDesc || "Descrizione dettagliata dell'errore"}
                   </label>
                   <textarea
                     required
                     rows={4}
                     value={descrizione}
                     onChange={(e) => setDescrizione(e.target.value)}
-                    placeholder="Descrivi cosa succede a schermo, cosa guardare e perché si tratta di un'incongruenza..."
+                    placeholder={f.placeholderBlooperDesc || "Descrivi cosa succede a schermo, cosa guardare e perché si tratta di un'incongruenza..."}
                     className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3.5 py-2 text-sm text-white placeholder-zinc-600 focus:border-amber-500 focus:outline-none"
                   />
                 </div>
@@ -444,7 +447,7 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
                     onClick={() => setShowSubmitModal(false)}
                     className="rounded-xl border border-zinc-800 px-4 py-2 text-xs font-bold text-zinc-400 hover:text-white"
                   >
-                    Annulla
+                    {f.cancel || "Annulla"}
                   </button>
                   <button
                     type="submit"
@@ -452,7 +455,7 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
                     className="flex items-center gap-1.5 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-zinc-950 shadow-md hover:brightness-110 disabled:opacity-50"
                   >
                     <Send className="h-3.5 w-3.5" />
-                    {submitting ? "Invio in corso..." : "Invia Segnalazione"}
+                    {submitting ? (f.submittingBlooper || "Invio in corso...") : (f.submitBlooper || "Invia Segnalazione")}
                   </button>
                 </div>
               </form>

@@ -48,7 +48,8 @@ const CATEGORY_COLORS: Record<string, { bg: string; text: string; border: string
 };
 
 export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: TriviaSectionProps) {
-  const { locale } = useTranslation();
+  const { dict, locale } = useTranslation();
+  const f = dict.film || {};
   const [triviaList, setTriviaList] = useState<MovieTrivia[]>(initialTrivia);
 
   useEffect(() => {
@@ -254,16 +255,16 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
         <div>
           <div className="inline-flex items-center gap-2 rounded-lg bg-amber-500/10 border border-amber-500/30 px-3 py-1 text-xs font-black text-amber-400 mb-2">
             <Lightbulb className="h-3.5 w-3.5 animate-pulse" />
-            ANEDDOTI & RETROSCENA
+            {f.triviaBadge || "ANEDDOTI & RETROSCENA"}
           </div>
           <h2 className="text-2xl sm:text-3xl font-black text-white tracking-tight flex items-center gap-2">
-            Curiosità dal Set
+            {f.triviaTitle || "Curiosità dal Set"}
             <span className="text-sm font-semibold text-zinc-400 bg-zinc-800/80 border border-zinc-700 px-2.5 py-0.5 rounded-full">
               {triviaList.length}
             </span>
           </h2>
           <p className="text-xs sm:text-sm text-zinc-400 mt-1">
-            Segreti di produzione, scelte di casting, improvvisazioni e retroscena esclusivi di <strong>{film.titolo}</strong>.
+            {(f.triviaSubtitle || "Segreti di produzione, scelte di casting, improvvisazioni e retroscena esclusivi di {title}.").replace("{title}", film.titolo)}
           </p>
         </div>
 
@@ -277,7 +278,7 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
             className="flex items-center gap-2 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 px-4 py-2 text-xs font-bold text-zinc-200 transition-all shadow-md active:scale-95"
           >
             <PlusCircle className="h-4 w-4 text-zinc-400" />
-            Proponi Curiosità
+            {f.proposeTrivia || "Proponi Curiosità"}
           </button>
 
           <button
@@ -286,7 +287,7 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
             className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 px-4 py-2 text-xs font-bold text-zinc-950 transition-all shadow-lg shadow-amber-500/10 active:scale-95 disabled:opacity-50"
           >
             <Sparkles className={`h-4 w-4 ${generating ? "animate-spin" : ""}`} />
-            {generating ? "Ricerca aneddoti..." : triviaList.length > 0 ? "Aggiungi altre con IA" : "Genera Curiosità IA"}
+            {generating ? (f.generatingTrivia || "Ricerca aneddoti...") : triviaList.length > 0 ? (f.generateTriviaMore || "Aggiungi altre con IA") : (f.generateTriviaFirst || "Genera Curiosità IA")}
           </button>
         </div>
       </div>
@@ -295,6 +296,7 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
       <div className="flex items-center gap-2 overflow-x-auto py-4 scrollbar-none">
         {CATEGORIES.map((cat) => {
           const isActive = selectedCategory === cat;
+          const label = cat === "Tutte" ? (f.allFilter || "Tutte") : getLocalizedTriviaCategory(cat, locale);
           return (
             <button
               key={cat}
@@ -305,7 +307,7 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
                   : "bg-zinc-900/80 text-zinc-400 hover:text-zinc-200 border border-zinc-800 hover:border-zinc-700"
               }`}
             >
-              {getLocalizedTriviaCategory(cat, locale)}
+              {label}
             </button>
           );
         })}
@@ -317,9 +319,9 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
           <div className="h-12 w-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 mb-3">
             <BookOpen className="h-6 w-6" />
           </div>
-          <h3 className="text-base font-bold text-white">Nessuna curiosità in questa categoria</h3>
+          <h3 className="text-base font-bold text-white">{f.noTriviaCategory || "Nessuna curiosità in questa categoria"}</h3>
           <p className="text-xs text-zinc-400 max-w-md mt-1 mb-4">
-            Non sono ancora presenti aneddoti per questo filtro. Clicca sul pulsante qui sotto per generare le prime curiosità verificate con l&apos;intelligenza artificiale!
+            {f.noTriviaCategoryDesc || "Non sono ancora presenti aneddoti per questo filtro. Clicca sul pulsante qui sotto per generare le prime curiosità verificate con l'intelligenza artificiale!"}
           </p>
           <button
             onClick={handleGenerateTrivia}
@@ -327,7 +329,7 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
             className="flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2 text-xs font-bold text-zinc-950 hover:brightness-110 active:scale-95 transition"
           >
             <Sparkles className="h-4 w-4" />
-            {generating ? "Generazione..." : "Scopri curiosità con l'IA"}
+            {generating ? (f.generatingAi || "Generazione...") : (f.discoverTriviaAi || "Scopri curiosità con l'IA")}
           </button>
         </div>
       ) : (
@@ -360,7 +362,7 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
 
                     {item.fonte && (
                       <span className="text-[10px] font-medium text-zinc-500 italic max-w-[150px] truncate" title={item.fonte}>
-                        Fonte: {item.fonte}
+                        {f.sourceLabel || "Fonte:"} {item.fonte}
                       </span>
                     )}
                   </div>
@@ -381,11 +383,11 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
                   <div className="flex items-center gap-1.5 text-[11px]">
                     {item.provenienza === "ia" ? (
                       <span className="inline-flex items-center gap-1 text-amber-400 font-semibold">
-                        <Sparkles className="h-3 w-3" /> IA Archivista
+                        <Sparkles className="h-3 w-3" /> {f.aiArchivist || "IA Archivista"}
                       </span>
                     ) : (
                       <span className="text-zinc-400 font-medium">
-                        di {item.inserito_da || "Appassionato"}
+                        {f.byAuthor || "di"} {item.inserito_da || f.fan || "Appassionato"}
                       </span>
                     )}
                   </div>
@@ -431,8 +433,8 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
               <Sparkles className="h-5 w-5" />
             </div>
             <div>
-              <h4 className="text-sm font-bold text-white">Vuoi scoprire altri aneddoti esclusivi?</h4>
-              <p className="text-xs text-zinc-400">L&apos;IA cercherà altri retroscena cinematografici verificati senza ripetere quelli già mostrati.</p>
+              <h4 className="text-sm font-bold text-white">{f.wantMoreTrivia || "Vuoi scoprire altri aneddoti esclusivi?"}</h4>
+              <p className="text-xs text-zinc-400">{f.wantMoreTriviaDesc || "L'IA cercherà altri retroscena cinematografici verificati senza ripetere quelli già mostrati."}</p>
             </div>
           </div>
           <button
@@ -441,7 +443,7 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
             className="w-full sm:w-auto flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 px-5 py-2.5 text-xs font-bold text-zinc-950 transition-all shadow-md shadow-amber-500/10 active:scale-95 disabled:opacity-50 whitespace-nowrap"
           >
             <Sparkles className={`h-4 w-4 ${generating ? "animate-spin" : ""}`} />
-            {generating ? "Ricerca in corso..." : "Aggiungi altre curiosità"}
+            {generating ? (f.generatingTrivia || "Ricerca in corso...") : (f.addMoreTrivia || "Aggiungi altre curiosità")}
           </button>
         </div>
       </>
@@ -463,7 +465,7 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
                 <Lightbulb className="h-5 w-5" />
               </div>
               <div>
-                <h3 className="text-lg font-bold text-white">Proponi una Curiosità</h3>
+                <h3 className="text-lg font-bold text-white">{f.proposeModalTitle || "Proponi una Curiosità"}</h3>
                 <p className="text-xs text-zinc-400">{film.titolo}</p>
               </div>
             </div>
@@ -477,7 +479,7 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
               <form onSubmit={handleSubmitProposal} className="space-y-4">
                 <div>
                   <label className="block text-xs font-semibold text-zinc-300 mb-1">
-                    Categoria
+                    {f.fieldCategory || "Categoria"}
                   </label>
                   <select
                     value={formCategoria}
@@ -494,12 +496,12 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
 
                 <div>
                   <label className="block text-xs font-semibold text-zinc-300 mb-1">
-                    Titolo dell&apos;aneddoto / curiosità
+                    {f.fieldTriviaTitle || "Titolo dell'aneddoto / curiosità"}
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="Es: L'improvvisazione memorabile durante la cena"
+                    placeholder={f.placeholderTriviaTitle || "Es: L'improvvisazione memorabile durante la cena"}
                     value={formTitolo}
                     onChange={(e) => setFormTitolo(e.target.value)}
                     className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-zinc-200 focus:border-amber-500 focus:outline-none placeholder:text-zinc-600"
@@ -508,12 +510,12 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
 
                 <div>
                   <label className="block text-xs font-semibold text-zinc-300 mb-1">
-                    Descrizione dettagliata
+                    {f.fieldDescription || "Descrizione dettagliata"}
                   </label>
                   <textarea
                     required
                     rows={4}
-                    placeholder="Racconta cosa è successo sul set o durante la produzione..."
+                    placeholder={f.placeholderTriviaDesc || "Racconta cosa è successo sul set o durante la produzione..."}
                     value={formDescrizione}
                     onChange={(e) => setFormDescrizione(e.target.value)}
                     className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-zinc-200 focus:border-amber-500 focus:outline-none placeholder:text-zinc-600"
@@ -522,11 +524,11 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
 
                 <div>
                   <label className="block text-xs font-semibold text-zinc-300 mb-1">
-                    Fonte (opzionale)
+                    {f.fieldSource || "Fonte (opzionale)"}
                   </label>
                   <input
                     type="text"
-                    placeholder="Es: Intervista Vanity Fair 2021, Commento audio DVD"
+                    placeholder={f.placeholderSource || "Es: Intervista Vanity Fair 2021, Commento audio DVD"}
                     value={formFonte}
                     onChange={(e) => setFormFonte(e.target.value)}
                     className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-3 py-2 text-xs text-zinc-200 focus:border-amber-500 focus:outline-none placeholder:text-zinc-600"
@@ -539,7 +541,7 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
                     onClick={() => setShowSubmitModal(false)}
                     className="rounded-xl border border-zinc-800 px-4 py-2 text-xs font-bold text-zinc-400 hover:text-white"
                   >
-                    Annulla
+                    {f.cancel || "Annulla"}
                   </button>
                   <button
                     type="submit"
@@ -547,7 +549,7 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
                     className="flex items-center gap-2 rounded-xl bg-amber-500 px-5 py-2 text-xs font-bold text-zinc-950 hover:brightness-110 active:scale-95 disabled:opacity-50"
                   >
                     <Send className="h-3.5 w-3.5" />
-                    {submitting ? "Invio in corso..." : "Invia Curiosità"}
+                    {submitting ? (f.submittingTrivia || "Invio in corso...") : (f.submitTrivia || "Invia Curiosità")}
                   </button>
                 </div>
               </form>

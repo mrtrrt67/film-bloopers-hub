@@ -240,35 +240,32 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
           <div className="flex items-center justify-between text-xs font-bold text-rose-300">
             <span className="flex items-center gap-1.5">
               <AlertTriangle className="h-4 w-4 text-rose-400" />
-              Motiva la contestazione dell&apos;errore
+              {locale === "es" ? "Explica el motivo del desacuerdo" : locale === "en" ? "Explain the reason for disputing" : locale === "fr" ? "Expliquez la contestation" : locale === "de" ? "Begründe den Einwand" : "Motiva la contestazione dell'errore"}
             </span>
             <button
               type="button"
               onClick={() => setShowContestForm(false)}
               className="text-zinc-400 hover:text-white text-xs px-2 py-0.5 rounded hover:bg-zinc-800 transition"
             >
-              ✕ Chiudi
+              {locale === "es" ? "✕ Cerrar" : locale === "en" ? "✕ Close" : locale === "fr" ? "✕ Fermer" : locale === "de" ? "✕ Schließen" : "✕ Chiudi"}
             </button>
           </div>
 
-          {/* Banner Punti & Ricompensa */}
-          <div className="p-2.5 rounded-xl bg-gradient-to-r from-amber-950/40 via-zinc-900 to-zinc-950 border border-amber-500/30 text-xs space-y-1">
-            <div className="flex items-center gap-1.5 text-amber-400 font-bold text-[11px]">
-              <Sparkles className="h-3.5 w-3.5" />
-              <span>Ricompensa per segnalazione valida:</span>
-            </div>
-            <p className="text-[11px] text-zinc-300 leading-normal">
-              Se la tua contestazione corregge il blooper oppure <strong className="text-white">smaschera un errore inesistente</strong> portando alla sua rimozione, lo staff ti accredita <strong className="text-amber-300">+10 Punti</strong> (<strong className="text-amber-300">+20 Punti 2x</strong> con Piano Annuale, Lifetime o Amministratore) per scalare la classifica e sbloccare mesi Premium gratuiti!
-            </p>
-          </div>
-
           <p className="text-[11px] text-zinc-400 leading-normal">
-            Spiega brevemente perché ritieni questo errore non attendibile (es. minuto errato, effetto speciale intenzionale, anacronismo inesistente, ecc.):
+            {locale === "es"
+              ? "Explica brevemente por qué consideras que este error no es válido (ej. minuto erróneo, efecto especial intencional, anacronismo inexistente, etc.):"
+              : locale === "en"
+              ? "Briefly explain why you consider this mistake invalid (e.g. wrong timestamp, intentional effect, non-existent anachronism):"
+              : locale === "fr"
+              ? "Expliquez brièvement pourquoi vous jugez cette erreur non valable (ex. faux raccord inexistant, effet voulu) :"
+              : locale === "de"
+              ? "Erkläre kurz, warum du diesen Fehler für ungültig hältst (z.B. falscher Zeitstempel, beabsichtigter Effekt):"
+              : "Spiega brevemente perché ritieni questo errore non attendibile (es. minuto errato, effetto speciale intenzionale, anacronismo inesistente, ecc.):"}
           </p>
           <textarea
             value={contestReason}
             onChange={(e) => setContestReason(e.target.value)}
-            placeholder="Scrivi qui la motivazione del dislike / contestazione..."
+            placeholder={locale === "es" ? "Escribe aquí el motivo del desacuerdo..." : locale === "en" ? "Write the dispute reason here..." : "Scrivi qui la motivazione del dislike / contestazione..."}
             rows={2}
             className="w-full rounded-lg bg-zinc-900 border border-zinc-700 p-2.5 text-xs text-white placeholder:text-zinc-500 focus:outline-none focus:border-rose-400"
           />
@@ -278,7 +275,7 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
               onClick={() => setShowContestForm(false)}
               className="px-3 py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-white bg-zinc-800 transition"
             >
-              Annulla
+              {dict.film?.cancel || "Annulla"}
             </button>
             <button
               type="button"
@@ -297,7 +294,7 @@ export default function BlooperItem({ blooper, onVote, userLoggedIn }: BlooperIt
               disabled={loading}
               className="px-3.5 py-1.5 rounded-lg text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 transition shadow disabled:opacity-50"
             >
-              Invia Contestazione (👎)
+              {locale === "es" ? "Enviar Impugnación (👎)" : locale === "en" ? "Submit Dispute (👎)" : locale === "fr" ? "Envoyer (👎)" : locale === "de" ? "Einwand Senden (👎)" : "Invia Contestazione (👎)"}
             </button>
           </div>
         </div>

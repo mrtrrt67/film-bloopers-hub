@@ -237,6 +237,46 @@ async function callGeminiZeroTemp(prompt) {
   };
 }
 
+// Helper auto-traduzione multilingua a basso consumo per batch notturno
+async function translateSyncText(text, context = "blooper") {
+  if (!text || !text.trim()) return { it: "", en: "", es: "", fr: "", de: "" };
+  const prompt = `You are a professional film localization engine.
+The input text below is a cinema ${context} in Italian.
+Provide natural translations into ALL five languages:
+- "it": Italian (keep original faithfully)
+- "en": English
+- "es": Spanish
+- "fr": French
+- "de": German
+
+Original Input:
+"""${text.trim()}"""
+
+Return ONLY a valid JSON object with keys "it", "en", "es", "fr", "de". No markdown explanations.`;
+
+  for (const model of ["gemini-flash-lite-latest", "gemini-3.1-flash-lite", "gemini-flash-latest"]) {
+    try {
+      const response = await ai.models.generateContent({
+        model,
+        contents: prompt,
+        config: { responseMimeType: "application/json" }
+      });
+      const textRes = response?.text?.trim() || "";
+      const parsed = cleanAndParseJson(textRes);
+      if (parsed && (parsed.en || parsed.it)) {
+        return {
+          it: (parsed.it || text).trim(),
+          en: (parsed.en || text).trim(),
+          es: (parsed.es || parsed.en || text).trim(),
+          fr: (parsed.fr || parsed.en || text).trim(),
+          de: (parsed.de || parsed.en || text).trim(),
+        };
+      }
+    } catch (e) {}
+  }
+  return { it: text, en: text, es: text, fr: text, de: text };
+}
+
 function buildBloopersSyncPrompt(film, esclusioni, requested, isPass2 = false) {
   const esclusioneText = esclusioni.length > 0
     ? `\nERRORI GIÀ REGISTRATI NEL NOSTRO ARCHIVIO (NON RIPETERE ASSOLUTAMENTE QUESTI ERRORI O VARIANTI DEGLI STESSI):\n${esclusioni
@@ -780,18 +820,23 @@ async function main() {
         if (resBloopers.success && Array.isArray(resBloopers.data)) {
           const valid = resBloopers.data.filter(b => b.descrizione && b.descrizione.length > 15);
           if (valid.length > 0) {
-            const rows = valid.map(b => ({
-              film_id: film.id,
-              minuto: b.minuto || "00:00:00",
-              categoria: b.categoria || "Errori di scena / Posizione",
-              descrizione: b.descrizione.trim(),
-              youtube_query: b.youtube_query || `${film.titolo} blooper`,
-              approvato: true,
-              inserito_da: "IA (Daily Sync)",
-              provenienza: "IA Verificata",
-              conferme: 0,
-              contestazioni: 0,
-            }));
+            const rows = [];
+            for (const b of valid) {
+              const trans = await translateSyncText(b.descrizione.trim(), "blooper");
+              rows.push({
+                film_id: film.id,
+                minuto: b.minuto || "00:00:00",
+                categoria: b.categoria || "Errori di scena / Posizione",
+                descrizione: b.descrizione.trim(),
+                descrizione_i18n: trans,
+                youtube_query: b.youtube_query || `${film.titolo} blooper`,
+                approvato: true,
+                inserito_da: "IA (Daily Sync)",
+                provenienza: "IA Verificata",
+                conferme: 0,
+                contestazioni: 0,
+              });
+            }
             const { error: errIns } = await supabase.from('errori').insert(rows);
             if (!errIns) {
               const newTotal = existingDescriptions.length + valid.length;
@@ -825,18 +870,26 @@ async function main() {
         if (resTrivia.success && Array.isArray(resTrivia.data)) {
           const valid = resTrivia.data.filter(t => t.titolo && t.descrizione && t.descrizione.length > 20);
           if (valid.length > 0) {
-            const rows = valid.map((t, idx) => ({
-              film_id: film.id,
-              categoria: t.categoria || "Curiosità & Retroscena",
-              titolo: t.titolo.trim(),
-              descrizione: t.descrizione.trim(),
-              fonte: t.fonte || "Archivio Ufficiale",
-              approvato: true,
-              inserito_da: "IA (Daily Sync)",
-              provenienza: "IA Verificata",
-              likes: 0,
-              ordine: idx,
-            }));
+            const rows = [];
+            for (let idx = 0; idx < valid.length; idx++) {
+              const t = valid[idx];
+              const transTitle = await translateSyncText(t.titolo.trim(), "title");
+              const transDesc = await translateSyncText(t.descrizione.trim(), "trivia");
+              rows.push({
+                film_id: film.id,
+                categoria: t.categoria || "Curiosità & Retroscena",
+                titolo: t.titolo.trim(),
+                descrizione: t.descrizione.trim(),
+                titolo_i18n: transTitle,
+                descrizione_i18n: transDesc,
+                fonte: t.fonte || "Archivio Ufficiale",
+                approvato: true,
+                inserito_da: "IA (Daily Sync)",
+                provenienza: "IA Verificata",
+                likes: 0,
+                ordine: idx,
+              });
+            }
 
             // Inserimento con strategia Zero-Downtime: inserisce prima le autentiche
             const { error: errIns } = await supabase.from('movie_trivia').insert(rows);

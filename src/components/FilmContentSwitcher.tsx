@@ -5,7 +5,7 @@ import { Film as FilmIcon, Lightbulb, Sparkles } from "lucide-react";
 import { Film, Blooper, MovieTrivia } from "@/lib/types";
 import BloopersSection from "@/app/film/[slug]/BloopersSection";
 import TriviaSection from "@/components/TriviaSection";
-import { useTranslation } from "@/i18n/client";
+import { useTranslation, getLocalizedDbText } from "@/i18n/client";
 
 import { createClient } from "@/lib/supabase/client";
 
@@ -20,7 +20,7 @@ export default function FilmContentSwitcher({
   initialBloopers,
   initialTrivia,
 }: FilmContentSwitcherProps) {
-  const { dict } = useTranslation();
+  const { dict, locale } = useTranslation();
   const [activeTab, setActiveTab] = useState<"bloopers" | "trivia">("bloopers");
   const [bloopers, setBloopers] = useState<Blooper[]>(initialBloopers);
   const [trivia, setTrivia] = useState<MovieTrivia[]>(initialTrivia);
@@ -55,6 +55,7 @@ export default function FilmContentSwitcher({
                 const voti = b.voti_bloopers || [];
                 return {
                   ...b,
+                  descrizione: getLocalizedDbText(b.descrizione_i18n, locale, b.descrizione),
                   conferme: voti.filter((v: any) => v.tipo === "conferma").length,
                   contestazioni: voti.filter((v: any) => v.tipo === "contestazione").length,
                   voto_utente: null,
@@ -76,13 +77,18 @@ export default function FilmContentSwitcher({
           .order("created_at", { ascending: false })
           .then(({ data }: { data: any }) => {
             if (data && data.length > 0) {
-              setTrivia(data as MovieTrivia[]);
-              setTriviaCount(data.length);
+              const mappedTrivia = data.map((t: any) => ({
+                ...t,
+                titolo: getLocalizedDbText(t.titolo_i18n, locale, t.titolo),
+                descrizione: getLocalizedDbText(t.descrizione_i18n, locale, t.descrizione),
+              }));
+              setTrivia(mappedTrivia as MovieTrivia[]);
+              setTriviaCount(mappedTrivia.length);
             }
           });
       }
     }
-  }, [film.id, initialBloopers.length, initialTrivia.length]);
+  }, [film.id, initialBloopers.length, initialTrivia.length, locale]);
 
   // Rileva eventuale ancora nell'URL (#curiosita o #trivia o ?view=trivia)
   useEffect(() => {
