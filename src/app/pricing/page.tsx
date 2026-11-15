@@ -30,7 +30,7 @@ function PricingContent() {
         try {
           const { data: prof } = await supabase
             .from("profiles")
-            .select("tier, tipo_abbonamento, data_scadenza, punti")
+            .select("tier, tipo_abbonamento, subscription_type, data_scadenza, punti, is_admin")
             .eq("id", u.id)
             .maybeSingle();
           if (prof) setUserProfile(prof);
@@ -236,10 +236,15 @@ function PricingContent() {
         {PRICING_PLANS.map((plan) => {
           const isPromo = plan.id === "lifetime-promo";
           const isAnnuale = plan.id === "annuale";
+          const userSubType = userProfile?.subscription_type;
+          const targetLifetimePlanId = userSubType === "lifetime-promo" ? "lifetime-promo" : "lifetime-standard";
           const isCurrentPlan =
             (plan.id === "free" && (!isUserSubscribed || !userSub || userSub === "nessuno")) ||
             (isUserSubscribed && userSub === plan.id) ||
-            (isUserSubscribed && userSub === "lifetime" && (plan.id === "lifetime-promo" || plan.id === "lifetime-standard"));
+            (isUserSubscribed && userSub === "lifetime" && plan.id === targetLifetimePlanId);
+
+          const isAlreadyLifetime =
+            isUserSubscribed && userSub === "lifetime" && (plan.id === "lifetime-promo" || plan.id === "lifetime-standard") && !isCurrentPlan;
 
           const localized = getPlanDetails(plan.id);
           const planName = localized?.name || plan.name;
@@ -271,10 +276,10 @@ function PricingContent() {
               )}
 
               <div>
-                <div className="flex items-center justify-between mb-1 gap-1">
-                  <h3 className="text-sm sm:text-base font-bold text-white truncate">{planName}</h3>
+                <div className="flex items-center justify-between mb-1 gap-1.5 flex-wrap">
+                  <h3 className="text-sm sm:text-base font-bold text-white">{planName}</h3>
                   {isCurrentPlan && (
-                    <span className="rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5 whitespace-nowrap shrink-0">
+                    <span className="rounded-md bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5 whitespace-nowrap shrink-0">
                       {dict.pricing.currentPlan}
                     </span>
                   )}
@@ -311,7 +316,7 @@ function PricingContent() {
               {plan.id === "free" ? (
                 <button
                   disabled
-                  className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 py-2.5 px-3 text-xs font-bold text-zinc-400 cursor-default whitespace-nowrap"
+                  className="w-full rounded-xl border border-zinc-800 bg-zinc-900/60 py-2.5 px-3 text-xs font-bold text-zinc-400 cursor-default"
                 >
                   {isCurrentPlan ? dict.pricing.currentPlan : dict.pricing.freeButton}
                 </button>
@@ -319,15 +324,30 @@ function PricingContent() {
                 <button
                   onClick={handleManageBilling}
                   disabled={openingPortal}
-                  className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-purple-500/50 bg-purple-500/20 py-2.5 px-3 text-xs font-bold text-purple-300 hover:bg-purple-500/30 transition shadow whitespace-nowrap"
+                  className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-purple-500/50 bg-purple-500/20 py-2.5 px-3 text-xs font-bold text-purple-300 hover:bg-purple-500/30 transition shadow cursor-pointer"
                 >
                   <span>{openingPortal ? dict.pricing.openingPortal : dict.pricing.openPortal}</span>
+                </button>
+              ) : isCurrentPlan && userSub === "lifetime" ? (
+                <button
+                  disabled
+                  className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-emerald-500/40 bg-emerald-500/15 py-2.5 px-3 text-xs font-bold text-emerald-300 cursor-default shadow-sm"
+                >
+                  <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                  <span>{dict.pricing.currentPlan}</span>
+                </button>
+              ) : isAlreadyLifetime ? (
+                <button
+                  disabled
+                  className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-zinc-800 bg-zinc-900/40 py-2.5 px-3 text-xs font-bold text-zinc-500 cursor-default"
+                >
+                  <span>{dict.pricing.includedInLifetime}</span>
                 </button>
               ) : (
                 <button
                   onClick={() => handleSelectPlan(plan.id)}
                   disabled={loadingPlan === plan.id}
-                  className={`w-full flex items-center justify-center gap-1.5 rounded-xl py-2.5 px-3 text-xs font-bold transition-all shadow-md whitespace-nowrap ${
+                  className={`w-full flex items-center justify-center gap-1.5 rounded-xl py-2.5 px-2.5 sm:px-3 text-xs font-bold text-center leading-snug transition-all shadow-md active:scale-98 cursor-pointer disabled:cursor-not-allowed ${
                     isPromo
                       ? "bg-gradient-to-r from-amber-500 to-orange-500 text-zinc-950 hover:brightness-110 shadow-amber-500/20"
                       : isAnnuale
@@ -348,7 +368,7 @@ function PricingContent() {
                           ? dict.pricing.yearlyButton
                           : dict.pricing.lifetimeButton}
                       </span>
-                      <ArrowRight className="h-3 w-3 shrink-0" />
+                      <ArrowRight className="h-3.5 w-3.5 shrink-0" />
                     </>
                   )}
                 </button>
