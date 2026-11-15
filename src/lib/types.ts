@@ -109,6 +109,7 @@ export interface TMDBMovieResult {
   genre_ids?: number[];
   vote_average?: number;
   media_type?: string;
+  personCreditRole?: string;
 }
 
 export interface TMDBMovieDetails extends TMDBMovieResult {

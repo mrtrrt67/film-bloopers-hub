@@ -65,7 +65,7 @@ export default function EsploraPage() {
     loadDbFilms();
   }, []);
 
-  // Ricerca istantanea su TMDB con debounce
+  // Ricerca istantanea su TMDB e archivio (anche per regista e attore) con debounce
   useEffect(() => {
     if (!searchTerm || searchTerm.trim().length < 2) {
       setTmdbResults([]);
@@ -74,23 +74,50 @@ export default function EsploraPage() {
 
     const timer = setTimeout(async () => {
       setLoading(true);
+      const cleanTerm = searchTerm.trim();
       try {
-        const res = await fetch(`/api/movies/search?q=${encodeURIComponent(searchTerm)}`);
+        // 1. Interrogazione proattiva Supabase per titoli, registi o attori non ancora caricati
+        const { data: dbMatches } = await supabase
+          .from("films")
+          .select("*, errori(count), movie_trivia(count)")
+          .or(`titolo.ilike.%${cleanTerm}%,regista.ilike.%${cleanTerm}%,attori.ilike.%${cleanTerm}%`)
+          .limit(40);
+
+        if (dbMatches && dbMatches.length > 0) {
+          setDbFilms((prev) => {
+            const existingIds = new Set(prev.map((f) => f.id));
+            const newFilms = dbMatches
+              .filter((m: any) => !existingIds.has(m.id))
+              .map((f: any) => ({
+                ...f,
+                bloopers_count: extractCount(f.errori),
+                trivia_count: extractCount(f.movie_trivia),
+              }));
+            return newFilms.length > 0 ? [...prev, ...newFilms] : prev;
+          });
+        }
+
+        // 2. Interrogazione TMDB (supporta film, registi e attori con relative filmografie)
+        const res = await fetch(`/api/movies/search?q=${encodeURIComponent(cleanTerm)}`);
         if (res.ok) {
           const data = await res.json();
           setTmdbResults(data.results || []);
           if (data.results?.length > 0 && activeTab === "archivio") {
-            // Se non ci sono risultati locali, suggerisce la tab TMDB
-            const localMatches = dbFilms.filter((f) =>
-              f.titolo?.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            if (localMatches.length === 0) {
+            // Controlla se esistono corrispondenze in archivio (per titolo, regista o attore)
+            const hasLocalMatches =
+              dbFilms.some((f) =>
+                (f.titolo && f.titolo.toLowerCase().includes(cleanTerm.toLowerCase())) ||
+                (f.regista && f.regista.toLowerCase().includes(cleanTerm.toLowerCase())) ||
+                (f.attori && f.attori.toLowerCase().includes(cleanTerm.toLowerCase()))
+              ) || (dbMatches && dbMatches.length > 0);
+
+            if (!hasLocalMatches) {
               setActiveTab("tmdb");
             }
           }
         }
       } catch (err) {
-        console.error("Errore ricerca TMDB:", err);
+        console.error("Errore ricerca TMDB/DB:", err);
       } finally {
         setLoading(false);
       }
@@ -303,6 +330,12 @@ export default function EsploraPage() {
                   </div>
 
                   <div className="flex flex-col flex-1 p-4">
+                    {movie.personCreditRole && (
+                      <span className="mb-2 inline-flex items-center gap-1.5 self-start rounded-md bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold text-amber-400">
+                        <Sparkles className="h-3 w-3 text-amber-400 shrink-0" />
+                        <span>{movie.personCreditRole}</span>
+                      </span>
+                    )}
                     <h3 className="text-sm font-bold text-white line-clamp-1">{movie.title}</h3>
                     <p className="text-xs text-zinc-400 line-clamp-2 mt-1 mb-4 flex-1">
                       {movie.overview || dict.explore?.noOverview || "Nessuna sinossi disponibile."}

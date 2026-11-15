@@ -60,8 +60,85 @@ export async function searchTMDBMovies(
     const rawList = (data.results || []) as any[];
 
     const results: TMDBMovieResult[] = [];
+    const seenMovieIds = new Set<number>();
+
+    // 1. Supporto per registi e attori (media_type === "person")
+    const personMatches = rawList.filter((item: any) => item.media_type === "person");
+
+    for (const person of personMatches.slice(0, 2)) {
+      const personName = person.name || person.original_name;
+      const dept = person.known_for_department;
+      const isDirector = dept === "Directing";
+      const roleLabel = isDirector ? `Regia: ${personName}` : `Cast: ${personName}`;
+
+      // A. Aggiungiamo prima i film noti direttamente inclusi in person.known_for
+      const knownForList = Array.isArray(person.known_for) ? person.known_for : [];
+      for (const kf of knownForList) {
+        if (!kf || kf.media_type === "person") continue;
+        const kfTitle = kf.title || kf.name;
+        if (!kfTitle || seenMovieIds.has(kf.id)) continue;
+        seenMovieIds.add(kf.id);
+        results.push({
+          id: kf.id,
+          title: kfTitle,
+          original_title: kf.original_title || kf.original_name || kfTitle,
+          release_date: kf.release_date || kf.first_air_date || "",
+          overview: kf.overview || "",
+          poster_path: kf.poster_path || null,
+          backdrop_path: kf.backdrop_path || null,
+          genre_ids: kf.genre_ids || [],
+          vote_average: kf.vote_average,
+          media_type: kf.media_type === "tv" ? "tv" : "movie",
+          personCreditRole: roleLabel,
+        });
+      }
+
+      // B. Recuperiamo la filmografia ufficiale della persona da TMDB
+      if (person.id) {
+        try {
+          const creditsUrl = `${TMDB_API_BASE}/person/${person.id}/movie_credits?api_key=${apiKey}&language=it-IT`;
+          const creditsRes = await fetch(creditsUrl, {
+            signal: AbortSignal.timeout(3000),
+            next: { revalidate: 3600 },
+          });
+
+          if (creditsRes.ok) {
+            const creditsData = await creditsRes.json();
+            const rawCredits: any[] = isDirector
+              ? (creditsData.crew || []).filter((c: any) => c.job === "Director")
+              : (creditsData.cast || []);
+
+            // Ordina per numero di voti/popolarità per far emergere i film principali
+            rawCredits.sort((a, b) => (b.vote_count || 0) - (a.vote_count || 0));
+
+            for (const item of rawCredits.slice(0, 15)) {
+              if (!item || !item.title || seenMovieIds.has(item.id)) continue;
+              seenMovieIds.add(item.id);
+              results.push({
+                id: item.id,
+                title: item.title,
+                original_title: item.original_title || item.title,
+                release_date: item.release_date || "",
+                overview: item.overview || "",
+                poster_path: item.poster_path || null,
+                backdrop_path: item.backdrop_path || null,
+                genre_ids: item.genre_ids || [],
+                vote_average: item.vote_average,
+                media_type: "movie",
+                personCreditRole: roleLabel,
+              });
+            }
+          }
+        } catch (creditErr) {
+          console.error("Errore recupero credits persona TMDB:", creditErr);
+        }
+      }
+    }
+
+    // 2. Aggiungiamo i film e le serie TV che corrispondono direttamente al titolo
     for (const item of rawList) {
       if (item.media_type === "person") continue;
+      if (seenMovieIds.has(item.id)) continue;
 
       const isTv = item.media_type === "tv" || (!item.title && !!item.name);
       const title = isTv ? (item.name || item.original_name) : (item.title || item.original_title);
@@ -69,6 +146,7 @@ export async function searchTMDBMovies(
       const release_date = isTv ? item.first_air_date : item.release_date;
 
       if (!title) continue;
+      seenMovieIds.add(item.id);
 
       results.push({
         id: item.id,
