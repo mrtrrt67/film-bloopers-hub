@@ -215,7 +215,7 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
             className="flex items-center gap-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 px-3.5 py-2 text-xs font-bold text-zinc-950 shadow-md shadow-amber-500/10 hover:brightness-110 transition-all disabled:opacity-50"
           >
             <Sparkles className={`h-4 w-4 ${generating ? "animate-spin" : ""}`} />
-            {generating ? (f.generatingAi || "Analisi IA in corso...") : (f.generateAi || "Genera altri con IA")}
+            {generating ? (f.generatingAi || "Analisi IA in corso...") : bloopers.length > 0 ? (f.generateAi || "Genera altri con IA") : (f.generateBloopersFirst || "Genera Bloopers IA")}
           </button>
 
           <button
@@ -300,18 +300,33 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
       ) : (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-800 p-12 text-center my-6">
           <AlertCircle className="h-10 w-10 text-zinc-600 mb-2" />
-          <h3 className="text-sm font-bold text-white">Nessun blooper registrato</h3>
+          <h3 className="text-sm font-bold text-white">
+            {bloopers.length === 0
+              ? (f.noBloopersTitle || "Nessun blooper registrato")
+              : (f.noBloopersCategory || "Nessun blooper in questa categoria")}
+          </h3>
           <p className="text-xs text-zinc-400 max-w-sm mt-1 mb-4">
-            Non ci sono ancora errori archiviati per questa pellicola. Usa l&apos;intelligenza artificiale per cercarli in pochi secondi!
+            {bloopers.length === 0
+              ? (f.noBloopersDesc || "Non ci sono ancora errori archiviati per questa pellicola. Usa l'intelligenza artificiale per cercarli in pochi secondi!")
+              : (f.noBloopersCategoryDesc || "Non ci sono errori che corrispondono al filtro selezionato.")}
           </p>
-          <button
-            onClick={handleGenerateWithAI}
-            disabled={generating}
-            className="flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-xs font-bold text-zinc-950 shadow-md hover:brightness-110 disabled:opacity-50"
-          >
-            <Sparkles className="h-4 w-4" />
-            {generating ? "Generazione in corso..." : "Genera i primi Bloopers con l'IA"}
-          </button>
+          {bloopers.length === 0 ? (
+            <button
+              onClick={handleGenerateWithAI}
+              disabled={generating}
+              className="flex items-center gap-2 rounded-xl bg-amber-500 px-4 py-2.5 text-xs font-bold text-zinc-950 shadow-md hover:brightness-110 disabled:opacity-50"
+            >
+              <Sparkles className="h-4 w-4" />
+              {generating ? (f.generatingBloopers || "Generazione in corso...") : (f.generateBloopersFirst || "Genera i primi Bloopers con l'IA")}
+            </button>
+          ) : (
+            <button
+              onClick={() => setSelectedCategory("Tutte")}
+              className="rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-2 text-xs font-bold text-zinc-200 hover:text-white"
+            >
+              {f.allFilter || "Tutte"}
+            </button>
+          )}
         </div>
       )}
 

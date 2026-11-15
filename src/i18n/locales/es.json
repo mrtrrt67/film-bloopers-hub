@@ -149,7 +149,13 @@
     "fieldBlooperDesc": "Descripción detallada del error",
     "placeholderBlooperDesc": "Describe lo que ocurre en pantalla y por qué es una incongruencia...",
     "submitBlooper": "Enviar Reporte",
-    "submittingBlooper": "Enviando..."
+    "submittingBlooper": "Enviando...",
+    "noBloopersTitle": "Ningún gazapo registrado",
+    "noBloopersDesc": "Aún no hay errores archivados para esta película. ¡Usa la Inteligencia Artificial para encontrarlos en segundos!",
+    "generateBloopersFirst": "Generar primeros gazapos con IA",
+    "generatingBloopers": "Generando gazapos...",
+    "noBloopersCategory": "Ningún gazapo en esta categoría",
+    "noBloopersCategoryDesc": "No hay errores que coincidan con el filtro seleccionado."
   },
   "pricing": {
     "badge": "Archivo Abierto & Gratuito",

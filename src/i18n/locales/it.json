@@ -149,7 +149,13 @@
     "fieldBlooperDesc": "Descrizione dettagliata dell'errore",
     "placeholderBlooperDesc": "Descrivi cosa succede a schermo, cosa guardare e perché si tratta di un'incongruenza...",
     "submitBlooper": "Invia Segnalazione",
-    "submittingBlooper": "Invio in corso..."
+    "submittingBlooper": "Invio in corso...",
+    "noBloopersTitle": "Nessun blooper registrato",
+    "noBloopersDesc": "Non ci sono ancora errori archiviati per questa pellicola. Usa l'intelligenza artificiale per cercarli in pochi secondi!",
+    "generateBloopersFirst": "Genera i primi Bloopers con l'IA",
+    "generatingBloopers": "Generazione in corso...",
+    "noBloopersCategory": "Nessun blooper in questa categoria",
+    "noBloopersCategoryDesc": "Non ci sono errori che corrispondono al filtro selezionato."
   },
   "pricing": {
     "badge": "Archivio a Consultazione Libera & Gratuita",

@@ -149,7 +149,13 @@
     "fieldBlooperDesc": "Genaue Beschreibung des Fehlers",
     "placeholderBlooperDesc": "Beschreibe, was auf dem Bildschirm zu sehen ist und warum es ein Fehler ist...",
     "submitBlooper": "Fehler Melden",
-    "submittingBlooper": "Wird gesendet..."
+    "submittingBlooper": "Wird gesendet...",
+    "noBloopersTitle": "Keine Filmfehler eingetragen",
+    "noBloopersDesc": "Für diesen Film sind noch keine Fehler erfasst. Nutze Künstliche Intelligenz, um sie in Sekundenschnelle zu finden!",
+    "generateBloopersFirst": "Erste Filmfehler mit KI generieren",
+    "generatingBloopers": "Fehler werden generiert...",
+    "noBloopersCategory": "Keine Filmfehler in dieser Kategorie",
+    "noBloopersCategoryDesc": "Es wurden keine Fehler für den ausgewählten Filter gefunden."
   },
   "pricing": {
     "badge": "Offenes & Kostenloses Archiv",

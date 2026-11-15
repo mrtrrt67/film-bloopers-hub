@@ -149,7 +149,13 @@
     "fieldBlooperDesc": "Description détaillée de l'erreur",
     "placeholderBlooperDesc": "Décrivez ce qui se passe à l'écran et pourquoi il s'agit d'une incohérence...",
     "submitBlooper": "Envoyer le Signalement",
-    "submittingBlooper": "Envoi en cours..."
+    "submittingBlooper": "Envoi en cours...",
+    "noBloopersTitle": "Aucun blooper enregistré",
+    "noBloopersDesc": "Il n'y a pas encore d'erreurs répertoriées pour ce film. Utilisez l'Intelligence Artificielle pour les trouver en quelques secondes !",
+    "generateBloopersFirst": "Générer les premiers bloopers avec l'IA",
+    "generatingBloopers": "Génération en cours...",
+    "noBloopersCategory": "Aucun blooper dans cette catégorie",
+    "noBloopersCategoryDesc": "Aucune erreur ne correspond au filtre sélectionné."
   },
   "pricing": {
     "badge": "Archive Ouverte & Gratuite",

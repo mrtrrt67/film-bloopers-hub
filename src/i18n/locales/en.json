@@ -149,7 +149,13 @@
     "fieldBlooperDesc": "Detailed mistake description",
     "placeholderBlooperDesc": "Describe what happens on screen and why it's a mistake...",
     "submitBlooper": "Submit Report",
-    "submittingBlooper": "Submitting..."
+    "submittingBlooper": "Submitting...",
+    "noBloopersTitle": "No bloopers recorded",
+    "noBloopersDesc": "There are no documented mistakes for this movie yet. Use Artificial Intelligence to find them in seconds!",
+    "generateBloopersFirst": "Generate first Bloopers with AI",
+    "generatingBloopers": "Generating bloopers...",
+    "noBloopersCategory": "No bloopers in this category",
+    "noBloopersCategoryDesc": "There are no mistakes matching the selected filter."
   },
   "pricing": {
     "badge": "Open & Free Public Archive",
