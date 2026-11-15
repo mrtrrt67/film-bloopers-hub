@@ -261,6 +261,12 @@ export default async function HomePage({
               <span>{dict.nav.huntersRanking}</span>
             </Link>
           </div>
+
+          {/* AI Uncover Callout Pill */}
+          <div className="mt-6 inline-flex items-center gap-2 rounded-xl bg-amber-500/10 border border-amber-500/25 px-4 py-2 text-xs sm:text-sm text-amber-300 font-medium max-w-xl mx-auto shadow-sm">
+            <Sparkles className="h-4 w-4 text-amber-400 shrink-0" />
+            <span>{dict.home.aiCallout}</span>
+          </div>
         </div>
 
         {/* Live Counters */}

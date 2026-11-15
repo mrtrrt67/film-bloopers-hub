@@ -218,17 +218,65 @@ export default async function ClassificaPage({
           </div>
         </div>
 
-        {/* Premi in Palio */}
-        <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
-          <div className="flex items-center gap-2.5">
+        {/* Premi in Palio & Mesi Cumulabili */}
+        <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-r from-amber-950/40 via-zinc-900/90 to-zinc-950 p-4 sm:p-5 shadow-lg space-y-3 text-xs">
+          <div className="flex items-center gap-2.5 border-b border-zinc-800/80 pb-2.5">
             <Crown className="h-5 w-5 text-amber-400 shrink-0" />
             <div>
-              <strong className="text-white text-sm">{dict.ranking.tableTitle}:</strong>
-              <p className="text-zinc-400 text-xs mt-0.5">
-                {dict.ranking.thresholdMonthly}: <strong className="text-amber-300">{sogliaMensile} pt</strong> • {dict.ranking.thresholdLifetime}: <strong className="text-amber-300">{sogliaLifetime} pt</strong>
+              <h4 className="text-sm font-black text-white uppercase tracking-wider">
+                {dict.ranking.rewardsTitle}
+              </h4>
+              <p className="text-zinc-400 text-[11px] mt-0.5">
+                {dict.ranking.rewardsSubtitle}
               </p>
             </div>
           </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+            <div className="flex items-start gap-2.5 rounded-xl bg-zinc-950/70 p-3.5 border border-amber-500/20">
+              <span className="text-lg shrink-0">🎁</span>
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <strong className="text-amber-300 font-bold text-xs">
+                    {dict.ranking.rewardMonthlyTitle.replace("{points}", sogliaMensile.toString())}
+                  </strong>
+                  <span className="rounded-full bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-[9px] font-bold px-1.5 py-0.5 uppercase">
+                    {dict.ranking.rewardMonthlyBadge}
+                  </span>
+                </div>
+                <p className="text-zinc-300 text-xs leading-relaxed">
+                  {dict.ranking.rewardMonthlyDesc.replace(/\{points\}/g, sogliaMensile.toString())}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-start gap-2.5 rounded-xl bg-zinc-950/70 p-3.5 border border-amber-500/20">
+              <span className="text-lg shrink-0">👑</span>
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <strong className="text-amber-300 font-bold text-xs">
+                    {dict.ranking.rewardLifetimeTitle.replace("{points}", sogliaLifetime.toString())}
+                  </strong>
+                  <span className="rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-300 text-[9px] font-bold px-1.5 py-0.5 uppercase">
+                    {dict.ranking.rewardLifetimeBadge}
+                  </span>
+                </div>
+                <p className="text-zinc-300 text-xs leading-relaxed">
+                  {dict.ranking.rewardLifetimeDesc.replace(/\{points\}/g, sogliaLifetime.toString())}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Intestazione Tabella Classifica */}
+      <div className="flex items-center justify-between gap-4 mb-4">
+        <div>
+          <h3 className="text-lg font-black text-white tracking-tight">{dict.ranking.tableTitle}</h3>
+          <p className="text-xs text-zinc-400 mt-0.5">
+            {locale === "it" ? "Posizioni aggiornate in tempo reale in base ai punti accumulati." : "Real-time ranking positions based on verified points."}
+          </p>
         </div>
       </div>
 

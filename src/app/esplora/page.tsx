@@ -307,9 +307,10 @@ export default function EsploraPage() {
               return (
                 <div
                   key={movie.id}
-                  className="flex flex-col rounded-xl border border-zinc-800 bg-zinc-900/40 overflow-hidden shadow-lg hover:border-amber-500/40 transition-all"
+                  onClick={() => handleImportAndNavigate(movie)}
+                  className="group flex flex-col rounded-xl border border-zinc-800 bg-zinc-900/40 overflow-hidden shadow-lg hover:border-amber-500/50 hover:-translate-y-1 hover:shadow-xl hover:shadow-amber-500/5 transition-all duration-300 cursor-pointer"
                 >
-                  <div className="relative aspect-[2/3] w-full bg-zinc-950">
+                  <div className="relative aspect-[2/3] w-full bg-zinc-950 overflow-hidden">
                     {poster ? (
                       <Image
                         src={poster}
@@ -317,7 +318,7 @@ export default function EsploraPage() {
                         fill
                         unoptimized
                         sizes="(max-width: 768px) 100vw, 25vw"
-                        className="object-cover"
+                        className="object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center text-zinc-600">
@@ -331,20 +332,24 @@ export default function EsploraPage() {
 
                   <div className="flex flex-col flex-1 p-4">
                     {movie.personCreditRole && (
-                      <span className="mb-2 inline-flex items-center gap-1.5 self-start rounded-md bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold text-amber-400">
+                      <span className="mb-2 inline-flex items-center gap-1.5 self-start rounded-md bg-amber-500/15 border border-amber-500/30 px-2 py-0.5 text-[10px] font-bold text-amber-400 group-hover:border-amber-400/50 transition-colors">
                         <Sparkles className="h-3 w-3 text-amber-400 shrink-0" />
                         <span>{movie.personCreditRole}</span>
                       </span>
                     )}
-                    <h3 className="text-sm font-bold text-white line-clamp-1">{movie.title}</h3>
+                    <h3 className="text-sm font-bold text-white line-clamp-1 group-hover:text-amber-400 transition-colors">{movie.title}</h3>
                     <p className="text-xs text-zinc-400 line-clamp-2 mt-1 mb-4 flex-1">
                       {movie.overview || dict.explore?.noOverview || "Nessuna sinossi disponibile."}
                     </p>
 
                     <button
-                      onClick={() => handleImportAndNavigate(movie)}
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleImportAndNavigate(movie);
+                      }}
                       disabled={importingId === movie.id}
-                      className="w-full flex items-center justify-center gap-1.5 rounded-lg bg-zinc-800 hover:bg-amber-500 hover:text-zinc-950 py-2 text-xs font-bold text-zinc-200 transition-all disabled:opacity-50"
+                      className="w-full flex items-center justify-center gap-1.5 rounded-lg bg-zinc-800 hover:bg-amber-500 hover:text-zinc-950 py-2 text-xs font-bold text-zinc-200 transition-all disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed shadow-md"
                     >
                       {importingId === movie.id ? (
                         <span className="animate-pulse">{dict.explore?.importing || "Importazione..."}</span>
