@@ -48,6 +48,7 @@ export async function GET() {
       missingBloopersCount: missingB.length,
       missingTriviaCount: missingT.length,
       filmsNeedingTranslationCount: filmIds.length,
+      filmMap,
       filmIds,
     });
   } catch (err: any) {

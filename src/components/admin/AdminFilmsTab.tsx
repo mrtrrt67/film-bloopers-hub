@@ -93,6 +93,7 @@ export default function AdminFilmsTab({ initialFilter = "all", onNavigateToConfi
     missingBloopersCount: number;
     missingTriviaCount: number;
     filmsNeedingTranslationCount: number;
+    filmMap?: Record<number, { missingBloopers: number; missingTrivia: number }>;
   } | null>(null);
 
   const fetchMissingI18nStats = async () => {
@@ -390,6 +391,19 @@ export default function AdminFilmsTab({ initialFilter = "all", onNavigateToConfi
     }
     if (filterType === "no_trivia") {
       return (f.trivia_count || 0) === 0;
+    }
+    if (filterType === "i18n_complete") {
+      const hasItems = (f.bloopers_count || 0) > 0 || (f.trivia_count || 0) > 0;
+      const info = missingI18nStats?.filmMap?.[f.id];
+      return hasItems && (!info || (info.missingBloopers === 0 && info.missingTrivia === 0));
+    }
+    if (filterType === "i18n_missing_trivia") {
+      const info = missingI18nStats?.filmMap?.[f.id];
+      return !!info && info.missingBloopers === 0 && info.missingTrivia > 0;
+    }
+    if (filterType === "i18n_missing_both") {
+      const info = missingI18nStats?.filmMap?.[f.id];
+      return !!info && info.missingBloopers > 0 && info.missingTrivia > 0;
     }
     if (filterType === "recent") {
       return Number(f.anno) >= 2016;
@@ -911,6 +925,22 @@ export default function AdminFilmsTab({ initialFilter = "all", onNavigateToConfi
   const duplicatePostersCount = films.filter((f) => f.poster_url && posterFrequency[f.poster_url] > 1).length;
   const totalIssuesCount = missingPostersCount + missingCastCount + duplicatePostersCount;
 
+  const i18nCompleteCount = films.filter((f) => {
+    const hasItems = (f.bloopers_count || 0) > 0 || (f.trivia_count || 0) > 0;
+    const info = missingI18nStats?.filmMap?.[f.id];
+    return hasItems && (!info || (info.missingBloopers === 0 && info.missingTrivia === 0));
+  }).length;
+
+  const i18nMissingTriviaOnlyCount = films.filter((f) => {
+    const info = missingI18nStats?.filmMap?.[f.id];
+    return !!info && info.missingBloopers === 0 && info.missingTrivia > 0;
+  }).length;
+
+  const i18nMissingBothCount = films.filter((f) => {
+    const info = missingI18nStats?.filmMap?.[f.id];
+    return !!info && info.missingBloopers > 0 && info.missingTrivia > 0;
+  }).length;
+
   return (
     <div className="space-y-6">
       {/* BARRA SUPERIORE: PANNELLO DI CONTROLLO & METRICHE UNIFICATE */}
@@ -1187,6 +1217,62 @@ export default function AdminFilmsTab({ initialFilter = "all", onNavigateToConfi
             </span>
           </button>
 
+          {/* 100% Tradotti */}
+          <button
+            onClick={() => setFilterType("i18n_complete")}
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+              filterType === "i18n_complete"
+                ? "bg-emerald-500 text-zinc-950 shadow-md font-black"
+                : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
+            }`}
+          >
+            <Languages className="h-3.5 w-3.5 text-emerald-400" />
+            <span>100% Tradotti</span>
+            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
+              filterType === "i18n_complete" ? "bg-zinc-950/20 text-zinc-950" : "bg-emerald-500/20 text-emerald-400"
+            }`}>
+              {i18nCompleteCount}
+            </span>
+          </button>
+
+          {/* Solo Curiosità da Tradurre */}
+          <button
+            onClick={() => setFilterType("i18n_missing_trivia")}
+            className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+              filterType === "i18n_missing_trivia"
+                ? "bg-indigo-600 text-white shadow-md font-black"
+                : "bg-zinc-900/90 text-zinc-300 border border-zinc-800 hover:text-white hover:bg-zinc-800/80"
+            }`}
+          >
+            <Languages className="h-3.5 w-3.5 text-indigo-400" />
+            <span>Curiosità da Tradurre</span>
+            <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
+              filterType === "i18n_missing_trivia" ? "bg-white/20 text-white" : "bg-indigo-500/20 text-indigo-300"
+            }`}>
+              {i18nMissingTriviaOnlyCount}
+            </span>
+          </button>
+
+          {/* Sia Blooper che Curiosità da Tradurre */}
+          {i18nMissingBothCount > 0 && (
+            <button
+              onClick={() => setFilterType("i18n_missing_both")}
+              className={`px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 ${
+                filterType === "i18n_missing_both"
+                  ? "bg-amber-500 text-zinc-950 shadow-md font-black"
+                  : "bg-amber-950/30 text-amber-300 border border-amber-500/40 hover:bg-amber-900/30"
+              }`}
+            >
+              <Languages className="h-3.5 w-3.5 text-amber-400" />
+              <span>Blooper & Curiosità da Tradurre</span>
+              <span className={`px-1.5 py-0.5 rounded-md text-[10px] font-black ${
+                filterType === "i18n_missing_both" ? "bg-zinc-950/20 text-zinc-950" : "bg-amber-500/30 text-amber-200"
+              }`}>
+                {i18nMissingBothCount}
+              </span>
+            </button>
+          )}
+
           {/* Anomalie (visibile solo se ci sono problemi di poster o cast) */}
           {totalIssuesCount > 0 && (
             <button
@@ -1324,15 +1410,49 @@ export default function AdminFilmsTab({ initialFilter = "all", onNavigateToConfi
                         <Sparkles className={`h-3 w-3 ${scanningFilmId === film.id ? "animate-spin" : ""}`} />
                         <span>{scanningFilmId === film.id ? "Scansione..." : "Aggiorna IA"}</span>
                       </button>
-                      <button
-                        onClick={() => handleTranslateSingleFilm(film)}
-                        disabled={translatingFilmId === film.id}
-                        className="flex items-center gap-1 px-2 py-1 rounded-lg bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-zinc-950 border border-indigo-500/30 font-bold transition text-[11px] disabled:opacity-50"
-                        title="Traduci tutti i blooper e le curiosità di questo film nelle 5 lingue (it, en, es, fr, de)"
-                      >
-                        <Languages className={`h-3 w-3 ${translatingFilmId === film.id ? "animate-spin" : ""}`} />
-                        <span>{translatingFilmId === film.id ? "Traduco..." : "Traduci i18n"}</span>
-                      </button>
+                      {(() => {
+                        const i18nInfo = missingI18nStats?.filmMap?.[film.id];
+                        const missingB = i18nInfo?.missingBloopers || 0;
+                        const missingT = i18nInfo?.missingTrivia || 0;
+                        const needsTranslation = missingB > 0 || missingT > 0;
+
+                        if (!needsTranslation) {
+                          const hasItems = (film.bloopers_count || 0) > 0 || (film.trivia_count || 0) > 0;
+                          if (hasItems) {
+                            return (
+                              <span
+                                className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-bold text-[10px]"
+                                title="Tutti i blooper e le curiosità di questo film sono già tradotti nelle 5 lingue"
+                              >
+                                <Check className="h-3 w-3" />
+                                <span>i18n ✓</span>
+                              </span>
+                            );
+                          }
+                          return null;
+                        }
+
+                        let detail = "";
+                        if (missingB > 0 && missingT > 0) {
+                          detail = ` (${missingB} bl, ${missingT} cur)`;
+                        } else if (missingT > 0) {
+                          detail = ` (${missingT} cur)`;
+                        } else if (missingB > 0) {
+                          detail = ` (${missingB} bl)`;
+                        }
+
+                        return (
+                          <button
+                            onClick={() => handleTranslateSingleFilm(film)}
+                            disabled={translatingFilmId === film.id}
+                            className="flex items-center gap-1 px-2 py-1 rounded-lg bg-indigo-500/15 hover:bg-indigo-500 text-indigo-300 hover:text-zinc-950 border border-indigo-500/40 font-bold transition text-[11px] disabled:opacity-50 shadow-sm"
+                            title={`Traduci con IA nelle 5 lingue:${missingB > 0 ? ` ${missingB} bloopers` : ""}${missingT > 0 ? ` ${missingT} curiosità` : ""}`}
+                          >
+                            <Languages className={`h-3 w-3 ${translatingFilmId === film.id ? "animate-spin" : ""}`} />
+                            <span>{translatingFilmId === film.id ? "Traduco..." : `Traduci i18n${detail}`}</span>
+                          </button>
+                        );
+                      })()}
                       <Link
                         href={`/film/${slugify(film.titolo, film.anno)}-${film.id}`}
                         target="_blank"
