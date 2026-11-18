@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateBloopersForMovie } from "@/lib/gemini";
 import { translateFilmText } from "@/lib/translator";
+import { extractClientMetadata, insertLogWithMeta } from "@/lib/request-meta";
 
 export async function POST(request: Request) {
   try {
@@ -26,15 +27,53 @@ export async function POST(request: Request) {
     const isUserAdmin = user && user.email && user.email.toLowerCase() === adminEmail;
     const today = new Date().toISOString().slice(0, 10);
 
-    // 1. Verifica autenticazione e quota
-    if (!user) {
-      return NextResponse.json(
-        { error: "È necessario accedere con il proprio account gratuito per generare nuovi bloopers con l'IA (15 generazioni/giorno incluse)." },
-        { status: 401 }
-      );
-    }
+    // 1. Verifica autenticazione e quota (15 ricerche/giorno per utenti Free e visitatori)
+    const clientMeta = extractClientMetadata(request);
+    const clientIp = clientMeta.ip_address || "anonymous";
 
-    if (!isUserAdmin) {
+    if (!user) {
+      // Ospite non registrato: verifica quota giornaliera (15 chiamate/giorno per IP)
+      const todayStart = `${today}T00:00:00.000Z`;
+      let guestCallsToday = 0;
+
+      try {
+        const { count, error: countErr } = await adminDb
+          .from("log_ricerche")
+          .select("id", { count: "exact", head: true })
+          .is("user_id", null)
+          .eq("ip_address", clientIp)
+          .gte("created_at", todayStart);
+
+        if (!countErr && typeof count === "number") {
+          guestCallsToday = count;
+        }
+      } catch (err) {
+        console.warn("Verifica quota guest fallback:", err);
+      }
+
+      if (guestCallsToday >= 15) {
+        return NextResponse.json(
+          { error: "Hai raggiunto il limite giornaliero di 15 ricerche IA per i visitatori. Crea un account gratuito o accedi per continuare!" },
+          { status: 429 }
+        );
+      }
+
+      // Registra la chiamata IA del visitatore
+      try {
+        await insertLogWithMeta(
+          adminDb,
+          "log_ricerche",
+          {
+            user_id: null,
+            termine: titolo,
+            query: "ia_bloopers_guest",
+          },
+          clientMeta
+        );
+      } catch (logErr) {
+        console.warn("Log ricerca guest non riuscito:", logErr);
+      }
+    } else if (!isUserAdmin) {
       const { data: profile } = await supabase
         .from("profiles")
         .select("*")

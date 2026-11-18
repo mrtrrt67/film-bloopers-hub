@@ -45,8 +45,7 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
   const supabase = createClient();
 
   useEffect(() => {
-    supabase.auth.getUser().then(async ({ data }: { data: any }) => {
-      const u = data?.user || null;
+    const syncUser = async (u: any) => {
       setUser(u);
       if (u) {
         const { data: prof } = await supabase
@@ -75,16 +74,47 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
             );
           }
         }
+      } else {
+        setProfile(null);
       }
+    };
+
+    supabase.auth.getUser().then(({ data }: { data: any }) => {
+      syncUser(data?.user || null);
     });
-  }, []);
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
+      syncUser(session?.user || null);
+    });
+
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
+  }, [bloopers.length]);
 
   // Generazione bloopers con Gemini
   const handleGenerateWithAI = async () => {
-    if (!user) {
-      setShowAuthModal(true);
-      return;
+    let currentUser = user;
+    if (!currentUser) {
+      try {
+        const { data } = await supabase.auth.getUser();
+        currentUser = data?.user || null;
+        if (currentUser) setUser(currentUser);
+      } catch {}
     }
+
+    // Se visitatore ospite non loggato, verifica le 15 ricerche gratuite giornaliere
+    if (!currentUser) {
+      const today = new Date().toISOString().slice(0, 10);
+      const guestKey = `fbh_guest_ai_${today}`;
+      const guestCalls = parseInt(localStorage.getItem(guestKey) || "0", 10);
+      if (guestCalls >= 15) {
+        showToast("info", "Hai utilizzato le 15 ricerche IA gratuite di oggi per i visitatori. Accedi o crea un account per continuare!");
+        setShowAuthModal(true);
+        return;
+      }
+    }
+
     setGenerating(true);
     try {
       const res = await fetch("/api/bloopers/generate", {
@@ -102,12 +132,23 @@ export default function BloopersSection({ film, initialBloopers, onBloopersUpdat
 
       const data = await res.json();
       if (res.ok && data.bloopers && data.bloopers.length > 0) {
+        // Se visitatore ospite, incrementa il contatore locale
+        if (!currentUser) {
+          const today = new Date().toISOString().slice(0, 10);
+          const guestKey = `fbh_guest_ai_${today}`;
+          const currentCalls = parseInt(localStorage.getItem(guestKey) || "0", 10);
+          localStorage.setItem(guestKey, String(currentCalls + 1));
+        }
+
         setBloopers((prev) => {
           const next = [...prev, ...data.bloopers];
           onBloopersUpdate?.(next);
           return next;
         });
         showToast("success", `✨ Trovati e aggiunti con successo ${data.bloopers.length} nuovi blooper verificati!`);
+      } else if (res.status === 401 || res.status === 429) {
+        showToast("info", data.error || "Limite giornaliero raggiunto. Accedi con il tuo account gratuito per continuare.");
+        setShowAuthModal(true);
       } else {
         showToast("info", data.error || "Nessun nuovo blooper trovato per questa pellicola.");
       }

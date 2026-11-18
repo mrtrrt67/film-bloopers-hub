@@ -79,6 +79,10 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
       setUser(data?.user || null);
     });
 
+    const { data: authListener } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
+      setUser(session?.user || null);
+    });
+
     // Carica liked IDs da localStorage se presenti
     try {
       const storedLikes = localStorage.getItem("filmbloopers_trivia_likes");
@@ -86,13 +90,37 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
         setLikedIds(new Set(JSON.parse(storedLikes)));
       }
     } catch {}
+
+    return () => {
+      authListener?.subscription?.unsubscribe();
+    };
   }, []);
 
   // Generazione con Gemini
   const handleGenerateTrivia = async () => {
-    if (!user) {
-      setShowAuthModal(true);
-      return;
+    let currentUser = user;
+    if (!currentUser) {
+      try {
+        const { data } = await supabase.auth.getUser();
+        currentUser = data?.user || null;
+        if (currentUser) setUser(currentUser);
+      } catch {}
+    }
+
+    // Se visitatore ospite non loggato, verifica le 15 ricerche gratuite giornaliere
+    if (!currentUser) {
+      const today = new Date().toISOString().slice(0, 10);
+      const guestKey = `fbh_guest_ai_${today}`;
+      const guestCalls = parseInt(localStorage.getItem(guestKey) || "0", 10);
+      if (guestCalls >= 15) {
+        setAlertModal({
+          title: "Limite Chiamate Raggiunto",
+          message: "Hai utilizzato le 15 ricerche IA gratuite di oggi per i visitatori. Accedi o crea un account gratuito per continuare!",
+          variant: "info",
+        });
+        setShowAuthModal(true);
+        return;
+      }
     }
 
     setGenerating(true);
@@ -112,11 +140,26 @@ export default function TriviaSection({ film, initialTrivia, onTriviaUpdate }: T
 
       const data = await res.json();
       if (res.ok && data.trivia && data.trivia.length > 0) {
+        // Se visitatore ospite, incrementa il contatore locale
+        if (!currentUser) {
+          const today = new Date().toISOString().slice(0, 10);
+          const guestKey = `fbh_guest_ai_${today}`;
+          const currentCalls = parseInt(localStorage.getItem(guestKey) || "0", 10);
+          localStorage.setItem(guestKey, String(currentCalls + 1));
+        }
+
         setTriviaList((prev) => {
           const next = [...prev, ...data.trivia];
           onTriviaUpdate?.(next);
           return next;
         });
+      } else if (res.status === 401 || res.status === 429) {
+        setAlertModal({
+          title: "Limite Chiamate Raggiunto",
+          message: data.error || "Hai raggiunto il limite giornaliero. Accedi con il tuo account gratuito per continuare.",
+          variant: "info",
+        });
+        setShowAuthModal(true);
       } else {
         setAlertModal({
           title: "Generazione Curiosità",
