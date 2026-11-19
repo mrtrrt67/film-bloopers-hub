@@ -223,28 +223,40 @@ export default function PwaInstallPrompt() {
               </div>
             ) : isChromeIOS ? (
               // Guida per Google Chrome su iPhone
-              <div className="space-y-3 text-left text-xs bg-zinc-900/60 p-4 rounded-2xl border border-zinc-800/80">
-                <p className="text-zinc-300 leading-relaxed">
-                  Stai usando <strong>Google Chrome</strong> su iPhone:
-                </p>
-                <div className="space-y-2.5">
+              <div className="space-y-3 text-left">
+                <div className="space-y-2.5 text-xs bg-zinc-900/60 p-3.5 rounded-2xl border border-zinc-800/80">
+                  <p className="text-zinc-300 leading-relaxed mb-2 font-medium">
+                    Su <strong>Google Chrome per iPhone</strong> i comandi sono diversi da Safari:
+                  </p>
                   <div className="flex items-center gap-3">
                     <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500 text-zinc-950 font-black text-[11px]">
                       1
                     </span>
-                    <span className="text-zinc-200">
-                      Tocca i <strong>tre puntini (⋯)</strong> in basso a destra (o in alto)
+                    <span className="text-zinc-200 leading-snug">
+                      Tocca i <strong>tre puntini (⋯)</strong> nella barra degli strumenti di Chrome (in basso a destra o in alto)
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
                     <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500 text-zinc-950 font-black text-[11px]">
                       2
                     </span>
-                    <span className="text-zinc-200">
-                      Scorri il menu e tocca <strong>&ldquo;Aggiungi a schermata Home&rdquo;</strong>
+                    <span className="text-zinc-200 leading-snug">
+                      Scorri il menu delle opzioni verso il basso e tocca <strong>&ldquo;Aggiungi a schermata Home&rdquo;</strong>
                     </span>
                   </div>
                 </div>
+
+                {/* Pulsante rapido per aprire direttamente il foglio di condivisione di sistema */}
+                {typeof navigator !== "undefined" && Boolean(navigator.share) && (
+                  <button
+                    type="button"
+                    onClick={handleOpenSystemShare}
+                    className="w-full py-2.5 px-3 rounded-xl bg-amber-500 hover:bg-amber-400 text-zinc-950 text-xs font-bold flex items-center justify-center gap-2 transition shadow-md"
+                  >
+                    <Share className="h-4 w-4" />
+                    <span>Oppure apri Condividi adesso</span>
+                  </button>
+                )}
               </div>
             ) : isFirefoxIOS ? (
               // Guida per Firefox su iPhone
