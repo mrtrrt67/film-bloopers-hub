@@ -211,7 +211,7 @@ export async function POST(request: Request) {
           conferme: 0,
           contestazioni: 0,
           inserito_da: emailInserimento,
-          provenienza: "IA Verificata",
+          provenienza: "ia",
         };
       })
     );

@@ -207,7 +207,7 @@ export async function POST(request: Request) {
           conferme: 0,
           contestazioni: 0,
           inserito_da: "IA (Admin)",
-          provenienza: "IA Verificata",
+          provenienza: "ia",
         }));
 
         let insertErr = null;

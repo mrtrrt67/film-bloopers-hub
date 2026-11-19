@@ -213,7 +213,7 @@ export async function POST(request: Request) {
           fonte: g.fonte || "Dietro le quinte",
           approvato: true,
           inserito_da: emailInserimento,
-          provenienza: "IA Verificata",
+          provenienza: "ia",
           likes: 0,
           ordine: (existingTrivia?.length || 0) + idx + 1,
         };
@@ -244,6 +244,19 @@ export async function POST(request: Request) {
         insertErr = null;
       } else {
         insertErr = resUser.error || insertErr;
+
+        // Fallback di resilienza: se RLS blocca approvato = true, riprova con approvato = false
+        if (insertErr && (insertErr.code === "42501" || insertErr.message?.toLowerCase().includes("row-level security"))) {
+          const fallbackDaInserire = daInserire.map((d) => ({ ...d, approvato: false }));
+          const resFallback = await supabase
+            .from("movie_trivia")
+            .insert(fallbackDaInserire)
+            .select();
+          if (!resFallback.error && resFallback.data) {
+            inserted = resFallback.data;
+            insertErr = null;
+          }
+        }
       }
     }
 

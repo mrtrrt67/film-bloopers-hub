@@ -159,6 +159,16 @@ export async function POST(request: Request) {
         }
       }
 
+      if (error && (error.code === "42501" || error.message?.toLowerCase().includes("row-level security"))) {
+        // Fallback di resilienza: se RLS blocca approvato = true, riprova salvando con approvato = false
+        const fallbackDaInserire = { ...daInserire, approvato: false };
+        const retryFallback = await supabase.from("movie_trivia").insert(fallbackDaInserire).select().single();
+        if (!retryFallback.error && retryFallback.data) {
+          inserted = retryFallback.data;
+          error = null;
+        }
+      }
+
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 500 });
       }

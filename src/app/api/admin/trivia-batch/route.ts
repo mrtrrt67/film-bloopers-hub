@@ -219,7 +219,7 @@ export async function POST(request: Request) {
             fonte: g.fonte || "Making-of ufficiale",
             approvato: true,
             inserito_da: "IA (Admin)",
-            provenienza: "IA Verificata",
+            provenienza: "ia",
             likes: Math.floor(Math.random() * 5) + 1,
             ordine: (film.currentCount || 0) + idx + 1,
           };
@@ -241,7 +241,7 @@ export async function POST(request: Request) {
           const res = await db.from("movie_trivia").insert(daInserire);
           insertErr = res.error;
           if (!insertErr && filmId) {
-            await db.from("movie_trivia").delete().eq("film_id", film.id).neq("provenienza", "IA Verificata").neq("provenienza", "utente");
+            await db.from("movie_trivia").delete().eq("film_id", film.id).neq("provenienza", "ia").neq("provenienza", "IA Verificata").neq("provenienza", "utente");
           }
         }
 
