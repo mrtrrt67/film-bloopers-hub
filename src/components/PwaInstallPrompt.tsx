@@ -1,11 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Download, X, Share, PlusSquare, Smartphone, ExternalLink, ChevronDown } from "lucide-react";
+import { Download, X, Share, PlusSquare, Smartphone, ExternalLink, ChevronDown, Info, ArrowUp } from "lucide-react";
 
 export default function PwaInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
   const [isIOS, setIsIOS] = useState(false);
+  const [isChromeIOS, setIsChromeIOS] = useState(false);
+  const [isFirefoxIOS, setIsFirefoxIOS] = useState(false);
   const [isInAppBrowser, setIsInAppBrowser] = useState(false);
   const [isStandalone, setIsStandalone] = useState(false);
   const [showPrompt, setShowPrompt] = useState(false);
@@ -40,6 +42,12 @@ export default function PwaInstallPrompt() {
     const isIosDevice = /iphone|ipad|ipod/.test(ua);
     setIsIOS(isIosDevice);
 
+    const isChrome = isIosDevice && /crios/i.test(ua);
+    setIsChromeIOS(isChrome);
+
+    const isFirefox = isIosDevice && /fxios/i.test(ua);
+    setIsFirefoxIOS(isFirefox);
+
     // Rileva se aperto dentro WebView/In-App Browser (Instagram, Facebook, TikTok, ecc.)
     const inApp = /instagram|fbav|fban|messenger|threads|tiktok|bytedance/i.test(ua);
     setIsInAppBrowser(inApp);
@@ -53,7 +61,7 @@ export default function PwaInstallPrompt() {
 
     window.addEventListener("beforeinstallprompt", handleBeforeInstall);
 
-    // Su dispositivi mobile (iOS o Android senza evento immediato), mostra il prompt dopo 3 secondi
+    // Su dispositivi mobile, mostra il prompt dopo 3 secondi
     const timer = setTimeout(() => {
       setShowPrompt(true);
     }, 3000);
@@ -80,9 +88,36 @@ export default function PwaInstallPrompt() {
       }
     }
 
-    // Su iOS o in-app browser, oppure su Android se deferredPrompt non è disponibile:
-    // mostra la guida modale dettagliata
+    // Su iOS scrolla verso l'alto per far riapparire istantaneamente la barra inferiore di Safari
+    if (isIOS) {
+      try {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      } catch {}
+    }
+
     setShowGuideModal(true);
+  };
+
+  const handleOpenSystemShare = async () => {
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: "FilmBloopers Hub",
+          text: "FilmBloopers Hub - Il Portale degli Errori nei Film",
+          url: window.location.href,
+        });
+        setShowGuideModal(false);
+      } catch {
+        // L'utente ha annullato o share non riuscito
+      }
+    }
+  };
+
+  const handleScrollToTopAndReveal = () => {
+    try {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } catch {}
+    setShowGuideModal(false);
   };
 
   const handleDismiss = () => {
@@ -136,7 +171,7 @@ export default function PwaInstallPrompt() {
       {/* Guida Modale Istruzioni Mobile */}
       {showGuideModal && (
         <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center bg-black/85 backdrop-blur-md p-4 animate-in fade-in duration-200">
-          <div className="relative w-full max-w-sm rounded-3xl border border-zinc-800 bg-zinc-950 p-6 text-center shadow-2xl space-y-4">
+          <div className="relative w-full max-w-sm rounded-3xl border border-zinc-800 bg-zinc-950 p-6 text-center shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <button
               type="button"
               onClick={() => setShowGuideModal(false)}
@@ -152,18 +187,22 @@ export default function PwaInstallPrompt() {
             <h3 className="text-base font-black text-white">
               {isInAppBrowser
                 ? "Apri nel Browser Principale"
+                : isChromeIOS
+                ? "Installa da Chrome per iPhone"
+                : isFirefoxIOS
+                ? "Installa da Firefox per iPhone"
                 : isIOS
-                ? "Installa su iPhone / iPad"
+                ? "Installa su iPhone (Safari)"
                 : "Installa su Smartphone"}
             </h3>
 
             {isInAppBrowser ? (
               // Guida per chi apre da Instagram, Facebook o TikTok
               <div className="space-y-3 text-left text-xs bg-zinc-900/60 p-4 rounded-2xl border border-zinc-800/80">
-                <p className="text-zinc-300">
-                  Stai visualizzando il sito all&apos;interno di <strong>Instagram o Facebook</strong>, che impediscono l&apos;installazione diretta.
+                <p className="text-zinc-300 leading-relaxed">
+                  Stai visualizzando il sito dall&apos;app di <strong>Instagram o Facebook</strong>, che impedisce l&apos;installazione diretta.
                 </p>
-                <div className="space-y-2">
+                <div className="space-y-2.5">
                   <div className="flex items-center gap-3">
                     <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500 text-zinc-950 font-black text-[11px]">
                       1
@@ -182,19 +221,19 @@ export default function PwaInstallPrompt() {
                   </div>
                 </div>
               </div>
-            ) : isIOS ? (
-              // Guida dedicata per iOS Safari
-              <>
-                <p className="text-xs text-zinc-400 leading-relaxed">
-                  Su iOS, Apple richiede di aggiungere l&apos;icona tramite la barra di Safari con questi 2 semplici passaggi:
+            ) : isChromeIOS ? (
+              // Guida per Google Chrome su iPhone
+              <div className="space-y-3 text-left text-xs bg-zinc-900/60 p-4 rounded-2xl border border-zinc-800/80">
+                <p className="text-zinc-300 leading-relaxed">
+                  Stai usando <strong>Google Chrome</strong> su iPhone:
                 </p>
-                <div className="space-y-2.5 text-left text-xs bg-zinc-900/60 p-3.5 rounded-2xl border border-zinc-800/80">
+                <div className="space-y-2.5">
                   <div className="flex items-center gap-3">
                     <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500 text-zinc-950 font-black text-[11px]">
                       1
                     </span>
-                    <span className="text-zinc-200 flex items-center gap-1.5">
-                      Tocca il pulsante <Share className="h-4 w-4 text-amber-400 inline shrink-0" /> (Condividi) nella barra inferiore di Safari
+                    <span className="text-zinc-200">
+                      Tocca i <strong>tre puntini (⋯)</strong> in basso a destra (o in alto)
                     </span>
                   </div>
                   <div className="flex items-center gap-3">
@@ -202,16 +241,89 @@ export default function PwaInstallPrompt() {
                       2
                     </span>
                     <span className="text-zinc-200">
-                      Scorri il menu e tocca <strong>&ldquo;Aggiungi alla schermata Home&rdquo;</strong>
+                      Scorri il menu e tocca <strong>&ldquo;Aggiungi a schermata Home&rdquo;</strong>
                     </span>
                   </div>
                 </div>
-                {/* Freccia animata verso il basso che indica la barra di Safari */}
-                <div className="flex flex-col items-center justify-center gap-1 text-[11px] text-amber-400 font-semibold animate-bounce pt-1">
-                  <span>Il tasto Condividi è qui sotto</span>
-                  <ChevronDown className="h-4 w-4" />
+              </div>
+            ) : isFirefoxIOS ? (
+              // Guida per Firefox su iPhone
+              <div className="space-y-3 text-left text-xs bg-zinc-900/60 p-4 rounded-2xl border border-zinc-800/80">
+                <p className="text-zinc-300 leading-relaxed">
+                  Stai usando <strong>Firefox</strong> su iPhone:
+                </p>
+                <div className="space-y-2.5">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500 text-zinc-950 font-black text-[11px]">
+                      1
+                    </span>
+                    <span className="text-zinc-200">
+                      Tocca il menu con le tre linee <strong>(≡)</strong> in basso a destra
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500 text-zinc-950 font-black text-[11px]">
+                      2
+                    </span>
+                    <span className="text-zinc-200">
+                      Tocca <strong>&ldquo;Condividi&rdquo;</strong> e poi <strong>&ldquo;Aggiungi a schermata Home&rdquo;</strong>
+                    </span>
+                  </div>
                 </div>
-              </>
+              </div>
+            ) : isIOS ? (
+              // Guida per Safari iOS
+              <div className="space-y-3 text-left">
+                <div className="space-y-2.5 text-xs bg-zinc-900/60 p-3.5 rounded-2xl border border-zinc-800/80">
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500 text-zinc-950 font-black text-[11px]">
+                      1
+                    </span>
+                    <span className="text-zinc-200 flex items-center gap-1.5 leading-snug">
+                      Tocca il pulsante <Share className="h-4 w-4 text-amber-400 inline shrink-0" /> (Condividi, quadrato con freccia) nella barra inferiore di Safari
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-amber-500 text-zinc-950 font-black text-[11px]">
+                      2
+                    </span>
+                    <span className="text-zinc-200 leading-snug">
+                      Scorri il menu delle azioni e tocca <strong>&ldquo;Aggiungi alla schermata Home&rdquo;</strong>
+                    </span>
+                  </div>
+                </div>
+
+                {/* Box esplicativo per barra Safari nascosta durante lo scroll */}
+                <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-xs space-y-2">
+                  <div className="flex items-center gap-1.5 font-bold text-amber-400">
+                    <Info className="h-4 w-4 shrink-0" />
+                    <span>Non vedi la barra in basso?</span>
+                  </div>
+                  <p className="text-zinc-300 text-[11px] leading-relaxed">
+                    Quando scorri una pagina, Safari nasconde automaticamente la barra inferiore. Per farla riapparire:
+                  </p>
+                  <button
+                    type="button"
+                    onClick={handleScrollToTopAndReveal}
+                    className="w-full py-2 px-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-amber-400 font-bold text-xs flex items-center justify-center gap-1.5 border border-zinc-700 transition"
+                  >
+                    <ArrowUp className="h-3.5 w-3.5" />
+                    <span>Fai riapparire la barra (Torna in cima)</span>
+                  </button>
+                </div>
+
+                {/* Pulsante alternativo Web Share */}
+                {typeof navigator !== "undefined" && Boolean(navigator.share) && (
+                  <button
+                    type="button"
+                    onClick={handleOpenSystemShare}
+                    className="w-full py-2 px-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs font-semibold flex items-center justify-center gap-2 border border-zinc-800 transition"
+                  >
+                    <Share className="h-3.5 w-3.5 text-amber-400" />
+                    <span>Oppure apri il menu Condividi direttamente</span>
+                  </button>
+                )}
+              </div>
             ) : (
               // Guida generica per Android senza prompt automatico
               <div className="space-y-2.5 text-left text-xs bg-zinc-900/60 p-3.5 rounded-2xl border border-zinc-800/80">
