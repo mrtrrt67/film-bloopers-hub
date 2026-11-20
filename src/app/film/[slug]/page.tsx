@@ -247,7 +247,7 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
         "es": `/es/film/${canonicalFilmSlug}`,
         "fr": `/fr/film/${canonicalFilmSlug}`,
         "de": `/de/film/${canonicalFilmSlug}`,
-        "x-default": `/en/film/${canonicalFilmSlug}`,
+        "x-default": `/film/${canonicalFilmSlug}`,
       },
     },
     openGraph: {

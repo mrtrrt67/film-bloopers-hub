@@ -12,7 +12,7 @@ export const metadata: Metadata = {
       "es": "/es/esplora",
       "fr": "/fr/esplora",
       "de": "/de/esplora",
-      "x-default": "/en/esplora",
+      "x-default": "/esplora",
     },
   },
   openGraph: {

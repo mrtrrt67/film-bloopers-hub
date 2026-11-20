@@ -71,7 +71,7 @@ export const metadata: Metadata = {
       "es": "/es",
       "fr": "/fr",
       "de": "/de",
-      "x-default": "/en",
+      "x-default": "/",
     },
   },
   openGraph: {

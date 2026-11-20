@@ -15,7 +15,7 @@ export const metadata: Metadata = {
       "es": "/es/cookie",
       "fr": "/fr/cookie",
       "de": "/de/cookie",
-      "x-default": "/en/cookie",
+      "x-default": "/cookie",
     },
   },
 };

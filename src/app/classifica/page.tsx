@@ -20,7 +20,7 @@ export const metadata: Metadata = {
       "es": "/es/classifica",
       "fr": "/fr/classifica",
       "de": "/de/classifica",
-      "x-default": "/en/classifica",
+      "x-default": "/classifica",
     },
   },
 };

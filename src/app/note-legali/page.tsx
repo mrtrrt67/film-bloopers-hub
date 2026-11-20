@@ -14,7 +14,7 @@ export const metadata: Metadata = {
       "es": "/es/note-legali",
       "fr": "/fr/note-legali",
       "de": "/de/note-legali",
-      "x-default": "/en/note-legali",
+      "x-default": "/note-legali",
     },
   },
 };

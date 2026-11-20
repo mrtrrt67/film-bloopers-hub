@@ -12,7 +12,7 @@ export const metadata: Metadata = {
       "es": "/es/suggerimenti",
       "fr": "/fr/suggerimenti",
       "de": "/de/suggerimenti",
-      "x-default": "/en/suggerimenti",
+      "x-default": "/suggerimenti",
     },
   },
   openGraph: {

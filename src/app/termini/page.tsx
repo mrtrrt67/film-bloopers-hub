@@ -14,7 +14,7 @@ export const metadata: Metadata = {
       "es": "/es/termini",
       "fr": "/fr/termini",
       "de": "/de/termini",
-      "x-default": "/en/termini",
+      "x-default": "/termini",
     },
   },
 };
